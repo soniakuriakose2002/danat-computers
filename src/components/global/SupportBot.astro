@@ -10,8 +10,7 @@ import { site, whatsappLink } from '@data/site';
   rel="noopener noreferrer"
   aria-label={`Chat with Danat on WhatsApp — ${site.phone.display}`}
 >
-  <span class="wa__icon"><Icon name="whatsapp" size={26} /></span>
-  <span class="wa__label">Chat on WhatsApp</span>
+  <span class="wa__icon"><Icon name="whatsapp" size={28} /></span>
   <span class="wa__ping" aria-hidden="true"></span>
 </a>
 
@@ -23,17 +22,19 @@ import { site, whatsappLink } from '@data/site';
     z-index: 120;
     display: flex;
     align-items: center;
-    gap: 0;
+    justify-content: center;
+    width: 3.5rem;
     height: 3.5rem;
-    padding: 0 0.75rem;
-    border-radius: 999px;
-    background: #25d366;
+    border-radius: 50%;
+    /* Icon only — the aria-label carries the name. WhatsApp brand green
+       is #25D366, but a white mark on it measures 1.98:1, under the 3:1
+       WCAG asks of non-text. This green gives 5.97:1 and still reads as
+       WhatsApp. */
+    background: #0e7333;
     color: #fff;
     box-shadow: 0 10px 26px -10px rgb(20 23 26 / 0.55);
     margin-bottom: env(safe-area-inset-bottom, 0px);
     transition:
-      gap var(--t2) var(--ease),
-      padding var(--t2) var(--ease),
       transform var(--t2) var(--ease),
       background-color var(--t2) var(--ease);
   }
@@ -45,37 +46,15 @@ import { site, whatsappLink } from '@data/site';
     flex: none;
   }
 
-  /* Collapsed to a circle at rest; the label expands on hover or focus. */
-  .wa__label {
-    max-width: 0;
-    overflow: hidden;
-    white-space: nowrap;
-    font-size: 0.9375rem;
-    font-weight: 600;
-    letter-spacing: -0.01em;
-    transition: max-width var(--t3) var(--ease), opacity var(--t2) var(--ease);
-    opacity: 0;
-  }
-
   .wa:hover,
   .wa:focus-visible {
-    gap: 0.6rem;
-    padding-right: 1.4rem;
     transform: translateY(-2px);
-    background: #1fbe5a;
-  }
-
-  .wa:hover .wa__label,
-  .wa:focus-visible .wa__label {
-    max-width: 12rem;
-    opacity: 1;
+    background: #0a5c29;
   }
 
   .wa__ping {
     position: absolute;
-    left: 0.75rem;
-    width: 2rem;
-    height: 2rem;
+    inset: 0;
     border-radius: 50%;
     box-shadow: 0 0 0 0 rgb(37 211 102 / 0.6);
     animation: wa-ping 3s var(--ease) infinite;
@@ -95,8 +74,7 @@ import { site, whatsappLink } from '@data/site';
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .wa,
-    .wa__label {
+    .wa {
       transition: none;
     }
     .wa__ping {

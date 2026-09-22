@@ -84,8 +84,9 @@ const services = (await getCollection('services')).sort(
         <p class="label">Not sure which you need?</p>
         <h2 class="sc__h">Describe the problem.<br /><em>We will tell you.</em></h2>
       </div>
-      <a class="sc__wa" href={whatsappLink()} target="_blank" rel="noopener noreferrer">
-        <Icon name="whatsapp" size={16} />Chat on WhatsApp
+      <a class="sc__wa" href={whatsappLink()} target="_blank" rel="noopener noreferrer"
+        title="Chat on WhatsApp" aria-label="Chat with Danat on WhatsApp">
+        <Icon name="whatsapp" size={20} />
       </a>
     </div>
   </section>
@@ -267,20 +268,21 @@ const services = (await getCollection('services')).sort(
   }
   .sc__h em { font-style: normal; color: var(--green-bright); }
 
+  /* Mark only, no label. White on --green (#59AA54) is 2.88:1, under the
+     3:1 WCAG asks of a non-text graphic, so these sit on --green-deep
+     (7.06:1) instead. */
   .sc__wa {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.55rem;
+    display: grid;
+    place-items: center;
     justify-self: start;
-    padding: 0.9rem 1.5rem;
-    border-radius: 999px;
-    background: var(--green);
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--green-deep);
     color: #fff;
-    font-size: 0.9375rem;
-    font-weight: 500;
-    transition: background-color var(--t2) var(--ease);
+    transition: background-color var(--t2) var(--ease), transform var(--t2) var(--ease);
   }
-  .sc__wa:hover { background: #fff; color: var(--ink); }
+  .sc__wa:hover { background: #fff; color: var(--ink); transform: translateY(-2px); }
 
   /* ---------- layout ---------- */
 

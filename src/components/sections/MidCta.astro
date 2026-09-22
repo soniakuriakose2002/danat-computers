@@ -46,8 +46,9 @@ const figures = [
       </div>
 
       <div class="mid__acts" data-rise style="--d:190ms">
-        <a class="mid__wa" href={whatsappLink()} target="_blank" rel="noopener noreferrer">
-          <Icon name="whatsapp" size={16} />Chat on WhatsApp
+        <a class="mid__wa" href={whatsappLink()} target="_blank" rel="noopener noreferrer"
+          title="Chat on WhatsApp" aria-label="Chat with Danat on WhatsApp">
+          <Icon name="whatsapp" size={20} />
         </a>
         <a class="mid__call" href={`tel:${site.phone.tel}`}>{site.phone.display}</a>
         <span class="mid__note">Sat&ndash;Thu &middot; four branches across Oman</span>
@@ -157,19 +158,21 @@ const figures = [
   }
 
   .mid__wa {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.55rem;
-    padding: 0.9rem 1.5rem;
-    border-radius: 999px;
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    flex: none;
+    border-radius: 50%;
     background: #fff;
     color: #2f6429;
-    font-size: 0.9375rem;
-    font-weight: 600;
     box-shadow: 0 10px 24px -14px rgb(0 0 0 / 0.45);
-    transition: background-color var(--t2) var(--ease), color var(--t2) var(--ease);
+    transition:
+      background-color var(--t2) var(--ease),
+      color var(--t2) var(--ease),
+      transform var(--t2) var(--ease);
   }
-  .mid__wa:hover { background: var(--ink); color: #fff; }
+  .mid__wa:hover { background: var(--ink); color: #fff; transform: translateY(-2px); }
 
   .mid__call {
     font-family: var(--font-mono);
