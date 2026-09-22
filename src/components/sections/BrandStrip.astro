@@ -32,6 +32,15 @@ const rows = [brands.slice(0, half), brands.slice(half)];
 ---
 
 <section class="bs" data-tone="light">
+  <!-- Wavy boundary with the dark hero above. Two paths at different
+       speeds so the crest never sits still. -->
+  <div class="bs__wave" aria-hidden="true">
+    <svg viewBox="0 0 1440 130" preserveAspectRatio="none">
+      <path class="bs__wave-b" d="M0,-24 L1440,-24 L1440,34 C1300,132 1140,4 950,52 C760,100 570,146 380,98 C248,64 118,22 0,58 Z"></path>
+      <path class="bs__wave-f" d="M0,-24 L1440,-24 L1440,14 C1276,116 1104,-4 908,38 C712,80 524,130 336,76 C214,42 106,6 0,38 Z"></path>
+    </svg>
+  </div>
+
   <div class="shell bs__head">
     <p class="label">What we carry</p>
     <p class="bs__count">
@@ -61,18 +70,46 @@ const rows = [brands.slice(0, half), brands.slice(half)];
 </section>
 
 <style>
-  /* Rounded shoulders instead of a wave: the white sheet lifts over the
-     dark hero. Each section boundary on this page uses a different
-     treatment so none of them becomes a tic. */
   .bs {
     position: relative;
     z-index: 1;
     background: var(--white);
-    border-radius: clamp(24px, 3.5vw, 52px) clamp(24px, 3.5vw, 52px) 0 0;
-    margin-top: calc(clamp(24px, 3.5vw, 52px) * -1);
-    padding-block: clamp(3.5rem, 6vw, 5.5rem) clamp(2.5rem, 5vw, 4.5rem);
+    padding-block: clamp(5.5rem, 10vw, 9rem) clamp(2.5rem, 5vw, 4.5rem);
     overflow: hidden;
     isolation: isolate;
+  }
+
+  /* ---------- wave ---------- */
+
+  .bs__wave {
+    position: absolute;
+    top: -1px;
+    left: 0;
+    width: 100%;
+    height: clamp(58px, 9vw, 130px);
+    z-index: 2;
+    pointer-events: none;
+  }
+  .bs__wave svg { width: 100%; height: 100%; }
+
+  /* The front path must be the hero's own colour, or the seam shows. */
+  .bs__wave-b {
+    transform-origin: center top;
+    fill: color-mix(in oklab, var(--ink) 86%, var(--green));
+    animation: bs-swell-b 13s ease-in-out infinite alternate;
+  }
+  .bs__wave-f {
+    transform-origin: center top;
+    fill: var(--ink);
+    animation: bs-swell-f 9s ease-in-out infinite alternate;
+  }
+  @keyframes bs-swell-b {
+    from { transform: translate3d(-1.5%, 2px, 0) scaleY(1); }
+    to   { transform: translate3d(1.5%, -3px, 0) scaleY(1.06); }
+  }
+  @keyframes bs-swell-f {
+    from { transform: translate3d(1.2%, -2px, 0) scaleY(1.04); }
+    to   { transform: translate3d(-1.2%, 3px, 0) scaleY(1); }
   }
 
   /* ---------- head ---------- */
@@ -193,6 +230,7 @@ const rows = [brands.slice(0, half), brands.slice(half)];
 
   @media (prefers-reduced-motion: reduce) {
     .bs__track { animation: none; }
+    .bs__wave-b, .bs__wave-f { animation: none; }
     .bs__rail { overflow-x: auto; mask-image: none; }
   }
 </style>
