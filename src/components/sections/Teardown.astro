@@ -117,20 +117,22 @@ const pillars = [
           </div>
 
           {/* the part */}
-          <figure class="td__fig" data-parallax={i === 0 ? '0.06' : '0.14'}>
-            {img ? (
-              <Image src={img} alt="" widths={[720, 1100, 1600]}
-                sizes="(min-width: 62rem) 46vw, 92vw"
-                quality={82} format="webp"
-                loading={i === 0 ? 'eager' : 'lazy'} />
-            ) : (
-              <span class="td__slot">
-                <b>{s.n}</b>
-                <i>{s.rail} render</i>
-                <em>src/assets/renders/{s.n}.png</em>
-              </span>
-            )}
+          <figure class="td__fig" data-travel style={`--dir:${i % 2 ? -1 : 1}`}>
             <span class="td__glow" aria-hidden="true"></span>
+            <div class="td__part">
+              {img ? (
+                <Image src={img} alt="" widths={[420, 640, 900]}
+                  sizes="(min-width: 62rem) 46vw, 92vw"
+                  quality={82} format="webp"
+                  loading={i === 0 ? 'eager' : 'lazy'} />
+              ) : (
+                <span class="td__slot">
+                  <b>{s.n}</b>
+                  <i>{s.rail} render</i>
+                  <em>src/assets/renders/{s.n}.png</em>
+                </span>
+              )}
+            </div>
           </figure>
 
           {/* spec */}
@@ -223,6 +225,73 @@ const pillars = [
   </div>
 </section>
 
+<script is:inline>
+  /* Plays the teardown through by itself, stage by stage.
+
+     Scrolls with its own rAF tween rather than scrollIntoView({smooth}):
+     chained smooth-scroll calls interrupt one another, the browser gives
+     no completion signal, and the duration is not ours to set. A tween
+     is deterministic and cancellable on any frame.
+
+     It hands control back on the first wheel, touch, key or click —
+     those are user-only events, so our own window.scrollTo calls cannot
+     trip them. Reduced motion skips it entirely. */
+  (() => {
+    const run = () => {
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+      const stages = [...document.querySelectorAll('.td__stage')];
+      if (stages.length < 2) return;
+
+      let stop = false;
+      const cancel = () => {
+        stop = true;
+        document.documentElement.removeAttribute('data-td-playing');
+      };
+      for (const ev of ['wheel', 'touchstart', 'keydown', 'pointerdown']) {
+        window.addEventListener(ev, cancel, { passive: true, once: true });
+      }
+
+      const tweenTo = (y, ms) =>
+        new Promise((done) => {
+          const from = window.scrollY;
+          const dy = y - from;
+          const t0 = performance.now();
+          const frame = (now) => {
+            if (stop) return done();
+            const t = Math.min(1, (now - t0) / ms);
+            const e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+            window.scrollTo(0, from + dy * e);
+            t < 1 ? requestAnimationFrame(frame) : done();
+          };
+          requestAnimationFrame(frame);
+        });
+
+      const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+
+      (async () => {
+        await wait(1500);
+        if (stop || window.scrollY > 60) return cancel();
+        document.documentElement.setAttribute('data-td-playing', '');
+
+        for (let i = 1; i < stages.length; i += 1) {
+          if (stop) return;
+          const r = stages[i].getBoundingClientRect();
+          const y = window.scrollY + r.top - (window.innerHeight - r.height) / 2;
+          await tweenTo(Math.max(0, y), 1400);
+          if (stop) return;
+          await wait(1100);
+        }
+        cancel();
+      })();
+    };
+
+    run();
+    // View Transitions swap the document without a reload.
+    document.addEventListener('astro:page-load', run);
+  })();
+</script>
+
 <style>
   .td {
     position: relative;
@@ -243,6 +312,30 @@ const pillars = [
   }
 
   .td__anchor { position: absolute; top: -5rem; }
+
+  /* Shown only while the sequence is driving itself. */
+  .td::after {
+    content: 'Playing — scroll to take over';
+    position: fixed;
+    left: 50%;
+    bottom: 1.25rem;
+    z-index: 40;
+    padding: 0.4rem 0.9rem;
+    border-radius: 999px;
+    border: 1px solid rgb(255 255 255 / 0.18);
+    background: rgb(7 9 10 / 0.82);
+    backdrop-filter: blur(8px);
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgb(255 255 255 / 0.72);
+    translate: -50% 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--t2) var(--ease);
+  }
+  :global(html[data-td-playing]) .td::after { opacity: 1; }
 
   .td__grid {
     display: grid;
@@ -289,13 +382,42 @@ const pillars = [
     display: grid;
     place-items: center;
     min-height: clamp(11rem, 26vw, 20rem);
+    /* A real camera. Without this the rotations below are flat shears. */
+    perspective: 1100px;
+    perspective-origin: 50% 50%;
   }
-  .td__fig :global(img) {
+
+  /* The part is a plane in space, not a picture sliding up the page.
+     --t runs 0 -> 1 as the figure crosses the viewport, so the part
+     swings through face-on at the halfway point and away again.
+
+     translateZ uses t*(1-t), which peaks at 0.25 when t is 0.5 — so the
+     part reaches the viewer exactly when it is square to the camera, and
+     recedes at both ends. --dir alternates per stage so consecutive
+     parts turn opposite ways.
+
+     --t is never published under reduced motion or with JS off; the
+     fallback of 0.5 is the neutral pose, square to the camera. */
+  .td__part {
     position: relative;
     z-index: 1;
     width: 100%;
+    transform-style: preserve-3d;
+    will-change: transform;
+    transform:
+      translateZ(calc(var(--t, 0.5) * (1 - var(--t, 0.5)) * 520px))
+      rotateY(calc((var(--t, 0.5) - 0.5) * -52deg * var(--dir, 1)))
+      rotateX(calc((var(--t, 0.5) - 0.5) * 18deg))
+      rotateZ(calc((var(--t, 0.5) - 0.5) * 6deg * var(--dir, 1)));
+  }
+
+  .td__part :global(img) {
+    display: block;
+    width: 100%;
     height: auto;
     object-fit: contain;
+    /* Grounds the part instead of letting it float flat. */
+    filter: drop-shadow(0 30px 40px rgb(0 0 0 / 0.55));
   }
 
   /* The green bloom behind the part. This is what carries the look while
@@ -312,6 +434,8 @@ const pillars = [
       transparent 70%
     );
     filter: blur(24px);
+    opacity: calc(0.45 + var(--t, 0.5) * (1 - var(--t, 0.5)) * 2.2);
+    transform: scale(calc(0.86 + var(--t, 0.5) * (1 - var(--t, 0.5)) * 0.9));
   }
 
   /* Marked, not broken. Disappears the moment a render lands. */
@@ -564,6 +688,9 @@ const pillars = [
   }
 
   @media (prefers-reduced-motion: reduce) {
+    /* Square to the camera, no motion. --t is never set, so this only
+       needs to drop the will-change hint. */
+    .td__part { will-change: auto; }
     .td__cta, .td__cta:hover, .td__cue span { transform: none; transition: none; }
     .td__cue span { transform: rotate(90deg); }
   }
