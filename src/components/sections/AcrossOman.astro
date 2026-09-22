@@ -218,12 +218,14 @@ const stats = [
     pointer-events: none;
   }
   .ao__wave svg { width: 100%; height: 100%; }
+  /* Must match the bottom of the section above it — currently the green
+     mid-CTA band, not the ink hero. */
   .ao__wave-b {
-    fill: color-mix(in oklab, var(--ink) 86%, var(--green));
+    fill: #2f6429;
     animation: ao-swell-b 13s ease-in-out infinite alternate;
   }
   .ao__wave-f {
-    fill: var(--ink);
+    fill: #27551f;
     animation: ao-swell-f 9s ease-in-out infinite alternate;
   }
   @keyframes ao-swell-b {

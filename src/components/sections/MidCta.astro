@@ -1,13 +1,14 @@
 ---
+import { Image } from 'astro:assets';
 import Icon from '@components/ui/Icon.astro';
 import { site, whatsappLink } from '@data/site';
+import imgBench from '@assets/photos/repair-board.jpg';
 
 /**
  * 05 — Mid-page CTA.
  *
- * The reference site places one roughly halfway down for a reason: by
- * this point the visitor knows what you do and why you, so make it
- * possible to act without scrolling to the footer.
+ * A second conversion point roughly halfway down, so contacting Danat
+ * does not require scrolling to the footer.
  *
  * Figures are ERP-derived, not marketing rounding.
  */
@@ -19,30 +20,41 @@ const figures = [
 ];
 ---
 
-<section class="mid" data-tone="ink">
+<section class="mid" data-tone="dark">
+  <!-- A flat colour block reads as a divider, not a moment. The photo
+       gives the band texture and depth; the green tint keeps the text
+       contrast where it needs to be. -->
+  <div class="mid__bg" aria-hidden="true">
+    <Image src={imgBench} alt="" widths={[1000, 1600, 2000]} sizes="100vw"
+      quality={72} format="webp" loading="lazy" />
+    <span class="mid__tint"></span>
+  </div>
   <div class="mid__glow" aria-hidden="true"></div>
 
-  <div class="shell mid__in">
-    <div class="mid__copy">
-      <p class="label" data-rise>Free diagnosis</p>
-      <h2 class="mid__h" data-rise style="--d:70ms">
-        Something stopped working?<br /><em>Bring it in.</em>
-      </h2>
-      <p class="mid__p" data-rise style="--d:130ms">
-        We tell you what failed, what it costs and how long it takes —
-        before you agree to anything.
-      </p>
+  <div class="shell">
+    <!-- copy and actions share one row, so neither is stranded -->
+    <div class="mid__top">
+      <div class="mid__copy">
+        <p class="label" data-rise>Free diagnosis</p>
+        <h2 class="mid__h" data-rise style="--d:70ms">
+          Something stopped working?<br /><em>Bring it in.</em>
+        </h2>
+        <p class="mid__p" data-rise style="--d:130ms">
+          We tell you what failed, what it costs and how long it takes —
+          before you agree to anything.
+        </p>
+      </div>
 
       <div class="mid__acts" data-rise style="--d:190ms">
         <a class="mid__wa" href={whatsappLink()} target="_blank" rel="noopener noreferrer">
           <Icon name="whatsapp" size={16} />Chat on WhatsApp
         </a>
-        <a class="mid__call" href={`tel:${site.phone.tel}`}>
-          {site.phone.display}
-        </a>
+        <a class="mid__call" href={`tel:${site.phone.tel}`}>{site.phone.display}</a>
+        <span class="mid__note">Sat&ndash;Thu &middot; four branches across Oman</span>
       </div>
     </div>
 
+    <!-- full-width figure strip, divided -->
     <dl class="mid__figs" data-rise style="--d:240ms">
       {figures.map((f) => (
         <div>
@@ -55,113 +67,172 @@ const figures = [
 </section>
 
 <style>
+  /* Brand green rather than black: it breaks the run of white sections
+     without adding a second dark slab to the page. */
   .mid {
     position: relative;
-    background: var(--ink);
-    color: var(--text-inv);
-    padding-block: clamp(3.25rem, 6vw, 5.5rem);
+    background: #27551f;
+    color: #fff;
+    padding-block: clamp(2.25rem, 4vw, 3.25rem);
     overflow: hidden;
     isolation: isolate;
   }
 
+  .mid__bg {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .mid__bg :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 62% 45%;
+  }
+
+  /* Heaviest over the copy, lighter on the right so the photograph is
+     actually visible. Every stop still clears AA for white text. */
+  .mid__tint {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(100deg,
+        #27551f 0%,
+        rgb(39 85 31 / 0.97) 34%,
+        rgb(47 100 41 / 0.93) 62%,
+        rgb(47 100 41 / 0.88) 100%),
+      linear-gradient(to bottom, rgb(39 85 31 / 0.35), transparent 40%);
+  }
+
+  /* A soft light bloom, top-right. */
   .mid__glow {
     position: absolute;
-    left: -8%;
-    bottom: -60%;
+    right: -8%;
+    top: -55%;
     width: 46%;
     aspect-ratio: 1;
-    z-index: -1;
-    background: radial-gradient(
-      circle,
-      color-mix(in oklab, var(--green) 26%, transparent) 0%,
-      transparent 62%
-    );
-    filter: blur(70px);
+    z-index: 0;
+    background: radial-gradient(circle, rgb(255 255 255 / 0.1) 0%, transparent 62%);
+    filter: blur(60px);
     pointer-events: none;
   }
 
-  .mid__in {
+  /* Content must sit above the bloom, which is absolutely positioned. */
+  .mid :global(.shell) {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ---------- top row ---------- */
+
+  .mid__top {
     display: grid;
-    gap: var(--s6);
-    align-items: center;
+    gap: var(--s5);
+    align-items: end;
+    padding-bottom: clamp(1.4rem, 2.4vw, 2rem);
   }
 
   .mid__h {
     margin-top: var(--s4);
-    font-size: clamp(1.75rem, 3.2vw, 2.75rem);
-    line-height: 1.08;
+    font-size: clamp(1.5rem, 2.5vw, 2.1rem);
+    line-height: 1.1;
     letter-spacing: -0.035em;
     font-weight: 700;
   }
-  .mid__h em { font-style: normal; color: var(--green-bright); }
+  .mid__h em { font-style: normal; color: #d9f2d3; }
 
   .mid__p {
     margin-top: var(--s4);
-    max-width: 44ch;
+    max-width: 42ch;
     font-size: 0.9375rem;
-    line-height: 1.65;
-    color: var(--text-inv-2);
+    line-height: 1.6;
+    color: rgb(255 255 255 / 0.84);
   }
 
   .mid__acts {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--s4);
-    margin-top: var(--s5);
+    display: grid;
+    justify-items: start;
+    gap: var(--s3);
   }
 
   .mid__wa {
     display: inline-flex;
     align-items: center;
     gap: 0.55rem;
-    padding: 0.85rem 1.4rem;
+    padding: 0.9rem 1.5rem;
     border-radius: 999px;
-    background: var(--green);
-    color: #fff;
+    background: #fff;
+    color: #2f6429;
     font-size: 0.9375rem;
-    font-weight: 500;
-    transition: background-color var(--t2) var(--ease);
+    font-weight: 600;
+    box-shadow: 0 10px 24px -14px rgb(0 0 0 / 0.45);
+    transition: background-color var(--t2) var(--ease), color var(--t2) var(--ease);
   }
-  .mid__wa:hover { background: #fff; color: var(--ink); }
+  .mid__wa:hover { background: var(--ink); color: #fff; }
 
   .mid__call {
     font-family: var(--font-mono);
-    font-size: 0.875rem;
+    font-size: 0.9375rem;
     letter-spacing: 0.04em;
-    color: var(--text-inv-2);
-    border-bottom: 1px solid rgb(255 255 255 / 0.28);
+    color: #fff;
+    border-bottom: 1px solid rgb(255 255 255 / 0.5);
     padding-bottom: 2px;
-    transition: color var(--t2) var(--ease), border-color var(--t2) var(--ease);
+    transition: border-color var(--t2) var(--ease);
   }
-  .mid__call:hover { color: #fff; border-color: #fff; }
+  .mid__call:hover { border-color: #fff; }
+
+  .mid__note {
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgb(255 255 255 / 0.66);
+  }
 
   /* ---------- figures ---------- */
 
   .mid__figs {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: var(--s5) var(--s4);
+    gap: var(--s5) 0;
+    padding-top: clamp(1.2rem, 2.2vw, 1.75rem);
+    border-top: 1px solid rgb(255 255 255 / 0.26);
   }
 
+  /* Hairline between figures rather than floating them in space. */
+  .mid__figs > div { padding-inline: var(--s5); }
+  .mid__figs > div:first-child { padding-left: 0; }
+  .mid__figs > div + div { border-left: 1px solid rgb(255 255 255 / 0.26); }
+
   .mid__figs dt {
-    font-size: clamp(1.5rem, 2.6vw, 2.25rem);
+    font-size: clamp(1.4rem, 2.3vw, 2rem);
     font-weight: 700;
-    letter-spacing: -0.035em;
+    letter-spacing: -0.04em;
     line-height: 1;
     font-variant-numeric: tabular-nums;
     color: #fff;
   }
 
   .mid__figs dd {
-    margin-top: 0.3rem;
+    margin-top: 0.35rem;
     font-size: 0.75rem;
     letter-spacing: 0.02em;
-    color: var(--text-inv-3);
+    color: rgb(255 255 255 / 0.72);
+  }
+
+  @media (min-width: 40rem) {
+    .mid__figs { grid-template-columns: repeat(4, 1fr); }
+    .mid__figs > div:nth-child(3) { border-left: 1px solid rgb(255 255 255 / 0.26); }
+  }
+
+  @media (max-width: 40rem) {
+    /* 2x2: the third cell starts a new row, so it has no left rule. */
+    .mid__figs > div:nth-child(3) { padding-left: 0; border-left: 0; }
   }
 
   @media (min-width: 62rem) {
-    .mid__in { grid-template-columns: 1.15fr 1fr; gap: var(--s8); }
-    .mid__figs { grid-template-columns: repeat(4, 1fr); gap: var(--s4); }
+    .mid__top { grid-template-columns: minmax(0, 1fr) auto; gap: var(--s7); }
+    .mid__acts { justify-items: end; text-align: right; }
   }
 </style>
