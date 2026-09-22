@@ -1,150 +1,207 @@
 ---
 import Icon from '@components/ui/Icon.astro';
-import { site, whatsappLink, branches as allBranches } from '@data/site';
+import { whatsappLink, branches as allBranches } from '@data/site';
 
 /**
  * Oman outline projected from the public-domain Natural Earth country
- * boundary (johan/world.geo.json), equirectangular with a cos(lat)
- * correction, fitted to a 1000 x 1342 viewBox. The second sub-path is
- * the Musandam exclave.
+ * boundary, equirectangular with a cos(lat) correction, fitted to a
+ * 1000 x 1342 viewBox. Second sub-path is the Musandam exclave.
  */
 const OMAN =
   'M878.7,727.2L830.9,821.5L772.8,814.3L746.2,847.1L725.6,916.9L741.4,1008.9L729.3,1025.8L670.4,1025.4L590.4,1076.8L577.9,1143.9L548.6,1173.0L468.9,1171.8L418.8,1206.5L419.4,1262.1L357.5,1300.4L286.8,1287.4L201.1,1333.8L142.0,1341.6L100.2,1245.4L0.0,1018.2L384.2,880.6L469.6,605.2L410.9,507.7L414.2,452.2L451.6,395.3L451.9,339.0L509.9,311.9L487.2,292.7L497.7,203.1L563.1,202.5L620.5,296.6L692.0,346.6L786.0,364.6L861.8,389.7L919.6,468.6L954.2,514.3L1000.0,531.7L999.8,562.5L953.1,644.5L932.7,683.1L878.7,727.2Z ' +
   'M562.4,68.8L545.7,93.8L521.4,46.9L558.7,0.0L574.5,12.0L562.4,68.8Z';
 
-/** Pin positions are the real coordinates run through the same projection. */
-const pins = [
-  { slug: 'sohar', x: 603.1, y: 282.1 },
-  { slug: 'hail', x: 792.8, y: 375.3 },
-  { slug: 'ruwi', x: 820.7, y: 386.6 },
-  { slug: 'salalah', x: 268.1, y: 1290.8 },
+/** Real coordinates through the same projection, in viewBox units. */
+const geo: Record<string, { x: number; y: number }> = {
+  sohar: { x: 603, y: 282 },
+  hail: { x: 793, y: 375 },
+  ruwi: { x: 821, y: 387 },
+  salalah: { x: 268, y: 1291 },
+};
+
+/** Where each photo card sits, nudged clear of its pin. */
+const cardPos: Record<string, { x: number; y: number }> = {
+  sohar: { x: 33, y: 13 },
+  ruwi: { x: 86, y: 20 },
+  hail: { x: 84, y: 45 },
+  salalah: { x: 20, y: 77 },
+};
+
+const order = ['ruwi', 'sohar', 'hail', 'salalah'];
+const list = order.map((s) => allBranches.find((b) => b.slug === s)!);
+
+/** Dotted routes between branches. */
+const routes = [
+  [geo.sohar, geo.hail],
+  [geo.hail, geo.ruwi],
+  [geo.ruwi, geo.salalah],
 ];
 
-/** Branch cards, ordered north to south to match the map. */
-const order = ['sohar', 'hail', 'ruwi', 'salalah'];
-const list = order.map((s) => allBranches.find((b) => b.slug === s)!);
-const pinFor = (slug: string) => pins.find((p) => p.slug === slug)!;
+const stats = [
+  { icon: 'pin' as const, value: '4', label: 'Branches', known: true },
+  { icon: 'users' as const, value: '20+', label: 'Years of Service', known: true },
+  { icon: 'heart' as const, value: null, label: 'Happy Customers', known: false },
+];
 ---
 
-<section class="ao section" data-tone="light" data-oman>
-  <!-- Wavy boundary with the dark hero above. -->
+<section class="ao" data-oman>
   <div class="ao__wave" aria-hidden="true">
     <svg viewBox="0 0 1440 130" preserveAspectRatio="none">
-      <path
-        class="ao__wave-b"
-        d="M0,0 L1440,0 L1440,46 C1250,104 1080,26 860,58 C650,88 430,122 215,92 C135,80 60,62 0,74 Z"
-      ></path>
-      <path
-        class="ao__wave-f"
-        d="M0,0 L1440,0 L1440,30 C1230,86 1060,10 840,42 C630,72 410,104 200,76 C125,66 55,48 0,58 Z"
-      ></path>
+      <path class="ao__wave-b" d="M0,0 L1440,0 L1440,34 C1300,132 1140,4 950,52 C760,100 570,146 380,98 C248,64 118,22 0,58 Z"></path>
+      <path class="ao__wave-f" d="M0,0 L1440,0 L1440,14 C1276,116 1104,-4 908,38 C712,80 524,130 336,76 C214,42 106,6 0,38 Z"></path>
     </svg>
   </div>
 
-  <div class="shell">
-    <div class="ao__grid">
-      <!-- ───────── copy + branch detail ───────── -->
-      <div class="ao__side">
-        <p class="label" data-rise>Our reach</p>
+  <div class="ao__grid shell">
+    <!-- ══════════ LEFT ══════════ -->
+    <div class="ao__side">
+      <p class="label" data-rise>Our reach</p>
 
-        <h2 class="ao__title" data-rise style="--d:70ms">
-          Across Oman.<br /><em>Closer to you.</em>
-        </h2>
+      <h2 class="ao__title" data-rise style="--d:70ms">
+        Across Oman.<br /><em>Closer to you.</em>
+      </h2>
 
-        <p class="ao__sub" data-rise style="--d:140ms">
-          Four locations. One commitment. Serving individuals, businesses and
-          communities across the Sultanate for over twenty years.
-        </p>
+      <p class="ao__sub" data-rise style="--d:130ms">
+        Four locations. One commitment. Serving individuals, businesses and
+        communities across the Sultanate for over twenty years.
+      </p>
 
-        <!-- The card swaps as you move between pins. -->
-        <div class="ao__cards" data-rise style="--d:200ms">
-          {list.map((b, i) => (
-            <article class="ao__card" data-card={b.slug} data-on={i === 2 ? '' : undefined}>
-              <p class="ao__cn">
-                <span>{b.name}</span>
-                {!b.verified && <i class="ao__todo">details to confirm</i>}
-              </p>
+      <div class="ao__tabs" role="tablist" aria-label="Branches" data-rise style="--d:190ms">
+        {list.map((b, i) => (
+          <button
+            type="button"
+            class="ao__tab"
+            data-tab={b.slug}
+            data-on={i === 0 ? '' : undefined}
+            role="tab"
+            aria-selected={i === 0 ? 'true' : 'false'}
+          >
+            <Icon name="pin" size={14} />
+            {b.city.split(',')[0]}
+          </button>
+        ))}
+      </div>
+
+      <div class="ao__cards" data-rise style="--d:240ms">
+        {list.map((b, i) => (
+          <article class="ao__card" data-card={b.slug} data-on={i === 0 ? '' : undefined}>
+            <div class="ao__info">
+              <h3 class="ao__cn">{b.name}</h3>
               <p class="ao__city">{b.city}</p>
 
-              <address>{b.address.split('\n').map((l) => <>{l}<br /></>)}</address>
+              {b.verified ? (
+                <address>{b.address.split('\n').map((l) => <>{l}<br /></>)}</address>
+              ) : (
+                <div class="ao__slot ao__slot--addr"><span>Address to be confirmed</span></div>
+              )}
 
-              <ul class="ao__hours" data-unverified={!b.hoursVerified ? '' : undefined}>
-                {b.hours.map((h) => <li>{h}</li>)}
-                {!b.hoursVerified && <li class="ao__hwarn">Hours not yet confirmed</li>}
-              </ul>
+              <div class="ao__hours">
+                <Icon name="clock" size={17} />
+                <ul data-unverified={!b.hoursVerified ? '' : undefined}>
+                  {b.hours.map((h) => <li>{h}</li>)}
+                </ul>
+              </div>
 
               <div class="ao__acts">
-                {b.tel ? (
-                  <a class="ao__call" href={`tel:${b.tel}`}>{b.phone}</a>
-                ) : (
-                  <a class="ao__call" href={`tel:${site.phone.tel}`}>{site.phone.display}</a>
-                )}
                 <a
                   class="ao__wa"
                   href={whatsappLink(`Hello Danat — I'd like to contact your ${b.name} branch about`)}
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  WhatsApp <Icon name="arrow" size={13} />
+                  <Icon name="whatsapp" size={15} />Chat on WhatsApp
                 </a>
+                <span class="ao__dir" aria-disabled="true" title="Map link to be added">
+                  Get Directions <Icon name="send" size={14} />
+                </span>
               </div>
-            </article>
-          ))}
-        </div>
+            </div>
 
-        <a class="ao__all" href="/branches" data-rise style="--d:260ms">
-          View our locations <Icon name="arrow" size={14} />
-        </a>
+            <!-- shopfront photo — empty until real photography arrives -->
+            <div class="ao__shot">
+              <div class="ao__slot ao__slot--photo">
+                <Icon name="camera" size={20} />
+                <span>Shopfront photo</span>
+              </div>
+              <span class="ao__chip">
+                <Icon name="pin" size={12} />{b.city.split(',')[0]} Branch
+              </span>
+            </div>
+          </article>
+        ))}
       </div>
 
-      <!-- ───────── map ───────── -->
-      <div class="ao__mapwrap" data-rise="fade" style="--d:120ms">
-        <svg
-          class="ao__map"
-          viewBox="0 0 1000 1342"
-          role="img"
-          aria-label="Map of Oman showing Danat branches in Sohar, Al Hail, Ruwi and Salalah"
-        >
-          <path class="ao__land" d={OMAN} />
-          <path class="ao__edge" d={OMAN} />
+      <a class="ao__all" href="/branches" data-rise style="--d:300ms">
+        View all locations <Icon name="arrow" size={14} />
+      </a>
 
-          {list.map((b, i) => {
-            const p = pinFor(b.slug);
-            return (
-              <g
-                class="ao__pin"
-                data-pin={b.slug}
-                data-on={b.slug === 'ruwi' ? '' : undefined}
-                style={`--i:${i}`}
-                transform={`translate(${p.x} ${p.y})`}
-                tabindex="0"
-                role="button"
-                aria-label={`${b.name}, ${b.city}`}
-              >
-                <circle class="ao__halo" r="46"></circle>
-                <circle class="ao__ring" r="20"></circle>
-                <circle class="ao__dot" r="11"></circle>
-                <text class="ao__plabel" x="34" y="9">{b.city.split(',')[0]}</text>
-              </g>
-            );
-          })}
+      <p class="ao__script ao__script--low" aria-hidden="true">Technology<br />Across Oman</p>
+    </div>
+
+    <!-- ══════════ RIGHT ══════════ -->
+    <div class="ao__mapwrap" data-rise="fade" style="--d:140ms">
+      <p class="ao__script ao__script--high" aria-hidden="true">
+        Same Trust<br />Across Every City
+      </p>
+
+      <div class="ao__map">
+        <svg viewBox="0 0 1000 1342" role="img"
+          aria-label="Map of Oman showing Danat branches in Ruwi, Sohar, Al Hail and Salalah">
+          <path class="ao__land" d={OMAN} />
+          {routes.map(([a, b]) => (
+            <path class="ao__route"
+              d={`M${a.x},${a.y} Q${(a.x + b.x) / 2 + 70},${(a.y + b.y) / 2} ${b.x},${b.y}`} />
+          ))}
+          {list.map((b, i) => (
+            <g class="ao__pin" data-pin={b.slug} data-on={i === 0 ? '' : undefined}
+              style={`--i:${i}`} transform={`translate(${geo[b.slug].x} ${geo[b.slug].y})`}>
+              <circle class="ao__halo" r="46"></circle>
+              <circle class="ao__dot" r="14"></circle>
+            </g>
+          ))}
         </svg>
 
-        <p class="ao__legend">
-          <span aria-hidden="true"></span>
-          Four branches &middot; Sohar, Al&nbsp;Hail, Ruwi and Salalah
-        </p>
+        {list.map((b) => (
+          <button type="button" class="ao__mcard" data-mcard={b.slug}
+            data-on={b.slug === 'ruwi' ? '' : undefined}
+            style={`--x:${cardPos[b.slug].x}%; --y:${cardPos[b.slug].y}%`}
+            aria-label={`Show ${b.name}`}>
+            <span class="ao__slot ao__slot--thumb"><Icon name="camera" size={16} /></span>
+            <span class="ao__mlabel">
+              <Icon name="pin" size={11} />{b.city.split(',')[0]}
+            </span>
+          </button>
+        ))}
       </div>
+
+      <dl class="ao__stats">
+        {stats.map((s) => (
+          <div>
+            <dt><Icon name={s.icon} size={22} /></dt>
+            <dd>
+              {s.known ? <b>{s.value}</b> : <b class="ao__blank" aria-hidden="true"></b>}
+              <i>{s.label}</i>
+            </dd>
+          </div>
+        ))}
+      </dl>
+
+      <p class="ao__compass" aria-hidden="true">
+        <Icon name="compass" size={30} />
+        <span>Serving<br />a Connected<br />Oman</span>
+      </p>
     </div>
   </div>
+
+  <!-- landmark strip — left empty until artwork is supplied -->
+  <div class="ao__strip" aria-hidden="true"></div>
 </section>
 
 <style>
   .ao {
     position: relative;
-    background: var(--white);
-    /* Extra top padding so the content clears the wave. */
-    padding-block: clamp(6rem, 11vw, 10rem) clamp(3.5rem, 6vw, 6rem);
+    background: linear-gradient(180deg, var(--white) 0%, #f7faf8 62%, var(--white) 100%);
+    padding-block: clamp(6rem, 11vw, 10rem) 0;
     overflow: hidden;
     isolation: isolate;
   }
@@ -160,200 +217,217 @@ const pinFor = (slug: string) => pins.find((p) => p.slug === slug)!;
     z-index: 2;
     pointer-events: none;
   }
-
-  .ao__wave svg {
-    width: 100%;
-    height: 100%;
-  }
-
-  /* Filled with the hero's ink, because the hero is what sits above. */
+  .ao__wave svg { width: 100%; height: 100%; }
   .ao__wave-b {
     fill: color-mix(in oklab, var(--ink) 86%, var(--green));
     animation: ao-swell-b 13s ease-in-out infinite alternate;
   }
-
   .ao__wave-f {
     fill: var(--ink);
     animation: ao-swell-f 9s ease-in-out infinite alternate;
   }
-
   @keyframes ao-swell-b {
     from { transform: translate3d(-1.5%, 2px, 0) scaleY(1); }
     to   { transform: translate3d(1.5%, -3px, 0) scaleY(1.06); }
   }
-
   @keyframes ao-swell-f {
     from { transform: translate3d(1.2%, -2px, 0) scaleY(1.04); }
     to   { transform: translate3d(-1.2%, 3px, 0) scaleY(1); }
   }
 
+  /* ---------- grid ---------- */
+
   .ao__grid {
+    position: relative;
+    z-index: 1;
     display: grid;
     gap: var(--s7);
-    align-items: center;
+    align-items: start;
+    padding-bottom: clamp(3rem, 6vw, 5rem);
   }
 
-  /* ---------- copy ---------- */
+  /* ---------- left ---------- */
 
   .ao__title {
     margin-top: var(--s4);
-    font-size: clamp(1.9rem, 3.4vw, 3rem);
-    line-height: 1.06;
-    letter-spacing: -0.035em;
-    font-weight: 600;
+    font-size: clamp(2rem, 3.6vw, 3.1rem);
+    line-height: 1.04;
+    letter-spacing: -0.038em;
+    font-weight: 700;
   }
-
-  .ao__title em {
-    font-style: normal;
-    color: var(--green-deep);
-  }
+  .ao__title em { font-style: normal; color: var(--green); }
 
   .ao__sub {
     margin-top: var(--s4);
-    max-width: 42ch;
+    max-width: 40ch;
     font-size: 0.9375rem;
     line-height: 1.65;
     color: var(--text-2);
   }
 
-  /* ---------- branch card ---------- */
-
-  .ao__cards {
-    position: relative;
-    display: grid;
+  .ao__tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
     margin-top: var(--s5);
-    padding: 1.25rem 1.4rem;
-    border: 1px solid var(--line-light);
-    border-left: 3px solid var(--green);
-    border-radius: 10px;
-    background: var(--off);
-    min-height: 15rem;
   }
+
+  .ao__tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.6rem 1.1rem;
+    border: 1px solid var(--line-light);
+    border-radius: 999px;
+    background: var(--white);
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-2);
+    transition:
+      background-color var(--t2) var(--ease),
+      border-color var(--t2) var(--ease),
+      color var(--t2) var(--ease);
+  }
+  .ao__tab:hover { border-color: var(--green); color: var(--green-deep); }
+  .ao__tab[data-on] { background: var(--green); border-color: var(--green); color: #fff; }
+
+  .ao__cards { position: relative; display: grid; margin-top: 0.85rem; }
 
   .ao__card {
     grid-area: 1 / 1;
     display: none;
+    border: 1px solid var(--line-light);
+    border-left: 3px solid var(--green);
+    border-radius: 12px;
+    background: var(--white);
+    box-shadow: 0 18px 40px -28px rgb(20 23 26 / 0.3);
+    overflow: hidden;
   }
-
-  .ao__card[data-on] {
-    display: block;
-    animation: ao-in 300ms var(--ease) both;
-  }
-
+  .ao__card[data-on] { display: grid; animation: ao-in 300ms var(--ease) both; }
   @keyframes ao-in {
-    from {
-      opacity: 0;
-      transform: translateY(8px);
-    }
-    to {
-      opacity: 1;
-      transform: none;
-    }
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: none; }
   }
 
-  .ao__cn {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    flex-wrap: wrap;
-    font-size: 1.125rem;
-    font-weight: 600;
-    letter-spacing: -0.02em;
-  }
-
-  /* Honest marker while the branch details are unconfirmed. */
-  .ao__todo {
-    font-family: var(--font-mono);
-    font-style: normal;
-    font-size: 0.5625rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    padding: 0.2rem 0.45rem;
-    border-radius: 3px;
-    background: #fdf3e2;
-    color: #8a6100;
-  }
+  .ao__info { padding: 1.35rem 1.4rem; }
+  .ao__cn { font-size: 1.2rem; font-weight: 700; letter-spacing: -0.025em; }
 
   .ao__city {
-    margin-top: 0.15rem;
+    margin-top: 0.2rem;
     font-family: var(--font-mono);
     font-size: 0.625rem;
-    letter-spacing: 0.14em;
+    letter-spacing: 0.16em;
     text-transform: uppercase;
     color: var(--green-deep);
   }
 
-  .ao__cards address {
+  .ao__card address {
     display: block;
-    margin-top: 0.8rem;
+    margin-top: 0.85rem;
     font-style: normal;
     font-size: var(--small);
-    line-height: 1.6;
+    line-height: 1.65;
     color: var(--text-2);
   }
 
   .ao__hours {
-    margin-top: 0.7rem;
-    display: grid;
-    gap: 0.2rem;
-    font-family: var(--font-mono);
-    font-size: 0.6875rem;
-    letter-spacing: 0.04em;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    margin-top: 0.9rem;
     color: var(--text-3);
   }
-
-  /* Placeholder hours are dimmed and labelled, so they cannot be
-     mistaken for confirmed trading times. */
-  .ao__hours[data-unverified] li:not(.ao__hwarn) {
-    opacity: 0.5;
+  .ao__hours ul {
+    display: grid;
+    gap: 0.15rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.03em;
   }
-
-  .ao__hwarn {
-    margin-top: 0.3rem;
-    color: #8a6100;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    font-size: 0.5625rem;
-  }
+  .ao__hours ul[data-unverified] { opacity: 0.55; }
 
   .ao__acts {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: var(--s4);
-    margin-top: 1rem;
-  }
-
-  .ao__call {
-    font-size: 0.9375rem;
-    font-weight: 600;
-    letter-spacing: -0.01em;
-    border-bottom: 1px solid var(--text);
-    padding-bottom: 2px;
-    transition: color var(--t2) var(--ease), border-color var(--t2) var(--ease);
-  }
-
-  .ao__call:hover {
-    color: var(--green-deep);
-    border-color: var(--green-deep);
+    gap: 0.6rem;
+    margin-top: 1.1rem;
   }
 
   .ao__wa {
     display: inline-flex;
     align-items: center;
-    gap: 0.45rem;
-    padding: 0.55rem 1rem;
+    gap: 0.5rem;
+    padding: 0.7rem 1.2rem;
     border-radius: 999px;
     background: var(--green);
     color: #fff;
-    font-size: 0.8125rem;
+    font-size: 0.875rem;
     font-weight: 500;
     transition: background-color var(--t2) var(--ease);
   }
+  .ao__wa:hover { background: var(--text); }
 
-  .ao__wa:hover {
-    background: var(--text);
+  /* Inert until real map links exist — shown as pending, not clickable. */
+  .ao__dir {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1.2rem;
+    border: 1px solid var(--line-light);
+    border-radius: 999px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-3);
+    cursor: not-allowed;
   }
+
+  .ao__shot { position: relative; min-height: 11rem; }
+
+  .ao__chip {
+    position: absolute;
+    right: 0.7rem;
+    bottom: 0.7rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.35rem 0.7rem;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.94);
+    box-shadow: 0 4px 12px -6px rgb(20 23 26 / 0.4);
+    font-size: 0.6875rem;
+    font-weight: 500;
+  }
+
+  /* ---------- reserved space for missing data ---------- */
+
+  .ao__slot {
+    display: grid;
+    place-items: center;
+    gap: 0.35rem;
+    border: 1px dashed var(--line-light);
+    border-radius: 8px;
+    background: repeating-linear-gradient(45deg, #fafafa 0 8px, #f4f4f2 8px 16px);
+    color: var(--text-3);
+    font-size: 0.6875rem;
+    text-align: center;
+  }
+  .ao__slot--addr { margin-top: 0.85rem; padding: 0.85rem; }
+  .ao__slot--photo { height: 100%; min-height: 11rem; border-radius: 0; border-width: 0 0 0 1px; }
+  .ao__slot--thumb { width: 100%; aspect-ratio: 4 / 3; border-radius: 6px; }
+
+  /* ---------- scripts ---------- */
+
+  .ao__script {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: clamp(1rem, 1.5vw, 1.35rem);
+    line-height: 1.25;
+    color: var(--green-deep);
+    opacity: 0.9;
+  }
+  .ao__script--low { margin-top: var(--s6); }
+  .ao__script--high { position: absolute; right: 0; top: 0; text-align: right; z-index: 3; }
 
   .ao__all {
     display: inline-flex;
@@ -361,243 +435,168 @@ const pinFor = (slug: string) => pins.find((p) => p.slug === slug)!;
     gap: 0.55rem;
     justify-self: start;
     margin-top: var(--s5);
-    padding-bottom: 0.35rem;
+    padding-bottom: 0.3rem;
     border-bottom: 1px solid var(--text);
     font-size: 0.9375rem;
     font-weight: 500;
     transition: color var(--t2) var(--ease), border-color var(--t2) var(--ease);
   }
-
-  .ao__all:hover {
-    color: var(--green-deep);
-    border-color: var(--green-deep);
-  }
-
-  .ao__all :global(svg) {
-    transition: transform var(--t2) var(--ease);
-  }
-
-  .ao__all:hover :global(svg) {
-    transform: translateX(4px);
-  }
+  .ao__all:hover { color: var(--green-deep); border-color: var(--green-deep); }
 
   /* ---------- map ---------- */
 
-  .ao__mapwrap {
-    position: relative;
-    display: grid;
-    justify-items: center;
-    gap: var(--s4);
-  }
+  .ao__mapwrap { position: relative; padding-top: 3rem; }
 
-  .ao__map {
-    width: 100%;
-    max-width: 24rem;
-    height: auto;
-    overflow: visible;
-  }
+  .ao__map { position: relative; width: 100%; max-width: 30rem; margin-inline: auto; }
+  .ao__map svg { width: 100%; height: auto; overflow: visible; }
 
   .ao__land {
-    fill: var(--off);
-    stroke: none;
+    fill: color-mix(in oklab, var(--green) 16%, #fff);
+    stroke: color-mix(in oklab, var(--green) 34%, #fff);
+    stroke-width: 3;
   }
 
-  /* The coastline draws itself in when the section arrives. */
-  .ao__edge {
-    fill: none;
-    stroke: var(--green);
-    stroke-width: 4;
-    stroke-linejoin: round;
-    opacity: 0.65;
-    stroke-dasharray: 6000;
-    stroke-dashoffset: 6000;
-  }
-
-  [data-in] .ao__edge {
-    animation: ao-draw 2600ms var(--ease) 200ms forwards;
-  }
-
-  @keyframes ao-draw {
-    to {
-      stroke-dashoffset: 0;
-    }
-  }
-
-  /* ---------- pins ---------- */
-
-  .ao__pin {
-    cursor: pointer;
-    opacity: 0;
-    transform-box: fill-box;
-    transform-origin: center;
-  }
-
-  [data-in] .ao__pin {
-    animation: ao-drop 520ms var(--ease) forwards;
-    animation-delay: calc(900ms + var(--i) * 160ms);
-  }
-
-  @keyframes ao-drop {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-
-  .ao__dot {
-    fill: var(--green);
-    stroke: #fff;
-    stroke-width: 4;
-    transition: r 260ms var(--ease);
-  }
-
-  .ao__ring {
+  .ao__route {
     fill: none;
     stroke: var(--green);
     stroke-width: 3;
-    opacity: 0;
-    transition: opacity 260ms var(--ease);
+    stroke-dasharray: 3 14;
+    stroke-linecap: round;
+    opacity: 0.5;
+    animation: ao-flow 3s linear infinite;
   }
+  @keyframes ao-flow { to { stroke-dashoffset: -17; } }
 
-  .ao__halo {
-    fill: var(--green);
-    opacity: 0;
-    transform-box: fill-box;
-    transform-origin: center;
-  }
-
-  /* Active pin keeps a slow sonar ping. */
-  .ao__pin[data-on] .ao__halo {
-    animation: ao-ping 2.8s var(--ease) infinite;
-  }
-
+  .ao__dot { fill: var(--green); stroke: #fff; stroke-width: 5; }
+  .ao__halo { fill: var(--green); opacity: 0; transform-box: fill-box; transform-origin: center; }
+  .ao__pin[data-on] .ao__halo { animation: ao-ping 2.8s var(--ease) infinite; }
   @keyframes ao-ping {
-    0% {
-      opacity: 0.32;
-      transform: scale(0.35);
-    }
-    70% {
-      opacity: 0;
-      transform: scale(1);
-    }
-    100% {
-      opacity: 0;
-      transform: scale(1);
-    }
+    0% { opacity: 0.3; transform: scale(0.35); }
+    70% { opacity: 0; transform: scale(1); }
+    100% { opacity: 0; transform: scale(1); }
   }
 
-  .ao__pin[data-on] .ao__ring,
-  .ao__pin:hover .ao__ring,
-  .ao__pin:focus-visible .ao__ring {
-    opacity: 1;
+  .ao__mcard {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    translate: -50% -50%;
+    width: clamp(5rem, 8vw, 7rem);
+    padding: 0.3rem;
+    border-radius: 10px;
+    border: 1px solid var(--line-light);
+    background: var(--white);
+    box-shadow: 0 10px 24px -14px rgb(20 23 26 / 0.45);
+    text-align: left;
+    transition: transform var(--t2) var(--ease), border-color var(--t2) var(--ease);
+  }
+  .ao__mcard:hover { transform: translateY(-3px); }
+  .ao__mcard[data-on] { border-color: var(--green); }
+
+  .ao__mlabel {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.3rem 0.1rem 0.1rem;
+    font-size: 0.625rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+  .ao__mcard[data-on] .ao__mlabel { color: var(--green-deep); }
+
+  /* ---------- stats ---------- */
+
+  .ao__stats { display: grid; gap: var(--s5); margin-top: var(--s6); }
+  .ao__stats > div { display: flex; align-items: center; gap: 0.85rem; }
+  .ao__stats dt { color: var(--green); display: grid; place-items: center; }
+  .ao__stats dd b {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+  .ao__stats dd i {
+    display: block;
+    margin-top: 0.2rem;
+    font-style: normal;
+    font-size: 0.8125rem;
+    color: var(--text-2);
   }
 
-  .ao__pin[data-on] .ao__dot,
-  .ao__pin:hover .ao__dot {
-    r: 14;
+  /* Unverified figure: reserved blank rather than an invented number. */
+  .ao__blank {
+    width: 6.5rem;
+    height: 1.5rem;
+    border-radius: 4px;
+    border: 1px dashed var(--line-light);
+    background: repeating-linear-gradient(45deg, #fafafa 0 8px, #f4f4f2 8px 16px);
   }
 
-  .ao__plabel {
-    font-family: var(--font-mono);
-    font-size: 34px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    fill: var(--text-3);
-    transition: fill 260ms var(--ease);
-    pointer-events: none;
-  }
-
-  .ao__pin[data-on] .ao__plabel,
-  .ao__pin:hover .ao__plabel {
-    fill: var(--text);
-  }
-
-  /* Salalah sits at the bottom-left, so its label reads better flipped. */
-  .ao__pin[data-pin='salalah'] .ao__plabel {
-    text-anchor: end;
-    transform: translateX(-68px);
-  }
-
-  /* Al Hail and Ruwi are only ~11 viewBox units apart — without these
-     offsets the two labels sit on top of one another. */
-  .ao__pin[data-pin='hail'] .ao__plabel {
-    text-anchor: end;
-    transform: translate(-34px, -30px);
-  }
-
-  .ao__pin[data-pin='ruwi'] .ao__plabel {
-    transform: translate(6px, 34px);
-  }
-
-  .ao__legend {
+  .ao__compass {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    font-family: var(--font-mono);
-    font-size: 0.625rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
+    gap: 0.8rem;
+    margin-top: var(--s6);
     color: var(--text-3);
+    font-size: 0.75rem;
+    line-height: 1.45;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
   }
 
-  .ao__legend span {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--green);
+  /* ---------- landmark strip ---------- */
+
+  .ao__strip {
+    height: clamp(4rem, 9vw, 8.5rem);
+    border-top: 1px dashed var(--line-light);
+    background: repeating-linear-gradient(45deg, #fbfbfa 0 10px, #f5f6f4 10px 20px);
   }
 
   /* ---------- layout ---------- */
 
-  @media (min-width: 62rem) {
-    .ao__grid {
-      grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr);
-      gap: var(--s9);
-    }
+  @media (min-width: 48rem) {
+    .ao__card[data-on] { grid-template-columns: 1.15fr 1fr; }
+  }
+
+  @media (min-width: 68rem) {
+    .ao__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: var(--s8); }
+    .ao__stats { position: absolute; right: 0; top: 32%; margin: 0; width: 11rem; }
+    .ao__compass { position: absolute; right: 0; bottom: 4%; margin: 0; width: 11rem; }
+    .ao__map { max-width: 25rem; margin-left: 0; }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .ao__edge {
-      stroke-dashoffset: 0;
-      animation: none !important;
-    }
-    .ao__pin {
-      opacity: 1;
-      animation: none !important;
-    }
-    .ao__halo {
-      animation: none !important;
-    }
-    .ao__card[data-on] {
-      animation: none;
-    }
+    .ao__wave-b, .ao__wave-f, .ao__route, .ao__halo { animation: none !important; }
+    .ao__card[data-on] { animation: none; }
   }
 </style>
 
 <script>
   const root = document.querySelector<HTMLElement>('[data-oman]');
   if (root) {
-    const pins = [...root.querySelectorAll<SVGGElement>('[data-pin]')];
-    const cards = [...root.querySelectorAll<HTMLElement>('[data-card]')];
+    const q = <T extends Element>(s: string) => [...root.querySelectorAll<T>(s)];
+    const tabs = q<HTMLElement>('[data-tab]');
+    const cards = q<HTMLElement>('[data-card]');
+    const pins = q<SVGGElement>('[data-pin]');
+    const mcards = q<HTMLElement>('[data-mcard]');
 
+    /* One function drives tabs, pins and map cards alike. */
     const show = (slug: string) => {
-      pins.forEach((p) => p.toggleAttribute('data-on', p.dataset.pin === slug));
-      cards.forEach((c) => c.toggleAttribute('data-on', c.dataset.card === slug));
+      const on = (el: Element, key?: string) => el.toggleAttribute('data-on', key === slug);
+      tabs.forEach((el) => {
+        on(el, el.dataset.tab);
+        el.setAttribute('aria-selected', String(el.dataset.tab === slug));
+      });
+      cards.forEach((el) => on(el, el.dataset.card));
+      pins.forEach((el) => on(el, el.dataset.pin));
+      mcards.forEach((el) => on(el, el.dataset.mcard));
     };
 
-    pins.forEach((p) => {
-      const slug = p.dataset.pin!;
-      p.addEventListener('pointerenter', () => show(slug));
-      p.addEventListener('click', () => show(slug));
-      p.addEventListener('focus', () => show(slug));
-      p.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          show(slug);
-        }
-      });
+    tabs.forEach((el) => el.addEventListener('click', () => show(el.dataset.tab!)));
+    mcards.forEach((el) => {
+      el.addEventListener('click', () => show(el.dataset.mcard!));
+      el.addEventListener('pointerenter', () => show(el.dataset.mcard!));
     });
   }
 </script>

@@ -1,0 +1,235 @@
+---
+import { site } from '@data/site';
+
+/**
+ * 02 — Credibility, immediately after the hero.
+ *
+ * GEEKS uses press logos here. Danat has no press coverage, but it does
+ * carry these brands — every name and the category beside it came out of
+ * the company's own product catalogue, not from a wish list.
+ */
+const brands = [
+  { n: 'HP', k: 'Laptops · Printers' },
+  { n: 'Dell', k: 'Laptops · Monitors' },
+  { n: 'Lenovo', k: 'Laptops · Desktops' },
+  { n: 'ASUS', k: 'Laptops · Boards' },
+  { n: 'Acer', k: 'Laptops · Monitors' },
+  { n: 'Apple', k: 'MacBook · Parts' },
+  { n: 'Canon', k: 'Printers · Toner' },
+  { n: 'Epson', k: 'Printers · Ink' },
+  { n: 'Hikvision', k: 'CCTV · NVR' },
+  { n: 'Dahua', k: 'CCTV · DVR' },
+  { n: 'Uniview', k: 'CCTV · NVR' },
+  { n: 'EZVIZ', k: 'Wi-Fi cameras' },
+  { n: 'TP-Link', k: 'Routers · Switches' },
+  { n: 'Zebra', k: 'Barcode · Scanners' },
+  { n: 'AOC', k: 'Monitors' },
+  { n: 'Panasonic', k: 'Batteries · Projectors' },
+];
+
+const half = Math.ceil(brands.length / 2);
+const rows = [brands.slice(0, half), brands.slice(half)];
+---
+
+<section class="bs" data-tone="light">
+  <!-- Wavy boundary with the dark hero above. -->
+  <div class="bs__wave" aria-hidden="true">
+    <svg viewBox="0 0 1440 130" preserveAspectRatio="none">
+      <path class="bs__wave-b" d="M0,0 L1440,0 L1440,34 C1300,132 1140,4 950,52 C760,100 570,146 380,98 C248,64 118,22 0,58 Z"></path>
+      <path class="bs__wave-f" d="M0,0 L1440,0 L1440,14 C1276,116 1104,-4 908,38 C712,80 524,130 336,76 C214,42 106,6 0,38 Z"></path>
+    </svg>
+  </div>
+
+  <div class="shell bs__grid">
+    <!-- statement -->
+    <div class="bs__say">
+      <p class="label" data-rise>What we carry</p>
+      <h2 class="bs__h" data-rise style="--d:70ms">
+        {brands.length} brands.<br />
+        <em>{site.stats.parts.toLocaleString('en-US')} lines.</em><br />
+        One counter.
+      </h2>
+      <p class="bs__p" data-rise style="--d:140ms">
+        Sold, serviced and stocked in-house — so the part is usually on our
+        shelf, not three weeks away.
+      </p>
+    </div>
+
+    <!-- two rails, opposing directions -->
+    <div class="bs__rails" data-rise="fade" style="--d:120ms">
+      {rows.map((row, r) => (
+        <div class="bs__rail" data-dir={r === 1 ? 'rev' : undefined}>
+          <div class="bs__track">
+            {[0, 1].map(() =>
+              row.map((b) => (
+                <span class="bs__chip">
+                  <b>{b.n}</b>
+                  <i>{b.k}</i>
+                </span>
+              ))
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .bs {
+    position: relative;
+    background: var(--white);
+    padding-block: clamp(5.5rem, 10vw, 9rem) clamp(2.5rem, 5vw, 4.5rem);
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  /* ---------- wave ---------- */
+
+  .bs__wave {
+    position: absolute;
+    top: -1px;
+    left: 0;
+    width: 100%;
+    height: clamp(58px, 9vw, 130px);
+    z-index: 2;
+    pointer-events: none;
+  }
+  .bs__wave svg { width: 100%; height: 100%; }
+  .bs__wave-b {
+    fill: color-mix(in oklab, var(--ink) 86%, var(--green));
+    animation: bs-swell-b 13s ease-in-out infinite alternate;
+  }
+  .bs__wave-f {
+    fill: var(--ink);
+    animation: bs-swell-f 9s ease-in-out infinite alternate;
+  }
+  @keyframes bs-swell-b {
+    from { transform: translate3d(-1.5%, 2px, 0) scaleY(1); }
+    to   { transform: translate3d(1.5%, -3px, 0) scaleY(1.06); }
+  }
+  @keyframes bs-swell-f {
+    from { transform: translate3d(1.2%, -2px, 0) scaleY(1.04); }
+    to   { transform: translate3d(-1.2%, 3px, 0) scaleY(1); }
+  }
+
+  /* ---------- layout ---------- */
+
+  .bs__grid {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: var(--s6);
+    align-items: center;
+  }
+
+  .bs__h {
+    margin-top: var(--s4);
+    font-size: clamp(1.6rem, 2.8vw, 2.4rem);
+    line-height: 1.08;
+    letter-spacing: -0.035em;
+    font-weight: 700;
+  }
+  .bs__h em {
+    font-style: normal;
+    color: var(--green-deep);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .bs__p {
+    margin-top: var(--s4);
+    max-width: 34ch;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--text-2);
+  }
+
+  /* ---------- rails ---------- */
+
+  .bs__rails {
+    display: grid;
+    gap: 0.6rem;
+    min-width: 0;
+  }
+
+  /* Edges fade, so chips never clip hard against the gutter. */
+  .bs__rail {
+    overflow: hidden;
+    mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  }
+
+  .bs__track {
+    display: flex;
+    gap: 0.6rem;
+    width: max-content;
+    animation: bs-run 42s linear infinite;
+  }
+
+  /* Second row runs the other way — the counter-motion is what makes it
+     read as a moving wall rather than a single ticker. */
+  .bs__rail[data-dir='rev'] .bs__track {
+    animation-direction: reverse;
+    animation-duration: 52s;
+  }
+
+  .bs__rails:hover .bs__track { animation-play-state: paused; }
+
+  @keyframes bs-run {
+    from { transform: translate3d(0, 0, 0); }
+    to { transform: translate3d(-50%, 0, 0); }
+  }
+
+  /* ---------- chips ---------- */
+
+  .bs__chip {
+    display: grid;
+    gap: 0.1rem;
+    flex: none;
+    padding: 0.7rem 1.1rem;
+    border: 1px solid var(--line-light);
+    border-radius: 10px;
+    background: var(--white);
+    transition:
+      border-color var(--t2) var(--ease),
+      background-color var(--t2) var(--ease),
+      transform var(--t2) var(--ease);
+  }
+
+  .bs__chip:hover {
+    border-color: var(--green);
+    background: var(--green-wash);
+    transform: translateY(-2px);
+  }
+
+  .bs__chip b {
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text);
+    white-space: nowrap;
+  }
+
+  .bs__chip i {
+    font-style: normal;
+    font-size: 0.6875rem;
+    letter-spacing: 0.02em;
+    color: var(--text-3);
+    white-space: nowrap;
+    transition: color var(--t2) var(--ease);
+  }
+
+  .bs__chip:hover i { color: var(--green-deep); }
+
+  @media (min-width: 62rem) {
+    .bs__grid {
+      grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.22fr);
+      gap: var(--s8);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bs__track { animation: none; }
+    .bs__wave-b, .bs__wave-f { animation: none; }
+    .bs__rail { overflow-x: auto; mask-image: none; }
+  }
+</style>

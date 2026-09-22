@@ -1,0 +1,190 @@
+---
+import Icon from '@components/ui/Icon.astro';
+
+/**
+ * 07 — What actually happens if you walk in.
+ *
+ * Removing uncertainty is the job here. A customer with a dead laptop
+ * wants to know whether they will be charged before they know the price.
+ */
+const steps = [
+  {
+    n: '01',
+    title: 'Diagnose',
+    body: 'Bring it in or send it with us. We find what actually failed — not a guess from the symptoms.',
+    note: 'Free',
+    icon: 'search' as const,
+  },
+  {
+    n: '02',
+    title: 'Quote',
+    body: 'A fixed price and a realistic timeframe, before any work starts. If it is not worth repairing, we say so.',
+    note: 'No surprises',
+    icon: 'clock' as const,
+  },
+  {
+    n: '03',
+    title: 'Repair',
+    body: 'Board level where other shops swap the whole unit. Parts usually come off our own shelf, not a three-week order.',
+    note: 'In-house',
+    icon: 'laptop' as const,
+  },
+  {
+    n: '04',
+    title: 'Verify',
+    body: 'Tested under load before it goes back to you, with a warranty on the work and the parts.',
+    note: 'Warranted',
+    icon: 'drive' as const,
+  },
+];
+---
+
+<section class="hw section" data-tone="off">
+  <div class="shell">
+    <div class="hw__head">
+      <div>
+        <p class="label" data-rise>How it works</p>
+        <h2 class="hw__title" data-rise style="--d:70ms">
+          Simple.<br /><em>Transparent. Fixed price.</em>
+        </h2>
+      </div>
+      <p class="hw__intro" data-rise style="--d:140ms">
+        Four steps, the same at every branch. You will always know the cost
+        before we start, and you keep the choice at every stage.
+      </p>
+    </div>
+
+    <ol class="hw__steps">
+      {steps.map((s, i) => (
+        <li data-rise style={`--d:${i * 80}ms`}>
+          <span class="hw__ico"><Icon name={s.icon} size={20} /></span>
+          <span class="hw__n">{s.n}</span>
+          <h3 class="hw__st">{s.title}</h3>
+          <p class="hw__sb">{s.body}</p>
+          <span class="hw__note">{s.note}</span>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .hw {
+    background: var(--off);
+    padding-block: clamp(3.5rem, 6vw, 6rem);
+  }
+
+  .hw__head {
+    display: grid;
+    gap: var(--s5);
+    padding-bottom: clamp(2rem, 3.5vw, 3rem);
+  }
+
+  .hw__title {
+    margin-top: var(--s4);
+    font-size: clamp(1.75rem, 3.2vw, 2.75rem);
+    line-height: 1.08;
+    letter-spacing: -0.035em;
+    font-weight: 700;
+  }
+  .hw__title em { font-style: normal; color: var(--green-deep); }
+
+  .hw__intro {
+    max-width: 46ch;
+    font-size: 0.9375rem;
+    line-height: 1.65;
+    color: var(--text-2);
+  }
+
+  /* ---------- steps ---------- */
+
+  .hw__steps {
+    display: grid;
+    gap: clamp(1rem, 1.8vw, 1.5rem);
+    counter-reset: step;
+  }
+
+  .hw__steps li {
+    position: relative;
+    display: grid;
+    padding: 1.4rem 1.35rem 1.5rem;
+    border: 1px solid var(--line-light);
+    border-radius: 12px;
+    background: var(--white);
+    transition: border-color var(--t2) var(--ease), transform var(--t2) var(--ease);
+  }
+
+  .hw__steps li:hover {
+    border-color: var(--green);
+    transform: translateY(-3px);
+  }
+
+  .hw__ico {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    background: var(--green-wash);
+    color: var(--green-deep);
+  }
+
+  .hw__n {
+    position: absolute;
+    top: 1.35rem;
+    right: 1.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.16em;
+    color: var(--text-3);
+  }
+
+  .hw__st {
+    margin-top: 1rem;
+    font-size: 1.1875rem;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+  }
+
+  .hw__sb {
+    margin-top: 0.5rem;
+    font-size: var(--small);
+    line-height: 1.6;
+    color: var(--text-2);
+  }
+
+  .hw__note {
+    justify-self: start;
+    margin-top: 1rem;
+    padding: 0.3rem 0.7rem;
+    border-radius: 999px;
+    background: var(--green-wash);
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--green-deep);
+  }
+
+  /* A connecting line between the cards on wide screens. */
+  @media (min-width: 62rem) {
+    .hw__head { grid-template-columns: 1fr 1fr; gap: var(--s7); align-items: end; }
+    .hw__steps { grid-template-columns: repeat(4, 1fr); }
+
+    .hw__steps li::after {
+      content: '';
+      position: absolute;
+      top: 2.75rem;
+      right: calc(clamp(1rem, 1.8vw, 1.5rem) * -1);
+      width: clamp(1rem, 1.8vw, 1.5rem);
+      height: 1px;
+      background: var(--line-light);
+    }
+    .hw__steps li:last-child::after { display: none; }
+  }
+
+  @media (min-width: 40rem) and (max-width: 62rem) {
+    .hw__steps { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>

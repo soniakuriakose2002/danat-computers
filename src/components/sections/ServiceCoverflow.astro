@@ -84,21 +84,6 @@ const features = [
 ---
 
 <section class="cf section" data-tone="light" data-cf>
-  <!-- Wavy boundary with the white section above. Two layers drifting at
-       different speeds so the edge reads as water, not a shape. -->
-  <div class="cf__wave" aria-hidden="true">
-    <svg viewBox="0 0 1440 130" preserveAspectRatio="none">
-      <path
-        class="cf__wave-b"
-        d="M0,0 L1440,0 L1440,46 C1250,104 1080,26 860,58 C650,88 430,122 215,92 C135,80 60,62 0,74 Z"
-      ></path>
-      <path
-        class="cf__wave-f"
-        d="M0,0 L1440,0 L1440,30 C1230,86 1060,10 840,42 C630,72 410,104 200,76 C125,66 55,48 0,58 Z"
-      ></path>
-    </svg>
-  </div>
-
   <!-- washed-out backdrop -->
   <div class="cf__bg" aria-hidden="true">
     <Image src={imgBg} alt="" widths={[1200, 1900]} sizes="100vw" quality={70} format="webp" loading="lazy" />
@@ -214,59 +199,10 @@ const features = [
 <style>
   .cf {
     position: relative;
-    background: var(--off);
-    /* Extra top padding so the content clears the wave. */
-    padding-block: clamp(6rem, 11vw, 10rem) clamp(3.5rem, 6vw, 5.5rem);
+    background: var(--white);
+    padding-block: clamp(3.5rem, 6vw, 5.5rem);
     overflow: hidden;
     isolation: isolate;
-  }
-
-  /* ---------- wave ---------- */
-
-  .cf__wave {
-    position: absolute;
-    top: -1px;
-    left: 0;
-    width: 100%;
-    height: clamp(58px, 9vw, 130px);
-    z-index: 2;
-    pointer-events: none;
-  }
-
-  .cf__wave svg {
-    width: 100%;
-    height: 100%;
-  }
-
-  /* The back layer is the hero's ink, slightly translucent; the front
-     layer is solid, so the two read as overlapping swells. */
-  .cf__wave-b {
-    fill: color-mix(in oklab, var(--white) 62%, transparent);
-    transform-origin: center;
-    animation: cf-swell-b 13s ease-in-out infinite alternate;
-  }
-
-  .cf__wave-f {
-    fill: var(--white);
-    animation: cf-swell-f 9s ease-in-out infinite alternate;
-  }
-
-  @keyframes cf-swell-b {
-    from {
-      transform: translate3d(-1.5%, 2px, 0) scaleY(1);
-    }
-    to {
-      transform: translate3d(1.5%, -3px, 0) scaleY(1.06);
-    }
-  }
-
-  @keyframes cf-swell-f {
-    from {
-      transform: translate3d(1.2%, -2px, 0) scaleY(1.04);
-    }
-    to {
-      transform: translate3d(-1.2%, 3px, 0) scaleY(1);
-    }
   }
 
   /* ---------- backdrop ---------- */
@@ -288,8 +224,8 @@ const features = [
     position: absolute;
     inset: 0;
     background:
-      linear-gradient(100deg, var(--off) 0%, var(--off) 42%, rgb(244 244 242 / 0.9) 58%, rgb(244 244 242 / 0.74) 100%),
-      linear-gradient(to bottom, var(--off) 0%, transparent 22%, transparent 74%, var(--off) 100%);
+      linear-gradient(100deg, #fff 0%, #fff 42%, rgb(255 255 255 / 0.9) 58%, rgb(255 255 255 / 0.74) 100%),
+      linear-gradient(to bottom, #fff 0%, transparent 22%, transparent 74%, #fff 100%);
   }
 
   /* ---------- layout ---------- */
@@ -768,7 +704,6 @@ const features = [
     border-radius: 50%;
     border: 1px solid var(--line-light);
     background: var(--white);
-    box-shadow: 0 1px 0 rgb(20 23 26 / 0.04);
     color: var(--green-deep);
   }
 
@@ -827,9 +762,7 @@ const features = [
     }
     .cf__card[data-on]::after,
     .cf__arc path,
-    .cf__arc li i,
-    .cf__wave-b,
-    .cf__wave-f {
+    .cf__arc li i {
       animation: none;
     }
   }

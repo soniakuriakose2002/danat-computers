@@ -1,0 +1,167 @@
+---
+import Icon from '@components/ui/Icon.astro';
+import { site, whatsappLink } from '@data/site';
+
+/**
+ * 05 — Mid-page CTA.
+ *
+ * The reference site places one roughly halfway down for a reason: by
+ * this point the visitor knows what you do and why you, so make it
+ * possible to act without scrolling to the footer.
+ *
+ * Figures are ERP-derived, not marketing rounding.
+ */
+const figures = [
+  { v: site.stats.parts.toLocaleString('en-US'), l: 'Parts in stock' },
+  { v: String(site.stats.categories), l: 'Categories' },
+  { v: String(site.stats.branches), l: 'Branches' },
+  { v: `${new Date().getFullYear() - site.stats.since}+`, l: 'Years trading' },
+];
+---
+
+<section class="mid" data-tone="ink">
+  <div class="mid__glow" aria-hidden="true"></div>
+
+  <div class="shell mid__in">
+    <div class="mid__copy">
+      <p class="label" data-rise>Free diagnosis</p>
+      <h2 class="mid__h" data-rise style="--d:70ms">
+        Something stopped working?<br /><em>Bring it in.</em>
+      </h2>
+      <p class="mid__p" data-rise style="--d:130ms">
+        We tell you what failed, what it costs and how long it takes —
+        before you agree to anything.
+      </p>
+
+      <div class="mid__acts" data-rise style="--d:190ms">
+        <a class="mid__wa" href={whatsappLink()} target="_blank" rel="noopener noreferrer">
+          <Icon name="whatsapp" size={16} />Chat on WhatsApp
+        </a>
+        <a class="mid__call" href={`tel:${site.phone.tel}`}>
+          {site.phone.display}
+        </a>
+      </div>
+    </div>
+
+    <dl class="mid__figs" data-rise style="--d:240ms">
+      {figures.map((f) => (
+        <div>
+          <dt>{f.v}</dt>
+          <dd>{f.l}</dd>
+        </div>
+      ))}
+    </dl>
+  </div>
+</section>
+
+<style>
+  .mid {
+    position: relative;
+    background: var(--ink);
+    color: var(--text-inv);
+    padding-block: clamp(3.25rem, 6vw, 5.5rem);
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .mid__glow {
+    position: absolute;
+    left: -8%;
+    bottom: -60%;
+    width: 46%;
+    aspect-ratio: 1;
+    z-index: -1;
+    background: radial-gradient(
+      circle,
+      color-mix(in oklab, var(--green) 26%, transparent) 0%,
+      transparent 62%
+    );
+    filter: blur(70px);
+    pointer-events: none;
+  }
+
+  .mid__in {
+    display: grid;
+    gap: var(--s6);
+    align-items: center;
+  }
+
+  .mid__h {
+    margin-top: var(--s4);
+    font-size: clamp(1.75rem, 3.2vw, 2.75rem);
+    line-height: 1.08;
+    letter-spacing: -0.035em;
+    font-weight: 700;
+  }
+  .mid__h em { font-style: normal; color: var(--green-bright); }
+
+  .mid__p {
+    margin-top: var(--s4);
+    max-width: 44ch;
+    font-size: 0.9375rem;
+    line-height: 1.65;
+    color: var(--text-inv-2);
+  }
+
+  .mid__acts {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s4);
+    margin-top: var(--s5);
+  }
+
+  .mid__wa {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.85rem 1.4rem;
+    border-radius: 999px;
+    background: var(--green);
+    color: #fff;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    transition: background-color var(--t2) var(--ease);
+  }
+  .mid__wa:hover { background: #fff; color: var(--ink); }
+
+  .mid__call {
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    letter-spacing: 0.04em;
+    color: var(--text-inv-2);
+    border-bottom: 1px solid rgb(255 255 255 / 0.28);
+    padding-bottom: 2px;
+    transition: color var(--t2) var(--ease), border-color var(--t2) var(--ease);
+  }
+  .mid__call:hover { color: #fff; border-color: #fff; }
+
+  /* ---------- figures ---------- */
+
+  .mid__figs {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--s5) var(--s4);
+  }
+
+  .mid__figs dt {
+    font-size: clamp(1.5rem, 2.6vw, 2.25rem);
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    color: #fff;
+  }
+
+  .mid__figs dd {
+    margin-top: 0.3rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.02em;
+    color: var(--text-inv-3);
+  }
+
+  @media (min-width: 62rem) {
+    .mid__in { grid-template-columns: 1.15fr 1fr; gap: var(--s8); }
+    .mid__figs { grid-template-columns: repeat(4, 1fr); gap: var(--s4); }
+  }
+</style>

@@ -230,16 +230,29 @@ const branchNames = ['Muscat', 'Sohar', 'Salalah', 'Hail'];
     z-index: -2;
   }
 
+  /* Cross-fade without a gap.
+     Fading both frames at once leaves them each at ~50% mid-transition,
+     so the dark section shows through and the image appears to blink.
+     Instead the incoming frame sits ON TOP and fades in, while the
+     outgoing one holds at full opacity and only fades out afterwards —
+     underneath, where it is no longer visible. */
   .hx__bgframe {
     position: absolute;
     inset: 0;
     opacity: 0;
+    z-index: 0;
     transform: scale(1.06);
-    transition: opacity 900ms var(--ease), transform 1600ms var(--ease);
+    transition:
+      opacity 600ms var(--ease) 620ms,
+      transform 1600ms var(--ease);
   }
 
   .hx__bgframe[data-on] {
     opacity: 1;
+    z-index: 1;
+    transition:
+      opacity 600ms var(--ease) 0ms,
+      transform 1600ms var(--ease);
     transform: scale(1);
   }
 
@@ -250,10 +263,13 @@ const branchNames = ['Muscat', 'Sohar', 'Salalah', 'Hail'];
     object-position: 70% 40%;
   }
 
-  /* Heavy graded veil — the photo is atmosphere, not the subject. */
+  /* Heavy graded veil — the photo is atmosphere, not the subject.
+     NOTE: the cross-fade gives the active frame z-index 1, so the veil
+     and glow must sit explicitly above it or the photo paints over them. */
   .hx__veil {
     position: absolute;
     inset: 0;
+    z-index: 2;
     background:
       linear-gradient(100deg, rgb(8 12 11 / 0.97) 0%, rgb(8 12 11 / 0.86) 38%,
         rgb(8 12 11 / 0.55) 62%, rgb(8 12 11 / 0.72) 100%),
@@ -262,6 +278,7 @@ const branchNames = ['Muscat', 'Sohar', 'Salalah', 'Hail'];
 
   .hx__glow {
     position: absolute;
+    z-index: 3;
     left: 50%;
     top: 46%;
     width: min(60vw, 46rem);
@@ -860,7 +877,7 @@ const branchNames = ['Muscat', 'Sohar', 'Salalah', 'Hail'];
       animation: none;
     }
     .hx__bgframe {
-      transition: opacity 1ms;
+      transition: opacity 1ms !important;
       transform: none;
     }
   }
@@ -902,7 +919,7 @@ const branchNames = ['Muscat', 'Sohar', 'Salalah', 'Hail'];
     const start = () => {
       if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
       stop();
-      timer = window.setInterval(() => show(active + 1), 6000);
+      timer = window.setInterval(() => show(active + 1), 3600);
     };
 
     const pick = (i: number) => {

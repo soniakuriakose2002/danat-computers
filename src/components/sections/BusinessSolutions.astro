@@ -1,0 +1,210 @@
+---
+import { Image } from 'astro:assets';
+import Icon from '@components/ui/Icon.astro';
+import { whatsappLink } from '@data/site';
+import imgOffice from '@assets/photos/network-eng.jpg';
+
+/**
+ * 08 — The B2B side.
+ *
+ * This is real: the company's AR ledger shows hospitals, enterprises and
+ * other computer retailers buying at trade. Most visitors will read the
+ * rest of the page as a consumer repair shop, so this has to be explicit.
+ */
+const offers = [
+  ['IT infrastructure', 'Supply, setup and ongoing support across sites.'],
+  ['CCTV installation', 'Surveyed, installed and maintained.'],
+  ['Network setup', 'Structured cabling, switching and Wi-Fi.'],
+  ['Printer & consumables', 'Service contracts with stock held for you.'],
+  ['Hardware & software', 'Procurement, licensing and rollout.'],
+  ['Data recovery', 'Priority handling for business-critical drives.'],
+];
+---
+
+<section class="biz section" data-tone="light">
+  <div class="shell biz__grid">
+    <div class="biz__media" data-rise="fade">
+      <Image
+        src={imgOffice}
+        alt="Engineer working on network equipment in a server rack"
+        widths={[600, 1000, 1400]}
+        sizes="(max-width: 62rem) 100vw, 46vw"
+        quality={82}
+        format="webp"
+        loading="lazy"
+      />
+      <span class="biz__tag" aria-hidden="true">Work · Connect · Grow</span>
+    </div>
+
+    <div class="biz__copy">
+      <p class="label" data-rise>Business solutions</p>
+
+      <h2 class="biz__title" data-rise style="--d:70ms">
+        Technology that keeps<br /><em>business moving.</em>
+      </h2>
+
+      <p class="biz__sub" data-rise style="--d:130ms">
+        Hospitals, retailers and offices across Oman buy from us at trade —
+        supply, parts and consumables from the same stock and the same team
+        that serves the counter.
+      </p>
+
+      <ul class="biz__list" data-rise style="--d:190ms">
+        {offers.map(([t, d]) => (
+          <li>
+            <span class="biz__dot" aria-hidden="true"></span>
+            <span>
+              <b>{t}</b>
+              <i>{d}</i>
+            </span>
+          </li>
+        ))}
+      </ul>
+
+      <a
+        class="biz__cta"
+        href={whatsappLink('Hello Danat — I would like to talk about business supply / a maintenance contract for')}
+        target="_blank"
+        rel="noopener noreferrer"
+        data-rise
+        style="--d:250ms"
+      >
+        Talk to our business team
+        <span aria-hidden="true"><Icon name="arrow" size={15} /></span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .biz {
+    background: var(--white);
+    padding-block: clamp(3.5rem, 6vw, 6rem);
+  }
+
+  .biz__grid {
+    display: grid;
+    gap: var(--s7);
+    align-items: center;
+  }
+
+  /* ---------- media ---------- */
+
+  .biz__media {
+    position: relative;
+    border-radius: 14px;
+    overflow: hidden;
+    aspect-ratio: 4 / 3;
+    background: var(--off);
+  }
+
+  .biz__media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .biz__tag {
+    position: absolute;
+    left: 1rem;
+    bottom: 1rem;
+    padding: 0.45rem 0.9rem;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.94);
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text);
+  }
+
+  /* ---------- copy ---------- */
+
+  .biz__title {
+    margin-top: var(--s4);
+    font-size: clamp(1.75rem, 3.2vw, 2.75rem);
+    line-height: 1.08;
+    letter-spacing: -0.035em;
+    font-weight: 700;
+  }
+  .biz__title em { font-style: normal; color: var(--green-deep); }
+
+  .biz__sub {
+    margin-top: var(--s4);
+    max-width: 48ch;
+    font-size: 0.9375rem;
+    line-height: 1.65;
+    color: var(--text-2);
+  }
+
+  .biz__list {
+    display: grid;
+    gap: 0.7rem;
+    margin-top: var(--s5);
+    padding-top: var(--s5);
+    border-top: 1px solid var(--line-light);
+  }
+
+  .biz__list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7rem;
+  }
+
+  .biz__dot {
+    flex: none;
+    width: 6px;
+    height: 6px;
+    margin-top: 0.5rem;
+    border-radius: 50%;
+    background: var(--green);
+  }
+
+  .biz__list b {
+    display: block;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+  }
+
+  .biz__list i {
+    display: block;
+    margin-top: 0.1rem;
+    font-style: normal;
+    font-size: 0.8125rem;
+    color: var(--text-2);
+  }
+
+  .biz__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: var(--s6);
+    padding: 0.85rem 0.85rem 0.85rem 1.5rem;
+    border-radius: 999px;
+    background: var(--green);
+    color: #fff;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    transition: background-color var(--t2) var(--ease);
+  }
+
+  .biz__cta span {
+    display: grid;
+    place-items: center;
+    width: 1.9rem;
+    height: 1.9rem;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.22);
+    transition: transform var(--t2) var(--ease);
+  }
+
+  .biz__cta:hover { background: var(--text); }
+  .biz__cta:hover span { transform: translateX(3px); }
+
+  @media (min-width: 62rem) {
+    .biz__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: var(--s8); }
+    .biz__list { grid-template-columns: repeat(2, 1fr); gap: 0.9rem var(--s5); }
+  }
+</style>
