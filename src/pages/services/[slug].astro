@@ -1,0 +1,313 @@
+---
+import { getCollection, render } from 'astro:content';
+import { Image } from 'astro:assets';
+import PageLayout from '@layouts/PageLayout.astro';
+import Icon from '@components/ui/Icon.astro';
+import { site, whatsappLink, branches } from '@data/site';
+import { serviceMedia, fallbackMedia } from '@data/serviceMedia';
+
+export async function getStaticPaths() {
+  const services = await getCollection('services');
+  const sorted = services.sort((a, b) => a.data.index - b.data.index);
+
+  return sorted.map((entry, i) => ({
+    params: { slug: entry.id },
+    props: {
+      entry,
+      prev: sorted[(i - 1 + sorted.length) % sorted.length],
+      next: sorted[(i + 1) % sorted.length],
+    },
+  }));
+}
+
+const { entry, prev, next } = Astro.props;
+const { Content } = await render(entry);
+const media = serviceMedia[entry.id] ?? fallbackMedia;
+const num = String(entry.data.index).padStart(2, '0');
+---
+
+<PageLayout title={entry.data.title} description={entry.data.summary}>
+  <!-- ─────────── hero ─────────── -->
+  <section class="sh">
+    <div class="shell sh__grid">
+      <div class="sh__copy">
+        <nav class="sh__crumb" aria-label="Breadcrumb">
+          <a href="/">Home</a>
+          <span aria-hidden="true">/</span>
+          <a href="/services">Services</a>
+          <span aria-hidden="true">/</span>
+          <span aria-current="page">{entry.data.title}</span>
+        </nav>
+
+        <p class="label sh__n">{num} &mdash; Service</p>
+        <h1 class="sh__h">{entry.data.title}</h1>
+        <p class="sh__intro">{entry.data.intro}</p>
+
+        <div class="sh__acts">
+          <a class="sh__wa" href={whatsappLink(`Hello Danat — I need help with ${entry.data.title.toLowerCase()}:`)}
+            target="_blank" rel="noopener noreferrer">
+            <Icon name="whatsapp" size={16} />Ask about this
+          </a>
+          <a class="sh__call" href={`tel:${site.phone.tel}`}>{site.phone.display}</a>
+        </div>
+      </div>
+
+      <div class="sh__media">
+        <Image src={media.img} alt={media.alt} widths={[600, 1000, 1500]}
+          sizes="(max-width: 62rem) 100vw, 46vw" quality={82} format="webp" loading="eager" />
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────── body ─────────── -->
+  <section class="sb section" data-tone="light">
+    <div class="shell sb__grid">
+      <div class="sb__prose">
+        <Content />
+      </div>
+
+      <aside class="sb__side">
+        <div class="sb__box">
+          <h2 class="sb__bt">What this covers</h2>
+          <ul class="sb__list">
+            {entry.data.covers.map((c) => (
+              <li><span aria-hidden="true"></span>{c}</li>
+            ))}
+          </ul>
+        </div>
+
+        <div class="sb__box sb__box--quiet">
+          <h2 class="sb__bt">Where to bring it</h2>
+          <ul class="sb__branches">
+            {branches.map((b) => (
+              <li>
+                <b>{b.name}</b>
+                <i>{b.city}</i>
+              </li>
+            ))}
+          </ul>
+          <a class="sb__link" href="/branches">
+            Branch details <Icon name="arrow" size={13} />
+          </a>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ─────────── prev / next ─────────── -->
+  <nav class="sn section" data-tone="off" aria-label="Other services">
+    <div class="shell sn__grid">
+      <a class="sn__item" href={`/services/${prev.id}`}>
+        <span class="sn__dir"><Icon name="arrow" size={13} />Previous</span>
+        <span class="sn__t">{prev.data.title}</span>
+      </a>
+      <a class="sn__item sn__item--next" href={`/services/${next.id}`}>
+        <span class="sn__dir">Next<Icon name="arrow" size={13} /></span>
+        <span class="sn__t">{next.data.title}</span>
+      </a>
+    </div>
+  </nav>
+</PageLayout>
+
+<style>
+  /* ---------- hero ---------- */
+
+  .sh {
+    background: var(--off);
+    padding-block: clamp(7rem, 12vw, 10rem) clamp(2.5rem, 5vw, 4rem);
+  }
+
+  .sh__grid {
+    display: grid;
+    gap: var(--s6);
+    align-items: center;
+  }
+
+  .sh__crumb {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.8125rem;
+    color: var(--text-3);
+  }
+  .sh__crumb a { transition: color var(--t2) var(--ease); }
+  .sh__crumb a:hover { color: var(--green-deep); }
+  .sh__crumb [aria-current] { color: var(--text); }
+
+  .sh__n { display: flex; margin-top: var(--s5); }
+
+  .sh__h {
+    margin-top: var(--s4);
+    font-size: clamp(2rem, 4vw, 3.4rem);
+    line-height: 1.04;
+    letter-spacing: -0.038em;
+    font-weight: 700;
+  }
+
+  .sh__intro {
+    margin-top: var(--s4);
+    max-width: 46ch;
+    font-size: var(--lead);
+    line-height: 1.6;
+    color: var(--text-2);
+  }
+
+  .sh__acts {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s4);
+    margin-top: var(--s5);
+  }
+
+  .sh__wa {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.85rem 1.4rem;
+    border-radius: 999px;
+    background: var(--green);
+    color: #fff;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    transition: background-color var(--t2) var(--ease);
+  }
+  .sh__wa:hover { background: var(--text); }
+
+  .sh__call {
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    letter-spacing: 0.04em;
+    color: var(--text-2);
+    border-bottom: 1px solid var(--line-light);
+    padding-bottom: 2px;
+    transition: color var(--t2) var(--ease), border-color var(--t2) var(--ease);
+  }
+  .sh__call:hover { color: var(--green-deep); border-color: var(--green-deep); }
+
+  .sh__media {
+    border-radius: 14px;
+    overflow: hidden;
+    aspect-ratio: 16 / 11;
+    background: var(--off-2);
+  }
+  .sh__media :global(img) { width: 100%; height: 100%; object-fit: cover; }
+
+  /* ---------- body ---------- */
+
+  .sb { background: var(--white); }
+
+  .sb__grid { display: grid; gap: var(--s7); align-items: start; }
+
+  .sb__prose :global(p) {
+    max-width: 68ch;
+    font-size: 1.0625rem;
+    line-height: 1.75;
+    color: var(--text-2);
+  }
+  .sb__prose :global(p + p) { margin-top: 1.1rem; }
+  .sb__prose :global(strong) { color: var(--text); font-weight: 600; }
+
+  .sb__side { display: grid; gap: var(--s5); }
+
+  .sb__box {
+    padding: 1.4rem 1.5rem;
+    border: 1px solid var(--line-light);
+    border-left: 3px solid var(--green);
+    border-radius: 12px;
+    background: var(--white);
+  }
+  .sb__box--quiet { border-left-color: var(--line-light); background: var(--off); }
+
+  .sb__bt {
+    font-family: var(--font-mono);
+    font-size: var(--label);
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+
+  .sb__list { display: grid; gap: 0.6rem; margin-top: var(--s4); }
+  .sb__list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.6rem;
+    font-size: var(--small);
+    line-height: 1.5;
+    color: var(--text-2);
+  }
+  .sb__list span {
+    flex: none;
+    width: 6px;
+    height: 6px;
+    margin-top: 0.45rem;
+    border-radius: 50%;
+    background: var(--green);
+  }
+
+  .sb__branches { display: grid; gap: 0.55rem; margin-top: var(--s4); }
+  .sb__branches b { font-size: 0.875rem; font-weight: 600; }
+  .sb__branches i {
+    font-style: normal;
+    font-size: 0.75rem;
+    color: var(--text-3);
+    margin-left: 0.4rem;
+  }
+
+  .sb__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-top: var(--s4);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--text);
+    border-bottom: 1px solid var(--text);
+    padding-bottom: 2px;
+    transition: color var(--t2) var(--ease), border-color var(--t2) var(--ease);
+  }
+  .sb__link:hover { color: var(--green-deep); border-color: var(--green-deep); }
+
+  /* ---------- prev / next ---------- */
+
+  .sn { background: var(--off); padding-block: clamp(2.5rem, 5vw, 4rem); }
+  .sn__grid { display: grid; gap: var(--s4); }
+
+  .sn__item {
+    display: grid;
+    gap: 0.4rem;
+    padding: 1.15rem 1.35rem;
+    border: 1px solid var(--line-light);
+    border-radius: 12px;
+    background: var(--white);
+    transition: border-color var(--t2) var(--ease), transform var(--t2) var(--ease);
+  }
+  .sn__item:hover { border-color: var(--green); transform: translateY(-2px); }
+  .sn__item--next { text-align: right; }
+
+  .sn__dir {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+  .sn__item--next .sn__dir { justify-self: end; }
+  .sn__item :global(svg) { transform: rotate(180deg); }
+  .sn__item--next :global(svg) { transform: none; }
+
+  .sn__t { font-size: 1.0625rem; font-weight: 600; letter-spacing: -0.02em; }
+
+  /* ---------- layout ---------- */
+
+  @media (min-width: 62rem) {
+    .sh__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--s8); }
+    .sb__grid { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: var(--s8); }
+    .sn__grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
