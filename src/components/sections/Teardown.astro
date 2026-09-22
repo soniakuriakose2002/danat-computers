@@ -1,0 +1,570 @@
+---
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import Icon from '@components/ui/Icon.astro';
+import { site, brands } from '@data/site';
+
+/**
+ * TEARDOWN — the machine comes apart, part by part, as you scroll.
+ *
+ * Six stages. Each one is a band: the stage number on a rail at the
+ * left, the render in the middle, the spec at the right. Scrolling
+ * moves you through the disassembly rather than playing a video, which
+ * means it stays sharp at any screen size, weighs a fraction of a video
+ * file, and every word in it is real text that Google can read.
+ *
+ * RENDERS: drop six images into src/assets/renders/ named
+ *   01.png  02.png  03.png  04.png  05.png  06.png
+ * (.jpg/.webp also fine). They are picked up automatically, converted to
+ * WebP and sized per device at build time. Until a file is there, its
+ * stage shows a marked empty frame rather than a broken one.
+ *
+ * Best results: transparent PNG, ~2000px wide, the part lit against
+ * near-black with a green edge glow, shot from the same angle each time
+ * so the six read as one machine coming apart.
+ */
+const files = import.meta.glob<{ default: ImageMetadata }>(
+  '/src/assets/renders/*.{png,jpg,jpeg,webp,avif}',
+  { eager: true }
+);
+const render = (n: string): ImageMetadata | null =>
+  Object.entries(files).find(([p]) => p.includes(`/${n}.`))?.[1].default ?? null;
+
+const stages = [
+  {
+    n: '01',
+    rail: 'The complete system',
+    sub: null,
+    icon: 'laptop',
+    title: 'Brilliant display',
+    lead: 'Crystal clear visuals for a better viewing experience.',
+    specs: ['Full HD / 2K / 4K options', 'Anti-glare display', 'Vivid colour accuracy'],
+    hero: true,
+  },
+  {
+    n: '02',
+    rail: 'Display',
+    sub: 'See more.\nDo more.',
+    icon: 'laptop',
+    title: 'Brilliant display',
+    lead: 'Crystal clear visuals for a better viewing experience.',
+    specs: ['Full HD / 2K / 4K options', 'Anti-glare display', 'Vivid colour accuracy'],
+    hero: false,
+  },
+  {
+    n: '03',
+    rail: 'Performance',
+    sub: 'Built to\nkeep up.',
+    icon: 'chip',
+    title: 'Powerful performance',
+    lead: 'Latest Intel and AMD processors for seamless multitasking.',
+    specs: ['Intel Core / AMD Ryzen', 'High-speed RAM', 'Optimised for work, study and gaming'],
+    hero: false,
+  },
+  {
+    n: '04',
+    rail: 'Storage',
+    sub: 'Your data.\nAlways with you.',
+    icon: 'ssd',
+    title: 'Fast, reliable storage',
+    lead: 'More speed. More space. More possibilities.',
+    specs: ['SSD for faster performance', 'Large storage options', 'Secure data handling'],
+    hero: false,
+  },
+  {
+    n: '05',
+    rail: 'Cooling',
+    sub: 'Stay cool.\nPerform better.',
+    icon: 'fan',
+    title: 'Advanced cooling',
+    lead: 'Efficient thermal design for long-lasting performance.',
+    specs: ['Optimised airflow', 'Quieter operation', 'Stable performance'],
+    hero: false,
+  },
+  {
+    n: '06',
+    rail: 'Connectivity',
+    sub: 'Stay connected.\nEverywhere.',
+    icon: 'ports',
+    title: 'All the connections you need',
+    lead: 'Plug in, connect and get more done.',
+    specs: ['USB-C / USB-A', 'HDMI / display support', 'Audio and more'],
+    hero: false,
+  },
+];
+
+const pillars = [
+  { icon: 'box', a: 'Sales &', b: 'consultation' },
+  { icon: 'gear', a: 'Repair &', b: 'maintenance' },
+  { icon: 'chip', a: 'Upgrades &', b: 'customisation' },
+  { icon: 'shield', a: 'Warranty', b: 'support' },
+  { icon: 'users', a: 'Business', b: 'solutions' },
+];
+---
+
+<section class="td" data-tone="ink">
+  {stages.map((s, i) => {
+    const img = render(s.n);
+    return (
+      <article class="td__stage" data-hero={s.hero ? '' : undefined}>
+        <div class="shell td__grid">
+          {/* rail */}
+          <div class="td__rail" data-rise>
+            <span class="td__n">{s.n}</span>
+            <span class="td__line" aria-hidden="true"></span>
+            <span class="td__k">{s.rail}</span>
+            {s.sub && <span class="td__sub">{s.sub}</span>}
+          </div>
+
+          {/* the part */}
+          <figure class="td__fig" data-parallax={i === 0 ? '0.06' : '0.14'}>
+            {img ? (
+              <Image src={img} alt="" widths={[720, 1100, 1600]}
+                sizes="(min-width: 62rem) 46vw, 92vw"
+                quality={82} format="webp"
+                loading={i === 0 ? 'eager' : 'lazy'} />
+            ) : (
+              <span class="td__slot">
+                <b>{s.n}</b>
+                <i>{s.rail} render</i>
+                <em>src/assets/renders/{s.n}.png</em>
+              </span>
+            )}
+            <span class="td__glow" aria-hidden="true"></span>
+          </figure>
+
+          {/* spec */}
+          <div class="td__body">
+            {s.hero ? (
+              <>
+                <p class="td__eb" data-rise>{site.nameFull}</p>
+                <h2 class="td__h1" data-rise style="--d:80ms">
+                  More than<br />just <em>a laptop</em>
+                </h2>
+                <p class="td__lead" data-rise style="--d:150ms">
+                  Complete technology solutions to power your work, study and
+                  business.
+                </p>
+                <a class="td__cue" href="#stage-02" data-rise style="--d:220ms">
+                  <span aria-hidden="true"><Icon name="arrow" size={16} /></span>
+                  Scroll to explore
+                </a>
+              </>
+            ) : (
+              <>
+                <span class="td__ic" aria-hidden="true"><Icon name={s.icon} size={22} /></span>
+                <h3 class="td__h" data-rise>{s.title}</h3>
+                <p class="td__p" data-rise style="--d:70ms">{s.lead}</p>
+                <ul class="td__specs">
+                  {s.specs.map((sp, si) => (
+                    <li data-rise style={`--d:${120 + si * 60}ms`}>
+                      <Icon name="check" size={14} />{sp}
+                    </li>
+                  ))}
+                </ul>
+              </>
+            )}
+          </div>
+        </div>
+
+        {s.hero && (
+          <p class="td__script" aria-hidden="true">
+            Technology<br />for a Brighter<br />Tomorrow.
+          </p>
+        )}
+        <span id={`stage-${s.n}`} class="td__anchor" aria-hidden="true"></span>
+      </article>
+    );
+  })}
+
+  {/* ── closing: it is a service business, not a product page ── */}
+  <div class="td__close">
+    <div class="shell td__cgrid">
+      <div>
+        <p class="td__eb" data-rise>Our service</p>
+        <h2 class="td__ch" data-rise style="--d:70ms">
+          More than products.<br />A complete <em>service experience.</em>
+        </h2>
+        <p class="td__cp" data-rise style="--d:130ms">
+          From purchase to performance, we are with you at every step.
+        </p>
+        <a class="td__cta" href="/services" data-rise style="--d:190ms">
+          Explore our services
+          <span aria-hidden="true"><Icon name="arrow" size={15} /></span>
+        </a>
+      </div>
+
+      <ul class="td__pillars">
+        {pillars.map((p, i) => (
+          <li data-rise style={`--d:${i * 60}ms`}>
+            <span aria-hidden="true"><Icon name={p.icon} size={19} /></span>
+            <b>{p.a}<br />{p.b}</b>
+          </li>
+        ))}
+      </ul>
+
+      <dl class="td__stats" data-rise style="--d:220ms">
+        <div>
+          <dt><span data-count={brands.flat().length}>0</span></dt>
+          <dd>Brands we carry</dd>
+        </div>
+        <div>
+          <dt><span data-count={site.stats.branches}>0</span></dt>
+          <dd>Branches across Oman</dd>
+        </div>
+        {/* Nobody has given us a customer count, so the slot is held open
+            rather than filled with a round number. */}
+        <div class="td__pending">
+          <dt>&nbsp;</dt>
+          <dd>Customers served <s>figure to confirm</s></dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<style>
+  .td {
+    position: relative;
+    background: #07090a;
+    color: #fff;
+    overflow: hidden;
+  }
+
+  /* Each part gets its own band; the rules between them are what makes
+     it read as a sequence rather than one long picture. */
+  .td__stage {
+    position: relative;
+    padding-block: clamp(3rem, 7vw, 5.5rem);
+    border-bottom: 1px solid rgb(255 255 255 / 0.07);
+  }
+  .td__stage[data-hero] {
+    padding-block: clamp(6.5rem, 11vw, 9rem) clamp(3rem, 7vw, 5.5rem);
+  }
+
+  .td__anchor { position: absolute; top: -5rem; }
+
+  .td__grid {
+    display: grid;
+    gap: clamp(1.25rem, 3vw, 2.5rem);
+    align-items: center;
+  }
+
+  /* ---------- rail ---------- */
+
+  .td__rail {
+    display: grid;
+    justify-items: start;
+    gap: 0.5rem;
+  }
+  .td__n {
+    font-size: 0.9375rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: rgb(255 255 255 / 0.85);
+  }
+  .td__line {
+    width: 1px;
+    height: 2.2rem;
+    background: linear-gradient(to bottom, var(--green), transparent);
+  }
+  .td__k {
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgb(255 255 255 / 0.62);
+  }
+  .td__sub {
+    font-size: 0.8125rem;
+    line-height: 1.45;
+    white-space: pre-line;
+    color: rgb(255 255 255 / 0.45);
+  }
+
+  /* ---------- the part ---------- */
+
+  .td__fig {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: clamp(11rem, 26vw, 20rem);
+  }
+  .td__fig :global(img) {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+  }
+
+  /* The green bloom behind the part. This is what carries the look while
+     the renders are still missing. */
+  .td__glow {
+    position: absolute;
+    inset: 8% 4%;
+    z-index: 0;
+    border-radius: 50%;
+    background: radial-gradient(
+      ellipse at 50% 55%,
+      rgb(89 170 84 / 0.26) 0%,
+      rgb(89 170 84 / 0.08) 42%,
+      transparent 70%
+    );
+    filter: blur(24px);
+  }
+
+  /* Marked, not broken. Disappears the moment a render lands. */
+  .td__slot {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    justify-items: center;
+    gap: 0.4rem;
+    width: 100%;
+    padding: clamp(2rem, 5vw, 3.5rem) 1rem;
+    border: 1px dashed rgb(255 255 255 / 0.18);
+    border-radius: 14px;
+    text-align: center;
+  }
+  .td__slot b {
+    font-size: 1.6rem;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    color: rgb(255 255 255 / 0.28);
+  }
+  .td__slot i {
+    font-style: normal;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--green-bright);
+  }
+  .td__slot em {
+    font-style: normal;
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.06em;
+    /* 0.32 measured 2.79:1 — under AA. 0.55 is 5.87:1. */
+    color: rgb(255 255 255 / 0.55);
+  }
+
+  /* ---------- spec column ---------- */
+
+  .td__eb {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--green-bright);
+  }
+
+  .td__h1 {
+    margin-top: var(--s4);
+    font-size: clamp(2.1rem, 4.6vw, 3.4rem);
+    line-height: 1.04;
+    letter-spacing: -0.042em;
+    font-weight: 700;
+  }
+  .td__h1 em { font-style: normal; color: var(--green-bright); }
+
+  .td__lead {
+    margin-top: var(--s4);
+    max-width: 34ch;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: rgb(255 255 255 / 0.74);
+  }
+
+  .td__cue {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin-top: var(--s5);
+    font-size: 0.875rem;
+    color: rgb(255 255 255 / 0.82);
+  }
+  .td__cue span {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1px solid rgb(255 255 255 / 0.28);
+    transform: rotate(90deg);
+    transition: background-color var(--t2) var(--ease), transform var(--t2) var(--ease);
+  }
+  .td__cue:hover span { background: rgb(255 255 255 / 0.1); transform: rotate(90deg) translateX(3px); }
+
+  .td__ic {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    color: var(--green-bright);
+  }
+
+  .td__h {
+    margin-top: 0.4rem;
+    font-size: clamp(1.15rem, 2.2vw, 1.5rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+  }
+  .td__p {
+    margin-top: 0.45rem;
+    max-width: 34ch;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: rgb(255 255 255 / 0.66);
+  }
+
+  .td__specs { display: grid; gap: 0.5rem; margin-top: var(--s4); }
+  .td__specs li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.55rem;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: rgb(255 255 255 / 0.8);
+  }
+  .td__specs :global(svg) { flex: none; margin-top: 3px; color: var(--green-bright); }
+
+  /* ---------- handwritten aside ---------- */
+
+  .td__script {
+    position: absolute;
+    right: clamp(1rem, 3vw, 3rem);
+    top: 32%;
+    max-width: 10rem;
+    font-family: var(--font-serif, Georgia, serif);
+    font-style: italic;
+    font-size: clamp(1rem, 1.7vw, 1.35rem);
+    line-height: 1.3;
+    color: rgb(255 255 255 / 0.5);
+    rotate: -8deg;
+    pointer-events: none;
+    display: none;
+  }
+
+  /* ---------- closing ---------- */
+
+  .td__close {
+    padding-block: clamp(3rem, 7vw, 5rem);
+    /* Must land on --ink at the bottom: the wave at the top of the brand
+       strip is filled --ink, and a boundary shape is only invisible if it
+       matches the section above it. Ending on #07090a would show a seam. */
+    background: linear-gradient(160deg, #0a1b0f, var(--ink) 62%);
+  }
+  .td__cgrid { display: grid; gap: clamp(1.75rem, 4vw, 3rem); align-items: center; }
+
+  .td__ch {
+    margin-top: var(--s4);
+    font-size: clamp(1.6rem, 3.2vw, 2.4rem);
+    line-height: 1.1;
+    letter-spacing: -0.04em;
+    font-weight: 700;
+  }
+  .td__ch em { font-style: normal; color: var(--green-bright); }
+
+  .td__cp {
+    margin-top: var(--s4);
+    max-width: 36ch;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: rgb(255 255 255 / 0.7);
+  }
+
+  .td__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: var(--s5);
+    padding: 0.85rem 1.5rem;
+    border-radius: 999px;
+    background: var(--green);
+    color: #07090a;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    transition: background-color var(--t2) var(--ease), transform var(--t2) var(--ease);
+  }
+  .td__cta:hover { background: var(--green-bright); transform: translateY(-2px); }
+
+  .td__pillars {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
+    gap: 0.6rem;
+  }
+  .td__pillars li {
+    display: grid;
+    justify-items: center;
+    gap: 0.6rem;
+    padding: 1.1rem 0.6rem;
+    border: 1px solid rgb(255 255 255 / 0.1);
+    border-radius: 12px;
+    text-align: center;
+    transition: border-color var(--t2) var(--ease), background-color var(--t2) var(--ease);
+  }
+  .td__pillars li:hover {
+    border-color: rgb(111 201 106 / 0.45);
+    background: rgb(111 201 106 / 0.06);
+  }
+  .td__pillars span { color: var(--green-bright); }
+  .td__pillars b {
+    font-size: 0.75rem;
+    font-weight: 500;
+    line-height: 1.35;
+    color: rgb(255 255 255 / 0.82);
+  }
+
+  .td__stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s5);
+    padding-top: var(--s5);
+    border-top: 1px solid rgb(255 255 255 / 0.12);
+  }
+  .td__stats dt {
+    font-size: clamp(1.4rem, 2.4vw, 2rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .td__stats dd {
+    margin-top: 0.3rem;
+    font-size: 0.75rem;
+    color: rgb(255 255 255 / 0.62);
+  }
+  .td__pending dt {
+    min-width: 3ch;
+    border-bottom: 1px dashed rgb(255 255 255 / 0.3);
+  }
+  .td__stats s {
+    display: block;
+    margin-top: 0.2rem;
+    text-decoration: none;
+    font-family: var(--font-mono);
+    font-size: 0.5rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgb(255 255 255 / 0.42);
+  }
+
+  /* ---------- responsive ---------- */
+
+  @media (min-width: 62rem) {
+    .td__grid {
+      grid-template-columns: minmax(0, 0.42fr) minmax(0, 1.25fr) minmax(0, 0.9fr);
+      gap: clamp(1.5rem, 3vw, 3rem);
+    }
+    .td__script { display: block; }
+    .td__cgrid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); }
+    .td__stats { grid-column: 1 / -1; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .td__cta, .td__cta:hover, .td__cue span { transform: none; transition: none; }
+    .td__cue span { transform: rotate(90deg); }
+  }
+</style>

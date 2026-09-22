@@ -1,0 +1,265 @@
+---
+import { Image } from 'astro:assets';
+import Icon from '@components/ui/Icon.astro';
+import { site, branches } from '@data/site';
+import poster from '@assets/photos/repair-solder.jpg';
+
+/**
+ * HERO — 3D video.
+ *
+ * NOT YET WIRED INTO THE HOMEPAGE. Hero.astro is still the live hero and
+ * is untouched; swapping is a one-line import change in index.astro, and
+ * reverting is the same one line.
+ *
+ * This is waiting on one asset: a rendered 3D clip. Drop it in as
+ *   public/video/hero.webm   (VP9 or AV1, preferred)
+ *   public/video/hero.mp4    (H.264 baseline, for Safari/iOS)
+ * and set HAS_VIDEO to true. Until then the poster frame carries the
+ * section, so nothing renders broken.
+ *
+ * Spec for whoever renders it:
+ *   - 16:9, 1920x1080, no alpha needed (it sits behind a scrim)
+ *   - 6-10 seconds, and it MUST loop seamlessly: last frame == first
+ *   - no audio track at all (autoplay is blocked otherwise, and the
+ *     track is dead weight)
+ *   - under 3 MB after encoding. Above that it will not have started
+ *     before a visitor on Omani mobile has already scrolled past
+ *   - dark, near-black ground so white type holds contrast over it
+ *
+ * Autoplay only works muted and inline, which is why those attributes
+ * are not optional.
+ */
+const HAS_VIDEO = false;
+
+const nav = branches.map((b) => b.city.split(',')[0]);
+---
+
+<section class="h3">
+  <div class="h3__bg">
+    {HAS_VIDEO ? (
+      <video
+        class="h3__video"
+        poster={poster.src}
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="metadata"
+        aria-hidden="true"
+      >
+        <source src="/video/hero.webm" type="video/webm" />
+        <source src="/video/hero.mp4" type="video/mp4" />
+      </video>
+    ) : (
+      <Image
+        class="h3__poster"
+        src={poster}
+        alt=""
+        widths={[1000, 1600, 2200]}
+        sizes="100vw"
+        quality={72}
+        format="webp"
+        loading="eager"
+        fetchpriority="high"
+      />
+    )}
+    <span class="h3__scrim" aria-hidden="true"></span>
+  </div>
+
+  {!HAS_VIDEO && (
+    <p class="h3__slot">
+      <Icon name="plus" size={13} />
+      3D clip slot — awaiting render
+    </p>
+  )}
+
+  <div class="shell h3__in">
+    <p class="h3__kicker" data-rise>One company.<br />Many solutions.</p>
+
+    <h1 class="h3__title">
+      <span class="mask"><span class="mask__i" style="--d:140ms">Technology</span></span>
+      <span class="mask"><span class="mask__i" style="--d:250ms">that keeps</span></span>
+      <span class="mask"><span class="mask__i" style="--d:360ms">you <em>moving.</em></span></span>
+    </h1>
+
+    <p class="h3__p" data-rise style="--d:480ms">
+      Repair. Protect. Connect. Recover. Support. Danat Computers delivers
+      reliable IT solutions for individuals and businesses across Oman.
+    </p>
+
+    <a class="h3__cta" href="/services" data-rise style="--d:560ms">
+      Explore our services
+      <span class="h3__ctai" aria-hidden="true"><Icon name="arrow" size={16} /></span>
+    </a>
+  </div>
+
+  <p class="h3__rail" aria-hidden="true">{nav.join(' · ')}</p>
+  <p class="h3__scroll" aria-hidden="true">Scroll</p>
+</section>
+
+<style>
+  .h3 {
+    position: relative;
+    display: grid;
+    align-items: center;
+    min-height: min(100svh, 52rem);
+    padding-block: clamp(7rem, 12vw, 10rem) clamp(4rem, 8vw, 6rem);
+    background: var(--ink);
+    color: #fff;
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .h3__bg { position: absolute; inset: 0; z-index: 0; }
+  .h3__video,
+  .h3__bg :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 58% 45%;
+  }
+
+  /* Weighted left, where the type sits; the right keeps the picture. */
+  .h3__scrim {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(100deg,
+        rgb(8 10 12 / 0.92) 0%,
+        rgb(8 10 12 / 0.78) 40%,
+        rgb(8 10 12 / 0.42) 74%,
+        rgb(8 10 12 / 0.24) 100%),
+      linear-gradient(to top, rgb(8 10 12 / 0.6), transparent 42%);
+  }
+
+  /* Marks the empty asset rather than hiding it. Goes when the clip lands. */
+  .h3__slot {
+    position: absolute;
+    top: clamp(5.5rem, 9vw, 7rem);
+    right: clamp(1rem, 3vw, 2.5rem);
+    z-index: 2;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.35rem 0.7rem;
+    border: 1px dashed rgb(255 255 255 / 0.4);
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgb(255 255 255 / 0.72);
+  }
+
+  .h3__in { position: relative; z-index: 1; }
+
+  .h3__kicker {
+    position: relative;
+    padding-left: 3.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    line-height: 1.8;
+    color: rgb(255 255 255 / 0.78);
+  }
+  .h3__kicker::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.55rem;
+    width: 2.4rem;
+    height: 1px;
+    background: var(--green-bright);
+  }
+
+  .h3__title {
+    margin-top: var(--s5);
+    font-size: clamp(2.6rem, 7.4vw, 5.6rem);
+    line-height: 0.98;
+    letter-spacing: -0.045em;
+    font-weight: 700;
+  }
+  .h3__title em { font-style: normal; color: var(--green-bright); }
+
+  .h3__p {
+    margin-top: var(--s5);
+    max-width: 46ch;
+    font-size: var(--lead);
+    line-height: 1.6;
+    color: rgb(255 255 255 / 0.84);
+  }
+
+  .h3__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.9rem;
+    margin-top: var(--s5);
+    padding: 0.6rem 0.6rem 0.6rem 1.7rem;
+    border: 1px solid rgb(255 255 255 / 0.28);
+    border-radius: 999px;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: border-color var(--t2) var(--ease), background-color var(--t2) var(--ease);
+  }
+  .h3__cta:hover { border-color: transparent; background: rgb(255 255 255 / 0.1); }
+
+  .h3__ctai {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    flex: none;
+    border-radius: 50%;
+    background: var(--green);
+    color: #0e1012;
+    transition: transform var(--t2) var(--ease);
+  }
+  .h3__cta:hover .h3__ctai { transform: translateX(3px); }
+
+  .h3__rail,
+  .h3__scroll {
+    position: absolute;
+    z-index: 1;
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgb(255 255 255 / 0.5);
+  }
+  .h3__rail {
+    right: clamp(0.8rem, 2vw, 1.4rem);
+    top: 50%;
+    writing-mode: vertical-rl;
+    transform: translateY(-50%);
+  }
+  .h3__scroll {
+    left: clamp(1rem, 3vw, 2.5rem);
+    bottom: clamp(1.4rem, 3vw, 2.5rem);
+  }
+
+  @media (max-width: 62rem) {
+    .h3__rail { display: none; }
+  }
+
+  /* A looping clip is motion nobody asked for. Reduced motion gets the
+     poster frame, and the script below never calls play(). */
+  @media (prefers-reduced-motion: reduce) {
+    .h3__ctai { transition: none; }
+  }
+</style>
+
+<script is:inline>
+  // autoplay is a request, not a guarantee: low-power mode, data saver and
+  // reduced-motion all refuse it. The poster stays up in every such case.
+  (() => {
+    const v = document.querySelector('.h3__video');
+    if (!v) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      v.removeAttribute('autoplay');
+      v.pause();
+      return;
+    }
+    v.play?.().catch(() => {});
+  })();
+</script>
