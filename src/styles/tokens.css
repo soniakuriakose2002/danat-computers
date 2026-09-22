@@ -30,6 +30,19 @@
   --green-deep: #2f6429; /* on light surfaces  6.8:1 on --white */
   --green-wash: #eef6ed;
 
+  /* ---------- ACCENT — clay ----------
+     NOT from the logo. The mark is 100x100 and effectively all green;
+     its few warm pixels are compression artefacts, not a second brand
+     colour. Clay is a deliberate choice: hue 21, which is 95 degrees
+     off the green at 116, so the two never read as a gradient of each
+     other. Warm against the green's cool, and at home in Oman.
+     Used for editorial emphasis, never for a primary action — green
+     stays the button colour so a call to action is always one colour. */
+  --clay: #c2591f; /* fills and graphics   4.4:1 on --white */
+  --clay-bright: #e08b54; /* on dark surfaces     7.3:1 on --ink   */
+  --clay-deep: #a84a16; /* on light surfaces    5.7:1 on --white, 5.2:1 on --off */
+  --clay-wash: #fbf0e9;
+
   /* ---------- SEMANTIC (flipped by [data-tone]) ---------- */
   --bg: var(--white);
   --bg-2: var(--off);
