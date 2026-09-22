@@ -67,10 +67,6 @@ const N = items.length;
 ---
 
 <section class="gk section" data-tone="off" data-gk>
-  <svg class="gk__wave" viewBox="0 0 1440 72" preserveAspectRatio="none" aria-hidden="true">
-    <path d="M0,0 H1440 V22 C1268,62 1122,12 946,32 C770,52 648,72 476,56 C332,43 168,16 0,30 Z"></path>
-  </svg>
-
   <div class="shell gk__head">
     <div>
       <p class="label" data-rise>Inside Danat</p>
@@ -154,24 +150,9 @@ const N = items.length;
     position: relative;
     background: var(--off);
     color: var(--text);
-    padding-block: clamp(5rem, 8vw, 8rem) clamp(3.5rem, 6vw, 6rem);
+    padding-block: clamp(3.5rem, 6vw, 6rem);
     overflow: hidden;
     isolation: isolate;
-  }
-
-  .gk__wave {
-    position: absolute;
-    top: -1px;
-    left: 0;
-    width: 100%;
-    height: clamp(34px, 5vw, 72px);
-    z-index: 0;
-    pointer-events: none;
-  }
-
-  /* The section above is white, so that is what flows down. */
-  .gk__wave path {
-    fill: var(--white);
   }
 
   /* ---------- head ---------- */
