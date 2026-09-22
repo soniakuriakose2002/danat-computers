@@ -84,7 +84,7 @@ const features = [
 ---
 
 <section class="cf section" data-tone="light" data-cf>
-  <!-- Wavy boundary with the dark hero above. Two layers drifting at
+  <!-- Wavy boundary with the white section above. Two layers drifting at
        different speeds so the edge reads as water, not a shape. -->
   <div class="cf__wave" aria-hidden="true">
     <svg viewBox="0 0 1440 130" preserveAspectRatio="none">
@@ -214,7 +214,7 @@ const features = [
 <style>
   .cf {
     position: relative;
-    background: var(--white);
+    background: var(--off);
     /* Extra top padding so the content clears the wave. */
     padding-block: clamp(6rem, 11vw, 10rem) clamp(3.5rem, 6vw, 5.5rem);
     overflow: hidden;
@@ -241,13 +241,13 @@ const features = [
   /* The back layer is the hero's ink, slightly translucent; the front
      layer is solid, so the two read as overlapping swells. */
   .cf__wave-b {
-    fill: color-mix(in oklab, var(--ink) 55%, transparent);
+    fill: color-mix(in oklab, var(--white) 62%, transparent);
     transform-origin: center;
     animation: cf-swell-b 13s ease-in-out infinite alternate;
   }
 
   .cf__wave-f {
-    fill: var(--ink);
+    fill: var(--white);
     animation: cf-swell-f 9s ease-in-out infinite alternate;
   }
 
@@ -288,8 +288,8 @@ const features = [
     position: absolute;
     inset: 0;
     background:
-      linear-gradient(100deg, #fff 0%, #fff 42%, rgb(255 255 255 / 0.9) 58%, rgb(255 255 255 / 0.74) 100%),
-      linear-gradient(to bottom, #fff 0%, transparent 22%, transparent 74%, #fff 100%);
+      linear-gradient(100deg, var(--off) 0%, var(--off) 42%, rgb(244 244 242 / 0.9) 58%, rgb(244 244 242 / 0.74) 100%),
+      linear-gradient(to bottom, var(--off) 0%, transparent 22%, transparent 74%, var(--off) 100%);
   }
 
   /* ---------- layout ---------- */
@@ -768,6 +768,7 @@ const features = [
     border-radius: 50%;
     border: 1px solid var(--line-light);
     background: var(--white);
+    box-shadow: 0 1px 0 rgb(20 23 26 / 0.04);
     color: var(--green-deep);
   }
 

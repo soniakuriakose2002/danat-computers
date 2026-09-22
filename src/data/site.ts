@@ -69,8 +69,14 @@ export interface Branch {
   hours: string[];
   /** Map position as a % of the SVG viewBox — approximate, for the stylised map only. */
   map: { x: number; y: number };
-  /** false = needs confirmation from the client before launch */
+  /** Address/phone confirmed against a published source. */
   verified: boolean;
+  /**
+   * Opening hours are NOT sourced — they are a placeholder pattern.
+   * Nothing published by Danat states its trading hours. Leave false
+   * until the client confirms, so the UI can flag them.
+   */
+  hoursVerified: boolean;
 }
 
 /**
@@ -89,6 +95,7 @@ export const branches: Branch[] = [
     hours: ['Sat–Thu  09:00 – 13:00', 'Sat–Thu  16:00 – 21:00', 'Friday   Closed'],
     map: { x: 70, y: 30 },
     verified: true,
+    hoursVerified: false,
   },
   {
     slug: 'sohar',
@@ -100,6 +107,7 @@ export const branches: Branch[] = [
     hours: ['Sat–Thu  09:00 – 13:00', 'Sat–Thu  16:00 – 21:00', 'Friday   Closed'],
     map: { x: 55, y: 17 },
     verified: false,
+    hoursVerified: false,
   },
   {
     slug: 'hail',
@@ -111,6 +119,7 @@ export const branches: Branch[] = [
     hours: ['Sat–Thu  09:00 – 13:00', 'Sat–Thu  16:00 – 21:00', 'Friday   Closed'],
     map: { x: 63, y: 26 },
     verified: false,
+    hoursVerified: false,
   },
   {
     slug: 'salalah',
@@ -122,6 +131,7 @@ export const branches: Branch[] = [
     hours: ['Sat–Thu  09:00 – 13:00', 'Sat–Thu  16:00 – 21:00', 'Friday   Closed'],
     map: { x: 26, y: 76 },
     verified: false,
+    hoursVerified: false,
   },
 ];
 
