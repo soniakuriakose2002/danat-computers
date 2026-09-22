@@ -42,6 +42,8 @@
   /* ---------- TYPE ---------- */
   --font: 'Switzer', 'Switzer-fallback', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Mono', Menlo, monospace;
+  /* Italic only. Reserved for one emotive line per page. */
+  --font-serif: 'Instrument Serif', Georgia, 'Times New Roman', serif;
 
   --d1: clamp(2.75rem, 7.4vw, 7.5rem); /* hero */
   --d2: clamp(2.25rem, 5vw, 4.5rem); /* section heads */

@@ -2,124 +2,272 @@
 import PageLayout from '@layouts/PageLayout.astro';
 import Icon from '@components/ui/Icon.astro';
 import { site, whatsappLink, branches } from '@data/site';
-import { OMAN_PATH, OMAN_VIEWBOX, OMAN_PINS, OMAN_ROUTES } from '@data/omanMap';
+import { OMAN_PATH, OMAN_VIEWBOX, OMAN_PINS, OMAN_SPOKES } from '@data/omanMap';
 
 /** North to south, matching the map. */
 const order = ['sohar', 'hail', 'ruwi', 'salalah'];
 const list = order.map((s) => branches.find((b) => b.slug === s)!);
 
 const confirmed = list.filter((b) => b.verified).length;
+
+/**
+ * Which side of its pin each label sits on, so the chips never collide.
+ * Al Hail and Ruwi are only 28 map units apart, so Al Hail is pushed out
+ * to the right while Sohar hangs to the left.
+ */
+const labelSide: Record<string, 'left' | 'right'> = {
+  sohar: 'left',
+  hail: 'right',
+  ruwi: 'right',
+  salalah: 'right',
+};
+
+/**
+ * Al Hail and Ruwi are 28 map units apart — under 1% of the height — so
+ * their chips would sit on top of each other. Push one up, one down.
+ */
+const labelNudge: Record<string, string> = {
+  sohar: '0%',
+  hail: '-3.4%',
+  ruwi: '2.8%',
+  salalah: '0%',
+};
+
+const figures = [
+  { icon: 'building', v: site.stats.branches, suffix: '', l: 'Branches' },
+  { icon: 'box', v: site.stats.parts, suffix: '', l: 'Parts in stock' },
+  {
+    icon: 'award',
+    v: new Date().getFullYear() - site.stats.since,
+    suffix: '+',
+    l: 'Years trading',
+  },
+] as const;
+
+/** Map viewBox, so chip positions can be expressed as percentages. */
+const W = 1000;
+const H = 1342;
 ---
 
 <PageLayout
   title="Branches"
   description="Danat Computers has four branches across Oman — Ruwi, Sohar, Al Hail and Salalah. Addresses, opening hours and contact for each."
 >
-  <!-- ─────────── head ─────────── -->
+  {/* ─────────────────────── 01 · reach ─────────────────────── */}
   <section class="bh">
+    <!-- Soft brand blooms. They are what stops a white page reading as
+         an empty page, and they cost one composited layer each. -->
+    <div class="bh__aura" aria-hidden="true">
+      <span class="bh__b1"></span>
+      <span class="bh__b2"></span>
+      <span class="bh__b3"></span>
+    </div>
+
     <div class="shell">
-      <nav class="bh__crumb" aria-label="Breadcrumb">
+      <nav class="bh__crumb" aria-label="Breadcrumb" data-rise>
         <a href="/">Home</a>
         <span aria-hidden="true">/</span>
         <span aria-current="page">Branches</span>
       </nav>
 
       <div class="bh__grid">
-        <div>
-          <p class="label bh__l">Our reach</p>
-          <h1 class="bh__h">
+        <!-- ── copy ── -->
+        <div class="bh__copy">
+          <p class="eyebrow" data-rise>
+            <i class="eyebrow__dot" aria-hidden="true"></i>
+            Our reach
+            <i class="eyebrow__rule" aria-hidden="true"></i>
+          </p>
+
+          <h1 class="bh__h" data-rise style="--d:70ms">
             Four branches.<br /><em>One standard.</em>
           </h1>
-          <p class="bh__p">
+
+          <p class="bh__p" data-rise style="--d:130ms">
             Ruwi, Sohar, Al Hail and Salalah. The same technicians, the same
             free diagnosis and the same stock behind every counter.
           </p>
 
           <dl class="bh__figs">
-            <div><dt>{site.stats.branches}</dt><dd>Branches</dd></div>
-            <div><dt>{site.stats.parts.toLocaleString('en-US')}</dt><dd>Parts in stock</dd></div>
-            <div><dt>{new Date().getFullYear() - site.stats.since}+</dt><dd>Years trading</dd></div>
+            {figures.map((f, i) => (
+              <div class="fig" data-rise style={`--d:${190 + i * 70}ms`}>
+                <span class="fig__i" aria-hidden="true">
+                  <Icon name={f.icon} size={19} />
+                </span>
+                <div>
+                  <dt><span data-count={f.v}>0</span>{f.suffix}</dt>
+                  <dd>{f.l}</dd>
+                </div>
+              </div>
+            ))}
           </dl>
+
+          <div class="bh__acts" data-rise style="--d:400ms">
+            <a class="btn-green" href="#branches">
+              Find your nearest branch
+              <span class="btn-green__i" aria-hidden="true">
+                <Icon name="arrow" size={15} />
+              </span>
+            </a>
+            <span class="bh__where">
+              <Icon name="pin" size={15} />Across Oman
+            </span>
+          </div>
         </div>
 
-        <!-- map -->
-        <div class="bh__map">
-          <svg viewBox={OMAN_VIEWBOX} role="img"
-            aria-label="Map of Oman showing Danat branches in Sohar, Al Hail, Ruwi and Salalah">
-            <path class="bh__land" d={OMAN_PATH} />
-            {OMAN_ROUTES.map(([a, b]) => {
-              const p = OMAN_PINS[a];
-              const q = OMAN_PINS[b];
-              return (
-                <path class="bh__route"
-                  d={`M${p.x},${p.y} Q${(p.x + q.x) / 2 + 70},${(p.y + q.y) / 2} ${q.x},${q.y}`} />
-              );
-            })}
-            {list.map((b) => (
-              <g class="bh__pin" transform={`translate(${OMAN_PINS[b.slug].x} ${OMAN_PINS[b.slug].y})`}>
-                <circle class="bh__halo" r="46"></circle>
-                <circle class="bh__dot" r="14"></circle>
-              </g>
+        <!-- ── map ── -->
+        <div class="bh__map" data-rise style="--d:160ms">
+          <div class="bh__mapin">
+            <svg class="bh__svg" viewBox={OMAN_VIEWBOX} role="img"
+              aria-label="Map of Oman showing Danat branches in Sohar, Al Hail, Ruwi and Salalah">
+              <defs>
+                <linearGradient id="omanFill" x1="0" y1="0" x2="0.4" y2="1">
+                  <stop class="bh__s0" offset="0%" />
+                  <stop class="bh__s1" offset="100%" />
+                </linearGradient>
+              </defs>
+
+              <path class="bh__land" d={OMAN_PATH} />
+              <path class="bh__edge" d={OMAN_PATH} pathLength="1" />
+
+              {/* Every branch threads back to Ruwi, the main counter. */}
+              {OMAN_SPOKES.map(([a, b], i) => {
+                const p = OMAN_PINS[a];
+                const q = OMAN_PINS[b];
+                return (
+                  <path class="bh__route" style={`--i:${i}`}
+                    d={`M${p.x},${p.y} Q${(p.x + q.x) / 2 - 40},${(p.y + q.y) / 2} ${q.x},${q.y}`} />
+                );
+              })}
+
+              {list.map((b, i) => (
+                <g class="bh__pin" style={`--i:${i}`}
+                  transform={`translate(${OMAN_PINS[b.slug].x} ${OMAN_PINS[b.slug].y})`}>
+                  <circle class="bh__halo" r="44"></circle>
+                  <circle class="bh__ring" r="20"></circle>
+                  <circle class="bh__dot" r="12"></circle>
+                </g>
+              ))}
+            </svg>
+
+            {/* Labels are HTML, not SVG text — crisp at every size, and
+                each one jumps to its card. */}
+            {list.map((b, i) => (
+              <a class="chip" href={`#${b.slug}`} data-side={labelSide[b.slug]}
+                style={`--i:${i}; --x:${((OMAN_PINS[b.slug].x / W) * 100).toFixed(2)}%; --y:${((OMAN_PINS[b.slug].y / H) * 100).toFixed(2)}%; --dy:${labelNudge[b.slug]}`}>
+                {b.city.split(',')[0]}
+              </a>
             ))}
-          </svg>
+
+            <!-- A handwritten aside, set in the page's serif italic. -->
+            <p class="bh__note" aria-hidden="true">
+              Four locations<br />Stronger together
+              <svg class="bh__arrow" viewBox="0 0 90 70" fill="none">
+                <path d="M78 4C84 24 74 46 50 56" stroke="currentColor"
+                  stroke-width="3" stroke-linecap="round" pathLength="1" />
+                <path d="M62 52 49 57l9 10" stroke="currentColor"
+                  stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+            </p>
+          </div>
+
+          <!-- Floating promise card -->
+          <a class="promise" href={whatsappLink()} target="_blank"
+            rel="noopener noreferrer" data-rise style="--d:520ms">
+            <span class="promise__h">Quality<br />support<br />everywhere</span>
+            <span class="promise__p">Same service. Same care.<br />In every city.</span>
+            <span class="promise__i" aria-hidden="true">
+              <Icon name="arrow" size={14} />
+            </span>
+          </a>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ─────────── branch cards ─────────── -->
-  <section class="bl section" data-tone="light">
+  {/* ─────────────────────── 02 · branches ─────────────────────── */}
+  <section class="bl section" id="branches" data-tone="light">
+    <div class="shell bl__head">
+      <p class="eyebrow eyebrow--mid" data-rise>
+        <i class="eyebrow__rule" aria-hidden="true"></i>
+        Our branches
+        <i class="eyebrow__rule" aria-hidden="true"></i>
+      </p>
+      <h2 class="bl__h" data-rise style="--d:70ms">
+        Visit our <em>branches</em>
+      </h2>
+      <p class="bl__sub" data-rise style="--d:130ms">
+        Same friendly team. Same trusted service.
+      </p>
+    </div>
+
     <ul class="shell bl__grid">
       {list.map((b, i) => (
-        <li id={b.slug} data-rise style={`--d:${(i % 2) * 70}ms`}>
-          <article class="bl__card">
-            <header class="bl__top">
+        <li id={b.slug} data-rise style={`--d:${(i % 2) * 90}ms`}>
+          <article class="card">
+            {/* No shopfront photography has been supplied yet, so the
+                frame is held open rather than filled with stock. */}
+            <div class="card__media">
+              <span class="card__hatch" aria-hidden="true"></span>
+              <span class="card__wait">Shopfront photo to follow</span>
+              <span class="card__badge" aria-hidden="true">
+                <Icon name="building" size={19} />
+              </span>
+            </div>
+
+            <header class="card__top">
               <div>
-                <h2 class="bl__n">{b.name}</h2>
-                <p class="bl__c">{b.city}</p>
+                <h3 class="card__n">{b.name}</h3>
+                <p class="card__c">{b.city}</p>
               </div>
-              {!b.verified && <span class="bl__todo">Details to confirm</span>}
+              {b.slug === 'ruwi' ? (
+                <span class="card__tag">Main branch</span>
+              ) : (
+                !b.verified && <span class="card__tag card__tag--todo">To confirm</span>
+              )}
             </header>
 
-            <div class="bl__rows">
-              <div class="bl__row">
-                <Icon name="pin" size={17} />
+            <div class="card__rows">
+              <div class="card__row">
+                <Icon name="pin" size={16} />
                 {b.verified ? (
                   <address>{b.address.split('\n').map((l) => <>{l}<br /></>)}</address>
                 ) : (
-                  <span class="bl__slot">Street address to be confirmed</span>
+                  <span class="card__slot">Street address to be confirmed</span>
                 )}
               </div>
 
-              <div class="bl__row">
-                <Icon name="clock" size={17} />
-                <ul class="bl__hours" data-unverified={!b.hoursVerified ? '' : undefined}>
+              <div class="card__row">
+                <Icon name="clock" size={16} />
+                <ul class="card__hours" data-unverified={!b.hoursVerified ? '' : undefined}>
                   {b.hours.map((h) => <li>{h}</li>)}
-                  {!b.hoursVerified && <li class="bl__warn">Hours not yet confirmed</li>}
+                  {!b.hoursVerified && <li class="card__warn">Hours not yet confirmed</li>}
                 </ul>
               </div>
             </div>
 
-            <div class="bl__acts">
-              <a class="bl__wa"
+            <footer class="card__acts">
+              <a class="card__wa"
                 href={whatsappLink(`Hello Danat — I'd like to contact your ${b.name} branch about`)}
-                target="_blank" rel="noopener noreferrer">
-                <Icon name="whatsapp" size={15} />WhatsApp
+                target="_blank" rel="noopener noreferrer"
+                title={`WhatsApp ${b.name}`}
+                aria-label={`Message ${b.name} on WhatsApp`}>
+                <Icon name="whatsapp" size={18} />
               </a>
-              <a class="bl__call" href={`tel:${b.tel ?? site.phone.tel}`}>
+              <a class="card__call" href={`tel:${b.tel ?? site.phone.tel}`}>
                 {b.phone ?? site.phone.display}
               </a>
-              <span class="bl__dir" aria-disabled="true" title="Map link to be added">
-                Directions <Icon name="send" size={13} />
+              <span class="card__go" aria-hidden="true">
+                <Icon name="arrow" size={15} />
               </span>
-            </div>
+            </footer>
           </article>
         </li>
       ))}
     </ul>
 
     {confirmed < list.length && (
-      <p class="shell bl__note">
+      <p class="shell bl__note" data-rise>
         {list.length - confirmed} of {list.length} branch addresses are still
         being confirmed with the company. Phone and WhatsApp reach the Ruwi
         counter, who will direct you.
@@ -127,27 +275,70 @@ const confirmed = list.filter((b) => b.verified).length;
     )}
   </section>
 
-  <!-- ─────────── cta ─────────── -->
+  {/* ─────────────────────── 03 · cta ─────────────────────── */}
   <section class="bc" data-tone="ink">
     <div class="shell bc__in">
       <div>
-        <p class="label">Not sure which branch?</p>
-        <h2 class="bc__h">Message us.<br /><em>We will point you.</em></h2>
+        <p class="label" data-rise>Not sure which branch?</p>
+        <h2 class="bc__h" data-rise style="--d:70ms">
+          Message us.<br /><em>We will point you.</em>
+        </h2>
       </div>
-      <a class="bc__wa" href={whatsappLink()} target="_blank" rel="noopener noreferrer">
-        <Icon name="whatsapp" size={16} />Chat on WhatsApp
+      <a class="bc__wa" data-rise style="--d:140ms" href={whatsappLink()}
+        target="_blank" rel="noopener noreferrer"
+        title="Chat on WhatsApp" aria-label="Chat with Danat on WhatsApp">
+        <Icon name="whatsapp" size={20} />
       </a>
     </div>
   </section>
 </PageLayout>
 
 <style>
-  /* ---------- head ---------- */
+  /* ============================================================
+     01 · REACH
+     ============================================================ */
 
   .bh {
-    background: var(--off);
-    padding-block: clamp(7rem, 12vw, 10rem) clamp(2.5rem, 5vw, 4rem);
+    position: relative;
+    background: var(--white);
+    padding-block: clamp(6.5rem, 11vw, 9rem) clamp(3rem, 6vw, 5rem);
+    overflow: hidden;
+    isolation: isolate;
   }
+
+  /* ---------- ambient blooms ---------- */
+
+  .bh__aura {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+  }
+  .bh__aura span {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      color-mix(in oklab, var(--green) 30%, transparent) 0%,
+      transparent 68%
+    );
+    filter: blur(28px);
+  }
+  .bh__b1 { top: -26%; left: -14%; width: 44%; aspect-ratio: 1; opacity: 0.5; }
+  .bh__b2 { top: 8%; right: -18%; width: 52%; aspect-ratio: 1; opacity: 0.38; }
+  .bh__b3 { bottom: -30%; left: 30%; width: 46%; aspect-ratio: 1; opacity: 0.3; }
+
+  /* A very slow drift. Below ~0.04 Hz it never reads as "animation" —
+     it just stops the background looking like a flat fill. */
+  @media (prefers-reduced-motion: no-preference) {
+    .bh__b1 { animation: drift-a 26s var(--ease) infinite alternate; }
+    .bh__b2 { animation: drift-b 32s var(--ease) infinite alternate; }
+    .bh__b3 { animation: drift-a 38s var(--ease) infinite alternate-reverse; }
+  }
+  @keyframes drift-a { to { transform: translate3d(5%, 7%, 0) scale(1.14); } }
+  @keyframes drift-b { to { transform: translate3d(-7%, 5%, 0) scale(1.1); } }
+
+  /* ---------- breadcrumb ---------- */
 
   .bh__crumb {
     display: flex;
@@ -163,269 +354,707 @@ const confirmed = list.filter((b) => b.verified).length;
 
   .bh__grid {
     display: grid;
-    gap: var(--s7);
+    gap: clamp(2.5rem, 6vw, 4rem);
     align-items: center;
     margin-top: var(--s5);
   }
 
-  .bh__l { display: flex; }
+  /* ---------- eyebrow ---------- */
+
+  .eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--green-deep);
+  }
+  .eyebrow__dot {
+    width: 9px;
+    height: 9px;
+    flex: none;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 0 4px color-mix(in oklab, var(--green) 20%, transparent);
+  }
+  .eyebrow__rule {
+    width: 26px;
+    height: 1px;
+    flex: none;
+    background: color-mix(in oklab, var(--green) 55%, transparent);
+  }
+  .eyebrow--mid { justify-content: center; }
+
+  /* ---------- headline ---------- */
 
   .bh__h {
     margin-top: var(--s4);
-    font-size: clamp(2rem, 4vw, 3.4rem);
-    line-height: 1.04;
-    letter-spacing: -0.038em;
+    font-size: clamp(2.2rem, 5vw, 3.9rem);
+    line-height: 1.02;
+    letter-spacing: -0.042em;
     font-weight: 700;
   }
   .bh__h em { font-style: normal; color: var(--green-deep); }
 
   .bh__p {
     margin-top: var(--s4);
-    max-width: 44ch;
+    max-width: 42ch;
     font-size: var(--lead);
-    line-height: 1.6;
+    line-height: 1.62;
     color: var(--text-2);
   }
+
+  /* ---------- figures ---------- */
 
   .bh__figs {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--s5);
+    gap: clamp(0.6rem, 1.4vw, 0.9rem);
     margin-top: var(--s5);
-    padding-top: var(--s5);
-    border-top: 1px solid var(--line-light);
   }
-  .bh__figs > div + div { padding-left: var(--s5); border-left: 1px solid var(--line-light); }
-  .bh__figs dt {
-    font-size: clamp(1.35rem, 2vw, 1.75rem);
+
+  .fig {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.85rem 1.15rem 0.85rem 0.85rem;
+    border: 1px solid var(--line-light);
+    border-radius: 14px;
+    background: rgb(255 255 255 / 0.78);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 12px 26px -22px rgb(0 0 0 / 0.5);
+    transition:
+      transform var(--t2) var(--ease),
+      border-color var(--t2) var(--ease),
+      box-shadow var(--t2) var(--ease);
+  }
+  .fig:hover {
+    transform: translateY(-3px);
+    border-color: color-mix(in oklab, var(--green) 34%, var(--line-light));
+    box-shadow: 0 18px 30px -22px rgb(0 0 0 / 0.45);
+  }
+
+  .fig__i {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    flex: none;
+    border-radius: 11px;
+    color: var(--green-deep);
+    background: color-mix(in oklab, var(--green) 14%, #fff);
+  }
+
+  .fig dt {
+    font-size: 1.3rem;
     font-weight: 700;
     letter-spacing: -0.03em;
     line-height: 1;
     font-variant-numeric: tabular-nums;
   }
-  .bh__figs dd { margin-top: 0.25rem; font-size: 0.75rem; color: var(--text-3); }
-
-  /* ---------- map ---------- */
-
-  .bh__map { justify-self: center; width: 100%; max-width: 22rem; }
-  .bh__map svg { width: 100%; height: auto; overflow: visible; }
-
-  .bh__land {
-    fill: color-mix(in oklab, var(--green) 16%, #fff);
-    stroke: color-mix(in oklab, var(--green) 34%, #fff);
-    stroke-width: 3;
+  .fig dd {
+    margin-top: 0.2rem;
+    font-size: 0.75rem;
+    color: var(--text-3);
+    white-space: nowrap;
   }
 
+  /* ---------- actions ---------- */
+
+  .bh__acts {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s4) var(--s5);
+    margin-top: var(--s5);
+  }
+
+  .btn-green {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.55rem 0.55rem 0.55rem 1.6rem;
+    border-radius: 999px;
+    /* Measured: white is 8.73:1 on #27551F and 4.90:1 on #3D7F35, so
+       every point of the ramp clears AA. Running it out to --green
+       (#59AA54) would drop the right-hand end to 2.88:1. */
+    background: linear-gradient(100deg, #27551f, #3d7f35);
+    color: #fff;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    overflow: hidden;
+    box-shadow: 0 14px 28px -16px color-mix(in oklab, var(--green) 70%, #000);
+    transition: transform var(--t2) var(--ease), box-shadow var(--t2) var(--ease);
+  }
+  .btn-green:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 18px 32px -16px color-mix(in oklab, var(--green) 70%, #000);
+  }
+  /* A light sheen crosses the pill on hover. */
+  .btn-green::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      100deg, transparent 35%, rgb(255 255 255 / 0.22) 50%, transparent 65%
+    );
+    transform: translate3d(-100%, 0, 0);
+    transition: transform var(--t4) var(--ease);
+  }
+  .btn-green:hover::after { transform: translate3d(100%, 0, 0); }
+
+  .btn-green__i {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    flex: none;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.2);
+    transition: transform var(--t2) var(--ease);
+  }
+  .btn-green:hover .btn-green__i { transform: translateX(3px); }
+
+  .bh__where {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.875rem;
+    color: var(--text-2);
+  }
+  .bh__where :global(svg) { color: var(--green-deep); }
+
+  /* ============================================================
+     MAP
+     ============================================================ */
+
+  .bh__map { position: relative; justify-self: center; width: 100%; }
+  .bh__mapin { position: relative; width: 100%; max-width: 26rem; margin-inline: auto; }
+  .bh__svg { display: block; width: 100%; height: auto; overflow: visible; }
+
+  /* The fill arrives only once the coastline has been traced, so the
+     two do not compete for the eye. */
+  /* Gradient stops live here, not on the <stop> elements: var() is not
+     reliably resolved inside SVG presentation attributes. */
+  .bh__s0 { stop-color: var(--green); stop-opacity: 0.10; }
+  .bh__s1 { stop-color: var(--green); stop-opacity: 0.26; }
+
+  .bh__land {
+    fill: url(#omanFill);
+    stroke: none;
+    opacity: 0;
+    transition: opacity 900ms var(--ease) 820ms;
+  }
+  .bh__map[data-in] .bh__land { opacity: 1; }
+
+  /* Coastline draws itself over 1.5s. */
+  .bh__edge {
+    fill: none;
+    stroke: color-mix(in oklab, var(--green) 48%, #fff);
+    stroke-width: 3;
+    stroke-linejoin: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset 1500ms var(--ease) 120ms;
+  }
+  .bh__map[data-in] .bh__edge { stroke-dashoffset: 0; }
+
+  /* Spokes thread outward from Ruwi. */
   .bh__route {
     fill: none;
     stroke: var(--green);
-    stroke-width: 3;
-    stroke-dasharray: 3 14;
+    stroke-width: 2.5;
+    stroke-dasharray: 2 13;
     stroke-linecap: round;
-    opacity: 0.5;
-    animation: bh-flow 3s linear infinite;
+    opacity: 0;
+    transition: opacity 600ms var(--ease) calc(1480ms + var(--i) * 120ms);
   }
-  @keyframes bh-flow { to { stroke-dashoffset: -17; } }
+  .bh__map[data-in] .bh__route {
+    opacity: 0.55;
+    animation: flow 3s linear infinite;
+  }
+  @keyframes flow { to { stroke-dashoffset: -15; } }
 
-  .bh__dot { fill: var(--green); stroke: #fff; stroke-width: 5; }
+  /* Pins drop north to south, 150ms apart — the map is read in the same
+     order as the cards below it. */
+  .bh__pin {
+    --pd: calc(1560ms + var(--i) * 150ms);
+    opacity: 0;
+    scale: 0.2;
+    transform-box: fill-box;
+    transform-origin: center;
+    transition:
+      opacity 400ms var(--ease) var(--pd),
+      scale 620ms cubic-bezier(0.3, 1.5, 0.5, 1) var(--pd);
+  }
+  .bh__map[data-in] .bh__pin { opacity: 1; scale: 1; }
+
+  .bh__dot { fill: var(--green-deep); }
+  .bh__ring { fill: #fff; }
+
   .bh__halo {
     fill: var(--green);
     opacity: 0;
     transform-box: fill-box;
     transform-origin: center;
-    animation: bh-ping 3s var(--ease) infinite;
   }
-  .bh__pin:nth-child(3) .bh__halo { animation-delay: 0.4s; }
-  .bh__pin:nth-child(4) .bh__halo { animation-delay: 0.8s; }
-  .bh__pin:nth-child(5) .bh__halo { animation-delay: 1.2s; }
-
-  @keyframes bh-ping {
-    0% { opacity: 0.28; transform: scale(0.35); }
-    70% { opacity: 0; transform: scale(1); }
-    100% { opacity: 0; transform: scale(1); }
+  /* The ping waits until every pin has landed. */
+  .bh__map[data-in] .bh__halo {
+    animation: ping 3s var(--ease) calc(var(--pd) + 400ms) infinite;
+  }
+  @keyframes ping {
+    0% { opacity: 0.3; transform: scale(0.35); }
+    70%, 100% { opacity: 0; transform: scale(1); }
   }
 
-  /* ---------- cards ---------- */
+  /* ---------- label chips ---------- */
 
-  .bl { background: var(--white); }
+  .chip {
+    position: absolute;
+    top: calc(var(--y) + var(--dy, 0%));
+    left: var(--x);
+    padding: 0.3rem 0.7rem;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.92);
+    backdrop-filter: blur(6px);
+    box-shadow: 0 6px 16px -10px rgb(0 0 0 / 0.55);
+    font-size: clamp(0.6875rem, 1.1vw, 0.8125rem);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--text);
+    white-space: nowrap;
+    opacity: 0;
+    transition:
+      opacity 380ms var(--ease) calc(1760ms + var(--i) * 150ms),
+      color var(--t2) var(--ease),
+      background-color var(--t2) var(--ease);
+  }
+  /* `translate` does the anchoring so `opacity` is the only thing the
+     reveal touches — the two never fight. */
+  .chip[data-side='right'] { translate: 1.4rem -50%; }
+  .chip[data-side='left'] { translate: calc(-100% - 1.4rem) -50%; }
 
-  .bl__grid { display: grid; gap: clamp(1rem, 2vw, 1.5rem); }
+  .bh__map[data-in] .chip { opacity: 1; }
 
-  .bl__card {
+  .chip:hover { background: var(--green-deep); color: #fff; }
+
+  /* ---------- handwritten aside ---------- */
+
+  .bh__note {
+    position: absolute;
+    top: 0;
+    right: -4%;
+    max-width: 9.5rem;
+    /* It overhangs the map box, so it must never sit in front of the
+       promise card's hit area. */
+    pointer-events: none;
+    font-family: var(--font-serif, Georgia, serif);
+    font-style: italic;
+    font-size: clamp(0.95rem, 1.5vw, 1.2rem);
+    line-height: 1.3;
+    color: var(--text-2);
+    text-align: center;
+    opacity: 0;
+    rotate: -4deg;
+    transition: opacity 600ms var(--ease) 2200ms;
+  }
+  .bh__map[data-in] .bh__note { opacity: 1; }
+
+  .bh__arrow {
+    display: block;
+    width: 62px;
+    height: auto;
+    margin: 0.2rem auto 0;
+    color: var(--green);
+  }
+  /* The stroke draws once the words have settled. */
+  .bh__arrow path:first-child {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset 700ms var(--ease) 2500ms;
+  }
+  .bh__arrow path:last-child {
+    opacity: 0;
+    transition: opacity 250ms var(--ease) 3100ms;
+  }
+  .bh__map[data-in] .bh__arrow path:first-child { stroke-dashoffset: 0; }
+  .bh__map[data-in] .bh__arrow path:last-child { opacity: 1; }
+
+  /* ---------- promise card ---------- */
+
+  .promise {
+    position: relative;
+    display: block;
+    width: min(14rem, 100%);
+    margin: var(--s5) auto 0;
+    padding: 1.15rem 1.25rem;
+    border: 1px solid var(--line-light);
+    border-left: 3px solid var(--green);
+    border-radius: 14px;
+    background: rgb(255 255 255 / 0.9);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 20px 40px -28px rgb(0 0 0 / 0.55);
+    transition: transform var(--t2) var(--ease), box-shadow var(--t2) var(--ease);
+  }
+  .promise:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 26px 44px -28px rgb(0 0 0 / 0.5);
+  }
+
+  .promise__h {
+    display: block;
+    font-size: 1.05rem;
+    font-weight: 700;
+    line-height: 1.18;
+    letter-spacing: -0.028em;
+  }
+  .promise__p {
+    display: block;
+    margin-top: 0.6rem;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: var(--text-3);
+  }
+  .promise__i {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    margin-top: 0.85rem;
+    border-radius: 50%;
+    color: var(--green-deep);
+    background: color-mix(in oklab, var(--green) 13%, #fff);
+    transition: transform var(--t2) var(--ease), background-color var(--t2) var(--ease);
+  }
+  .promise:hover .promise__i {
+    transform: translateX(3px);
+    background: color-mix(in oklab, var(--green) 24%, #fff);
+  }
+
+  /* ============================================================
+     02 · BRANCHES
+     ============================================================ */
+
+  .bl { background: var(--off); }
+
+  .bl__head { text-align: center; }
+
+  .bl__h {
+    margin-top: var(--s4);
+    font-size: clamp(1.8rem, 3.6vw, 2.9rem);
+    font-weight: 700;
+    letter-spacing: -0.038em;
+    line-height: 1.08;
+  }
+  .bl__h em { font-style: normal; color: var(--green-deep); }
+
+  .bl__sub { margin-top: var(--s3); font-size: 1rem; color: var(--text-2); }
+
+  .bl__grid {
+    display: grid;
+    gap: clamp(1rem, 2.2vw, 1.5rem);
+    margin-top: clamp(2rem, 4vw, 3rem);
+  }
+
+  /* ---------- card ---------- */
+
+  .card {
+    position: relative;
     display: flex;
     flex-direction: column;
     height: 100%;
-    padding: 1.5rem 1.6rem;
     border: 1px solid var(--line-light);
-    border-left: 3px solid var(--green);
-    border-radius: 12px;
+    border-radius: 18px;
     background: var(--white);
-    transition: border-color var(--t2) var(--ease), transform var(--t2) var(--ease);
+    overflow: hidden;
+    transition:
+      transform var(--t3) var(--ease),
+      border-color var(--t2) var(--ease),
+      box-shadow var(--t3) var(--ease);
   }
-  .bl__card:hover { transform: translateY(-3px); }
+  .card:hover {
+    transform: translateY(-5px);
+    border-color: color-mix(in oklab, var(--green) 32%, var(--line-light));
+    box-shadow: 0 26px 46px -30px rgb(0 0 0 / 0.5);
+  }
 
-  .bl__top {
+  /* ---------- reserved photo frame ---------- */
+
+  .card__media {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(
+      140deg,
+      color-mix(in oklab, var(--green) 11%, #fff),
+      color-mix(in oklab, var(--green) 4%, #fff)
+    );
+    border-bottom: 1px solid var(--line-light);
+  }
+
+  /* Hatching marks the frame as deliberately empty, not broken. */
+  .card__hatch {
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      -45deg,
+      color-mix(in oklab, var(--green) 13%, transparent) 0 1px,
+      transparent 1px 11px
+    );
+  }
+
+  .card__wait {
+    position: relative;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--green-deep);
+  }
+
+  /* Circular badge straddling the frame edge. */
+  .card__badge {
+    position: absolute;
+    left: 1.4rem;
+    bottom: -22px;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #fff;
+    color: var(--green-deep);
+    box-shadow: 0 8px 18px -12px rgb(0 0 0 / 0.55);
+    transition: transform var(--t3) var(--ease);
+  }
+  .card:hover .card__badge { transform: scale(1.08) rotate(-6deg); }
+
+  /* ---------- card body ---------- */
+
+  .card__top {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
     gap: var(--s4);
     flex-wrap: wrap;
+    padding: 2rem 1.5rem 0;
   }
 
-  .bl__n { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.025em; }
-  .bl__c {
-    margin-top: 0.2rem;
+  .card__n { font-size: 1.2rem; font-weight: 700; letter-spacing: -0.028em; }
+  .card__c {
+    margin-top: 0.25rem;
     font-family: var(--font-mono);
     font-size: 0.625rem;
-    letter-spacing: 0.16em;
+    letter-spacing: 0.15em;
     text-transform: uppercase;
+    color: var(--text-3);
+  }
+
+  .card__tag {
+    padding: 0.28rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.6875rem;
+    font-weight: 600;
     color: var(--green-deep);
+    background: color-mix(in oklab, var(--green) 15%, #fff);
+    white-space: nowrap;
   }
-
   /* Honest marker while details are unconfirmed. */
-  .bl__todo {
-    padding: 0.25rem 0.5rem;
-    border-radius: 3px;
-    background: #fdf3e2;
-    font-family: var(--font-mono);
-    font-size: 0.5625rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: #8a6100;
-  }
+  .card__tag--todo { color: #8a5a00; background: #fdf3dc; }
 
-  .bl__rows { display: grid; gap: 0.9rem; margin-top: 1.1rem; }
-  .bl__row { display: flex; align-items: flex-start; gap: 0.7rem; color: var(--text-3); }
-
-  .bl__row address {
-    font-style: normal;
-    font-size: var(--small);
-    line-height: 1.6;
+  .card__rows {
+    display: grid;
+    gap: 0.75rem;
+    padding: 1.1rem 1.5rem 0;
+    font-size: 0.875rem;
+    line-height: 1.55;
     color: var(--text-2);
   }
+  .card__row { display: flex; gap: 0.65rem; }
+  .card__row :global(svg) { flex: none; margin-top: 2px; color: var(--green-deep); }
+  .card__row address { font-style: normal; }
 
-  .bl__slot {
-    font-size: var(--small);
-    color: var(--text-3);
-    font-style: italic;
-  }
+  .card__slot { color: var(--text-3); font-style: italic; }
 
-  .bl__hours {
-    display: grid;
-    gap: 0.15rem;
+  .card__hours[data-unverified] { opacity: 0.62; }
+  .card__warn {
+    margin-top: 0.3rem;
     font-family: var(--font-mono);
-    font-size: 0.6875rem;
-    letter-spacing: 0.03em;
-  }
-  .bl__hours[data-unverified] li:not(.bl__warn) { opacity: 0.55; }
-  .bl__warn {
-    margin-top: 0.25rem;
-    color: #8a6100;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
     font-size: 0.5625rem;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: #8a5a00;
   }
 
-  .bl__acts {
+  .card__acts {
     display: flex;
+    align-items: center;
+    gap: var(--s4);
     flex-wrap: wrap;
-    align-items: center;
-    gap: 0.6rem var(--s4);
     margin-top: auto;
-    padding-top: 1.35rem;
+    padding: 1.2rem 1.5rem 1.4rem;
   }
 
-  .bl__wa {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.65rem 1.15rem;
-    border-radius: 999px;
-    background: var(--green);
+  /* Mark only. The number beside it already says what this row is. */
+  .card__wa {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    flex: none;
+    border-radius: 50%;
+    background: var(--green-deep);
     color: #fff;
-    font-size: 0.8125rem;
-    font-weight: 500;
-    transition: background-color var(--t2) var(--ease);
+    transition: background-color var(--t2) var(--ease), transform var(--t2) var(--ease);
   }
-  .bl__wa:hover { background: var(--text); }
+  .card__wa:hover { background: var(--ink); transform: translateY(-2px); }
 
-  .bl__call {
+  .card__call {
     font-family: var(--font-mono);
     font-size: 0.8125rem;
-    letter-spacing: 0.04em;
+    letter-spacing: 0.03em;
     color: var(--text);
     border-bottom: 1px solid var(--line-light);
     padding-bottom: 2px;
     transition: border-color var(--t2) var(--ease);
   }
-  .bl__call:hover { border-color: var(--text); }
+  .card__call:hover { border-color: var(--green); }
 
-  /* Inert until real map links exist. */
-  .bl__dir {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    font-size: 0.8125rem;
-    color: var(--text-3);
-    cursor: not-allowed;
+  /* Decorative — the card already carries real links. */
+  .card__go {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    margin-left: auto;
+    border-radius: 50%;
+    border: 1px solid var(--line-light);
+    color: var(--green-deep);
+    transition:
+      transform var(--t2) var(--ease),
+      background-color var(--t2) var(--ease),
+      border-color var(--t2) var(--ease),
+      color var(--t2) var(--ease);
+  }
+  .card:hover .card__go {
+    transform: translateX(3px);
+    background: var(--green-deep);
+    border-color: var(--green-deep);
+    color: #fff;
   }
 
   .bl__note {
-    display: block;
-    margin-top: var(--s6);
-    padding: 0.9rem 1.1rem;
-    border: 1px dashed var(--line-light);
-    border-radius: 8px;
-    font-size: var(--small);
+    max-width: 62ch;
+    margin-top: clamp(1.5rem, 3vw, 2.25rem);
+    font-size: 0.875rem;
     line-height: 1.6;
     color: var(--text-3);
   }
 
-  /* ---------- cta ---------- */
+  /* ============================================================
+     03 · CTA
+     ============================================================ */
 
   .bc {
     background: var(--ink);
-    color: var(--text-inv);
+    color: #fff;
     padding-block: clamp(2.5rem, 5vw, 4rem);
   }
   .bc__in { display: grid; gap: var(--s5); align-items: center; }
   .bc__h {
     margin-top: var(--s4);
-    font-size: clamp(1.5rem, 2.8vw, 2.25rem);
-    line-height: 1.1;
-    letter-spacing: -0.035em;
+    font-size: clamp(1.5rem, 2.8vw, 2.2rem);
     font-weight: 700;
+    letter-spacing: -0.035em;
+    line-height: 1.1;
   }
   .bc__h em { font-style: normal; color: var(--green-bright); }
 
   .bc__wa {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.55rem;
+    display: grid;
+    place-items: center;
     justify-self: start;
-    padding: 0.9rem 1.5rem;
-    border-radius: 999px;
-    background: var(--green);
-    color: #fff;
-    font-size: 0.9375rem;
-    font-weight: 500;
-    transition: background-color var(--t2) var(--ease);
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: #fff;
+    color: var(--ink);
+    transition:
+      background-color var(--t2) var(--ease),
+      color var(--t2) var(--ease),
+      transform var(--t2) var(--ease);
   }
-  .bc__wa:hover { background: #fff; color: var(--ink); }
+  .bc__wa:hover { background: var(--green-bright); color: var(--ink); transform: translateY(-2px); }
 
-  /* ---------- layout ---------- */
+  /* ============================================================
+     RESPONSIVE
+     ============================================================ */
 
   @media (min-width: 48rem) {
     .bl__grid { grid-template-columns: repeat(2, 1fr); }
   }
 
   @media (min-width: 62rem) {
-    .bh__grid { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: var(--s8); }
-    .bc__in { grid-template-columns: 1fr auto; }
+    .bh__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); }
+    .bh__map {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      gap: var(--s5);
+    }
+    .bh__mapin { margin: 0; }
+    .promise { margin: 0; }
+    .bc__in { grid-template-columns: minmax(0, 1fr) auto; }
     .bc__wa { justify-self: end; }
   }
 
+  /* The aside only overlaps the map where there is room for it. */
+  @media (max-width: 62rem) {
+    .bh__note {
+      position: static;
+      max-width: none;
+      margin-top: var(--s4);
+      rotate: none;
+    }
+  }
+
+  @media (max-width: 30rem) {
+    .fig { flex: 1 1 100%; }
+    .chip { font-size: 0.625rem; padding: 0.22rem 0.5rem; }
+    .chip[data-side='right'] { translate: 1rem -50%; }
+    .chip[data-side='left'] { translate: calc(-100% - 1rem) -50%; }
+  }
+
+  /* ============================================================
+     REDUCED MOTION — nothing moves, nothing is hidden.
+     ============================================================ */
+
   @media (prefers-reduced-motion: reduce) {
-    .bh__route, .bh__halo { animation: none !important; }
+    .bh__aura span { animation: none; }
+
+    .bh__map :is(.bh__land, .bh__route, .bh__pin, .chip, .bh__note),
+    .bh__arrow path {
+      opacity: 1;
+      scale: 1;
+      stroke-dashoffset: 0;
+      transition: none;
+      animation: none !important;
+    }
+    .bh__edge { stroke-dashoffset: 0; transition: none; }
+    .bh__map[data-in] :is(.bh__route, .bh__halo) { animation: none; }
+
+    .card, .card:hover,
+    .fig, .fig:hover,
+    .promise, .promise:hover,
+    .card:hover .card__badge,
+    .card:hover .card__go {
+      transform: none;
+      transition: none;
+    }
+    .btn-green::after { display: none; }
   }
 </style>

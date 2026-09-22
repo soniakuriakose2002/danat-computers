@@ -32,3 +32,14 @@ export const OMAN_ROUTES: [string, string][] = [
   ['hail', 'ruwi'],
   ['ruwi', 'salalah'],
 ];
+
+/**
+ * Hub-and-spoke instead of a chain: every branch drawn back to Ruwi,
+ * which is the main counter. Used on /branches, where the point is that
+ * the four are one business rather than four stops on a road.
+ */
+export const OMAN_SPOKES: [string, string][] = [
+  ['ruwi', 'sohar'],
+  ['ruwi', 'hail'],
+  ['ruwi', 'salalah'],
+];
