@@ -1,338 +1,437 @@
 ---
-import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
 import PageLayout from '@layouts/PageLayout.astro';
 import Icon from '@components/ui/Icon.astro';
 import { site, whatsappLink, branches } from '@data/site';
-import { OMAN_PATH, OMAN_VIEWBOX, OMAN_PINS } from '@data/omanMap';
-import imgHero from '@assets/photos/support-agent.jpg';
-
-/**
- * Built on the pattern every good contact page uses: a photograph that
- * says who picks up, the channels laid out as large rows rather than a
- * paragraph, and the form last — because most people will phone or
- * message instead of typing.
- *
- * The site is a static build with no server, so the form composes the
- * enquiry into a WhatsApp message rather than pretending to POST.
- */
+import { OMAN_PATH, OMAN_VIEWBOX, OMAN_PINS, OMAN_SPOKES } from '@data/omanMap';
 
 const services = (await getCollection('services')).sort(
   (a, b) => a.data.index - b.data.index
 );
 
-const order = ['sohar', 'hail', 'ruwi', 'salalah'];
+const order = ['ruwi', 'sohar', 'hail', 'salalah'];
 const list = order.map((s) => branches.find((b) => b.slug === s)!);
-const ruwi = branches.find((b) => b.slug === 'ruwi')!;
-const unconfirmed = list.filter((b) => !b.verified).length;
 
-const rows = [
+/** North-to-south for the map, so the pins read top to bottom. */
+const mapOrder = ['sohar', 'hail', 'ruwi', 'salalah'];
+const mapList = mapOrder.map((s) => branches.find((b) => b.slug === s)!);
+
+const promises = [
+  { icon: 'chat', a: 'Quick', b: 'Response' },
+  { icon: 'shield', a: 'Trusted', b: 'Support' },
+  { icon: 'users', a: 'Expert', b: 'Team' },
+  { icon: 'gear', a: 'Better', b: 'Solutions' },
+] as const;
+
+/**
+ * Only ONE phone number is verified for Danat. The rest of the numbers on
+ * the current live site are unconfirmed, so Call and WhatsApp both point
+ * at the number we can actually stand behind rather than inventing a
+ * second landline.
+ */
+const ways = [
   {
     icon: 'phone',
-    label: 'Call the counter',
+    title: 'Call Us',
     value: site.phone.display,
+    note: 'The Ruwi counter. They will route you to your branch.',
+    cta: 'Call now',
     href: `tel:${site.phone.tel}`,
-    note: 'Ruwi. They will route you to the right branch.',
     external: false,
   },
   {
     icon: 'whatsapp',
-    label: 'WhatsApp',
+    title: 'WhatsApp',
     value: site.phone.display,
+    note: 'Send a photo of the issue for faster support.',
+    cta: 'Chat on WhatsApp',
     href: whatsappLink(),
-    note: 'Fastest. Send a photo of the fault.',
     external: true,
   },
   {
     icon: 'mail',
-    label: 'Email',
+    title: 'Email Us',
     value: site.email,
-    href: `mailto:${site.email}`,
     note: 'Quotes, purchase orders and trade accounts.',
+    cta: 'Send an email',
+    href: `mailto:${site.email}`,
+    external: false,
+  },
+  {
+    icon: 'pin',
+    title: 'Visit a Branch',
+    value: null,
+    note: 'Find your nearest Danat Computers branch across Oman.',
+    cta: 'View branches',
+    href: '/branches',
     external: false,
   },
 ] as const;
 
+/**
+ * Answers are written only where the company's own data supports them.
+ * Two of these need input from Danat before they can be answered, and
+ * they say so rather than guessing.
+ */
+const faqs = [
+  {
+    q: 'What are your working hours?',
+    a: null,
+    pending:
+      'Danat has not published confirmed trading hours. Message us on WhatsApp and we will confirm the hours for your branch.',
+  },
+  {
+    q: 'Do you provide on-site support?',
+    a: null,
+    pending:
+      'On-site coverage and call-out terms are still to be confirmed with the company.',
+  },
+  {
+    q: 'How can I check product availability?',
+    a: `We carry ${site.stats.parts.toLocaleString('en-US')} lines across ${site.stats.categories} categories. Send us the make and model on WhatsApp and we will check stock across all four branches before you travel.`,
+    pending: null,
+  },
+  {
+    q: 'Do you offer business solutions?',
+    a: 'Yes. Alongside the retail counter we supply businesses at trade, and take on CCTV and networking projects. Tell us the scope and we will come back with a quote.',
+    pending: null,
+  },
+  {
+    q: 'How can I contact a specific branch?',
+    a: `Every branch is reachable on ${site.phone.display}, which rings the Ruwi counter and is routed from there. Each branch's own details are listed on the branches page.`,
+    pending: null,
+  },
+];
+
 const W = 1000;
 const H = 1342;
+
+/** Chip offsets: Al Hail and Ruwi sit under 1% apart on the map. */
+const nudge: Record<string, string> = {
+  sohar: '0%',
+  hail: '-3.4%',
+  ruwi: '2.8%',
+  salalah: '0%',
+};
 ---
 
 <PageLayout
   title="Contact"
-  description={`Talk to Danat Computers — WhatsApp or call ${site.phone.display}, email ${site.email}, or walk into one of four branches across Oman.`}
+  description={`Talk to Danat Computers — call or WhatsApp ${site.phone.display}, email ${site.email}, or visit one of four branches across Oman.`}
 >
-  {/* ─────────────────────── 01 · hero ─────────────────────── */}
-  <section class="hero">
-    <div class="hero__bg" aria-hidden="true">
-      <Image
-        src={imgHero}
-        alt=""
-        widths={[900, 1400, 2000]}
-        sizes="100vw"
-        quality={74}
-        format="webp"
-        loading="eager"
-        fetchpriority="high"
-      />
-      {/* Measured against the real crop: the windows blow out to 252/255,
-          so white text needs this much scrim. Worst case is 5.15:1. */}
-      <span class="hero__scrim"></span>
+  {/* ═══════════════ 01 · hero + form ═══════════════ */}
+  <section class="hx">
+    <div class="hx__deco" aria-hidden="true">
+      <span class="hx__orb"></span>
+      <span class="hx__orb2"></span>
+      <span class="hx__wash"></span>
     </div>
 
-    <div class="shell hero__in">
-      <nav class="hero__crumb" aria-label="Breadcrumb">
-        <a href="/">Home</a>
-        <span aria-hidden="true">/</span>
-        <span aria-current="page">Contact</span>
-      </nav>
+    <p class="hx__side" aria-hidden="true">Same expertise<br />closer to you</p>
 
-      <p class="hero__eb">
-        <i class="hero__dot" aria-hidden="true"></i>
-        We pick up
-      </p>
+    <div class="shell hx__grid">
+      {/* ── copy ── */}
+      <div class="hx__copy">
+        <p class="eb" data-rise>
+          <i class="eb__rule" aria-hidden="true"></i>Contact us
+        </p>
 
-      <h1 class="hero__h">Contact us</h1>
+        <h1 class="hx__h" data-rise style="--d:70ms">
+          We're Just<br /><em>a Message Away.</em>
+        </h1>
 
-      <p class="hero__p">
-        Diagnosis is free and we quote before we touch anything. Message us a
-        photo of the fault and we usually know what we are looking at before
-        you arrive.
-      </p>
+        <p class="hx__p" data-rise style="--d:130ms">
+          Have a question, need support, or want to discuss your business
+          needs? Our team is here to help.
+        </p>
 
-      <div class="hero__acts">
-        <a class="btn-green" href="#enquiry">
-          Send an enquiry
-          <span class="btn-green__i" aria-hidden="true">
-            <Icon name="arrow" size={15} />
-          </span>
-        </a>
-        <a class="hero__call" href={`tel:${site.phone.tel}`}>
-          {site.phone.display}
-        </a>
+        <ul class="pro" data-rise style="--d:190ms">
+          {promises.map((p) => (
+            <li>
+              <span class="pro__i" aria-hidden="true"><Icon name={p.icon} size={19} /></span>
+              <span class="pro__t">{p.a}<br />{p.b}</span>
+            </li>
+          ))}
+        </ul>
+
+        <p class="hx__tag" data-rise style="--d:250ms">
+          <i class="eb__rule" aria-hidden="true"></i>
+          Technology for a brighter tomorrow
+        </p>
+      </div>
+
+      {/* ── script aside ── */}
+      <div class="hx__aside" data-rise style="--d:300ms">
+        <p class="script">Let's<br />Connect</p>
+        <svg class="script__sw" viewBox="0 0 150 22" fill="none" aria-hidden="true">
+          <path d="M3 15C34 4 92 3 147 9" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" pathLength="1" />
+        </svg>
+        <p class="hx__mantra">People. Products.<br />Support. A Brighter<br />Tomorrow.</p>
+      </div>
+
+      {/* ── form card ── */}
+      <div class="card" data-rise style="--d:160ms">
+        <h2 class="card__h">Send Us a Message</h2>
+        <p class="card__s">
+          Fill in the form and we'll get back to you as soon as possible.
+        </p>
+
+        <form class="card__f" id="enquiry">
+          <div class="fd">
+            <Icon name="users" size={16} />
+            <input id="f-name" name="name" type="text" autocomplete="name"
+              placeholder="Your Name" aria-label="Your name" required />
+          </div>
+
+          <div class="fd">
+            <Icon name="mail" size={16} />
+            <input id="f-email" name="email" type="email" autocomplete="email"
+              placeholder="Your Email" aria-label="Your email" />
+          </div>
+
+          <div class="card__two">
+            <div class="fd">
+              <Icon name="phone" size={16} />
+              <input id="f-phone" name="phone" type="tel" autocomplete="tel"
+                placeholder="Phone Number" aria-label="Your phone number" />
+            </div>
+            <div class="fd fd--sel">
+              <Icon name="gear" size={16} />
+              <select id="f-topic" name="topic" aria-label="Subject">
+                <option value="" disabled selected>Select Subject</option>
+                {services.map((s) => <option value={s.data.title}>{s.data.title}</option>)}
+                <option value="Business solutions">Business solutions</option>
+                <option value="Something else">Something else</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="fd fd--area">
+            <Icon name="chat" size={16} />
+            <textarea id="f-msg" name="message" rows="4" maxlength="500"
+              placeholder="Your Message" aria-label="Your message" required></textarea>
+            <span class="fd__count" id="count" aria-hidden="true">0/500</span>
+          </div>
+
+          <button class="btn" type="submit">
+            Send Message
+            <span class="btn__i" aria-hidden="true"><Icon name="arrow" size={15} /></span>
+          </button>
+
+          <p class="card__note">
+            <Icon name="lock" size={13} />
+            <span>
+              Opens WhatsApp with your message ready — nothing is stored on this
+              site and nothing sends until you press send.
+            </span>
+          </p>
+
+          <button class="card__alt" type="button" id="by-email">
+            Send by email instead
+          </button>
+
+          <noscript>
+            <p class="card__nojs">
+              This form needs JavaScript. Reach us on
+              {' '}<a href={whatsappLink()}>WhatsApp</a>, call
+              {' '}<a href={`tel:${site.phone.tel}`}>{site.phone.display}</a>, or email
+              {' '}<a href={`mailto:${site.email}`}>{site.email}</a>.
+            </p>
+          </noscript>
+        </form>
       </div>
     </div>
   </section>
 
-  {/* ─────────────────────── 02 · map + channels ─────────────────────── */}
-  <section class="reach section" data-tone="light">
-    <div class="shell reach__grid">
-      {/* Left: where we are. A real Google embed needs map links the
-          company has not supplied yet, so this is our own geography. */}
-      <div class="mapcard">
-        <div class="mapcard__top">
-          <p class="eyebrow">
-            <i class="eyebrow__rule" aria-hidden="true"></i>
-            Where we are
+  {/* ═══════════════ 02 · other ways ═══════════════ */}
+  <section class="wy section" data-tone="light">
+    <div class="shell wy__grid">
+      <div class="wy__intro" data-rise>
+        <p class="eb"><i class="eb__rule" aria-hidden="true"></i>Other ways to reach us</p>
+        <h2 class="wy__h">Choose Your<br />Preferred Way</h2>
+        <p class="wy__p">
+          Whether it's a quick question or technical support, reach out
+          through your preferred channel.
+        </p>
+      </div>
+
+      <ul class="wy__cards">
+        {ways.map((w, i) => (
+          <li data-rise style={`--d:${i * 70}ms`}>
+            <a class="wc" href={w.href}
+              target={w.external ? '_blank' : undefined}
+              rel={w.external ? 'noopener noreferrer' : undefined}>
+              <span class="wc__i" aria-hidden="true"><Icon name={w.icon} size={21} /></span>
+              <b class="wc__t">{w.title}</b>
+              {w.value && <span class="wc__v">{w.value}</span>}
+              <span class="wc__n">{w.note}</span>
+              <span class="wc__c">
+                {w.cta}<Icon name="arrow" size={14} />
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  {/* ═══════════════ 03 · across oman ═══════════════ */}
+  <section class="ao section" data-tone="light">
+    <div class="shell">
+      <div class="ao__panel">
+        {/* copy */}
+        <div class="ao__copy" data-rise>
+          <p class="eb"><i class="eb__rule" aria-hidden="true"></i>Our branches</p>
+          <h2 class="ao__h">Across Oman<br /><em>With You</em></h2>
+          <p class="ao__p">
+            Four branches. Same commitment. Visit your nearest Danat location
+            for expert service, genuine products and reliable support.
           </p>
-          <p class="mapcard__n"><b>4</b> branches across Oman</p>
+          <a class="btn btn--solid" href="/branches">
+            View all branches
+            <span class="btn__i" aria-hidden="true"><Icon name="arrow" size={15} /></span>
+          </a>
         </div>
 
-        <div class="mapcard__fig" data-rise>
-          <svg viewBox={OMAN_VIEWBOX} width="272" height="365" role="img"
+        {/* map */}
+        <div class="ao__map" data-rise style="--d:90ms">
+          <svg viewBox={OMAN_VIEWBOX} width="300" height="403" role="img"
             aria-label="Map of Oman showing Danat branches in Sohar, Al Hail, Ruwi and Salalah">
-            <defs>
-              <linearGradient id="cFill" x1="0" y1="0" x2="0.4" y2="1">
-                <stop class="cs0" offset="0%" stop-color="#59aa54" stop-opacity="0.10" />
-                <stop class="cs1" offset="100%" stop-color="#59aa54" stop-opacity="0.26" />
-              </linearGradient>
-            </defs>
-            <path class="cland" d={OMAN_PATH} fill="url(#cFill)" />
-            <path class="cedge" d={OMAN_PATH} pathLength="1" fill="none"
-              stroke="#a6d4a2" stroke-width="3" />
-            {list.map((b, i) => (
-              <g class="cpin" style={`--i:${i}`}
-                transform={`translate(${OMAN_PINS[b.slug].x} ${OMAN_PINS[b.slug].y})`}>
-                <circle class="chalo" r="44" fill="#59aa54" opacity="0"></circle>
-                <circle class="cring" r="19" fill="#ffffff"></circle>
-                <circle class="cdot" r="11" fill="#2f6429"></circle>
+            <path class="ao__land" d={OMAN_PATH} fill="#dfe9df" />
+            {OMAN_SPOKES.map(([a, b], i) => {
+              const p = OMAN_PINS[a];
+              const q = OMAN_PINS[b];
+              return (
+                <path class="ao__route" style={`--i:${i}`} fill="none"
+                  stroke="#8fb98c" stroke-width="3" stroke-dasharray="2 12"
+                  stroke-linecap="round"
+                  d={`M${p.x},${p.y} Q${(p.x + q.x) / 2 - 40},${(p.y + q.y) / 2} ${q.x},${q.y}`} />
+              );
+            })}
+            <text class="ao__wm" x="470" y="880" aria-hidden="true">OMAN</text>
+            {mapList.map((b, i) => (
+              <g class="ao__pin" style={`--i:${i}`}
+                transform={`translate(${OMAN_PINS[b.slug].x} ${OMAN_PINS[b.slug].y}) scale(1.5)`}>
+                <path fill="#2f6429"
+                  d="M0,0 C-8,-11 -14,-18 -14,-25 A14,14 0 1 1 14,-25 C14,-18 8,-11 0,0 Z" />
+                <circle cx="0" cy="-25" r="5" fill="#ffffff"></circle>
               </g>
             ))}
           </svg>
 
-          {list.map((b, i) => (
-            <a class="cchip" href={`/branches#${b.slug}`}
-              data-side={b.slug === 'sohar' ? 'left' : 'right'}
-              style={`--i:${i}; --x:${((OMAN_PINS[b.slug].x / W) * 100).toFixed(2)}%; --y:${((OMAN_PINS[b.slug].y / H) * 100).toFixed(2)}%; --dy:${b.slug === 'hail' ? '-3.4%' : b.slug === 'ruwi' ? '2.8%' : '0%'}`}>
+          {mapList.map((b, i) => (
+            <a class="ao__chip" href={`/branches#${b.slug}`} style={`--i:${i}; --x:${((OMAN_PINS[b.slug].x / W) * 100).toFixed(2)}%; --y:${((OMAN_PINS[b.slug].y / H) * 100).toFixed(2)}%; --dy:${nudge[b.slug]}`}>
               {b.city.split(',')[0]}
             </a>
           ))}
+
+          <p class="ao__script" aria-hidden="true">Your Tech Partner<br />Across Oman</p>
         </div>
 
-        <a class="mapcard__all" href="/branches">
-          Addresses and opening hours
-          <Icon name="arrow" size={15} />
-        </a>
-      </div>
-
-      {/* Right: the channels, as large rows. */}
-      <div class="rail" data-tone="ink">
-        <p class="rail__eb">Reach us</p>
-        <h2 class="rail__h">However suits you.</h2>
-
-        <ul class="rail__list">
-          {rows.map((r, i) => (
-            <li data-rise style={`--d:${i * 80}ms`}>
-              <a
-                class="row"
-                href={r.href}
-                target={r.external ? '_blank' : undefined}
-                rel={r.external ? 'noopener noreferrer' : undefined}
-              >
-                <span class="row__i" aria-hidden="true">
-                  <Icon name={r.icon} size={22} />
+        {/* numbered list */}
+        <ol class="ao__list">
+          {list.map((b, i) => (
+            <li data-rise style={`--d:${i * 60}ms`}>
+              <a class="bl" href={`/branches#${b.slug}`}>
+                <span class="bl__n">{String(i + 1).padStart(2, '0')}</span>
+                <span class="bl__t">
+                  <b>{b.name}</b>
+                  <em>{b.city}</em>
+                  <i data-unverified={!b.hoursVerified ? '' : undefined}>
+                    {b.hours[0]}
+                    {!b.hoursVerified && <s>Hours to confirm</s>}
+                  </i>
                 </span>
-                <span class="row__t">
-                  <b>{r.label}</b>
-                  <em>{r.value}</em>
-                  <i>{r.note}</i>
-                </span>
-                <span class="row__go" aria-hidden="true">
-                  <Icon name="arrow" size={15} />
-                </span>
+                <span class="bl__go" aria-hidden="true"><Icon name="arrow" size={15} /></span>
               </a>
             </li>
           ))}
+        </ol>
+      </div>
+    </div>
+  </section>
 
-          {/* The one address that is actually confirmed. */}
-          <li data-rise style="--d:240ms">
-            <div class="row row--static">
-              <span class="row__i" aria-hidden="true">
-                <Icon name="pin" size={22} />
-              </span>
-              <span class="row__t">
-                <b>Walk in</b>
-                <address>{ruwi.address.split('\n').map((l) => <>{l}<br /></>)}</address>
-                {unconfirmed > 0 && (
-                  <i>{unconfirmed} further branch addresses are being confirmed.</i>
-                )}
-              </span>
+  {/* ═══════════════ 04 · faq ═══════════════ */}
+  <section class="fq section" data-tone="light">
+    <div class="shell fq__grid">
+      <div class="fq__intro" data-rise>
+        <p class="eb"><i class="eb__rule" aria-hidden="true"></i>Still have questions?</p>
+        <h2 class="fq__h">Frequently Asked<br />Questions</h2>
+        <p class="fq__p">
+          Find quick answers to common questions. Can't find what you're
+          looking for? Ask us directly.
+        </p>
+        <a class="btn btn--ghost" href={whatsappLink('Hello Danat — I have a question about')}
+          target="_blank" rel="noopener noreferrer">
+          Ask us directly
+          <span class="btn__i" aria-hidden="true"><Icon name="arrow" size={14} /></span>
+        </a>
+      </div>
+
+      <div class="fq__list">
+        {faqs.map((f, i) => (
+          <details class="ac" data-rise style={`--d:${i * 50}ms`}>
+            <summary>
+              <span>{f.q}</span>
+              <i class="ac__i" aria-hidden="true"><Icon name="plus" size={15} /></i>
+            </summary>
+            <div class="ac__b">
+              {f.a
+                ? <p>{f.a}</p>
+                : <p class="ac__pending">{f.pending}</p>}
             </div>
-          </li>
-        </ul>
+          </details>
+        ))}
       </div>
     </div>
   </section>
 
-  {/* ─────────────────────── 03 · form ─────────────────────── */}
-  <section class="get section" data-tone="off">
-    <div class="shell">
-      <div class="get__head" data-rise>
-        <p class="eyebrow eyebrow--mid eyebrow--clay">
-          <i class="eyebrow__rule" aria-hidden="true"></i>
-          Send an enquiry
-          <i class="eyebrow__rule" aria-hidden="true"></i>
-        </p>
-        <h2 class="get__h">Get in <em>touch</em></h2>
-        <p class="get__p">
-          Fill this in and it opens WhatsApp with your message ready. Nothing
-          is stored on this site and nothing sends until you press send.
-        </p>
+  {/* ═══════════════ 05 · cta ═══════════════ */}
+  <section class="ct" data-tone="ink">
+    <div class="shell ct__in">
+      <span class="ct__i" aria-hidden="true"><Icon name="plane" size={34} /></span>
+      <div class="ct__l">
+        <p class="ct__k">Still need help?</p>
+        <p class="ct__h">Let's talk.</p>
       </div>
-
-      <form class="get__form" id="enquiry" data-rise style="--d:90ms">
-        <div class="f__row">
-          <div class="f">
-            <label for="f-name">Your name</label>
-            <input id="f-name" name="name" type="text" autocomplete="name"
-              placeholder="So we know who we are talking to" required />
-          </div>
-          <div class="f">
-            <label for="f-phone">Phone <span>optional</span></label>
-            <input id="f-phone" name="phone" type="tel" autocomplete="tel"
-              placeholder="If you would rather we called you" />
-          </div>
-        </div>
-
-        <div class="f__row">
-          <div class="f">
-            <label for="f-branch">Nearest branch</label>
-            <select id="f-branch" name="branch">
-              {list.map((b) => <option value={b.name}>{b.city}</option>)}
-              <option value="Not sure">Not sure</option>
-            </select>
-          </div>
-          <div class="f">
-            <label for="f-topic">What do you need?</label>
-            <select id="f-topic" name="topic">
-              {services.map((s) => <option value={s.data.title}>{s.data.title}</option>)}
-              <option value="Something else">Something else</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="f">
-          <label for="f-msg">What is happening?</label>
-          <textarea id="f-msg" name="message" rows="5" required
-            placeholder="It will not power on. No lights, no fan. It was fine yesterday."></textarea>
-        </div>
-
-        <div class="get__acts">
-          <button class="btn-green" type="submit">
-            Open in WhatsApp
-            <span class="btn-green__i" aria-hidden="true">
-              <Icon name="whatsapp" size={15} />
-            </span>
-          </button>
-          <button class="get__alt" type="button" id="by-email">
-            Send by email instead
-          </button>
-        </div>
-
-        <p class="get__note">
-          Opens your own WhatsApp or mail app. Danat replies from
-          {' '}{site.phone.display}.
-        </p>
-
-        <noscript>
-          <p class="get__nojs">
-            This form needs JavaScript to compose your message. You can reach
-            us on <a href={whatsappLink()}>WhatsApp</a>, by phone on
-            {' '}<a href={`tel:${site.phone.tel}`}>{site.phone.display}</a>, or
-            by email at <a href={`mailto:${site.email}`}>{site.email}</a>.
-          </p>
-        </noscript>
-      </form>
-    </div>
-  </section>
-
-  {/* ─────────────────────── 04 · company ─────────────────────── */}
-  <section class="cl" data-tone="ink">
-    <div class="shell cl__in">
-      <div>
-        <p class="label" data-rise>Company</p>
-        <p class="cl__name" data-rise style="--d:70ms">{site.legalName}</p>
-        <p class="cl__sub" data-rise style="--d:120ms">
-          Trading as {site.nameFull} since {site.stats.since}.
-        </p>
-      </div>
-      <ul class="cl__soc" data-rise style="--d:170ms">
-        <li>
-          <a href={site.social.facebook} target="_blank" rel="noopener noreferrer">Facebook</a>
-        </li>
-        <li>
-          <a href={site.social.instagram} target="_blank" rel="noopener noreferrer">Instagram</a>
-        </li>
-      </ul>
+      <p class="ct__p">
+        Our team is ready to assist you with any questions or support you need.
+      </p>
+      <a class="ct__b" href={whatsappLink()} target="_blank" rel="noopener noreferrer">
+        Contact us now<Icon name="arrow" size={15} />
+      </a>
     </div>
   </section>
 </PageLayout>
 
 <script is:inline define:vars={{ WA: site.phone.whatsapp, MAIL: site.email }}>
-  // Compose the enquiry and hand it to WhatsApp or mail. Nothing leaves
-  // the page until the person sends it themselves.
   (() => {
     const form = document.getElementById('enquiry');
     if (!form) return;
 
+    const msg = document.getElementById('f-msg');
+    const count = document.getElementById('count');
+    if (msg && count) {
+      const tick = () => { count.textContent = `${msg.value.length}/500`; };
+      msg.addEventListener('input', tick);
+      tick();
+    }
+
+    // No server to POST to, so the enquiry is composed and handed to
+    // WhatsApp. Nothing leaves the page until the person sends it.
     const compose = () => {
       const d = new FormData(form);
-      const phone = String(d.get('phone') || '').trim();
+      const opt = (k, label) => {
+        const v = String(d.get(k) || '').trim();
+        return v ? [`${label}: ${v}`] : [];
+      };
       return [
         `Hello Danat — this is ${String(d.get('name') || '').trim()}.`,
         ``,
-        `Branch: ${d.get('branch')}`,
-        `Service: ${d.get('topic')}`,
-        ...(phone ? [`Phone: ${phone}`] : []),
+        ...opt('topic', 'Subject'),
+        ...opt('phone', 'Phone'),
+        ...opt('email', 'Email'),
         ``,
         String(d.get('message') || '').trim(),
       ].join('\n');
@@ -341,142 +440,49 @@ const H = 1342;
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       if (!form.reportValidity()) return;
-      window.open(
-        `https://wa.me/${WA}?text=${encodeURIComponent(compose())}`,
-        '_blank',
-        'noopener'
-      );
+      window.open(`https://wa.me/${WA}?text=${encodeURIComponent(compose())}`,
+        '_blank', 'noopener');
     });
 
     document.getElementById('by-email')?.addEventListener('click', () => {
       if (!form.reportValidity()) return;
-      const d = new FormData(form);
+      const s = String(new FormData(form).get('topic') || 'Enquiry');
       window.location.href =
-        `mailto:${MAIL}?subject=${encodeURIComponent(`${d.get('topic')} — ${d.get('branch')}`)}` +
-        `&body=${encodeURIComponent(compose())}`;
+        `mailto:${MAIL}?subject=${encodeURIComponent(s)}&body=${encodeURIComponent(compose())}`;
     });
   })();
 </script>
 
 <style>
-  /* ============================================================
-     01 · HERO
-     ============================================================ */
+  /* ───────── shared ───────── */
 
-  .hero {
-    position: relative;
-    display: grid;
-    align-items: end;
-    min-height: clamp(30rem, 68vh, 44rem);
-    padding-block: clamp(8rem, 14vw, 11rem) clamp(3rem, 7vw, 5.5rem);
-    background: var(--ink);
-    color: #fff;
-    overflow: hidden;
-    isolation: isolate;
-  }
-
-  .hero__bg { position: absolute; inset: 0; z-index: 0; }
-  .hero__bg :global(img) {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: 62% 38%;
-  }
-
-  /* Heaviest on the left, under the type; the right keeps the photograph. */
-  .hero__scrim {
-    position: absolute;
-    inset: 0;
-    background:
-      linear-gradient(100deg,
-        rgb(8 10 12 / 0.88) 0%,
-        rgb(8 10 12 / 0.72) 38%,
-        rgb(8 10 12 / 0.30) 72%,
-        rgb(8 10 12 / 0.12) 100%),
-      linear-gradient(to top, rgb(8 10 12 / 0.55), transparent 45%);
-  }
-
-  .hero__in { position: relative; z-index: 1; }
-
-  .hero__crumb {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.45rem;
-    font-size: 0.8125rem;
-    color: rgb(255 255 255 / 0.68);
-  }
-  .hero__crumb a { transition: color var(--t2) var(--ease); }
-  .hero__crumb a:hover { color: #fff; }
-  .hero__crumb [aria-current] { color: #fff; }
-
-  .hero__eb {
+  .eb {
     display: flex;
     align-items: center;
     gap: 0.6rem;
-    margin-top: var(--s5);
     font-family: var(--font-mono);
     font-size: 0.6875rem;
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: var(--green-bright);
+    color: var(--green-deep);
   }
-  .hero__dot {
-    width: 9px;
-    height: 9px;
+  .eb__rule {
+    width: 28px;
+    height: 1px;
     flex: none;
-    border-radius: 50%;
-    background: var(--green-bright);
-    box-shadow: 0 0 0 4px rgb(111 201 106 / 0.22);
+    background: color-mix(in oklab, var(--green) 60%, transparent);
   }
 
-  .hero__h {
-    margin-top: var(--s4);
-    font-size: clamp(2.6rem, 8vw, 6rem);
-    line-height: 0.96;
-    letter-spacing: -0.045em;
-    font-weight: 700;
-  }
-
-  .hero__p {
-    margin-top: var(--s4);
-    max-width: 46ch;
-    font-size: var(--lead);
-    line-height: 1.6;
-    color: rgb(255 255 255 / 0.86);
-  }
-
-  .hero__acts {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--s4) var(--s5);
-    margin-top: var(--s5);
-  }
-
-  .hero__call {
-    font-family: var(--font-mono);
-    font-size: 0.9375rem;
-    letter-spacing: 0.04em;
-    color: #fff;
-    border-bottom: 1px solid rgb(255 255 255 / 0.45);
-    padding-bottom: 2px;
-    transition: border-color var(--t2) var(--ease);
-  }
-  .hero__call:hover { border-color: #fff; }
-
-  /* ---------- shared green pill ---------- */
-
-  .btn-green {
+  .btn {
     position: relative;
     display: inline-flex;
     align-items: center;
-    gap: 0.75rem;
-    padding: 0.55rem 0.55rem 0.55rem 1.6rem;
+    justify-content: center;
+    gap: 0.7rem;
+    padding: 0.85rem 0.85rem 0.85rem 1.5rem;
     border: 0;
     border-radius: 999px;
-    /* Measured: white is 8.73:1 on #27551F and 4.90:1 on #3D7F35, so the
-       label clears AA across the whole ramp. */
+    /* white on #27551f is 8.73:1 and on #3d7f35 is 4.90:1 — AA the whole ramp */
     background: linear-gradient(100deg, #27551f, #3d7f35);
     color: #fff;
     font: inherit;
@@ -484,467 +490,727 @@ const H = 1342;
     font-weight: 600;
     cursor: pointer;
     overflow: hidden;
-    box-shadow: 0 14px 28px -16px rgb(0 0 0 / 0.6);
     transition: transform var(--t2) var(--ease);
   }
-  .btn-green:hover { transform: translateY(-2px); }
-  .btn-green::after {
+  .btn:hover { transform: translateY(-2px); }
+  .btn::after {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(
-      100deg, transparent 35%, rgb(255 255 255 / 0.22) 50%, transparent 65%
-    );
+    background: linear-gradient(100deg, transparent 35%, rgb(255 255 255 / 0.22) 50%, transparent 65%);
     transform: translate3d(-100%, 0, 0);
     transition: transform var(--t4) var(--ease);
   }
-  .btn-green:hover::after { transform: translate3d(100%, 0, 0); }
+  .btn:hover::after { transform: translate3d(100%, 0, 0); }
+  .btn__i {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    flex: none;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.2);
+    transition: transform var(--t2) var(--ease);
+  }
+  .btn:hover .btn__i { transform: translateX(3px); }
 
-  .btn-green__i {
+  .btn--solid { align-self: flex-start; margin-top: var(--s5); }
+
+  .btn--ghost {
+    align-self: flex-start;
+    margin-top: var(--s5);
+    padding: 0.7rem 0.7rem 0.7rem 1.35rem;
+    background: transparent;
+    border: 1px solid var(--line-light);
+    color: var(--text);
+    font-size: 0.875rem;
+  }
+  .btn--ghost::after { display: none; }
+  .btn--ghost:hover { border-color: var(--green); }
+  .btn--ghost .btn__i {
+    width: 26px;
+    height: 26px;
+    background: var(--green-wash);
+    color: var(--green-deep);
+  }
+
+  /* ═══════════ 01 · HERO ═══════════ */
+
+  .hx {
+    position: relative;
+    padding-block: clamp(6.5rem, 11vw, 8.5rem) clamp(3rem, 6vw, 5rem);
+    background: linear-gradient(170deg, #fbfdfb 0%, #eef5ee 58%, #f7faf7 100%);
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .hx__deco { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+  /* Anchored to the top-right CORNER, with the sweep on its bottom-left.
+     A circle pushed off-canvas does not work here: the section clips its
+     top and the tall form card covers its left, so all that survives is
+     a flat band. Cornering it puts the curve on the one edge nothing
+     can crop. */
+  .hx__orb {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: min(48rem, 58vw);
+    height: clamp(15rem, 32vw, 26rem);
+    border-radius: 0 0 0 74%;
+    background: radial-gradient(
+      120% 150% at 78% 12%,
+      #35762f 0%,
+      #1d4623 48%,
+      #122d18 82%
+    );
+  }
+
+  .hx__orb2 {
+    position: absolute;
+    right: -6%;
+    top: 46%;
+    width: min(26rem, 32vw);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: color-mix(in oklab, var(--green) 14%, transparent);
+    filter: blur(6px);
+  }
+  .hx__wash {
+    position: absolute;
+    left: -10%;
+    bottom: -30%;
+    width: 38%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(circle, color-mix(in oklab, var(--green) 20%, transparent), transparent 66%);
+    filter: blur(30px);
+  }
+
+  .hx__side {
+    position: absolute;
+    top: 38%;
+    right: 1.1rem;
+    z-index: 1;
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    line-height: 1.9;
+    color: var(--text-3);
+    text-align: right;
+    display: none;
+  }
+
+  .hx__grid { display: grid; gap: clamp(2rem, 4vw, 3rem); align-items: start; }
+
+  .hx__h {
+    margin-top: var(--s4);
+    font-size: clamp(2.3rem, 5.2vw, 3.9rem);
+    line-height: 1.04;
+    letter-spacing: -0.042em;
+    font-weight: 700;
+  }
+  .hx__h em { font-style: normal; color: var(--green-deep); }
+
+  .hx__p {
+    margin-top: var(--s4);
+    max-width: 38ch;
+    font-size: var(--lead);
+    line-height: 1.6;
+    color: var(--text-2);
+  }
+
+  /* ---- four promises ---- */
+
+  .pro {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.9rem 0;
+    margin-top: var(--s5);
+  }
+  .pro li {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding-right: 1.1rem;
+  }
+  .pro li + li { padding-left: 1.1rem; border-left: 1px solid var(--line-light); }
+
+  .pro__i {
     display: grid;
     place-items: center;
     width: 34px;
     height: 34px;
     flex: none;
     border-radius: 50%;
-    background: rgb(255 255 255 / 0.2);
-    transition: transform var(--t2) var(--ease);
+    border: 1px solid var(--line-light);
+    background: #fff;
+    color: var(--text);
   }
-  .btn-green:hover .btn-green__i { transform: translateX(3px); }
+  .pro__t { font-size: 0.8125rem; line-height: 1.25; color: var(--text-2); }
 
-  /* ---------- shared eyebrow ---------- */
-
-  .eyebrow {
+  .hx__tag {
     display: flex;
     align-items: center;
     gap: 0.6rem;
-    font-family: var(--font-mono);
-    font-size: 0.6875rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--green-deep);
-  }
-  .eyebrow__rule {
-    width: 26px;
-    height: 1px;
-    flex: none;
-    background: color-mix(in oklab, var(--green) 55%, transparent);
-  }
-  .eyebrow--mid { justify-content: center; }
-  .eyebrow--clay { color: var(--clay-deep); }
-  .eyebrow--clay .eyebrow__rule {
-    background: color-mix(in oklab, var(--clay) 55%, transparent);
-  }
-
-  /* ============================================================
-     02 · MAP + CHANNELS
-     ============================================================ */
-
-  .reach { background: var(--white); }
-
-  .reach__grid { display: grid; gap: clamp(1rem, 2.2vw, 1.5rem); }
-
-  /* ---------- map card ---------- */
-
-  .mapcard {
-    display: flex;
-    flex-direction: column;
-    padding: clamp(1.4rem, 3vw, 2rem);
-    border: 1px solid var(--line-light);
-    border-radius: 18px;
-    background: var(--off);
-  }
-
-  .mapcard__top {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: var(--s4);
-  }
-  .mapcard__n { font-size: 0.875rem; color: var(--text-2); }
-  .mapcard__n b {
-    font-weight: 700;
-    color: var(--text);
-    font-variant-numeric: tabular-nums;
-  }
-
-  .mapcard__fig {
-    position: relative;
-    width: 100%;
-    max-width: 17rem;
-    margin: clamp(1.25rem, 3vw, 2rem) auto;
-  }
-  .mapcard__fig svg { display: block; width: 100%; height: auto; overflow: visible; }
-
-  .cs0 { stop-color: var(--green); stop-opacity: 0.10; }
-  .cs1 { stop-color: var(--green); stop-opacity: 0.26; }
-
-  .cland {
-    fill: url(#cFill);
-    opacity: 0;
-    transition: opacity 900ms var(--ease) 780ms;
-  }
-  .mapcard__fig[data-in] .cland { opacity: 1; }
-
-  .cedge {
-    fill: none;
-    stroke: color-mix(in oklab, var(--green) 48%, #fff);
-    stroke-width: 3;
-    stroke-linejoin: round;
-    stroke-dasharray: 1;
-    stroke-dashoffset: 1;
-    transition: stroke-dashoffset 1400ms var(--ease) 100ms;
-  }
-  .mapcard__fig[data-in] .cedge { stroke-dashoffset: 0; }
-
-  .cpin {
-    --pd: calc(1420ms + var(--i) * 140ms);
-    opacity: 0;
-    scale: 0.2;
-    transform-box: fill-box;
-    transform-origin: center;
-    transition:
-      opacity 380ms var(--ease) var(--pd),
-      scale 580ms cubic-bezier(0.3, 1.5, 0.5, 1) var(--pd);
-  }
-  .mapcard__fig[data-in] .cpin { opacity: 1; scale: 1; }
-
-  .cdot { fill: var(--green-deep); }
-  .cring { fill: #fff; }
-  .chalo {
-    fill: var(--green);
-    opacity: 0;
-    transform-box: fill-box;
-    transform-origin: center;
-  }
-  .mapcard__fig[data-in] .chalo {
-    animation: cping 3s var(--ease) calc(var(--pd) + 400ms) infinite;
-  }
-  @keyframes cping {
-    0% { opacity: 0.3; transform: scale(0.35); }
-    70%, 100% { opacity: 0; transform: scale(1); }
-  }
-
-  .cchip {
-    position: absolute;
-    top: calc(var(--y) + var(--dy, 0%));
-    left: var(--x);
-    padding: 0.26rem 0.6rem;
-    border-radius: 999px;
-    background: rgb(255 255 255 / 0.94);
-    box-shadow: 0 6px 16px -10px rgb(0 0 0 / 0.55);
-    font-size: 0.6875rem;
-    font-weight: 600;
-    white-space: nowrap;
-    color: var(--text);
-    opacity: 0;
-    transition:
-      opacity 360ms var(--ease) calc(1620ms + var(--i) * 140ms),
-      color var(--t2) var(--ease),
-      background-color var(--t2) var(--ease);
-  }
-  .cchip[data-side='right'] { translate: 1.2rem -50%; }
-  .cchip[data-side='left'] { translate: calc(-100% - 1.2rem) -50%; }
-  .mapcard__fig[data-in] .cchip { opacity: 1; }
-  .cchip:hover { background: var(--green-deep); color: #fff; }
-
-  .mapcard__all {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-top: auto;
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--green-deep);
-    border-bottom: 1px solid transparent;
-    align-self: flex-start;
-    transition: border-color var(--t2) var(--ease);
-  }
-  .mapcard__all:hover { border-color: var(--green); }
-
-  /* ---------- dark channel rail ---------- */
-
-  .rail {
-    padding: clamp(1.5rem, 3.2vw, 2.25rem);
-    border-radius: 18px;
-    background: var(--ink);
-    color: #fff;
-  }
-
-  .rail__eb {
-    font-family: var(--font-mono);
-    font-size: 0.6875rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    color: var(--green-bright);
-  }
-  .rail__h {
-    margin-top: var(--s4);
-    font-size: clamp(1.4rem, 2.6vw, 2rem);
-    font-weight: 700;
-    letter-spacing: -0.035em;
-  }
-
-  .rail__list {
-    display: grid;
-    gap: 0.4rem;
     margin-top: var(--s5);
-  }
-
-  .row {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 0.9rem;
-    border-radius: 14px;
-    transition: background-color var(--t2) var(--ease);
-  }
-  a.row:hover { background: rgb(255 255 255 / 0.07); }
-  .row--static { align-items: flex-start; }
-  /* The address is information, not a channel. Clay marks it as the one
-     row that does not go anywhere. */
-  .row--static .row__i {
-    color: var(--clay-bright);
-    border-color: rgb(224 139 84 / 0.4);
-  }
-
-  /* Outlined circle, the device these pages use to give a plain phone
-     number the weight of a button. */
-  .row__i {
-    display: grid;
-    place-items: center;
-    width: 54px;
-    height: 54px;
-    flex: none;
-    border-radius: 50%;
-    border: 1px solid rgb(255 255 255 / 0.3);
-    color: var(--green-bright);
-    transition: border-color var(--t2) var(--ease), background-color var(--t2) var(--ease);
-  }
-  a.row:hover .row__i {
-    border-color: var(--green-bright);
-    background: rgb(111 201 106 / 0.12);
-  }
-
-  .row__t { display: grid; min-width: 0; }
-  .row__t b {
-    font-family: var(--font-mono);
-    font-size: 0.5625rem;
-    font-weight: 500;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: rgb(255 255 255 / 0.62);
-  }
-  .row__t em,
-  .row__t address {
-    margin-top: 0.2rem;
-    font-style: normal;
-    font-size: 1rem;
-    font-weight: 600;
-    letter-spacing: -0.015em;
-    line-height: 1.45;
-    overflow-wrap: anywhere;
-  }
-  .row__t i {
-    margin-top: 0.2rem;
-    font-style: normal;
-    font-size: 0.75rem;
-    color: rgb(255 255 255 / 0.62);
-  }
-
-  .row__go {
-    display: grid;
-    place-items: center;
-    width: 32px;
-    height: 32px;
-    flex: none;
-    margin-left: auto;
-    border-radius: 50%;
-    color: rgb(255 255 255 / 0.75);
-    transition: transform var(--t2) var(--ease), color var(--t2) var(--ease);
-  }
-  a.row:hover .row__go { transform: translateX(3px); color: #fff; }
-
-  /* ============================================================
-     03 · FORM
-     ============================================================ */
-
-  .get { background: var(--off); }
-
-  .get__head { text-align: center; }
-
-  .get__h {
-    margin-top: var(--s4);
-    font-size: clamp(1.9rem, 4vw, 3rem);
-    font-weight: 700;
-    letter-spacing: -0.04em;
-    line-height: 1.06;
-  }
-  /* Clay, not green. Green owns the buttons; the accent owns emphasis,
-     so the two never compete for the same job. */
-  .get__h em { font-style: normal; color: var(--clay-deep); }
-
-  .get__p {
-    max-width: 48ch;
-    margin: var(--s4) auto 0;
-    font-size: 0.9375rem;
-    line-height: 1.6;
+    font-size: 0.8125rem;
     color: var(--text-2);
   }
 
-  .get__form {
-    position: relative;
-    display: grid;
-    gap: var(--s4);
-    max-width: 46rem;
-    margin: clamp(2rem, 4vw, 3rem) auto 0;
-    padding: clamp(1.4rem, 3vw, 2.25rem);
-    border: 1px solid var(--line-light);
+  /* ---- script aside ---- */
+
+  .hx__aside { display: grid; justify-items: start; }
+
+  .script {
+    font-family: var(--font-serif, Georgia, serif);
+    font-style: italic;
+    font-size: clamp(1.8rem, 3.6vw, 2.7rem);
+    line-height: 1.05;
+    letter-spacing: -0.02em;
+    color: var(--green-deep);
+    transform: rotate(-6deg);
+    transform-origin: left center;
+  }
+  .script__sw {
+    width: clamp(7rem, 12vw, 10rem);
+    height: auto;
+    margin: 0.5rem 0 0 0.4rem;
+    color: var(--green);
+    transform: rotate(-6deg);
+  }
+  .hx__mantra {
+    margin-top: var(--s5);
+    font-size: 0.875rem;
+    line-height: 1.65;
+    color: var(--text-2);
+  }
+
+  /* ---- form card ---- */
+
+  .card {
+    padding: clamp(1.3rem, 2.6vw, 1.9rem);
     border-radius: 18px;
-    background: var(--white);
-    box-shadow: 0 30px 60px -48px rgb(0 0 0 / 0.5);
+    background: #fff;
+    box-shadow: 0 30px 70px -40px rgb(10 30 12 / 0.45);
   }
+  .card__h { font-size: 1.3rem; font-weight: 700; letter-spacing: -0.03em; }
+  .card__s { margin-top: 0.35rem; font-size: 0.8125rem; color: var(--text-2); }
 
-  /* A clay rule across the top of the panel — the accent as a mark, not
-     a wash. */
-  .get__form::before {
-    content: '';
+  .card__f { display: grid; gap: 0.7rem; margin-top: var(--s5); }
+  .card__two { display: grid; gap: 0.7rem; }
+
+  .fd {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .fd :global(svg) {
     position: absolute;
-    top: -1px;
-    left: clamp(1.4rem, 3vw, 2.25rem);
-    width: 56px;
-    height: 3px;
-    border-radius: 0 0 3px 3px;
-    background: var(--clay);
-  }
-
-  .f__row { display: grid; gap: var(--s4); }
-  .f { display: grid; gap: 0.45rem; }
-
-  .f label {
-    font-family: var(--font-mono);
-    font-size: 0.5625rem;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
+    left: 0.85rem;
     color: var(--text-3);
+    pointer-events: none;
   }
-  .f label span { opacity: 0.7; }
+  .fd--area :global(svg) { top: 0.85rem; }
 
-  .f input,
-  .f select,
-  .f textarea {
+  .fd input,
+  .fd select,
+  .fd textarea {
     width: 100%;
-    padding: 0.85rem 0.95rem;
+    padding: 0.8rem 0.9rem 0.8rem 2.5rem;
     border: 1px solid var(--line-light);
     border-radius: 10px;
-    background: var(--off);
+    background: #fff;
     color: var(--text);
     font: inherit;
-    font-size: 0.9375rem;
+    font-size: 0.875rem;
     transition: border-color var(--t2) var(--ease), box-shadow var(--t2) var(--ease);
   }
-  .f textarea { resize: vertical; min-height: 7rem; line-height: 1.55; }
-  .f input::placeholder,
-  .f textarea::placeholder { color: var(--text-3); }
+  .fd textarea { resize: vertical; min-height: 6.5rem; line-height: 1.55; }
+  .fd input::placeholder,
+  .fd textarea::placeholder { color: var(--text-3); }
+  .fd select:invalid { color: var(--text-3); }
 
-  .f input:focus-visible,
-  .f select:focus-visible,
-  .f textarea:focus-visible {
+  .fd input:focus-visible,
+  .fd select:focus-visible,
+  .fd textarea:focus-visible {
     outline: none;
-    background: var(--white);
     border-color: var(--green-deep);
-    box-shadow: 0 0 0 3px color-mix(in oklab, var(--green) 26%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--green) 24%, transparent);
   }
 
-  .get__acts {
+  .fd__count {
+    position: absolute;
+    right: 0.7rem;
+    bottom: 0.5rem;
+    font-size: 0.625rem;
+    color: var(--text-3);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .card__f .btn { width: 100%; margin-top: 0.2rem; }
+
+  .card__note {
     display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--s4) var(--s5);
-    margin-top: var(--s3);
+    gap: 0.5rem;
+    padding-top: 0.6rem;
+    border-top: 1px solid var(--line-light);
+    font-size: 0.6875rem;
+    line-height: 1.5;
+    color: var(--text-3);
   }
+  .card__note :global(svg) { flex: none; margin-top: 2px; color: var(--green-deep); }
 
-  .get__alt {
+  .card__alt {
+    justify-self: start;
     padding: 0;
     border: 0;
     border-bottom: 1px solid var(--line-light);
     background: none;
     color: var(--text-2);
     font: inherit;
-    font-size: 0.875rem;
+    font-size: 0.8125rem;
     cursor: pointer;
     transition: color var(--t2) var(--ease), border-color var(--t2) var(--ease);
   }
-  .get__alt:hover { color: var(--green-deep); border-color: var(--green); }
+  .card__alt:hover { color: var(--green-deep); border-color: var(--green); }
 
-  .get__note { font-size: 0.75rem; line-height: 1.5; color: var(--text-3); }
-
-  .get__nojs {
-    padding: 0.85rem 1rem;
+  .card__nojs {
+    padding: 0.8rem 0.9rem;
     border-radius: 10px;
     background: #eceef0;
     color: #4a5560;
     font-size: 0.8125rem;
     line-height: 1.55;
   }
-  .get__nojs a { text-decoration: underline; }
+  .card__nojs a { text-decoration: underline; }
 
-  /* ============================================================
-     04 · COMPANY
-     ============================================================ */
+  /* ═══════════ 02 · WAYS ═══════════ */
 
-  .cl {
-    background: var(--ink);
-    color: #fff;
-    padding-block: clamp(2.25rem, 4.5vw, 3.5rem);
-  }
-  .cl__in { display: grid; gap: var(--s5); align-items: center; }
-  .cl__name {
+  .wy { background: var(--white); }
+  .wy__grid { display: grid; gap: clamp(1.5rem, 3vw, 2.5rem); }
+
+  .wy__h {
     margin-top: var(--s4);
-    font-size: clamp(1.15rem, 2.2vw, 1.6rem);
+    font-size: clamp(1.7rem, 3.2vw, 2.4rem);
     font-weight: 700;
-    letter-spacing: -0.03em;
+    letter-spacing: -0.038em;
+    line-height: 1.1;
   }
-  .cl__sub { margin-top: 0.35rem; font-size: 0.875rem; color: rgb(255 255 255 / 0.72); }
-
-  .cl__soc { display: flex; flex-wrap: wrap; gap: var(--s5); }
-  .cl__soc a {
+  .wy__p {
+    margin-top: var(--s4);
+    max-width: 32ch;
     font-size: 0.875rem;
-    color: #fff;
-    border-bottom: 1px solid rgb(255 255 255 / 0.4);
-    padding-bottom: 2px;
-    transition: border-color var(--t2) var(--ease), color var(--t2) var(--ease);
+    line-height: 1.6;
+    color: var(--text-2);
   }
-  .cl__soc a:hover { color: var(--green-bright); border-color: var(--green-bright); }
 
-  /* ============================================================
-     RESPONSIVE
-     ============================================================ */
+  .wy__cards { display: grid; gap: clamp(0.75rem, 1.6vw, 1.1rem); }
+
+  .wc {
+    display: grid;
+    height: 100%;
+    padding: 1.4rem 1.3rem;
+    border: 1px solid var(--line-light);
+    border-radius: 14px;
+    background: #fff;
+    transition:
+      transform var(--t2) var(--ease),
+      border-color var(--t2) var(--ease),
+      box-shadow var(--t2) var(--ease);
+  }
+  .wc:hover {
+    transform: translateY(-4px);
+    border-color: color-mix(in oklab, var(--green) 34%, var(--line-light));
+    box-shadow: 0 24px 44px -32px rgb(10 30 12 / 0.5);
+  }
+
+  .wc__i {
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: var(--green-wash);
+    color: var(--green-deep);
+    transition: background-color var(--t2) var(--ease), transform var(--t2) var(--ease);
+  }
+  .wc:hover .wc__i { transform: scale(1.06); background: color-mix(in oklab, var(--green) 20%, #fff); }
+
+  .wc__t { margin-top: 0.9rem; font-size: 1.05rem; font-weight: 700; letter-spacing: -0.025em; }
+  .wc__v {
+    margin-top: 0.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    letter-spacing: 0.01em;
+    color: var(--green-deep);
+    overflow-wrap: anywhere;
+  }
+  .wc__n { margin-top: 0.45rem; font-size: 0.8125rem; line-height: 1.5; color: var(--text-3); }
+  .wc__c {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 1rem;
+    align-self: end;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--green-deep);
+  }
+  .wc:hover .wc__c :global(svg) { transform: translateX(3px); }
+  .wc__c :global(svg) { transition: transform var(--t2) var(--ease); }
+
+  /* ═══════════ 03 · ACROSS OMAN ═══════════ */
+
+  .ao { background: var(--white); }
+
+  .ao__panel {
+    display: grid;
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+    padding: clamp(1.5rem, 3.4vw, 2.75rem);
+    border-radius: 22px;
+    background: linear-gradient(150deg, #f2f8f2, #eaf3ea 55%, #f7fbf7);
+  }
+
+  .ao__copy { display: flex; flex-direction: column; }
+  .ao__h {
+    margin-top: var(--s4);
+    font-size: clamp(1.8rem, 3.4vw, 2.6rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1.06;
+  }
+  .ao__h em { font-style: normal; color: var(--green-deep); }
+  .ao__p {
+    margin-top: var(--s4);
+    max-width: 34ch;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--text-2);
+  }
+
+  /* ---- map ---- */
+
+  .ao__map { position: relative; width: 100%; max-width: 19rem; justify-self: center; }
+  .ao__map svg { display: block; width: 100%; height: auto; overflow: visible; }
+
+  .ao__wm {
+    fill: #b9cdb8;
+    font-size: 78px;
+    font-weight: 600;
+    letter-spacing: 14px;
+  }
+
+  .ao__land { opacity: 0; transition: opacity 800ms var(--ease) 120ms; }
+  .ao__map[data-in] .ao__land { opacity: 1; }
+
+  .ao__route {
+    opacity: 0;
+    transition: opacity 500ms var(--ease) calc(700ms + var(--i) * 110ms);
+  }
+  .ao__map[data-in] .ao__route {
+    opacity: 1;
+    animation: ao-flow 3s linear infinite;
+  }
+  @keyframes ao-flow { to { stroke-dashoffset: -14; } }
+
+  .ao__pin {
+    --pd: calc(820ms + var(--i) * 140ms);
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: bottom center;
+    scale: 0.3;
+    transition:
+      opacity 340ms var(--ease) var(--pd),
+      scale 560ms cubic-bezier(0.3, 1.6, 0.5, 1) var(--pd);
+  }
+  .ao__map[data-in] .ao__pin { opacity: 1; scale: 1; }
+
+  .ao__chip {
+    position: absolute;
+    top: calc(var(--y) + var(--dy, 0%));
+    left: var(--x);
+    translate: 1.5rem -145%;
+    padding: 0.26rem 0.65rem;
+    border-radius: 999px;
+    background: #fff;
+    box-shadow: 0 6px 16px -9px rgb(10 30 12 / 0.5);
+    font-size: 0.75rem;
+    font-weight: 600;
+    white-space: nowrap;
+    color: var(--text);
+    opacity: 0;
+    transition:
+      opacity 340ms var(--ease) calc(980ms + var(--i) * 140ms),
+      color var(--t2) var(--ease),
+      background-color var(--t2) var(--ease);
+  }
+  .ao__map[data-in] .ao__chip { opacity: 1; }
+  .ao__chip:hover { background: var(--green-deep); color: #fff; }
+
+  .ao__script {
+    position: absolute;
+    right: -12%;
+    bottom: 6%;
+    max-width: 9rem;
+    font-family: var(--font-serif, Georgia, serif);
+    font-style: italic;
+    font-size: clamp(0.95rem, 1.5vw, 1.15rem);
+    line-height: 1.25;
+    color: var(--green-deep);
+    rotate: -8deg;
+    pointer-events: none;
+  }
+
+  /* ---- numbered list ---- */
+
+  .ao__list {
+    display: grid;
+    align-content: start;
+    gap: 0;
+    padding: 0.4rem 0.6rem;
+    border-radius: 16px;
+    background: #fff;
+  }
+  .ao__list > li + li { border-top: 1px solid var(--line-light); }
+
+  .bl {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 0.85rem 0.4rem;
+    transition: background-color var(--t2) var(--ease);
+  }
+  .bl:hover { background: var(--green-wash); border-radius: 10px; }
+
+  .bl__n {
+    font-size: 1.35rem;
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    color: var(--text-3);
+    font-variant-numeric: tabular-nums;
+    transition: color var(--t2) var(--ease);
+  }
+  .bl:hover .bl__n { color: var(--green-deep); }
+
+  .bl__t { display: grid; min-width: 0; }
+  .bl__t b { font-size: 0.9375rem; font-weight: 700; letter-spacing: -0.02em; }
+  .bl__t em {
+    margin-top: 0.1rem;
+    font-style: normal;
+    font-size: 0.75rem;
+    color: var(--text-3);
+  }
+  .bl__t i {
+    margin-top: 0.15rem;
+    font-style: normal;
+    font-size: 0.75rem;
+    color: var(--text-2);
+  }
+  /* Hours nobody has confirmed are dimmed and labelled, never presented
+     as fact. */
+  .bl__t i[data-unverified] { opacity: 0.55; }
+  .bl__t s {
+    display: block;
+    text-decoration: none;
+    font-family: var(--font-mono);
+    font-size: 0.5rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #4a5560;
+    opacity: 1;
+  }
+
+  .bl__go {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    flex: none;
+    margin-left: auto;
+    border-radius: 50%;
+    border: 1px solid var(--line-light);
+    color: var(--text-2);
+    transition:
+      transform var(--t2) var(--ease),
+      background-color var(--t2) var(--ease),
+      border-color var(--t2) var(--ease),
+      color var(--t2) var(--ease);
+  }
+  .bl:hover .bl__go {
+    transform: translateX(3px);
+    background: var(--green-deep);
+    border-color: var(--green-deep);
+    color: #fff;
+  }
+
+  /* ═══════════ 04 · FAQ ═══════════ */
+
+  .fq { background: var(--white); }
+  .fq__grid { display: grid; gap: clamp(1.5rem, 3vw, 2.5rem); }
+
+  .fq__intro { display: flex; flex-direction: column; }
+  .fq__h {
+    margin-top: var(--s4);
+    font-size: clamp(1.7rem, 3.2vw, 2.4rem);
+    font-weight: 700;
+    letter-spacing: -0.038em;
+    line-height: 1.1;
+  }
+  .fq__p {
+    margin-top: var(--s4);
+    max-width: 30ch;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--text-2);
+  }
+
+  .fq__list { display: grid; gap: 0.6rem; }
+
+  .ac {
+    border: 1px solid var(--line-light);
+    border-radius: 12px;
+    background: var(--off);
+    transition: border-color var(--t2) var(--ease), background-color var(--t2) var(--ease);
+  }
+  .ac[open] { background: #fff; border-color: color-mix(in oklab, var(--green) 30%, var(--line-light)); }
+
+  .ac summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s4);
+    padding: 1rem 1.15rem;
+    cursor: pointer;
+    list-style: none;
+    font-size: 0.9375rem;
+    font-weight: 500;
+  }
+  .ac summary::-webkit-details-marker { display: none; }
+  .ac summary:focus-visible {
+    outline: 2px solid var(--green-deep);
+    outline-offset: -2px;
+    border-radius: 12px;
+  }
+
+  .ac__i {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    flex: none;
+    border-radius: 50%;
+    border: 1px solid var(--line-light);
+    background: #fff;
+    color: var(--text-2);
+    transition: transform var(--t2) var(--ease), background-color var(--t2) var(--ease), color var(--t2) var(--ease);
+  }
+  .ac[open] .ac__i {
+    transform: rotate(45deg);
+    background: var(--green-deep);
+    border-color: var(--green-deep);
+    color: #fff;
+  }
+
+  .ac__b { padding: 0 1.15rem 1.1rem; }
+  .ac__b p { font-size: 0.875rem; line-height: 1.65; color: var(--text-2); }
+  /* Marked, not guessed — Danat has not supplied this yet. */
+  .ac__pending {
+    padding: 0.75rem 0.9rem;
+    border-radius: 9px;
+    background: #eceef0;
+    color: #4a5560 !important;
+  }
+
+  /* ═══════════ 05 · CTA ═══════════ */
+
+  .ct {
+    background: linear-gradient(105deg, #14311a, #1e4423 52%, #14311a);
+    color: #fff;
+    padding-block: clamp(2.25rem, 4.5vw, 3.25rem);
+  }
+  .ct__in { display: grid; gap: var(--s4) var(--s5); align-items: center; }
+
+  .ct__i {
+    display: grid;
+    place-items: center;
+    width: 62px;
+    height: 62px;
+    color: var(--green-bright);
+  }
+  .ct__k { font-size: 0.875rem; color: rgb(255 255 255 / 0.8); }
+  .ct__h {
+    margin-top: 0.15rem;
+    font-size: clamp(1.6rem, 3vw, 2.3rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1;
+  }
+  .ct__p { font-size: 0.875rem; line-height: 1.6; color: rgb(255 255 255 / 0.8); }
+
+  .ct__b {
+    display: inline-flex;
+    align-items: center;
+    justify-self: start;
+    gap: 0.5rem;
+    padding: 0.85rem 1.4rem;
+    border-radius: 999px;
+    background: #fff;
+    color: #14311a;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    transition: background-color var(--t2) var(--ease), transform var(--t2) var(--ease);
+  }
+  .ct__b:hover { transform: translateY(-2px); background: var(--green-bright); }
+
+  /* ═══════════ RESPONSIVE ═══════════ */
 
   @media (min-width: 40rem) {
-    .f__row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .card__two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .wy__cards { grid-template-columns: repeat(2, 1fr); }
   }
 
   @media (min-width: 62rem) {
-    .reach__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); }
-    .cl__in { grid-template-columns: minmax(0, 1fr) auto; }
+    .hx__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 0.92fr); }
+    .hx__aside { grid-column: 1; }
+    .card { grid-column: 2; grid-row: 1 / span 2; }
+    .wy__grid { grid-template-columns: minmax(0, 0.85fr) minmax(0, 2.4fr); }
+    .wy__cards { grid-template-columns: repeat(4, 1fr); }
+    .ao__panel { grid-template-columns: minmax(0, 0.95fr) minmax(0, 0.85fr) minmax(0, 1.1fr); }
+    .fq__grid { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.6fr); }
+    .ct__in {
+      grid-template-columns: auto auto minmax(0, 1fr) auto;
+    }
+    .ct__p {
+      max-width: 26ch;
+      padding-left: var(--s5);
+      border-left: 1px solid rgb(255 255 255 / 0.28);
+    }
+    .ct__b { justify-self: end; }
   }
 
-  /* ============================================================
-     REDUCED MOTION
-     ============================================================ */
+  @media (min-width: 82rem) {
+    .hx__grid {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 0.46fr) minmax(0, 0.9fr);
+    }
+    .hx__aside { grid-column: 2; align-self: center; }
+    .card { grid-column: 3; grid-row: 1; }
+    .hx__side { display: block; }
+  }
+
+  /* ═══════════ REDUCED MOTION ═══════════ */
 
   @media (prefers-reduced-motion: reduce) {
-    .mapcard__fig :is(.cland, .cpin, .cchip) {
+    .ao__map :is(.ao__land, .ao__route, .ao__pin, .ao__chip) {
       opacity: 1;
       scale: 1;
       transition: none;
       animation: none !important;
     }
-    .cedge { stroke-dashoffset: 0; transition: none; }
-    .mapcard__fig[data-in] .chalo { animation: none; }
-    .btn-green, .btn-green:hover { transform: none; transition: none; }
-    .btn-green::after { display: none; }
+    .btn, .btn:hover, .wc, .wc:hover, .ct__b, .ct__b:hover {
+      transform: none;
+      transition: none;
+    }
+    .btn::after { display: none; }
   }
 </style>
