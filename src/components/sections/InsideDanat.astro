@@ -1,0 +1,573 @@
+---
+import { Image } from 'astro:assets';
+
+import imgBoard from '@assets/photos/repair-board.jpg';
+import imgParts from '@assets/photos/network-patch.jpg';
+import imgDrive from '@assets/photos/datarecovery-drive.jpg';
+import imgShop from '@assets/photos/retail-display.jpg';
+import imgTeam from '@assets/photos/support-agent.jpg';
+import imgPrinter from '@assets/photos/printer-machine.jpg';
+
+/** Every claim here is drawn from Danat's own ERP records. */
+const items = [
+  {
+    kicker: 'Repair capability',
+    title: 'We fix the board, not just the machine',
+    body: 'Most workshops stop at "the motherboard has gone" and quote you a replacement. Our benches carry soldering and hot-air stations, microscopes, programmers and BGA rework tooling, and we stock solder balls from 0.35 mm up. A short on a power rail or a failed charging IC is a repair, not a write-off — and that difference is usually the difference between a service charge and a new laptop.',
+    href: '/services/computer-repair',
+    img: imgBoard,
+    alt: 'Technician repairing a laptop mainboard',
+  },
+  {
+    kicker: 'Stock depth',
+    title: '5,430 lines on the shelf, not on order',
+    body: 'Across four branches we carry 5,430 distinct product lines in 249 categories — 366 laptop keyboards, 314 batteries, 117 screens, 121 chassis, and the cables, hinges, fans and connectors that go with them. When a repair needs a part, it is usually already in the building rather than three weeks away, which is why our turnaround is measured in days.',
+    href: '/services/computer-sales',
+    img: imgParts,
+    alt: 'Network patch panel with dense cabling',
+  },
+  {
+    kicker: 'Data recovery',
+    title: 'We tell you what is recoverable before you pay',
+    body: 'If a drive is making noise, has stopped mounting, or you have deleted something that mattered, the most useful thing you can do is stop using it — every additional write reduces what can be recovered. We assess first and give you an honest answer before any work is agreed. Recovery from a dead laptop where the drive itself is healthy is usually quick and inexpensive.',
+    href: '/services/data-recovery',
+    img: imgDrive,
+    alt: 'Inside an opened hard disk drive',
+  },
+  {
+    kicker: 'New and refurbished',
+    title: 'Refurbished is not a lesser shelf',
+    body: 'We sell new machines from HP, Dell, Acer, ASUS, Lenovo and Apple — and we sell tested, warranted refurbished units alongside them. For most offices that is the difference between replacing four machines and replacing one. The same applies to monitors, printers, memory and storage, which we carry in both new and reconditioned form.',
+    href: '/services/computer-sales',
+    img: imgShop,
+    alt: 'Retail display of computer products',
+  },
+  {
+    kicker: 'Business supply',
+    title: 'Hospitals and retailers buy from us at trade',
+    body: 'Behind the retail counter is a wholesale operation. Hospitals, enterprises and other computer shops across Oman buy supply, parts and consumables from us at trade prices. If you need a quantity rather than a unit — or an ongoing maintenance contract across multiple sites — that is handled by the same team, from the same stock.',
+    href: '/business',
+    img: imgTeam,
+    alt: 'Support team at their workstations',
+  },
+  {
+    kicker: 'Consumables',
+    title: 'The cartridge is here when the printer needs it',
+    body: 'Printers fail in predictable ways — rollers glaze, fusers wear, heads clog, waste toner fills. All of it is serviceable and most of it is far cheaper than replacing the machine. Because we supply consumables as well as service, the toner, drum, chip or ribbon you need is usually in stock rather than on a three-week order.',
+    href: '/services/printer-services',
+    img: imgPrinter,
+    alt: 'Internal rollers of a printing machine',
+  },
+];
+
+/* Tripled so the rail can loop seamlessly: [clones][real][clones].
+   The viewport starts on the middle set. */
+const loop = [...items, ...items, ...items];
+const N = items.length;
+---
+
+<section class="gk section" data-tone="off" data-gk>
+  <svg class="gk__wave" viewBox="0 0 1440 90" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0,48 C180,4 330,86 520,52 C700,20 820,74 1000,56 C1180,38 1300,2 1440,26 L1440,0 L0,0 Z"></path>
+  </svg>
+
+  <div class="shell gk__head">
+    <div>
+      <p class="label" data-rise>Inside Danat</p>
+      <h2 class="gk__title" data-rise style="--d:70ms">
+        Twenty years of <em>doing the hard part.</em>
+      </h2>
+    </div>
+
+    <div class="gk__nav" data-rise style="--d:150ms">
+      <div class="gk__dots" role="tablist" aria-label="Choose a topic">
+        {items.map((it, i) => (
+          <button
+            type="button"
+            class="gk__dot"
+            data-dot={i}
+            data-on={i === 0 ? '' : undefined}
+            role="tab"
+            aria-selected={i === 0 ? 'true' : 'false'}
+            aria-label={it.title}
+          ></button>
+        ))}
+      </div>
+
+      <div class="gk__arrows">
+        <button type="button" class="gk__arrow" data-prev aria-label="Previous">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+            stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 12H5M11 6l-6 6 6 6" />
+          </svg>
+        </button>
+        <button type="button" class="gk__arrow" data-next aria-label="Next">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+            stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14M13 6l6 6-6 6" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="gk__vp">
+    <ul class="gk__rail" data-rail>
+      {loop.map((it, i) => (
+        <li class="gk__slide" data-slide={i} data-real={i % N}>
+          <div class="gk__card">
+            <button class="gk__hit" type="button" data-hit={i} aria-label={`Show: ${it.title}`}></button>
+
+            <!-- base state: image + caption -->
+            <span class="gk__img">
+              <Image
+                src={it.img}
+                alt={it.alt}
+                widths={[340, 600, 900]}
+                sizes="26rem"
+                quality={78}
+                format="webp"
+                loading={i >= N && i < N + 3 ? 'eager' : 'lazy'}
+              />
+            </span>
+            <span class="gk__cap">
+              <span class="gk__kick">{it.kicker}</span>
+              <span class="gk__ct">{it.title}</span>
+            </span>
+
+            <!-- overlay, revealed on the active slide -->
+            <span class="gk__hover">
+              <span class="gk__hkick">{it.kicker}</span>
+              <span class="gk__ht">{it.title}</span>
+              <span class="gk__desc"><span>{it.body}</span></span>
+              <a class="gk__link" href={it.href}>View Details</a>
+            </span>
+          </div>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .gk {
+    position: relative;
+    background: var(--off);
+    color: var(--text);
+    padding-block: clamp(5rem, 8vw, 8rem) clamp(3.5rem, 6vw, 6rem);
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .gk__wave {
+    position: absolute;
+    top: -1px;
+    left: 0;
+    width: 100%;
+    height: clamp(44px, 6vw, 90px);
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .gk__wave path {
+    fill: var(--white);
+  }
+
+  /* ---------- head ---------- */
+
+  .gk__head {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: var(--s5);
+    padding-bottom: clamp(1.75rem, 3vw, 2.5rem);
+  }
+
+  .gk__title {
+    margin-top: var(--s4);
+    font-size: clamp(1.75rem, 3.2vw, 2.75rem);
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    font-weight: 600;
+    max-width: 22ch;
+  }
+
+  .gk__title em {
+    font-style: normal;
+    color: var(--green-deep);
+  }
+
+  .gk__nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s5);
+    flex-wrap: wrap;
+  }
+
+  .gk__dots {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .gk__arrows {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .gk__arrow {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 50%;
+    border: 1px solid var(--line-light);
+    background: var(--white);
+    color: var(--text-2);
+    transition:
+      border-color var(--t2) var(--ease),
+      background-color var(--t2) var(--ease),
+      color var(--t2) var(--ease);
+  }
+
+  .gk__arrow:hover {
+    border-color: var(--green);
+    background: var(--green);
+    color: #fff;
+  }
+
+  .gk__dot {
+    width: 1.75rem;
+    height: 4px;
+    border-radius: 999px;
+    background: var(--line-light);
+    transition:
+      width 420ms var(--ease),
+      background-color var(--t2) var(--ease);
+  }
+
+  .gk__dot:hover {
+    background: var(--text-3);
+  }
+
+  .gk__dot[data-on] {
+    width: 3.5rem;
+    background: var(--green);
+  }
+
+  /* ---------- rail ---------- */
+
+  .gk__vp {
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+  }
+
+  .gk__rail {
+    --cw: clamp(15rem, 23vw, 22rem);
+    --cg: clamp(0.75rem, 1.2vw, 1.15rem);
+    display: flex;
+    gap: var(--cg);
+    height: clamp(26rem, 34vw, 31rem);
+    will-change: transform;
+    transition: transform 700ms var(--ease);
+  }
+
+  .gk__rail[data-nosnap] {
+    transition: none;
+  }
+
+  /* Every slide is the SAME width — the active one is not wider, it
+     simply reveals its overlay. That is how the reference works. */
+  .gk__slide {
+    flex: 0 0 var(--cw);
+    width: var(--cw);
+  }
+
+  .gk__card {
+    position: relative;
+    height: 100%;
+  }
+
+  .gk__hit {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    cursor: pointer;
+  }
+
+  .gk__slide[data-on] .gk__hit {
+    pointer-events: none;
+  }
+
+  /* ---------- base state ---------- */
+
+  .gk__img {
+    display: block;
+    aspect-ratio: 4 / 3;
+    border-radius: 10px;
+    overflow: hidden;
+    background: var(--off-2);
+    transition: opacity 320ms var(--ease);
+  }
+
+  .gk__img :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .gk__cap {
+    display: grid;
+    gap: 0.4rem;
+    padding: 0.9rem 0.15rem 0;
+    transition: opacity 320ms var(--ease);
+  }
+
+  .gk__kick {
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+
+  .gk__ct {
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.3;
+    color: var(--text);
+  }
+
+  /* Hover only. Nothing is open at rest — the reference names this
+     state "item_hover" and that is exactly what it is. */
+  .gk__card:hover .gk__img,
+  .gk__card:hover .gk__cap,
+  .gk__card:focus-within .gk__img,
+  .gk__card:focus-within .gk__cap {
+    opacity: 0;
+  }
+
+  /* ---------- overlay ---------- */
+
+  .gk__hover {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    padding: clamp(1.15rem, 1.6vw, 1.6rem);
+    border: 1px solid var(--green);
+    border-radius: 12px;
+    background: var(--white);
+    box-shadow: 0 22px 50px -30px rgb(20 23 26 / 0.35);
+    /* Always dark-on-white regardless of section tone. */
+    color: var(--text);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(8px);
+    transition:
+      opacity 300ms var(--ease),
+      transform 300ms var(--ease);
+  }
+
+  .gk__card:hover .gk__hover,
+  .gk__card:focus-within .gk__hover {
+    opacity: 1;
+    pointer-events: auto;
+    transform: none;
+  }
+
+  /* The hit target must not sit above the panel, or the excerpt
+     cannot be scrolled and the link cannot be clicked. */
+  .gk__card:hover .gk__hit {
+    pointer-events: none;
+  }
+
+  /* Touch devices have no hover, so there the centred card opens instead
+     — otherwise the panels would be unreachable on a phone. */
+  @media (hover: none) {
+    .gk__slide[data-on] .gk__img,
+    .gk__slide[data-on] .gk__cap {
+      opacity: 0;
+    }
+
+    .gk__slide[data-on] .gk__hover {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+  }
+
+  .gk__hkick {
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--green-deep);
+  }
+
+  .gk__ht {
+    display: block;
+    margin-top: 0.7rem;
+    font-size: clamp(1.05rem, 1.35vw, 1.3rem);
+    font-weight: 600;
+    letter-spacing: -0.025em;
+    line-height: 1.22;
+    color: var(--text);
+  }
+
+  /* Scrolling excerpt, like the reference. */
+  .gk__desc {
+    display: block;
+    flex: 1;
+    min-height: 0;
+    margin-top: 0.8rem;
+    padding-right: 0.7rem;
+    overflow-y: auto;
+    font-size: 0.875rem;
+    line-height: 1.62;
+    color: var(--text-2);
+    scrollbar-width: thin;
+    scrollbar-color: var(--text-3) transparent;
+  }
+
+  .gk__desc::-webkit-scrollbar {
+    width: 3px;
+  }
+
+  .gk__desc::-webkit-scrollbar-thumb {
+    background: var(--text-3);
+    border-radius: 999px;
+  }
+
+  .gk__link {
+    display: inline-block;
+    width: fit-content;
+    margin-top: 1rem;
+    padding-bottom: 0.3rem;
+    border-bottom: 1px solid var(--text);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text);
+    transition: color var(--t2) var(--ease), border-color var(--t2) var(--ease);
+  }
+
+  .gk__link:hover {
+    color: var(--green-deep);
+    border-color: var(--green-deep);
+  }
+
+  /* ---------- mobile ---------- */
+
+  @media (min-width: 62rem) {
+    .gk__head {
+      grid-template-columns: 1fr auto;
+      align-items: end;
+    }
+  }
+
+  @media (max-width: 40rem) {
+    .gk__rail {
+      --cw: min(78vw, 19rem);
+      height: 28rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .gk__rail,
+    .gk__hover,
+    .gk__img,
+    .gk__cap {
+      transition: none !important;
+    }
+  }
+</style>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-gk]');
+  const rail = root?.querySelector<HTMLElement>('[data-rail]');
+  const vp = root?.querySelector<HTMLElement>('.gk__vp');
+
+  if (root && rail && vp) {
+    const slides = [...rail.querySelectorAll<HTMLElement>('[data-slide]')];
+    const dots = [...root.querySelectorAll<HTMLElement>('[data-dot]')];
+    const N = dots.length;
+
+    // Start on the middle copy so there is always a set either side.
+    let idx = N;
+
+    /* Measure the rendered slide rather than reading --cw: that token is a
+       clamp() expression, so getPropertyValue returns the literal text. */
+    const metrics = () => {
+      const cw = slides[0].getBoundingClientRect().width;
+      const gap = parseFloat(getComputedStyle(rail).gap) || 16;
+      return { step: cw + gap, cw };
+    };
+
+    /* Centre the active slide in the viewport — the reference uses
+       Swiper's centeredSlides, and centring is what keeps the open card
+       in the same place every time. */
+    const place = (animate = true) => {
+      const { step, cw } = metrics();
+      const x = idx * step - (vp.clientWidth - cw) / 2;
+
+      rail.toggleAttribute('data-nosnap', !animate);
+      rail.style.transform = `translate3d(${-x}px, 0, 0)`;
+      if (!animate) void rail.offsetWidth; // flush before re-enabling
+    };
+
+    const paint = () => {
+      const real = ((idx % N) + N) % N;
+      slides.forEach((s, n) => s.toggleAttribute('data-on', n === idx));
+      dots.forEach((d, n) => {
+        d.toggleAttribute('data-on', n === real);
+        d.setAttribute('aria-selected', String(n === real));
+      });
+    };
+
+    const go = (next: number) => {
+      idx = next;
+      paint();
+      place(true);
+    };
+
+    /* After the slide finishes, jump silently back into the middle copy
+       so the rail can run forever in either direction. */
+    rail.addEventListener('transitionend', (e) => {
+      if (e.propertyName !== 'transform') return;
+      if (idx < N || idx >= N * 2) {
+        idx = (((idx % N) + N) % N) + N;
+        paint();
+        place(false);
+      }
+    });
+
+    slides.forEach((s, i) => {
+      const hit = s.querySelector<HTMLElement>('[data-hit]');
+      hit?.addEventListener('click', () => go(i));
+    });
+
+    dots.forEach((d, i) =>
+      d.addEventListener('click', () => {
+        // Move to the nearest copy of that item, so it never jumps far.
+        const base = Math.floor(idx / N) * N;
+        go(base + i);
+      })
+    );
+
+    root.querySelector('[data-next]')?.addEventListener('click', () => go(idx + 1));
+    root.querySelector('[data-prev]')?.addEventListener('click', () => go(idx - 1));
+
+    window.addEventListener('resize', () => place(false), { passive: true });
+    window.addEventListener('load', () => place(false));
+
+    paint();
+    place(false);
+  }
+</script>

@@ -1,0 +1,326 @@
+---
+import { Image } from 'astro:assets';
+import Icon from '@components/ui/Icon.astro';
+
+/* Photos chosen for how they CROP at 16:10, not how they look full-frame.
+   printer-office and cctv-white were both portrait/empty-wall shots that
+   centre-cropped to a blank rectangle. */
+import imgRepair from '@assets/photos/repair-solder.jpg';
+import imgPrinter from '@assets/photos/printer-machine.jpg';
+import imgCctv from '@assets/photos/cctv-wall.jpg';
+import imgNetwork from '@assets/photos/network-eng.jpg';
+import imgData from '@assets/photos/datarecovery-drive.jpg';
+import imgSupport from '@assets/photos/support-desk.jpg';
+
+const services = [
+  {
+    title: 'Computer Repair',
+    body: 'Laptops, desktops and MacBooks — diagnosed free, repaired at board level.',
+    href: '/services/computer-repair',
+    img: imgRepair,
+    alt: 'Technician testing a laptop mainboard with a multimeter',
+    icon: 'laptop' as const,
+  },
+  {
+    title: 'Printer Services',
+    body: 'Laser, inkjet, thermal and barcode printers serviced, repaired and supplied.',
+    href: '/services/printer-services',
+    img: imgPrinter,
+    alt: 'Internal rollers and drum of a printing machine being serviced',
+    icon: 'printer' as const,
+  },
+  {
+    title: 'CCTV & Security',
+    body: 'Surveyed, installed and maintained. IP and analogue systems across Oman.',
+    href: '/services/cctv-services',
+    img: imgCctv,
+    alt: 'Two security cameras mounted on a building wall',
+    icon: 'camera' as const,
+  },
+  {
+    title: 'Networking',
+    body: 'Structured cabling, switching, Wi-Fi and firewalls that hold up under load.',
+    href: '/services/networking',
+    img: imgNetwork,
+    alt: 'Engineer working on a network switch',
+    icon: 'network' as const,
+  },
+  {
+    title: 'Data Recovery',
+    body: 'Failed drives, dead machines and deleted volumes — assessed honestly first.',
+    href: '/services/data-recovery',
+    img: imgData,
+    alt: 'Inside an opened hard disk drive, platter and actuator arm visible',
+    icon: 'drive' as const,
+  },
+  {
+    title: 'IT Support',
+    body: 'On-site and remote support for homes and businesses, across four branches.',
+    href: '/services/hardware-troubleshooting',
+    img: imgSupport,
+    alt: 'Support agent at a workstation',
+    icon: 'headset' as const,
+  },
+];
+---
+
+<section class="sg section" data-tone="light">
+  <div class="shell">
+    <div class="sg__head">
+      <div>
+        <p class="label" data-rise>Our services</p>
+        <h2 class="sg__title" data-rise style="--d:70ms">
+          What do you need help with?
+        </h2>
+        <p class="sg__sub" data-rise style="--d:140ms">
+          Complete IT solutions for homes and businesses across Oman.
+        </p>
+      </div>
+
+      <a class="sg__all" href="/services" data-rise style="--d:200ms">
+        View all services <Icon name="arrow" size={14} />
+      </a>
+    </div>
+
+    <ul class="sg__grid">
+      {services.map((s, i) => (
+        <li data-rise style={`--d:${i * 70}ms`}>
+          <a class="sg__card" href={s.href}>
+            <span class="sg__media">
+              <Image
+                src={s.img}
+                alt={s.alt}
+                widths={[400, 700, 1000]}
+                sizes="(max-width: 48rem) 100vw, (max-width: 72rem) 50vw, 33vw"
+                quality={82}
+                format="webp"
+                loading={i < 3 ? 'eager' : 'lazy'}
+              />
+              <span class="sg__ico" aria-hidden="true">
+                <Icon name={s.icon} size={20} />
+              </span>
+            </span>
+
+            <span class="sg__text">
+              <span class="sg__name">{s.title}</span>
+              <span class="sg__body">{s.body}</span>
+            </span>
+
+            <span class="sg__foot">
+              <span class="sg__more">Learn more</span>
+              <span class="sg__go" aria-hidden="true"><Icon name="arrow" size={15} /></span>
+            </span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .sg {
+    background: var(--white);
+    padding-block: clamp(3.5rem, 6vw, 6rem);
+  }
+
+  /* ---------- head ---------- */
+
+  .sg__head {
+    display: grid;
+    gap: var(--s5);
+    padding-bottom: clamp(2rem, 3.5vw, 3rem);
+  }
+
+  .sg__title {
+    margin-top: var(--s4);
+    font-size: clamp(1.75rem, 3.2vw, 2.75rem);
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+    font-weight: 600;
+  }
+
+  .sg__sub {
+    margin-top: 0.7rem;
+    max-width: 48ch;
+    color: var(--text-2);
+  }
+
+  .sg__all {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    justify-self: start;
+    align-self: end;
+    padding-bottom: 0.35rem;
+    border-bottom: 1px solid var(--text);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: color var(--t2) var(--ease), border-color var(--t2) var(--ease);
+  }
+
+  .sg__all:hover {
+    color: var(--green-deep);
+    border-color: var(--green-deep);
+  }
+
+  .sg__all :global(svg) {
+    transition: transform var(--t2) var(--ease);
+  }
+
+  .sg__all:hover :global(svg) {
+    transform: translateX(4px);
+  }
+
+  /* ---------- grid ---------- */
+
+  .sg__grid {
+    display: grid;
+    gap: clamp(1.25rem, 2vw, 1.75rem);
+    grid-template-columns: 1fr;
+  }
+
+  .sg__card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    border: 1px solid var(--line-light);
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--white);
+    transition:
+      border-color var(--t2) var(--ease),
+      box-shadow var(--t2) var(--ease),
+      transform var(--t2) var(--ease);
+  }
+
+  .sg__media {
+    position: relative;
+    display: block;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    background: var(--off);
+  }
+
+  /* Full colour. Readable at a glance — no grey wash. */
+  .sg__media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 900ms var(--ease);
+  }
+
+  .sg__ico {
+    position: absolute;
+    left: 0.9rem;
+    bottom: 0.9rem;
+    display: grid;
+    place-items: center;
+    width: 2.7rem;
+    height: 2.7rem;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.94);
+    color: var(--text);
+    box-shadow: 0 4px 14px -6px rgb(20 23 26 / 0.4);
+    transition:
+      background-color var(--t2) var(--ease),
+      color var(--t2) var(--ease);
+  }
+
+  .sg__text {
+    display: block;
+    padding: 1.25rem 1.25rem 0;
+  }
+
+  .sg__name {
+    display: block;
+    font-size: 1.1875rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+
+  .sg__body {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: var(--small);
+    line-height: 1.6;
+    color: var(--text-2);
+  }
+
+  .sg__foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s4);
+    margin-top: auto;
+    padding: 1.1rem 1.25rem 1.25rem;
+  }
+
+  .sg__more {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text);
+  }
+
+  .sg__go {
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    border: 1px solid var(--line-light);
+    color: var(--text-2);
+    transition:
+      background-color var(--t2) var(--ease),
+      border-color var(--t2) var(--ease),
+      color var(--t2) var(--ease),
+      transform var(--t2) var(--ease);
+  }
+
+  /* ---------- hover: restrained, and it never hides anything ---------- */
+
+  .sg__card:hover,
+  .sg__card:focus-within {
+    border-color: var(--green);
+    box-shadow: 0 18px 40px -26px rgb(20 23 26 / 0.35);
+    transform: translateY(-3px);
+  }
+
+  .sg__card:hover .sg__media :global(img),
+  .sg__card:focus-within .sg__media :global(img) {
+    transform: scale(1.05);
+  }
+
+  .sg__card:hover .sg__ico,
+  .sg__card:focus-within .sg__ico {
+    background: var(--green);
+    color: #fff;
+  }
+
+  .sg__card:hover .sg__go,
+  .sg__card:focus-within .sg__go {
+    background: var(--green);
+    border-color: var(--green);
+    color: #fff;
+    transform: translateX(3px);
+  }
+
+  /* ---------- responsive ---------- */
+
+  @media (min-width: 40rem) {
+    .sg__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (min-width: 62rem) {
+    .sg__head {
+      grid-template-columns: 1fr auto;
+      align-items: end;
+    }
+    .sg__grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+</style>

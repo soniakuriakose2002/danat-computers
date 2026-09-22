@@ -42,7 +42,7 @@ const branchNames = ['Muscat', 'Sohar', 'Salalah', 'Hail'];
             widths={[900, 1400, 1920, 2400]}
             sizes="100vw"
             quality={72}
-            format="avif"
+            format="webp"
             loading={i === 0 ? 'eager' : 'lazy'}
             fetchpriority={i === 0 ? 'high' : undefined}
           />
@@ -197,7 +197,7 @@ const branchNames = ['Muscat', 'Sohar', 'Salalah', 'Hail'];
           >
             <span class="hx__thumbimg">
               <Image src={m.img} alt="" widths={[200, 400]} sizes="180px"
-                quality={70} format="avif" loading="lazy" />
+                quality={70} format="webp" loading="lazy" />
             </span>
             <span class="hx__thumbmeta">
               <b>{s.title}</b>

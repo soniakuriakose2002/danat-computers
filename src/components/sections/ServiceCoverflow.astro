@@ -1,0 +1,978 @@
+---
+import { Image } from 'astro:assets';
+import Icon from '@components/ui/Icon.astro';
+
+import imgRepair from '@assets/photos/repair-solder.jpg';
+import imgPrinter from '@assets/photos/printer-machine.jpg';
+import imgCctv from '@assets/photos/cctv-wall.jpg';
+import imgNetwork from '@assets/photos/network-patch.jpg';
+import imgData from '@assets/photos/datarecovery-drive.jpg';
+import imgSupport from '@assets/photos/support-desk.jpg';
+import imgBg from '@assets/photos/repair-board.jpg';
+
+const cards = [
+  {
+    n: '01',
+    title: 'Computer Repair',
+    tagline: 'Diagnose. Repair. Restore.',
+    blurb: 'Board-level repair for laptops and desktops.',
+    href: '/services/computer-repair',
+    img: imgRepair,
+    alt: 'Technician testing a laptop mainboard',
+    icon: 'laptop' as const,
+  },
+  {
+    n: '02',
+    title: 'Printer Services',
+    tagline: 'Service. Supply. Sustain.',
+    blurb: 'Keep your business printing.',
+    href: '/services/printer-services',
+    img: imgPrinter,
+    alt: 'Printer rollers being serviced',
+    icon: 'printer' as const,
+  },
+  {
+    n: '03',
+    title: 'CCTV & Security',
+    tagline: 'Survey. Install. Monitor.',
+    blurb: 'See a safer tomorrow.',
+    href: '/services/cctv-services',
+    img: imgCctv,
+    alt: 'Security cameras on a wall',
+    icon: 'camera' as const,
+  },
+  {
+    n: '04',
+    title: 'Networking',
+    tagline: 'Design. Cable. Connect.',
+    blurb: 'Stronger connections.',
+    href: '/services/networking',
+    img: imgNetwork,
+    alt: 'Network patch panel',
+    icon: 'network' as const,
+  },
+  {
+    n: '05',
+    title: 'Data Recovery',
+    tagline: 'Assess. Recover. Return.',
+    blurb: 'Recover what matters.',
+    href: '/services/data-recovery',
+    img: imgData,
+    alt: 'Opened hard disk drive',
+    icon: 'drive' as const,
+  },
+  {
+    n: '06',
+    title: 'IT Support',
+    tagline: 'Respond. Resolve. Maintain.',
+    blurb: 'Reliable remote and on-site support.',
+    href: '/services/hardware-troubleshooting',
+    img: imgSupport,
+    alt: 'Support team at their desks',
+    icon: 'headset' as const,
+  },
+];
+
+const arc = ['Repair', 'Protect', 'Connect', 'Support', 'Grow'];
+
+const features = [
+  ['Expert Technicians', 'Reliable, professional service.', 'laptop'],
+  ['Genuine Parts', 'Quality you can trust.', 'drive'],
+  ['Individuals & Business', 'Flexible solutions for every need.', 'headset'],
+  ['Across Oman', 'Four branches. Local support.', 'network'],
+] as const;
+---
+
+<section class="cf section" data-tone="light" data-cf>
+  <!-- Wavy boundary with the dark hero above. Two layers drifting at
+       different speeds so the edge reads as water, not a shape. -->
+  <div class="cf__wave" aria-hidden="true">
+    <svg viewBox="0 0 1440 130" preserveAspectRatio="none">
+      <path
+        class="cf__wave-b"
+        d="M0,0 L1440,0 L1440,46 C1250,104 1080,26 860,58 C650,88 430,122 215,92 C135,80 60,62 0,74 Z"
+      ></path>
+      <path
+        class="cf__wave-f"
+        d="M0,0 L1440,0 L1440,30 C1230,86 1060,10 840,42 C630,72 410,104 200,76 C125,66 55,48 0,58 Z"
+      ></path>
+    </svg>
+  </div>
+
+  <!-- washed-out backdrop -->
+  <div class="cf__bg" aria-hidden="true">
+    <Image src={imgBg} alt="" widths={[1200, 1900]} sizes="100vw" quality={70} format="webp" loading="lazy" />
+    <span class="cf__wash"></span>
+  </div>
+
+  <div class="cf__grid">
+    <!-- ───────── copy ───────── -->
+    <div class="cf__copy">
+      <p class="label" data-rise>Our services</p>
+
+      <h2 class="cf__title" data-rise style="--d:70ms">
+        What do you<br />need <em>help with?</em>
+      </h2>
+
+      <p class="cf__sub" data-rise style="--d:140ms">
+        Complete IT solutions for homes and businesses across Oman.
+        Reliable. Professional. Always local.
+      </p>
+
+      <a class="cf__cta" href="/services" data-rise style="--d:200ms">
+        Explore All Services
+        <span aria-hidden="true"><Icon name="arrow" size={15} /></span>
+      </a>
+
+      <blockquote class="cf__quote" data-rise style="--d:260ms">
+        Technology<br />that keeps you<br /><em>moving.</em>
+      </blockquote>
+
+      <p class="cf__trust" data-rise style="--d:320ms">
+        Trusted by individuals and businesses across Oman.
+      </p>
+    </div>
+
+    <!-- ───────── 3D coverflow ───────── -->
+    <div class="cf__stage">
+      <p class="cf__hint" aria-hidden="true">Scroll or drag to explore</p>
+
+      <div class="cf__viewport" data-viewport>
+        <ul class="cf__deck" data-deck>
+          {cards.map((c, i) => (
+            <li class="cf__card" data-card={i}>
+              <button class="cf__hit" type="button" data-hit={i} aria-label={`Show ${c.title}`}></button>
+
+              <span class="cf__img">
+                <Image
+                  src={c.img}
+                  alt={c.alt}
+                  widths={[320, 560, 800]}
+                  sizes="19rem"
+                  quality={80}
+                  format="webp"
+                  loading={i < 3 ? 'eager' : 'lazy'}
+                />
+              </span>
+
+              <span class="cf__tint" aria-hidden="true"></span>
+              <span class="cf__num">{c.n}</span>
+              <span class="cf__ico" aria-hidden="true"><Icon name={c.icon} size={19} /></span>
+
+              <span class="cf__body">
+                <span class="cf__badge" aria-hidden="true">{c.n}</span>
+                <span class="cf__name">{c.title}</span>
+                <span class="cf__tag">{c.tagline}</span>
+                <span class="cf__blurb">{c.blurb}</span>
+                <a class="cf__go" href={c.href} aria-label={`${c.title} — learn more`}>
+                  <Icon name="arrow" size={17} />
+                </a>
+              </span>
+            </li>
+          ))}
+        </ul>
+
+        <button type="button" class="cf__arrow cf__arrow--l" data-prev aria-label="Previous service">
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor"
+            stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M19 12H5M11 6l-6 6 6 6" />
+          </svg>
+        </button>
+        <button type="button" class="cf__arrow cf__arrow--r" data-next aria-label="Next service">
+          <Icon name="arrow" size={17} />
+        </button>
+      </div>
+
+      <!-- process arc -->
+      <div class="cf__arc" aria-hidden="true">
+        <svg viewBox="0 0 900 90" preserveAspectRatio="none">
+          <path d="M0,74 C220,30 430,16 660,30 C780,38 850,48 900,54" />
+        </svg>
+        <ul>
+          {arc.map((a, i) => (
+            <li style={`--i:${i}`}><i></i>{a}</li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ───────── feature row ───────── -->
+  <ul class="cf__feats shell">
+    {features.map(([t, d, ic], i) => (
+      <li data-rise style={`--d:${i * 70}ms`}>
+        <span class="cf__fico"><Icon name={ic as any} size={20} /></span>
+        <span>
+          <b>{t}</b>
+          <i>{d}</i>
+        </span>
+      </li>
+    ))}
+  </ul>
+</section>
+
+<style>
+  .cf {
+    position: relative;
+    background: var(--white);
+    /* Extra top padding so the content clears the wave. */
+    padding-block: clamp(6rem, 11vw, 10rem) clamp(3.5rem, 6vw, 5.5rem);
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  /* ---------- wave ---------- */
+
+  .cf__wave {
+    position: absolute;
+    top: -1px;
+    left: 0;
+    width: 100%;
+    height: clamp(58px, 9vw, 130px);
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .cf__wave svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  /* The back layer is the hero's ink, slightly translucent; the front
+     layer is solid, so the two read as overlapping swells. */
+  .cf__wave-b {
+    fill: color-mix(in oklab, var(--ink) 55%, transparent);
+    transform-origin: center;
+    animation: cf-swell-b 13s ease-in-out infinite alternate;
+  }
+
+  .cf__wave-f {
+    fill: var(--ink);
+    animation: cf-swell-f 9s ease-in-out infinite alternate;
+  }
+
+  @keyframes cf-swell-b {
+    from {
+      transform: translate3d(-1.5%, 2px, 0) scaleY(1);
+    }
+    to {
+      transform: translate3d(1.5%, -3px, 0) scaleY(1.06);
+    }
+  }
+
+  @keyframes cf-swell-f {
+    from {
+      transform: translate3d(1.2%, -2px, 0) scaleY(1.04);
+    }
+    to {
+      transform: translate3d(-1.2%, 3px, 0) scaleY(1);
+    }
+  }
+
+  /* ---------- backdrop ---------- */
+
+  .cf__bg {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+  }
+
+  .cf__bg :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 75% 40%;
+  }
+
+  .cf__wash {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(100deg, #fff 0%, #fff 42%, rgb(255 255 255 / 0.9) 58%, rgb(255 255 255 / 0.74) 100%),
+      linear-gradient(to bottom, #fff 0%, transparent 22%, transparent 74%, #fff 100%);
+  }
+
+  /* ---------- layout ---------- */
+
+  .cf__grid {
+    position: relative;
+    display: grid;
+    gap: var(--s7);
+    align-items: center;
+    width: 100%;
+    max-width: var(--maxw);
+    margin-inline: auto;
+    padding-inline: var(--gut);
+  }
+
+  /* ---------- copy ---------- */
+
+  .cf__title {
+    margin-top: var(--s4);
+    font-size: clamp(2rem, 3.6vw, 3.1rem);
+    line-height: 1.08;
+    letter-spacing: -0.035em;
+    font-weight: 600;
+  }
+
+  .cf__title em {
+    font-style: normal;
+    color: var(--green);
+  }
+
+  .cf__sub {
+    margin-top: var(--s4);
+    max-width: 38ch;
+    font-size: 0.9375rem;
+    line-height: 1.65;
+    color: var(--text-2);
+  }
+
+  .cf__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-top: var(--s5);
+    padding: 0.85rem 0.85rem 0.85rem 1.5rem;
+    border-radius: 999px;
+    background: var(--green);
+    color: #fff;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    transition: background-color var(--t2) var(--ease);
+  }
+
+  .cf__cta span {
+    display: grid;
+    place-items: center;
+    width: 1.9rem;
+    height: 1.9rem;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.22);
+    transition: transform var(--t2) var(--ease);
+  }
+
+  .cf__cta:hover {
+    background: var(--text);
+  }
+
+  .cf__cta:hover span {
+    transform: translateX(3px);
+  }
+
+  .cf__quote {
+    margin-top: var(--s6);
+    padding-left: 1rem;
+    border-left: 3px solid var(--green);
+    font-size: clamp(1.05rem, 1.4vw, 1.3rem);
+    font-weight: 500;
+    line-height: 1.35;
+    letter-spacing: -0.02em;
+  }
+
+  .cf__quote em {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 400;
+    color: var(--green-deep);
+  }
+
+  .cf__trust {
+    margin-top: var(--s5);
+    max-width: 26ch;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--text-3);
+  }
+
+  /* ---------- stage ---------- */
+
+  .cf__stage {
+    position: relative;
+    display: grid;
+    gap: var(--s4);
+  }
+
+  .cf__hint {
+    justify-self: center;
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 1.05rem;
+    color: var(--green-deep);
+    opacity: 0.85;
+  }
+
+  .cf__viewport {
+    position: relative;
+    height: clamp(21rem, 30vw, 26rem);
+    perspective: 1500px;
+    perspective-origin: 50% 50%;
+  }
+
+  .cf__deck {
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+  }
+
+  /* Each card is placed by JS via custom properties. Transform only —
+     no layout work, so this stays smooth. */
+  .cf__card {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: clamp(12.5rem, 17vw, 15.5rem);
+    height: clamp(17.5rem, 25vw, 21.5rem);
+    margin-left: calc(clamp(12.5rem, 17vw, 15.5rem) / -2);
+    margin-top: calc(clamp(17.5rem, 25vw, 21.5rem) / -2);
+    border-radius: 16px;
+    overflow: hidden;
+    background: var(--off-2);
+    box-shadow: 0 26px 60px -32px rgb(20 23 26 / 0.55);
+    transform:
+      translate3d(var(--x, 0px), 0, var(--z, 0px))
+      rotateY(var(--ry, 0deg))
+      scale(var(--sc, 1));
+    opacity: var(--op, 1);
+    z-index: var(--zi, 1);
+    transition:
+      transform 720ms var(--ease),
+      opacity 720ms var(--ease);
+    transition-delay: var(--dly, 0ms);
+    will-change: transform, opacity;
+  }
+
+  /* ENTRANCE — until the deck is in view the cards are stacked flat and
+     pushed back. Revealing sets [data-ready] and they fly into formation,
+     staggered outward from the centre. */
+  .cf__deck:not([data-ready]) .cf__card {
+    opacity: 0;
+    transform: translate3d(0, 70px, -520px) rotateY(0deg) scale(0.78);
+  }
+
+  /* A slow green pulse behind whichever card is active. */
+  .cf__card[data-on]::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    z-index: 0;
+    border-radius: inherit;
+    box-shadow: 0 0 0 0 rgb(89 170 84 / 0.55);
+    animation: cf-pulse 3.2s var(--ease) infinite;
+    pointer-events: none;
+  }
+
+  @keyframes cf-pulse {
+    0% {
+      box-shadow: 0 0 0 0 rgb(89 170 84 / 0.5);
+    }
+    70% {
+      box-shadow: 0 0 0 18px rgb(89 170 84 / 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgb(89 170 84 / 0);
+    }
+  }
+
+  .cf__hit {
+    position: absolute;
+    inset: 0;
+    z-index: 5;
+    cursor: pointer;
+  }
+
+  .cf__card[data-on] .cf__hit {
+    pointer-events: none;
+  }
+
+  .cf__img {
+    position: absolute;
+    inset: 0;
+  }
+
+  .cf__img :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Inactive cards are washed out; the active one takes the green. */
+  .cf__tint {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgb(255 255 255 / 0.96) 22%, rgb(255 255 255 / 0.35) 62%, transparent 100%);
+    transition: opacity 500ms var(--ease);
+  }
+
+  .cf__card[data-on] .cf__tint {
+    background: linear-gradient(to top, #14532a 6%, rgb(20 83 42 / 0.86) 42%, rgb(20 83 42 / 0.18) 100%);
+  }
+
+  .cf__num {
+    position: absolute;
+    top: 0.9rem;
+    left: 1rem;
+    z-index: 2;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    color: rgb(255 255 255 / 0.9);
+    text-shadow: 0 1px 6px rgb(0 0 0 / 0.5);
+  }
+
+  .cf__card[data-on] .cf__num {
+    opacity: 0;
+  }
+
+  .cf__ico {
+    position: absolute;
+    left: 1rem;
+    bottom: 7.6rem;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 2.3rem;
+    height: 2.3rem;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.9);
+    color: var(--text);
+    transition: opacity 400ms var(--ease);
+  }
+
+  .cf__card[data-on] .cf__ico {
+    opacity: 0;
+  }
+
+  /* ---------- card text ---------- */
+
+  .cf__body {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 3;
+    display: grid;
+    justify-items: start;
+    gap: 0.25rem;
+    padding: 1rem 1.05rem 1.15rem;
+  }
+
+  .cf__badge {
+    display: none;
+    place-items: center;
+    width: 2.1rem;
+    height: 2.1rem;
+    margin-bottom: 0.5rem;
+    border-radius: 50%;
+    border: 1px solid rgb(255 255 255 / 0.45);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    color: #fff;
+  }
+
+  .cf__card[data-on] .cf__badge {
+    display: grid;
+  }
+
+  .cf__name {
+    font-size: 1.0625rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    color: var(--text);
+  }
+
+  .cf__tag {
+    display: none;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: rgb(255 255 255 / 0.88);
+  }
+
+  .cf__blurb {
+    font-size: 0.75rem;
+    line-height: 1.45;
+    color: var(--text-2);
+  }
+
+  .cf__card[data-on] .cf__name {
+    font-size: 1.25rem;
+    color: #fff;
+  }
+
+  .cf__card[data-on] .cf__tag {
+    display: block;
+  }
+
+  .cf__card[data-on] .cf__blurb {
+    display: none;
+  }
+
+  .cf__go {
+    display: none;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    margin-top: 0.7rem;
+    border-radius: 50%;
+    border: 1px solid rgb(255 255 255 / 0.5);
+    color: #fff;
+    transition: background-color var(--t2) var(--ease), color var(--t2) var(--ease);
+  }
+
+  .cf__card[data-on] .cf__go {
+    display: grid;
+  }
+
+  .cf__go:hover {
+    background: #fff;
+    color: var(--green-deep);
+  }
+
+  /* ---------- arrows ---------- */
+
+  .cf__arrow {
+    position: absolute;
+    top: 50%;
+    z-index: 10;
+    translate: 0 -50%;
+    display: grid;
+    place-items: center;
+    width: 2.9rem;
+    height: 2.9rem;
+    border-radius: 50%;
+    border: 1px solid var(--line-light);
+    background: #fff;
+    color: var(--text);
+    box-shadow: 0 8px 22px -14px rgb(20 23 26 / 0.5);
+    transition: background-color var(--t2) var(--ease), color var(--t2) var(--ease);
+  }
+
+  .cf__arrow:hover {
+    background: var(--green);
+    border-color: var(--green);
+    color: #fff;
+  }
+
+  .cf__arrow--l {
+    left: -0.5rem;
+  }
+
+  .cf__arrow--r {
+    right: -0.5rem;
+  }
+
+  /* ---------- arc ---------- */
+
+  .cf__arc {
+    position: relative;
+    height: 3.5rem;
+  }
+
+  .cf__arc svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* The dotted arc travels slowly left to right, so the process line
+     reads as a flow rather than a static decoration. */
+  .cf__arc path {
+    fill: none;
+    stroke: var(--green);
+    stroke-width: 1.5;
+    stroke-dasharray: 2 7;
+    stroke-linecap: round;
+    opacity: 0.5;
+    animation: cf-flow 2.4s linear infinite;
+  }
+
+  @keyframes cf-flow {
+    to {
+      stroke-dashoffset: -9;
+    }
+  }
+
+  .cf__arc li i {
+    animation: cf-blip 3s var(--ease) infinite;
+    animation-delay: calc(var(--i, 0) * 260ms);
+  }
+
+  @keyframes cf-blip {
+    0%,
+    100% {
+      transform: scale(1);
+      opacity: 0.55;
+    }
+    50% {
+      transform: scale(1.5);
+      opacity: 1;
+    }
+  }
+
+  .cf__arc ul {
+    position: relative;
+    display: flex;
+    justify-content: space-between;
+    padding-inline: 1rem;
+  }
+
+  .cf__arc li {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+
+  .cf__arc li i {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--green);
+  }
+
+  .cf__arc li:nth-child(1) { margin-top: 2.1rem; }
+  .cf__arc li:nth-child(2) { margin-top: 1.2rem; }
+  .cf__arc li:nth-child(3) { margin-top: 0.7rem; }
+  .cf__arc li:nth-child(4) { margin-top: 0.9rem; }
+  .cf__arc li:nth-child(5) { margin-top: 1.4rem; }
+
+  /* ---------- features ---------- */
+
+  .cf__feats {
+    position: relative;
+    display: grid;
+    gap: var(--s5);
+    margin-top: clamp(2.5rem, 5vw, 4rem);
+    padding-top: clamp(1.75rem, 3vw, 2.5rem);
+    border-top: 1px solid var(--line-light);
+  }
+
+  .cf__feats li {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+  }
+
+  .cf__fico {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 2.9rem;
+    height: 2.9rem;
+    border-radius: 50%;
+    border: 1px solid var(--line-light);
+    background: var(--white);
+    color: var(--green-deep);
+  }
+
+  .cf__feats b {
+    display: block;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+  }
+
+  .cf__feats i {
+    display: block;
+    margin-top: 0.15rem;
+    font-style: normal;
+    font-size: 0.8125rem;
+    color: var(--text-2);
+  }
+
+  /* ---------- responsive ---------- */
+
+  @media (min-width: 40rem) {
+    .cf__feats {
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--s5) var(--s6);
+    }
+  }
+
+  @media (min-width: 62rem) {
+    .cf__grid {
+      grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr);
+      gap: var(--s8);
+    }
+    .cf__feats {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+
+  @media (max-width: 62rem) {
+    .cf__hint {
+      display: none;
+    }
+    .cf__arrow--l { left: 0.25rem; }
+    .cf__arrow--r { right: 0.25rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .cf__card {
+      transition: none;
+    }
+    .cf__deck:not([data-ready]) .cf__card {
+      opacity: var(--op, 1);
+      transform:
+        translate3d(var(--x, 0px), 0, var(--z, 0px))
+        rotateY(var(--ry, 0deg))
+        scale(var(--sc, 1));
+    }
+    .cf__card[data-on]::after,
+    .cf__arc path,
+    .cf__arc li i,
+    .cf__wave-b,
+    .cf__wave-f {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-cf]');
+  const deck = root?.querySelector<HTMLElement>('[data-deck]');
+  const vp = root?.querySelector<HTMLElement>('[data-viewport]');
+
+  if (root && deck && vp) {
+    const cards = [...deck.querySelectorAll<HTMLElement>('[data-card]')];
+    const N = cards.length;
+    let active = 0;
+
+    /* Coverflow placement. Offset is the shortest signed distance around
+       the ring, so the deck wraps instead of running out at the ends. */
+    const layout = () => {
+      const w = vp.clientWidth;
+      const spread = Math.min(w * 0.19, 190); // px between neighbours
+      const depth = Math.min(w * 0.14, 150); // px pushed back per step
+
+      cards.forEach((card, i) => {
+        let d = i - active;
+        if (d > N / 2) d -= N;
+        if (d < -N / 2) d += N;
+
+        const a = Math.abs(d);
+        const on = d === 0;
+
+        card.style.setProperty('--x', `${d * spread}px`);
+        card.style.setProperty('--z', `${-a * depth}px`);
+        card.style.setProperty('--ry', `${-d * 26}deg`);
+        card.style.setProperty('--sc', String(Math.max(0.62, 1 - a * 0.1)));
+        card.style.setProperty('--op', String(a > 2.6 ? 0 : Math.max(0, 1 - a * 0.26)));
+        card.style.setProperty('--zi', String(20 - a));
+        card.toggleAttribute('data-on', on);
+        // Cards behind the front one must not swallow clicks.
+        card.style.pointerEvents = a > 2.6 ? 'none' : '';
+      });
+    };
+
+    const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let timer: number | undefined;
+    let auto = !still;
+
+    const go = (i: number) => {
+      active = ((i % N) + N) % N;
+      layout();
+    };
+
+    const stopAuto = () => {
+      auto = false;
+      if (timer) window.clearInterval(timer);
+      timer = undefined;
+    };
+
+    const startAuto = () => {
+      if (!auto) return;
+      if (timer) window.clearInterval(timer);
+      timer = window.setInterval(() => go(active + 1), 3800);
+    };
+
+    /* Any deliberate input takes over and ends the auto-rotation. */
+    const drive = (i: number) => {
+      stopAuto();
+      go(i);
+    };
+
+    cards.forEach((c, i) => {
+      c.querySelector('[data-hit]')?.addEventListener('click', () => drive(i));
+    });
+    root.querySelector('[data-next]')?.addEventListener('click', () => drive(active + 1));
+    root.querySelector('[data-prev]')?.addEventListener('click', () => drive(active - 1));
+
+    // Drag / swipe
+    let down = false;
+    let startX = 0;
+    vp.addEventListener('pointerdown', (e) => {
+      down = true;
+      startX = e.clientX;
+    });
+    window.addEventListener('pointerup', (e) => {
+      if (!down) return;
+      down = false;
+      const dx = e.clientX - startX;
+      if (Math.abs(dx) > 45) drive(active + (dx < 0 ? 1 : -1));
+    });
+
+    /* Wheel over the deck spins it — the "scroll to explore" the label
+       promises. Throttled so one gesture moves one card, and it never
+       swallows the page scroll unless the gesture is mostly horizontal
+       or the deck is the thing under the pointer. */
+    let wheelLock = 0;
+    vp.addEventListener(
+      'wheel',
+      (e) => {
+        const now = Date.now();
+        if (now < wheelLock) return;
+        const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+        if (Math.abs(delta) < 12) return;
+        wheelLock = now + 420;
+        drive(active + (delta > 0 ? 1 : -1));
+      },
+      { passive: true }
+    );
+
+    // Keyboard
+    vp.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowRight') drive(active + 1);
+      if (e.key === 'ArrowLeft') drive(active - 1);
+    });
+
+    window.addEventListener('resize', layout, { passive: true });
+
+    /* Entrance: hold the cards stacked until the deck scrolls into view,
+       then fly them out into formation, staggered from the centre. */
+    const reveal = new IntersectionObserver(
+      ([e]) => {
+        if (!e.isIntersecting) {
+          if (timer) window.clearInterval(timer);
+          timer = undefined;
+          return;
+        }
+        if (!deck.hasAttribute('data-ready')) {
+          cards.forEach((c, i) => {
+            let d = i - active;
+            if (d > N / 2) d -= N;
+            if (d < -N / 2) d += N;
+            c.style.setProperty('--dly', `${Math.abs(d) * 90}ms`);
+          });
+          deck.setAttribute('data-ready', '');
+          // Clear the stagger once it has played, so later moves are instant.
+          window.setTimeout(
+            () => cards.forEach((c) => c.style.removeProperty('--dly')),
+            1100
+          );
+        }
+        startAuto();
+      },
+      { threshold: 0.25 }
+    );
+
+    layout();
+    reveal.observe(vp);
+  }
+</script>
