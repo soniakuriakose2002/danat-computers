@@ -1,0 +1,274 @@
+---
+import { Image } from 'astro:assets';
+import Icon from '@components/ui/Icon.astro';
+import imgCounter from '@assets/photos/support-agent.jpg';
+import imgBench from '@assets/photos/repair-solder.jpg';
+import imgBoard from '@assets/photos/repair-board.jpg';
+import imgDrive from '@assets/photos/drive-macro.jpg';
+
+/**
+ * THE DESCENT — how far in we actually go.
+ *
+ * An exploded view built in CSS 3D rather than WebGL: real
+ * `transform-style: preserve-3d` on real photographs, driven by the
+ * `data-progress` hook the shared scroll engine already provides. The
+ * section publishes --p from 0 to 1 as it crosses the viewport, and
+ * every layer reads it to separate along the deck's normal.
+ *
+ * Costs no JavaScript beyond the engine that is already on the page, and
+ * needs no model file. It can be swapped for a real GLTF later without
+ * the surrounding layout changing.
+ *
+ * --p falls back to 1, so with JS off or reduced motion on, the stack is
+ * simply drawn already open. Nothing is ever hidden behind the effect.
+ */
+const layers = [
+  {
+    img: imgCounter,
+    n: '01',
+    title: 'You hand it over',
+    note: 'Free diagnosis. We tell you what failed and what it costs before you agree to anything.',
+    href: '/services',
+    cta: 'All services',
+  },
+  {
+    img: imgBench,
+    n: '02',
+    title: 'It goes on the bench',
+    note: 'Probed, not guessed at. Most shops stop here and quote you a replacement.',
+    href: '/services/hardware-troubleshooting',
+    cta: 'Hardware troubleshooting',
+  },
+  {
+    img: imgBoard,
+    n: '03',
+    title: 'We open the board',
+    note: 'Fault traced to the component. This is the part almost nobody in Oman does in-house.',
+    href: '/services/computer-repair',
+    cta: 'Computer repair',
+  },
+  {
+    img: imgDrive,
+    n: '04',
+    title: 'You get your data back',
+    note: 'Because it was never really about the laptop.',
+    href: '/services/data-recovery',
+    cta: 'Data recovery',
+  },
+];
+---
+
+<section class="dc section" data-tone="light" data-progress>
+  <div class="shell dc__head">
+    <p class="label" data-rise>How deep we go</p>
+    <h2 class="dc__h" data-rise style="--d:70ms">
+      Most shops replace the box.<br /><em>We go in.</em>
+    </h2>
+    <p class="dc__p" data-rise style="--d:130ms">
+      Scroll, and the machine comes apart.
+    </p>
+  </div>
+
+  <div class="shell dc__grid">
+    {/* ── the stack ── */}
+    <div class="dc__stage" aria-hidden="true">
+      <div class="dc__deck">
+        {layers.map((l, i) => (
+          <figure class="dc__layer" style={`--i:${i}`}>
+            <Image src={l.img} alt="" widths={[520, 900]} sizes="(min-width: 62rem) 32vw, 88vw"
+              quality={70} format="webp" loading="lazy" />
+            <figcaption class="dc__badge">{l.n}</figcaption>
+          </figure>
+        ))}
+      </div>
+    </div>
+
+    {/* ── the reading order ── */}
+    <ol class="dc__list">
+      {layers.map((l, i) => (
+        <li data-rise style={`--d:${i * 80}ms`}>
+          <span class="dc__n">{l.n}</span>
+          <div class="dc__t">
+            <h3>{l.title}</h3>
+            <p>{l.note}</p>
+            <a class="dc__go" href={l.href}>
+              {l.cta}<Icon name="arrow" size={14} />
+            </a>
+          </div>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .dc {
+    background: var(--off);
+    overflow: hidden;
+  }
+
+  .dc__h {
+    margin-top: var(--s4);
+    font-size: clamp(1.8rem, 3.6vw, 2.9rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1.06;
+  }
+  .dc__h em { font-style: normal; color: var(--green-deep); }
+
+  .dc__p {
+    margin-top: var(--s4);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+
+  .dc__grid {
+    display: grid;
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items: center;
+    margin-top: clamp(2rem, 5vw, 3.5rem);
+  }
+
+  /* ───────── the 3D deck ───────── */
+
+  .dc__stage {
+    perspective: 1700px;
+    perspective-origin: 50% 46%;
+    /* The layers lift out of the box as they separate, so the stage
+       reserves the room rather than clipping them. */
+    padding-block: clamp(3rem, 9vw, 7rem);
+  }
+
+  .dc__deck {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    transform-style: preserve-3d;
+    /* Flattens very slightly as you scroll, so the stack feels like it
+       is turning toward you rather than only rising. */
+    transform:
+      rotateX(calc(54deg - var(--p, 1) * 9deg))
+      rotateZ(calc(-30deg + var(--p, 1) * 5deg));
+  }
+
+  .dc__layer {
+    position: absolute;
+    inset: 0;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 24px 50px -26px rgb(10 22 12 / 0.55);
+    /* translateZ inside the rotated deck pushes along the deck's own
+       normal — which is what makes this read as an exploded diagram
+       rather than four cards sliding up a page. */
+    transform: translate3d(0, 0, calc(var(--i) * var(--p, 1) * 112px));
+  }
+  .dc__layer :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Counter-rotates the parent's transform so the number stays flat to
+     the screen and readable. */
+  .dc__badge {
+    position: absolute;
+    top: 0.7rem;
+    left: 0.7rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 6px;
+    background: rgb(255 255 255 / 0.92);
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.12em;
+    color: var(--green-deep);
+    transform:
+      rotateZ(calc(30deg - var(--p, 1) * 5deg))
+      rotateX(calc(-54deg + var(--p, 1) * 9deg));
+  }
+
+  /* ───────── the list ───────── */
+
+  .dc__list { display: grid; gap: clamp(1.1rem, 2.4vw, 1.75rem); }
+
+  .dc__list li {
+    display: flex;
+    gap: var(--s4);
+    padding-bottom: clamp(1.1rem, 2.4vw, 1.75rem);
+    border-bottom: 1px solid var(--line-light);
+  }
+  .dc__list li:last-child { border-bottom: 0; padding-bottom: 0; }
+
+  .dc__n {
+    flex: none;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    color: var(--clay-deep);
+    padding-top: 0.25rem;
+  }
+
+  .dc__t h3 {
+    font-size: 1.0625rem;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+  }
+  .dc__t p {
+    margin-top: 0.35rem;
+    max-width: 42ch;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--text-2);
+  }
+
+  .dc__go {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.6rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--green-deep);
+    border-bottom: 1px solid transparent;
+    transition: border-color var(--t2) var(--ease);
+  }
+  .dc__go:hover { border-color: var(--green); }
+  .dc__go :global(svg) { transition: transform var(--t2) var(--ease); }
+  .dc__go:hover :global(svg) { transform: translateX(3px); }
+
+  /* ───────── responsive ───────── */
+
+  @media (min-width: 62rem) {
+    .dc__grid { grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr); }
+  }
+
+  /* Below the fold of a laptop screen the 3D costs more than it gives:
+     a tilted deck at phone width is unreadable. The same four photos
+     become a plain stack, and nothing is lost. */
+  @media (max-width: 48rem) {
+    .dc__stage { perspective: none; padding-block: 0; }
+    .dc__deck {
+      display: grid;
+      gap: 0.6rem;
+      aspect-ratio: auto;
+      transform: none;
+      transform-style: flat;
+    }
+    .dc__layer {
+      position: static;
+      aspect-ratio: 16 / 10;
+      transform: none;
+    }
+    .dc__badge { transform: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    /* --p is never published, so the fallback of 1 leaves the stack
+       drawn fully open. Nothing moves, nothing is hidden. */
+    .dc__go :global(svg) { transition: none; }
+  }
+</style>
