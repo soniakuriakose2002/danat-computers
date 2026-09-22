@@ -1,0 +1,431 @@
+---
+import PageLayout from '@layouts/PageLayout.astro';
+import Icon from '@components/ui/Icon.astro';
+import { site, whatsappLink, branches } from '@data/site';
+import { OMAN_PATH, OMAN_VIEWBOX, OMAN_PINS, OMAN_ROUTES } from '@data/omanMap';
+
+/** North to south, matching the map. */
+const order = ['sohar', 'hail', 'ruwi', 'salalah'];
+const list = order.map((s) => branches.find((b) => b.slug === s)!);
+
+const confirmed = list.filter((b) => b.verified).length;
+---
+
+<PageLayout
+  title="Branches"
+  description="Danat Computers has four branches across Oman — Ruwi, Sohar, Al Hail and Salalah. Addresses, opening hours and contact for each."
+>
+  <!-- ─────────── head ─────────── -->
+  <section class="bh">
+    <div class="shell">
+      <nav class="bh__crumb" aria-label="Breadcrumb">
+        <a href="/">Home</a>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page">Branches</span>
+      </nav>
+
+      <div class="bh__grid">
+        <div>
+          <p class="label bh__l">Our reach</p>
+          <h1 class="bh__h">
+            Four branches.<br /><em>One standard.</em>
+          </h1>
+          <p class="bh__p">
+            Ruwi, Sohar, Al Hail and Salalah. The same technicians, the same
+            free diagnosis and the same stock behind every counter.
+          </p>
+
+          <dl class="bh__figs">
+            <div><dt>{site.stats.branches}</dt><dd>Branches</dd></div>
+            <div><dt>{site.stats.parts.toLocaleString('en-US')}</dt><dd>Parts in stock</dd></div>
+            <div><dt>{new Date().getFullYear() - site.stats.since}+</dt><dd>Years trading</dd></div>
+          </dl>
+        </div>
+
+        <!-- map -->
+        <div class="bh__map">
+          <svg viewBox={OMAN_VIEWBOX} role="img"
+            aria-label="Map of Oman showing Danat branches in Sohar, Al Hail, Ruwi and Salalah">
+            <path class="bh__land" d={OMAN_PATH} />
+            {OMAN_ROUTES.map(([a, b]) => {
+              const p = OMAN_PINS[a];
+              const q = OMAN_PINS[b];
+              return (
+                <path class="bh__route"
+                  d={`M${p.x},${p.y} Q${(p.x + q.x) / 2 + 70},${(p.y + q.y) / 2} ${q.x},${q.y}`} />
+              );
+            })}
+            {list.map((b) => (
+              <g class="bh__pin" transform={`translate(${OMAN_PINS[b.slug].x} ${OMAN_PINS[b.slug].y})`}>
+                <circle class="bh__halo" r="46"></circle>
+                <circle class="bh__dot" r="14"></circle>
+              </g>
+            ))}
+          </svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ─────────── branch cards ─────────── -->
+  <section class="bl section" data-tone="light">
+    <ul class="shell bl__grid">
+      {list.map((b, i) => (
+        <li id={b.slug} data-rise style={`--d:${(i % 2) * 70}ms`}>
+          <article class="bl__card">
+            <header class="bl__top">
+              <div>
+                <h2 class="bl__n">{b.name}</h2>
+                <p class="bl__c">{b.city}</p>
+              </div>
+              {!b.verified && <span class="bl__todo">Details to confirm</span>}
+            </header>
+
+            <div class="bl__rows">
+              <div class="bl__row">
+                <Icon name="pin" size={17} />
+                {b.verified ? (
+                  <address>{b.address.split('\n').map((l) => <>{l}<br /></>)}</address>
+                ) : (
+                  <span class="bl__slot">Street address to be confirmed</span>
+                )}
+              </div>
+
+              <div class="bl__row">
+                <Icon name="clock" size={17} />
+                <ul class="bl__hours" data-unverified={!b.hoursVerified ? '' : undefined}>
+                  {b.hours.map((h) => <li>{h}</li>)}
+                  {!b.hoursVerified && <li class="bl__warn">Hours not yet confirmed</li>}
+                </ul>
+              </div>
+            </div>
+
+            <div class="bl__acts">
+              <a class="bl__wa"
+                href={whatsappLink(`Hello Danat — I'd like to contact your ${b.name} branch about`)}
+                target="_blank" rel="noopener noreferrer">
+                <Icon name="whatsapp" size={15} />WhatsApp
+              </a>
+              <a class="bl__call" href={`tel:${b.tel ?? site.phone.tel}`}>
+                {b.phone ?? site.phone.display}
+              </a>
+              <span class="bl__dir" aria-disabled="true" title="Map link to be added">
+                Directions <Icon name="send" size={13} />
+              </span>
+            </div>
+          </article>
+        </li>
+      ))}
+    </ul>
+
+    {confirmed < list.length && (
+      <p class="shell bl__note">
+        {list.length - confirmed} of {list.length} branch addresses are still
+        being confirmed with the company. Phone and WhatsApp reach the Ruwi
+        counter, who will direct you.
+      </p>
+    )}
+  </section>
+
+  <!-- ─────────── cta ─────────── -->
+  <section class="bc" data-tone="ink">
+    <div class="shell bc__in">
+      <div>
+        <p class="label">Not sure which branch?</p>
+        <h2 class="bc__h">Message us.<br /><em>We will point you.</em></h2>
+      </div>
+      <a class="bc__wa" href={whatsappLink()} target="_blank" rel="noopener noreferrer">
+        <Icon name="whatsapp" size={16} />Chat on WhatsApp
+      </a>
+    </div>
+  </section>
+</PageLayout>
+
+<style>
+  /* ---------- head ---------- */
+
+  .bh {
+    background: var(--off);
+    padding-block: clamp(7rem, 12vw, 10rem) clamp(2.5rem, 5vw, 4rem);
+  }
+
+  .bh__crumb {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.8125rem;
+    color: var(--text-3);
+  }
+  .bh__crumb a { transition: color var(--t2) var(--ease); }
+  .bh__crumb a:hover { color: var(--green-deep); }
+  .bh__crumb [aria-current] { color: var(--text); }
+
+  .bh__grid {
+    display: grid;
+    gap: var(--s7);
+    align-items: center;
+    margin-top: var(--s5);
+  }
+
+  .bh__l { display: flex; }
+
+  .bh__h {
+    margin-top: var(--s4);
+    font-size: clamp(2rem, 4vw, 3.4rem);
+    line-height: 1.04;
+    letter-spacing: -0.038em;
+    font-weight: 700;
+  }
+  .bh__h em { font-style: normal; color: var(--green-deep); }
+
+  .bh__p {
+    margin-top: var(--s4);
+    max-width: 44ch;
+    font-size: var(--lead);
+    line-height: 1.6;
+    color: var(--text-2);
+  }
+
+  .bh__figs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s5);
+    margin-top: var(--s5);
+    padding-top: var(--s5);
+    border-top: 1px solid var(--line-light);
+  }
+  .bh__figs > div + div { padding-left: var(--s5); border-left: 1px solid var(--line-light); }
+  .bh__figs dt {
+    font-size: clamp(1.35rem, 2vw, 1.75rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .bh__figs dd { margin-top: 0.25rem; font-size: 0.75rem; color: var(--text-3); }
+
+  /* ---------- map ---------- */
+
+  .bh__map { justify-self: center; width: 100%; max-width: 22rem; }
+  .bh__map svg { width: 100%; height: auto; overflow: visible; }
+
+  .bh__land {
+    fill: color-mix(in oklab, var(--green) 16%, #fff);
+    stroke: color-mix(in oklab, var(--green) 34%, #fff);
+    stroke-width: 3;
+  }
+
+  .bh__route {
+    fill: none;
+    stroke: var(--green);
+    stroke-width: 3;
+    stroke-dasharray: 3 14;
+    stroke-linecap: round;
+    opacity: 0.5;
+    animation: bh-flow 3s linear infinite;
+  }
+  @keyframes bh-flow { to { stroke-dashoffset: -17; } }
+
+  .bh__dot { fill: var(--green); stroke: #fff; stroke-width: 5; }
+  .bh__halo {
+    fill: var(--green);
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: bh-ping 3s var(--ease) infinite;
+  }
+  .bh__pin:nth-child(3) .bh__halo { animation-delay: 0.4s; }
+  .bh__pin:nth-child(4) .bh__halo { animation-delay: 0.8s; }
+  .bh__pin:nth-child(5) .bh__halo { animation-delay: 1.2s; }
+
+  @keyframes bh-ping {
+    0% { opacity: 0.28; transform: scale(0.35); }
+    70% { opacity: 0; transform: scale(1); }
+    100% { opacity: 0; transform: scale(1); }
+  }
+
+  /* ---------- cards ---------- */
+
+  .bl { background: var(--white); }
+
+  .bl__grid { display: grid; gap: clamp(1rem, 2vw, 1.5rem); }
+
+  .bl__card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 1.5rem 1.6rem;
+    border: 1px solid var(--line-light);
+    border-left: 3px solid var(--green);
+    border-radius: 12px;
+    background: var(--white);
+    transition: border-color var(--t2) var(--ease), transform var(--t2) var(--ease);
+  }
+  .bl__card:hover { transform: translateY(-3px); }
+
+  .bl__top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--s4);
+    flex-wrap: wrap;
+  }
+
+  .bl__n { font-size: 1.25rem; font-weight: 700; letter-spacing: -0.025em; }
+  .bl__c {
+    margin-top: 0.2rem;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--green-deep);
+  }
+
+  /* Honest marker while details are unconfirmed. */
+  .bl__todo {
+    padding: 0.25rem 0.5rem;
+    border-radius: 3px;
+    background: #fdf3e2;
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #8a6100;
+  }
+
+  .bl__rows { display: grid; gap: 0.9rem; margin-top: 1.1rem; }
+  .bl__row { display: flex; align-items: flex-start; gap: 0.7rem; color: var(--text-3); }
+
+  .bl__row address {
+    font-style: normal;
+    font-size: var(--small);
+    line-height: 1.6;
+    color: var(--text-2);
+  }
+
+  .bl__slot {
+    font-size: var(--small);
+    color: var(--text-3);
+    font-style: italic;
+  }
+
+  .bl__hours {
+    display: grid;
+    gap: 0.15rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.03em;
+  }
+  .bl__hours[data-unverified] li:not(.bl__warn) { opacity: 0.55; }
+  .bl__warn {
+    margin-top: 0.25rem;
+    color: #8a6100;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-size: 0.5625rem;
+  }
+
+  .bl__acts {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.6rem var(--s4);
+    margin-top: auto;
+    padding-top: 1.35rem;
+  }
+
+  .bl__wa {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.65rem 1.15rem;
+    border-radius: 999px;
+    background: var(--green);
+    color: #fff;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    transition: background-color var(--t2) var(--ease);
+  }
+  .bl__wa:hover { background: var(--text); }
+
+  .bl__call {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    letter-spacing: 0.04em;
+    color: var(--text);
+    border-bottom: 1px solid var(--line-light);
+    padding-bottom: 2px;
+    transition: border-color var(--t2) var(--ease);
+  }
+  .bl__call:hover { border-color: var(--text); }
+
+  /* Inert until real map links exist. */
+  .bl__dir {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.8125rem;
+    color: var(--text-3);
+    cursor: not-allowed;
+  }
+
+  .bl__note {
+    display: block;
+    margin-top: var(--s6);
+    padding: 0.9rem 1.1rem;
+    border: 1px dashed var(--line-light);
+    border-radius: 8px;
+    font-size: var(--small);
+    line-height: 1.6;
+    color: var(--text-3);
+  }
+
+  /* ---------- cta ---------- */
+
+  .bc {
+    background: var(--ink);
+    color: var(--text-inv);
+    padding-block: clamp(2.5rem, 5vw, 4rem);
+  }
+  .bc__in { display: grid; gap: var(--s5); align-items: center; }
+  .bc__h {
+    margin-top: var(--s4);
+    font-size: clamp(1.5rem, 2.8vw, 2.25rem);
+    line-height: 1.1;
+    letter-spacing: -0.035em;
+    font-weight: 700;
+  }
+  .bc__h em { font-style: normal; color: var(--green-bright); }
+
+  .bc__wa {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    justify-self: start;
+    padding: 0.9rem 1.5rem;
+    border-radius: 999px;
+    background: var(--green);
+    color: #fff;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    transition: background-color var(--t2) var(--ease);
+  }
+  .bc__wa:hover { background: #fff; color: var(--ink); }
+
+  /* ---------- layout ---------- */
+
+  @media (min-width: 48rem) {
+    .bl__grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (min-width: 62rem) {
+    .bh__grid { grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr); gap: var(--s8); }
+    .bc__in { grid-template-columns: 1fr auto; }
+    .bc__wa { justify-self: end; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .bh__route, .bh__halo { animation: none !important; }
+  }
+</style>
