@@ -1,0 +1,852 @@
+---
+import { getCollection } from 'astro:content';
+import PageLayout from '@layouts/PageLayout.astro';
+import Icon from '@components/ui/Icon.astro';
+import { site, whatsappLink, branches } from '@data/site';
+
+/**
+ * The site is a static build with no server, so there is nothing to POST
+ * a form to. Rather than fake a backend or drop a third-party embed, the
+ * form composes the enquiry into a WhatsApp message — the channel this
+ * business already runs on — with a mailto fallback. Everything it needs
+ * is in the URL, so it works without any hosting change.
+ */
+
+const services = (await getCollection('services')).sort(
+  (a, b) => a.data.index - b.data.index
+);
+
+const order = ['ruwi', 'sohar', 'hail', 'salalah'];
+const list = order.map((s) => branches.find((b) => b.slug === s)!);
+
+const channels = [
+  {
+    icon: 'whatsapp',
+    label: 'WhatsApp',
+    value: site.phone.display,
+    href: whatsappLink(),
+    note: 'Fastest. Send a photo of the fault.',
+    external: true,
+  },
+  {
+    icon: 'phone',
+    label: 'Call',
+    value: site.phone.display,
+    href: `tel:${site.phone.tel}`,
+    note: 'Ruwi counter. They will route you.',
+    external: false,
+  },
+  {
+    icon: 'mail',
+    label: 'Email',
+    value: site.email,
+    href: `mailto:${site.email}`,
+    note: 'For quotes, POs and trade accounts.',
+    external: false,
+  },
+] as const;
+---
+
+<PageLayout
+  title="Contact"
+  description={`Talk to Danat Computers — WhatsApp ${site.phone.display}, email ${site.email}, or visit one of four branches across Oman.`}
+>
+  {/* ─────────────────────── 01 · head ─────────────────────── */}
+  <section class="ch">
+    <div class="ch__aura" aria-hidden="true">
+      <span class="ch__b1"></span>
+      <span class="ch__b2"></span>
+    </div>
+
+    <div class="shell">
+      <nav class="ch__crumb" aria-label="Breadcrumb" data-rise>
+        <a href="/">Home</a>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page">Contact</span>
+      </nav>
+
+      <div class="ch__grid">
+        <div>
+          <p class="eyebrow" data-rise>
+            <i class="eyebrow__dot" aria-hidden="true"></i>
+            Get in touch
+            <i class="eyebrow__rule" aria-hidden="true"></i>
+          </p>
+
+          <h1 class="ch__h" data-rise style="--d:70ms">
+            Tell us what<br /><em>stopped working.</em>
+          </h1>
+
+          <p class="ch__p" data-rise style="--d:130ms">
+            Diagnosis is free and we quote before we touch anything. Send a
+            photo of the fault and we will usually know what we are looking
+            at before you arrive.
+          </p>
+        </div>
+
+        {/* ── direct channels ── */}
+        <ul class="ch__ch">
+          {channels.map((c, i) => (
+            <li data-rise style={`--d:${190 + i * 70}ms`}>
+              <a
+                class="chan"
+                href={c.href}
+                target={c.external ? '_blank' : undefined}
+                rel={c.external ? 'noopener noreferrer' : undefined}
+              >
+                <span class="chan__i" aria-hidden="true">
+                  <Icon name={c.icon} size={19} />
+                </span>
+                <span class="chan__t">
+                  <b>{c.label}</b>
+                  <em>{c.value}</em>
+                  <i>{c.note}</i>
+                </span>
+                <span class="chan__go" aria-hidden="true">
+                  <Icon name="arrow" size={15} />
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  {/* ─────────────────────── 02 · compose ─────────────────────── */}
+  <section class="cf section" data-tone="light">
+    <div class="shell cf__grid">
+      <div class="cf__intro" data-rise>
+        <p class="eyebrow">
+          <i class="eyebrow__rule" aria-hidden="true"></i>
+          Send an enquiry
+        </p>
+        <h2 class="cf__h">Write it once.<br /><em>We will pick it up.</em></h2>
+        <p class="cf__p">
+          Fill this in and it opens WhatsApp with your message ready to send —
+          nothing is stored on this site and nothing is sent until you press
+          send yourself.
+        </p>
+
+        <dl class="cf__facts">
+          <div>
+            <dt>Trading since</dt>
+            <dd>{site.stats.since}</dd>
+          </div>
+          <div>
+            <dt>Registered as</dt>
+            <dd>{site.legalName}</dd>
+          </div>
+        </dl>
+      </div>
+
+      <form class="cf__form" id="enquiry" data-rise style="--d:90ms">
+        <div class="f">
+          <label for="f-name">Your name</label>
+          <input id="f-name" name="name" type="text" autocomplete="name"
+            placeholder="So we know who we are talking to" required />
+        </div>
+
+        <div class="f__row">
+          <div class="f">
+            <label for="f-branch">Nearest branch</label>
+            <select id="f-branch" name="branch">
+              {list.map((b) => (
+                <option value={b.name}>{b.city}</option>
+              ))}
+              <option value="Not sure">Not sure</option>
+            </select>
+          </div>
+
+          <div class="f">
+            <label for="f-topic">What do you need?</label>
+            <select id="f-topic" name="topic">
+              {services.map((s) => (
+                <option value={s.data.title}>{s.data.title}</option>
+              ))}
+              <option value="Something else">Something else</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="f">
+          <label for="f-msg">What is happening?</label>
+          <textarea id="f-msg" name="message" rows="4" required
+            placeholder="It will not power on. No lights, no fan. It was fine yesterday."></textarea>
+        </div>
+
+        <div class="cf__acts">
+          <button class="btn-green" type="submit">
+            Open in WhatsApp
+            <span class="btn-green__i" aria-hidden="true">
+              <Icon name="whatsapp" size={15} />
+            </span>
+          </button>
+          <button class="cf__alt" type="button" id="by-email">
+            Send by email instead
+          </button>
+        </div>
+
+        <p class="cf__note">
+          Opens your own WhatsApp or mail app. Danat replies from
+          {' '}{site.phone.display}.
+        </p>
+
+        <noscript>
+          <p class="cf__nojs">
+            This form needs JavaScript to compose your message. You can reach
+            us directly on <a href={whatsappLink()}>WhatsApp</a>, by phone on
+            {' '}<a href={`tel:${site.phone.tel}`}>{site.phone.display}</a>, or
+            by email at <a href={`mailto:${site.email}`}>{site.email}</a>.
+          </p>
+        </noscript>
+      </form>
+    </div>
+  </section>
+
+  {/* ─────────────────────── 03 · branches ─────────────────────── */}
+  <section class="cb section" data-tone="off">
+    <div class="shell">
+      <div class="cb__head" data-rise>
+        <div>
+          <p class="eyebrow">
+            <i class="eyebrow__rule" aria-hidden="true"></i>
+            Or walk in
+          </p>
+          <h2 class="cb__h">Four counters across Oman</h2>
+        </div>
+        <a class="cb__all" href="/branches">
+          All branch details
+          <Icon name="arrow" size={15} />
+        </a>
+      </div>
+
+      <ul class="cb__grid">
+        {list.map((b, i) => (
+          <li data-rise style={`--d:${i * 70}ms`}>
+            <a class="bcard" href={`/branches#${b.slug}`}>
+              <span class="bcard__i" aria-hidden="true">
+                <Icon name="building" size={18} />
+              </span>
+              <b class="bcard__n">{b.name}</b>
+              <span class="bcard__c">{b.city}</span>
+              {!b.verified && <span class="bcard__todo">Address to confirm</span>}
+              <span class="bcard__go" aria-hidden="true">
+                <Icon name="arrow" size={14} />
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  {/* ─────────────────────── 04 · company ─────────────────────── */}
+  <section class="cl" data-tone="ink">
+    <div class="shell cl__in">
+      <div>
+        <p class="label" data-rise>Company</p>
+        <p class="cl__name" data-rise style="--d:70ms">{site.legalName}</p>
+        <p class="cl__sub" data-rise style="--d:120ms">
+          Trading as {site.nameFull} since {site.stats.since}.
+        </p>
+      </div>
+
+      <ul class="cl__soc" data-rise style="--d:170ms">
+        <li>
+          <a href={site.social.facebook} target="_blank" rel="noopener noreferrer">
+            Facebook
+          </a>
+        </li>
+        <li>
+          <a href={site.social.instagram} target="_blank" rel="noopener noreferrer">
+            Instagram
+          </a>
+        </li>
+      </ul>
+    </div>
+  </section>
+</PageLayout>
+
+<script is:inline define:vars={{ WA: site.phone.whatsapp, MAIL: site.email }}>
+  // Compose the enquiry into a message and hand it to WhatsApp or mail.
+  // Nothing leaves the page until the user sends it themselves.
+  (() => {
+    const form = document.getElementById('enquiry');
+    if (!form) return;
+
+    const compose = () => {
+      const d = new FormData(form);
+      const name = String(d.get('name') || '').trim();
+      const branch = String(d.get('branch') || '');
+      const topic = String(d.get('topic') || '');
+      const msg = String(d.get('message') || '').trim();
+      return [
+        `Hello Danat — this is ${name}.`,
+        ``,
+        `Branch: ${branch}`,
+        `Service: ${topic}`,
+        ``,
+        msg,
+      ].join('\n');
+    };
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (!form.reportValidity()) return;
+      const url = `https://wa.me/${WA}?text=${encodeURIComponent(compose())}`;
+      window.open(url, '_blank', 'noopener');
+    });
+
+    document.getElementById('by-email')?.addEventListener('click', () => {
+      if (!form.reportValidity()) return;
+      const d = new FormData(form);
+      const subject = `${d.get('topic')} — ${d.get('branch')}`;
+      window.location.href =
+        `mailto:${MAIL}?subject=${encodeURIComponent(subject)}` +
+        `&body=${encodeURIComponent(compose())}`;
+    });
+  })();
+</script>
+
+<style>
+  /* ============================================================
+     01 · HEAD
+     ============================================================ */
+
+  .ch {
+    position: relative;
+    background: var(--white);
+    padding-block: clamp(6.5rem, 11vw, 9rem) clamp(2.5rem, 5vw, 4rem);
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  .ch__aura {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+  }
+  .ch__aura span {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      color-mix(in oklab, var(--green) 28%, transparent) 0%,
+      transparent 68%
+    );
+    filter: blur(30px);
+  }
+  .ch__b1 { top: -30%; left: -12%; width: 46%; aspect-ratio: 1; opacity: 0.45; }
+  .ch__b2 { top: 6%; right: -20%; width: 50%; aspect-ratio: 1; opacity: 0.34; }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .ch__b1 { animation: ch-drift 28s var(--ease) infinite alternate; }
+    .ch__b2 { animation: ch-drift 34s var(--ease) infinite alternate-reverse; }
+  }
+  @keyframes ch-drift { to { transform: translate3d(5%, 6%, 0) scale(1.12); } }
+
+  .ch__crumb {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.8125rem;
+    color: var(--text-3);
+  }
+  .ch__crumb a { transition: color var(--t2) var(--ease); }
+  .ch__crumb a:hover { color: var(--green-deep); }
+  .ch__crumb [aria-current] { color: var(--text); }
+
+  .ch__grid {
+    display: grid;
+    gap: clamp(2.5rem, 5vw, 4rem);
+    align-items: center;
+    margin-top: var(--s5);
+  }
+
+  .ch__h {
+    margin-top: var(--s4);
+    font-size: clamp(2.2rem, 5vw, 3.9rem);
+    line-height: 1.02;
+    letter-spacing: -0.042em;
+    font-weight: 700;
+  }
+  .ch__h em { font-style: normal; color: var(--green-deep); }
+
+  .ch__p {
+    margin-top: var(--s4);
+    max-width: 44ch;
+    font-size: var(--lead);
+    line-height: 1.62;
+    color: var(--text-2);
+  }
+
+  /* ---------- eyebrow (shared) ---------- */
+
+  .eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--green-deep);
+  }
+  .eyebrow__dot {
+    width: 9px;
+    height: 9px;
+    flex: none;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 0 4px color-mix(in oklab, var(--green) 20%, transparent);
+  }
+  .eyebrow__rule {
+    width: 26px;
+    height: 1px;
+    flex: none;
+    background: color-mix(in oklab, var(--green) 55%, transparent);
+  }
+
+  /* ---------- channel cards ---------- */
+
+  .ch__ch { display: grid; gap: 0.75rem; }
+
+  .chan {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 1rem 1.15rem;
+    border: 1px solid var(--line-light);
+    border-radius: 14px;
+    background: rgb(255 255 255 / 0.8);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 12px 26px -24px rgb(0 0 0 / 0.5);
+    transition:
+      transform var(--t2) var(--ease),
+      border-color var(--t2) var(--ease),
+      box-shadow var(--t2) var(--ease);
+  }
+  .chan:hover {
+    transform: translateY(-3px);
+    border-color: color-mix(in oklab, var(--green) 34%, var(--line-light));
+    box-shadow: 0 18px 30px -22px rgb(0 0 0 / 0.45);
+  }
+
+  .chan__i {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    flex: none;
+    border-radius: 12px;
+    color: var(--green-deep);
+    background: color-mix(in oklab, var(--green) 14%, #fff);
+  }
+
+  .chan__t { display: grid; min-width: 0; }
+  .chan__t b {
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+  .chan__t em {
+    margin-top: 0.15rem;
+    font-style: normal;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    letter-spacing: -0.012em;
+    overflow-wrap: anywhere;
+  }
+  .chan__t i {
+    margin-top: 0.15rem;
+    font-style: normal;
+    font-size: 0.75rem;
+    color: var(--text-3);
+  }
+
+  .chan__go {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    flex: none;
+    margin-left: auto;
+    border-radius: 50%;
+    color: var(--green-deep);
+    background: color-mix(in oklab, var(--green) 10%, #fff);
+    transition: transform var(--t2) var(--ease), background-color var(--t2) var(--ease);
+  }
+  .chan:hover .chan__go {
+    transform: translateX(3px);
+    background: color-mix(in oklab, var(--green) 22%, #fff);
+  }
+
+  /* ============================================================
+     02 · FORM
+     ============================================================ */
+
+  .cf { background: var(--white); }
+
+  .cf__grid { display: grid; gap: clamp(2rem, 4vw, 3.5rem); }
+
+  .cf__h {
+    margin-top: var(--s4);
+    font-size: clamp(1.7rem, 3.2vw, 2.5rem);
+    font-weight: 700;
+    letter-spacing: -0.038em;
+    line-height: 1.08;
+  }
+  .cf__h em { font-style: normal; color: var(--green-deep); }
+
+  .cf__p {
+    margin-top: var(--s4);
+    max-width: 40ch;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--text-2);
+  }
+
+  .cf__facts {
+    display: grid;
+    gap: var(--s4);
+    margin-top: var(--s5);
+    padding-top: var(--s5);
+    border-top: 1px solid var(--line-light);
+  }
+  .cf__facts dt {
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+  .cf__facts dd {
+    margin-top: 0.25rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    letter-spacing: -0.012em;
+  }
+
+  /* ---------- fields ---------- */
+
+  .cf__form {
+    display: grid;
+    gap: var(--s4);
+    padding: clamp(1.4rem, 3vw, 2rem);
+    border: 1px solid var(--line-light);
+    border-radius: 18px;
+    background: var(--off);
+  }
+
+  .f__row { display: grid; gap: var(--s4); }
+
+  .f { display: grid; gap: 0.45rem; }
+
+  .f label {
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+
+  .f input,
+  .f select,
+  .f textarea {
+    width: 100%;
+    padding: 0.8rem 0.9rem;
+    border: 1px solid var(--line-light);
+    border-radius: 10px;
+    background: var(--white);
+    color: var(--text);
+    font: inherit;
+    font-size: 0.9375rem;
+    transition: border-color var(--t2) var(--ease), box-shadow var(--t2) var(--ease);
+  }
+  .f textarea { resize: vertical; min-height: 6rem; line-height: 1.55; }
+
+  .f input::placeholder,
+  .f textarea::placeholder { color: var(--text-3); }
+
+  .f input:focus-visible,
+  .f select:focus-visible,
+  .f textarea:focus-visible {
+    outline: none;
+    border-color: var(--green-deep);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--green) 26%, transparent);
+  }
+
+  /* ---------- actions ---------- */
+
+  .cf__acts {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s4);
+    margin-top: var(--s3);
+  }
+
+  .btn-green {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.55rem 0.55rem 0.55rem 1.6rem;
+    border: 0;
+    border-radius: 999px;
+    /* Measured: white is 8.73:1 on #27551F and 4.90:1 on #3D7F35, so the
+       label clears AA across the whole ramp. */
+    background: linear-gradient(100deg, #27551f, #3d7f35);
+    color: #fff;
+    font: inherit;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    cursor: pointer;
+    overflow: hidden;
+    box-shadow: 0 14px 28px -16px color-mix(in oklab, var(--green) 70%, #000);
+    transition: transform var(--t2) var(--ease), box-shadow var(--t2) var(--ease);
+  }
+  .btn-green:hover { transform: translateY(-2px); }
+  .btn-green::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      100deg, transparent 35%, rgb(255 255 255 / 0.22) 50%, transparent 65%
+    );
+    transform: translate3d(-100%, 0, 0);
+    transition: transform var(--t4) var(--ease);
+  }
+  .btn-green:hover::after { transform: translate3d(100%, 0, 0); }
+
+  .btn-green__i {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    flex: none;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.2);
+    transition: transform var(--t2) var(--ease);
+  }
+  .btn-green:hover .btn-green__i { transform: translateX(3px); }
+
+  .cf__alt {
+    padding: 0;
+    border: 0;
+    border-bottom: 1px solid var(--line-light);
+    background: none;
+    color: var(--text-2);
+    font: inherit;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: color var(--t2) var(--ease), border-color var(--t2) var(--ease);
+  }
+  .cf__alt:hover { color: var(--green-deep); border-color: var(--green); }
+
+  .cf__note {
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: var(--text-3);
+  }
+
+  .cf__nojs {
+    padding: 0.85rem 1rem;
+    border-radius: 10px;
+    background: #fdf3dc;
+    color: #8a5a00;
+    font-size: 0.8125rem;
+    line-height: 1.55;
+  }
+  .cf__nojs a { text-decoration: underline; }
+
+  /* ============================================================
+     03 · BRANCHES
+     ============================================================ */
+
+  .cb { background: var(--off); }
+
+  .cb__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--s4);
+  }
+
+  .cb__h {
+    margin-top: var(--s4);
+    font-size: clamp(1.5rem, 2.8vw, 2.1rem);
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    line-height: 1.1;
+  }
+
+  .cb__all {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--green-deep);
+    border-bottom: 1px solid transparent;
+    transition: border-color var(--t2) var(--ease);
+  }
+  .cb__all:hover { border-color: var(--green); }
+
+  .cb__grid {
+    display: grid;
+    gap: clamp(0.75rem, 1.6vw, 1rem);
+    margin-top: clamp(1.5rem, 3vw, 2.25rem);
+  }
+
+  .bcard {
+    position: relative;
+    display: grid;
+    height: 100%;
+    padding: 1.2rem 1.3rem;
+    border: 1px solid var(--line-light);
+    border-radius: 14px;
+    background: var(--white);
+    transition:
+      transform var(--t2) var(--ease),
+      border-color var(--t2) var(--ease),
+      box-shadow var(--t2) var(--ease);
+  }
+  .bcard:hover {
+    transform: translateY(-4px);
+    border-color: color-mix(in oklab, var(--green) 32%, var(--line-light));
+    box-shadow: 0 22px 40px -30px rgb(0 0 0 / 0.5);
+  }
+
+  .bcard__i {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    color: var(--green-deep);
+    background: color-mix(in oklab, var(--green) 13%, #fff);
+  }
+  .bcard__n {
+    margin-top: 0.8rem;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+  }
+  .bcard__c {
+    margin-top: 0.2rem;
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+  .bcard__todo {
+    justify-self: start;
+    margin-top: 0.6rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.625rem;
+    font-weight: 600;
+    color: #8a5a00;
+    background: #fdf3dc;
+  }
+  .bcard__go {
+    position: absolute;
+    top: 1.2rem;
+    right: 1.2rem;
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid var(--line-light);
+    color: var(--green-deep);
+    transition:
+      transform var(--t2) var(--ease),
+      background-color var(--t2) var(--ease),
+      border-color var(--t2) var(--ease),
+      color var(--t2) var(--ease);
+  }
+  .bcard:hover .bcard__go {
+    transform: translateX(3px);
+    background: var(--green-deep);
+    border-color: var(--green-deep);
+    color: #fff;
+  }
+
+  /* ============================================================
+     04 · COMPANY
+     ============================================================ */
+
+  .cl {
+    background: var(--ink);
+    color: #fff;
+    padding-block: clamp(2.25rem, 4.5vw, 3.5rem);
+  }
+  .cl__in { display: grid; gap: var(--s5); align-items: center; }
+
+  .cl__name {
+    margin-top: var(--s4);
+    font-size: clamp(1.15rem, 2.2vw, 1.6rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+  }
+  .cl__sub {
+    margin-top: 0.35rem;
+    font-size: 0.875rem;
+    color: rgb(255 255 255 / 0.72);
+  }
+
+  .cl__soc {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s5);
+  }
+  .cl__soc a {
+    font-size: 0.875rem;
+    color: #fff;
+    border-bottom: 1px solid rgb(255 255 255 / 0.4);
+    padding-bottom: 2px;
+    transition: border-color var(--t2) var(--ease), color var(--t2) var(--ease);
+  }
+  .cl__soc a:hover { color: var(--green-bright); border-color: var(--green-bright); }
+
+  /* ============================================================
+     RESPONSIVE
+     ============================================================ */
+
+  @media (min-width: 40rem) {
+    .f__row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .cb__grid { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (min-width: 62rem) {
+    .ch__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr); }
+    .cf__grid { grid-template-columns: minmax(0, 0.85fr) minmax(0, 1fr); }
+    .cb__grid { grid-template-columns: repeat(4, 1fr); }
+    .cl__in { grid-template-columns: minmax(0, 1fr) auto; }
+  }
+
+  /* ============================================================
+     REDUCED MOTION
+     ============================================================ */
+
+  @media (prefers-reduced-motion: reduce) {
+    .ch__aura span { animation: none; }
+    .chan, .chan:hover,
+    .bcard, .bcard:hover,
+    .btn-green, .btn-green:hover {
+      transform: none;
+      transition: none;
+    }
+    .btn-green::after { display: none; }
+  }
+</style>
