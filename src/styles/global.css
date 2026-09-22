@@ -1,0 +1,248 @@
+@import './tokens.css';
+@import './motion.css';
+
+/* ============================================================
+   RESET
+   ============================================================ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+* {
+  margin: 0;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  color-scheme: light;
+}
+
+body {
+  min-height: 100svh;
+  background: var(--white);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: var(--body);
+  line-height: 1.5;
+  font-synthesis-weight: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: clip;
+}
+
+img,
+picture,
+svg,
+video,
+canvas {
+  display: block;
+  max-width: 100%;
+}
+
+/* [hidden] must beat any component's own display rule. */
+[hidden] {
+  display: none !important;
+}
+
+input,
+button,
+textarea,
+select {
+  font: inherit;
+  color: inherit;
+}
+button {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-weight: 500;
+  text-wrap: balance;
+}
+p {
+  text-wrap: pretty;
+}
+ul,
+ol {
+  list-style: none;
+  padding: 0;
+}
+
+.num,
+[data-count] {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ============================================================
+   FOCUS
+   ============================================================ */
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+.skip-link {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 200;
+  padding: var(--s3) var(--s5);
+  background: var(--green);
+  color: #fff;
+  font-size: var(--small);
+  transform: translateY(-120%);
+  transition: transform var(--t1) var(--ease);
+}
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+
+.section {
+  position: relative;
+  background: var(--bg);
+  color: var(--fg);
+  padding-block: var(--pad-y);
+}
+
+.shell {
+  width: 100%;
+  max-width: var(--maxw);
+  margin-inline: auto;
+  padding-inline: var(--gut);
+}
+
+.shell-wide {
+  width: 100%;
+  padding-inline: var(--gut);
+}
+
+/* ============================================================
+   TYPE
+   ============================================================ */
+
+.d1 {
+  font-size: var(--d1);
+  line-height: 0.96;
+  letter-spacing: -0.035em;
+  font-weight: 500;
+}
+.d2 {
+  font-size: var(--d2);
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+  font-weight: 500;
+}
+.d3 {
+  font-size: var(--d3);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  font-weight: 500;
+}
+.d4 {
+  font-size: var(--d4);
+  line-height: 1.25;
+  letter-spacing: -0.015em;
+  font-weight: 500;
+}
+.lead {
+  font-size: var(--lead);
+  line-height: 1.55;
+  color: var(--fg-2);
+}
+.small {
+  font-size: var(--small);
+  line-height: 1.6;
+  color: var(--fg-2);
+}
+
+/* Section label — number + name, the editorial spine of the page. */
+.label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s3);
+  font-family: var(--font-mono);
+  font-size: var(--label);
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--fg-3);
+}
+
+.label::before {
+  content: '';
+  width: 1.75rem;
+  height: 1px;
+  background: currentColor;
+  opacity: 0.6;
+}
+
+.label--num::before {
+  display: none;
+}
+
+.accent {
+  color: var(--accent);
+}
+
+/* ============================================================
+   MEDIA — every image in the site shares one grade
+   ============================================================ */
+
+.media {
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-2);
+}
+
+.media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* A consistent, restrained grade so mixed sources read as one system. */
+.media--graded img {
+  filter: saturate(0.92) contrast(1.04);
+}
+
+/* Dark scrim for text over image. */
+.scrim::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgb(14 16 18 / 0.82) 0%,
+    rgb(14 16 18 / 0.5) 38%,
+    rgb(14 16 18 / 0.18) 70%,
+    rgb(14 16 18 / 0.3) 100%
+  );
+  pointer-events: none;
+}
+
+.rule {
+  height: 1px;
+  background: var(--line);
+  border: 0;
+  width: 100%;
+}

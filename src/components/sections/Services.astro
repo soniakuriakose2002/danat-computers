@@ -1,0 +1,403 @@
+---
+import { Image } from 'astro:assets';
+import repairBoard from '@assets/photos/repair-solder.jpg';
+import printer from '@assets/photos/printer-machine.jpg';
+import cctv from '@assets/photos/cctv-wall.jpg';
+import network from '@assets/photos/network-patch.jpg';
+import drive from '@assets/photos/drive-macro.jpg';
+import netEng from '@assets/photos/network-eng.jpg';
+
+const services = [
+  {
+    n: '01',
+    title: 'Computer Repair',
+    href: '/services/computer-repair',
+    body: 'Laptops, desktops and MacBooks — diagnosed free, repaired at board level where other shops replace the whole machine.',
+    img: repairBoard,
+    alt: 'Technician testing a laptop mainboard with a multimeter',
+  },
+  {
+    n: '02',
+    title: 'Printer Services',
+    href: '/services/printer-services',
+    body: 'Laser, inkjet, thermal, barcode and ID card printers — serviced, repaired, and supplied with the consumables that keep them running.',
+    img: printer,
+    alt: 'Close-up of an office printing machine',
+  },
+  {
+    n: '03',
+    title: 'CCTV & Security',
+    href: '/services/cctv-services',
+    body: 'Surveyed before quoted. Supply, installation, configuration and maintenance of IP and analogue systems across Oman.',
+    img: cctv,
+    alt: 'Security cameras mounted on a building wall',
+  },
+  {
+    n: '04',
+    title: 'Networking',
+    href: '/services/networking',
+    body: 'Structured cabling, managed and PoE switching, Wi-Fi placed by survey, routers and firewalls — designed, installed and fixed.',
+    img: network,
+    alt: 'Network patch panel with ethernet cabling',
+  },
+  {
+    n: '05',
+    title: 'Data Recovery',
+    href: '/services/data-recovery',
+    body: 'Failed drives, dead machines, deleted volumes. Assessed honestly before any work is agreed — we tell you what is recoverable first.',
+    img: drive,
+    alt: 'Close-up of a hard disk drive opened for recovery',
+  },
+  {
+    n: '06',
+    title: 'IT Support',
+    href: '/services/hardware-troubleshooting',
+    body: 'Hardware and software troubleshooting for homes and businesses, with on-site support and maintenance contracts across four branches.',
+    img: netEng,
+    alt: 'Engineer working on a network switch',
+  },
+];
+---
+
+<section class="svc" data-tone="light" data-services>
+  <div class="svc__head shell">
+    <p class="label" data-rise>02 &mdash; What we do</p>
+    <h2 class="d2 svc__title" data-rise style="--d:80ms">
+      Six things we do,<br />and do properly.
+    </h2>
+  </div>
+
+  <!-- Pinned stage: the image panel holds still while the list advances. -->
+  <div class="svc__stage">
+    <div class="svc__pin">
+      <div class="svc__media">
+        {services.map((s, i) => (
+          <figure class="svc__frame" data-frame={i} data-active={i === 0 ? '' : undefined}>
+            <Image
+              src={s.img}
+              alt={s.alt}
+              widths={[600, 900, 1400]}
+              sizes="(max-width: 60rem) 100vw, 46vw"
+              quality={80}
+              format="avif"
+              loading={i === 0 ? 'eager' : 'lazy'}
+            />
+          </figure>
+        ))}
+        <span class="svc__count">
+          <span data-svc-n>01</span><i>/ 06</i>
+        </span>
+      </div>
+
+      <ol class="svc__list">
+        {services.map((s, i) => (
+          <li class="svc__item" data-item={i} data-active={i === 0 ? '' : undefined}>
+            <a href={s.href} class="svc__link">
+              <span class="svc__n">{s.n}</span>
+              <span class="svc__text">
+                <span class="svc__name d3">{s.title}</span>
+                <span class="svc__body"><span>{s.body}</span></span>
+              </span>
+              <span class="svc__go" aria-hidden="true">
+                <svg viewBox="0 0 16 16" width="15" height="15" fill="none">
+                  <path d="M3 8h9.5M8.5 4l4 4-4 4" stroke="currentColor" stroke-width="1.6"
+                    stroke-linecap="round" stroke-linejoin="round"></path>
+                </svg>
+              </span>
+            </a>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </div>
+</section>
+
+<style>
+  .svc {
+    padding-bottom: 0;
+  }
+
+  .svc__head {
+    display: grid;
+    gap: var(--s5);
+    padding-bottom: var(--s8);
+  }
+
+  .svc__title {
+    max-width: 18ch;
+  }
+
+  .svc__pin {
+    display: grid;
+    gap: var(--s7);
+    padding-inline: var(--gut);
+    max-width: var(--maxw);
+    margin-inline: auto;
+    padding-bottom: var(--pad-y);
+  }
+
+  /* ---------- media ---------- */
+
+  .svc__media {
+    position: relative;
+    aspect-ratio: 4 / 3;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    background: var(--off-2);
+  }
+
+  .svc__frame {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transform: scale(1.06);
+    transition:
+      opacity var(--t3) var(--ease),
+      transform 1200ms var(--ease);
+  }
+
+  .svc__frame[data-active] {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .svc__frame :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: saturate(0.92) contrast(1.04);
+  }
+
+  .svc__count {
+    position: absolute;
+    left: 1.25rem;
+    bottom: 1.25rem;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.35rem;
+    padding: 0.5rem 0.8rem;
+    border-radius: 999px;
+    background: rgb(14 16 18 / 0.55);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    font-variant-numeric: tabular-nums;
+    color: #fff;
+  }
+
+  .svc__count i {
+    font-style: normal;
+    font-size: 0.625rem;
+    opacity: 0.6;
+  }
+
+  /* ---------- list ---------- */
+
+  .svc__list {
+    display: grid;
+    align-content: center;
+  }
+
+  .svc__item {
+    border-top: 1px solid var(--line);
+  }
+
+  .svc__item:last-child {
+    border-bottom: 1px solid var(--line);
+  }
+
+  .svc__link {
+    display: grid;
+    grid-template-columns: 2.75rem 1fr auto;
+    align-items: start;
+    gap: var(--s4);
+    padding-block: 1.35rem;
+    transition: padding var(--t2) var(--ease);
+  }
+
+  .svc__n {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    padding-top: 0.45rem;
+    color: var(--text-3);
+    transition: color var(--t2) var(--ease);
+  }
+
+  .svc__name {
+    display: block;
+    color: var(--text);
+    transition:
+      color var(--t2) var(--ease),
+      transform var(--t3) var(--ease);
+  }
+
+  /* Collapses when inactive. grid-template-rows 0fr->1fr is the only
+     way to animate to auto height without measuring in JS. */
+  .svc__body {
+    display: grid;
+    grid-template-rows: 0fr;
+    max-width: 52ch;
+    font-size: var(--small);
+    line-height: 1.6;
+    color: var(--text-2);
+    opacity: 0;
+    transition:
+      grid-template-rows var(--t3) var(--ease),
+      opacity var(--t2) var(--ease);
+  }
+
+  .svc__body > span {
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  .svc__item[data-active] .svc__body > span {
+    padding-top: 0.5rem;
+  }
+
+  .svc__go {
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    color: var(--text-3);
+    opacity: 0;
+    transform: translateX(-6px);
+    transition:
+      opacity var(--t2) var(--ease),
+      transform var(--t2) var(--ease),
+      background-color var(--t2) var(--ease),
+      color var(--t2) var(--ease),
+      border-color var(--t2) var(--ease);
+  }
+
+  /* ---------- active state ---------- */
+
+  .svc__item[data-active] .svc__n {
+    color: var(--green-deep);
+  }
+
+  .svc__item[data-active] .svc__name {
+    color: var(--text);
+  }
+
+  .svc__item[data-active] .svc__body {
+    grid-template-rows: 1fr;
+    opacity: 1;
+  }
+
+  .svc__item[data-active] .svc__go {
+    opacity: 1;
+    transform: none;
+    background: var(--green);
+    border-color: var(--green);
+    color: #fff;
+  }
+
+  .svc__item:not([data-active]) .svc__name {
+    color: var(--text-2);
+  }
+
+  .svc__link:hover .svc__name {
+    color: var(--text);
+  }
+
+  /* ---------- desktop: pin the media ---------- */
+
+  @media (min-width: 62rem) {
+    .svc__pin {
+      grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+      gap: var(--s9);
+      align-items: start;
+    }
+
+    .svc__media {
+      position: sticky;
+      top: calc(50svh - 19vw);
+      aspect-ratio: 4 / 5;
+      max-height: 38rem;
+    }
+
+    .svc__list {
+      padding-block: 2rem;
+    }
+
+    .svc__link {
+      padding-block: 1.75rem;
+    }
+  }
+
+  @media (max-width: 62rem) {
+    /* No pinning on touch. Every row is open, image sits above the list. */
+    .svc__body {
+      grid-template-rows: 1fr;
+      opacity: 1;
+    }
+    .svc__go {
+      opacity: 1;
+      transform: none;
+    }
+  }
+</style>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-services]');
+  if (root) {
+    const items = [...root.querySelectorAll<HTMLElement>('[data-item]')];
+    const frames = [...root.querySelectorAll<HTMLElement>('[data-frame]')];
+    const counter = root.querySelector<HTMLElement>('[data-svc-n]');
+    let current = 0;
+
+    const setActive = (i: number) => {
+      if (i === current || i < 0 || i >= items.length) return;
+      current = i;
+      items.forEach((el, n) => el.toggleAttribute('data-active', n === i));
+      frames.forEach((el, n) => el.toggleAttribute('data-active', n === i));
+      if (counter) counter.textContent = String(i + 1).padStart(2, '0');
+    };
+
+    // Desktop: whichever row is nearest the middle of the viewport wins.
+    const desktop = window.matchMedia('(min-width: 62rem)');
+
+    const onScroll = () => {
+      if (!desktop.matches) return;
+      const mid = window.innerHeight / 2;
+      let best = 0;
+      let bestDist = Infinity;
+      items.forEach((el, i) => {
+        const r = el.getBoundingClientRect();
+        const d = Math.abs(r.top + r.height / 2 - mid);
+        if (d < bestDist) {
+          bestDist = d;
+          best = i;
+        }
+      });
+      setActive(best);
+    };
+
+    let ticking = false;
+    window.addEventListener(
+      'scroll',
+      () => {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(() => {
+          onScroll();
+          ticking = false;
+        });
+      },
+      { passive: true }
+    );
+
+    // Pointer takes precedence over scroll position when the user hovers.
+    items.forEach((el, i) => {
+      el.addEventListener('pointerenter', () => desktop.matches && setActive(i));
+      el.addEventListener('focusin', () => setActive(i));
+    });
+
+    onScroll();
+  }
+</script>

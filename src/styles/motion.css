@@ -1,0 +1,159 @@
+/* ============================================================
+   DANAT — motion
+   Meaningful movement, not a blanket fade.
+   Every effect is transform/opacity/clip-path only.
+   ============================================================ */
+
+/* ------------------------------------------------------------
+   1. REVEAL — rise. The default for text blocks.
+   ------------------------------------------------------------ */
+[data-rise] {
+  opacity: 0;
+  transform: translate3d(0, 28px, 0);
+  transition:
+    opacity var(--t3) var(--ease),
+    transform var(--t3) var(--ease);
+  transition-delay: var(--d, 0ms);
+}
+[data-rise][data-in] {
+  opacity: 1;
+  transform: none;
+}
+
+/* ------------------------------------------------------------
+   2. MASK — headline lines wipe up from a clipped box.
+   Markup: .mask > .mask__i
+   ------------------------------------------------------------ */
+.mask {
+  display: block;
+  overflow: hidden;
+  padding-bottom: 0.1em;
+  margin-bottom: -0.1em;
+}
+.mask__i {
+  display: block;
+  transform: translate3d(0, 105%, 0);
+  transition: transform var(--t4) var(--ease);
+  transition-delay: var(--d, 0ms);
+}
+[data-in] .mask__i,
+.mask__i[data-in] {
+  transform: none;
+}
+
+/* ------------------------------------------------------------
+   3. CURTAIN — image reveals by un-clipping, and the picture
+   inside counter-scales. Far richer than a fade.
+   ------------------------------------------------------------ */
+[data-curtain] {
+  clip-path: inset(0 0 100% 0);
+  transition: clip-path var(--t4) var(--ease-io);
+  transition-delay: var(--d, 0ms);
+}
+[data-curtain][data-in] {
+  clip-path: inset(0 0 0% 0);
+}
+[data-curtain] img {
+  transform: scale(1.22);
+  transition: transform 1500ms var(--ease-io);
+  transition-delay: var(--d, 0ms);
+}
+[data-curtain][data-in] img {
+  transform: scale(1);
+}
+
+/* ------------------------------------------------------------
+   4. LINE — rules draw rather than appear.
+   ------------------------------------------------------------ */
+[data-draw] {
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform var(--t3) var(--ease);
+  transition-delay: var(--d, 0ms);
+}
+[data-draw][data-in] {
+  transform: scaleX(1);
+}
+
+/* ------------------------------------------------------------
+   5. PARALLAX — JS writes --py; CSS does the moving.
+   ------------------------------------------------------------ */
+[data-parallax] {
+  will-change: transform;
+  transform: translate3d(0, var(--py, 0px), 0);
+}
+
+[data-zoom] {
+  will-change: transform;
+  transform: scale(var(--z, 1));
+}
+
+/* ------------------------------------------------------------
+   6. MARQUEE
+   ------------------------------------------------------------ */
+@keyframes marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+/* ------------------------------------------------------------
+   7. Small utilities
+   ------------------------------------------------------------ */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes pulse-dot {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--green) 55%, transparent);
+  }
+  70% {
+    box-shadow: 0 0 0 8px transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+}
+
+/* ============================================================
+   REDUCED MOTION — stills the page, never hides content.
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  [data-rise],
+  [data-draw],
+  [data-curtain],
+  .mask__i {
+    opacity: 1 !important;
+    transform: none !important;
+    clip-path: none !important;
+  }
+
+  [data-curtain] img {
+    transform: none !important;
+  }
+
+  [data-parallax],
+  [data-zoom] {
+    transform: none !important;
+  }
+}

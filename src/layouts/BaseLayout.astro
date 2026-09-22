@@ -1,0 +1,54 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import { site } from '@data/site';
+import '@styles/fonts.css';
+import '@styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** Pages that open on a dark hero get a matching browser theme colour. */
+  darkTop?: boolean;
+}
+
+const { title, description = site.description, darkTop = true } = Astro.props;
+
+const pageTitle = title
+  ? `${title} — ${site.nameFull}`
+  : `${site.nameFull} — Technology that keeps you moving`;
+const canonical = new URL(Astro.url.pathname, Astro.site ?? site.url).href;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta name="theme-color" content={darkTop ? '#0E1012' : '#FFFFFF'} />
+    <meta name="generator" content={Astro.generator} />
+
+    <link rel="icon" href="/brand/favicon-32.png" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/brand/favicon-180.png" />
+
+    <!-- Only the display face is preloaded; the other two are non-blocking. -->
+    <link rel="preload" href="/fonts/switzer-var.woff2" as="font" type="font/woff2" crossorigin />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content={site.nameFull} />
+    <meta property="og:locale" content="en_OM" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <ClientRouter />
+  </head>
+
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <slot />
+  </body>
+</html>

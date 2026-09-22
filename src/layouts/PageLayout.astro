@@ -1,0 +1,26 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Header from '@components/global/Header.astro';
+import Footer from '@components/global/Footer.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** Hero sits under a transparent header on the homepage. */
+  overlayHeader?: boolean;
+}
+
+const { title, description, overlayHeader = false } = Astro.props;
+---
+
+<BaseLayout title={title} description={description}>
+  <Header overlay={overlayHeader} />
+  <main><slot /></main>
+  <Footer />
+</BaseLayout>
+
+<script>
+  import { boot } from '@scripts/scroll';
+  boot();
+  document.addEventListener('astro:after-swap', boot);
+</script>

@@ -1,0 +1,140 @@
+/* ============================================================
+   DANAT COMPUTERS — design tokens
+   White / off-white / charcoal, with Danat green as the accent.
+   Sections alternate light and dark via [data-tone].
+   ============================================================ */
+
+:root {
+  /* ---------- NEUTRALS ---------- */
+  --white: #ffffff;
+  --off: #f4f4f2;
+  --off-2: #ececea;
+  --line-light: #e2e2df;
+
+  --char: #14171a; /* primary dark surface */
+  --char-2: #1b1f23; /* raised dark surface */
+  --char-3: #262b30; /* dark borders / hover */
+  --ink: #0e1012; /* darkest, footer + overlays */
+
+  /* ---------- TEXT ---------- */
+  --text: #14171a;
+  --text-2: #56606a;
+  --text-3: #667079; /* AA on both white and off-white — used for small labels */
+  --text-inv: #f7f8f8;
+  --text-inv-2: #b7bfc6;
+  --text-inv-3: #79838c;
+
+  /* ---------- BRAND — measured from the official Danat logo ---------- */
+  --green: #59aa54; /* true mark colour */
+  --green-bright: #6fc96a; /* on dark surfaces   9.8:1 on --ink   */
+  --green-deep: #2f6429; /* on light surfaces  6.8:1 on --white */
+  --green-wash: #eef6ed;
+
+  /* ---------- SEMANTIC (flipped by [data-tone]) ---------- */
+  --bg: var(--white);
+  --bg-2: var(--off);
+  --fg: var(--text);
+  --fg-2: var(--text-2);
+  --fg-3: var(--text-3);
+  --accent: var(--green-deep);
+  --line: var(--line-light);
+
+  /* ---------- TYPE ---------- */
+  --font: 'Switzer', 'Switzer-fallback', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Mono', Menlo, monospace;
+
+  --d1: clamp(2.75rem, 7.4vw, 7.5rem); /* hero */
+  --d2: clamp(2.25rem, 5vw, 4.5rem); /* section heads */
+  --d3: clamp(1.75rem, 3.2vw, 2.75rem);
+  --d4: clamp(1.25rem, 2vw, 1.625rem);
+  --lead: clamp(1.0625rem, 1.25vw, 1.25rem);
+  --body: 1rem;
+  --small: 0.875rem;
+  --label: 0.6875rem;
+
+  /* ---------- SPACE ---------- */
+  --s1: 0.25rem;
+  --s2: 0.5rem;
+  --s3: 0.75rem;
+  --s4: 1rem;
+  --s5: 1.5rem;
+  --s6: 2rem;
+  --s7: 3rem;
+  --s8: 4rem;
+  --s9: 6rem;
+  --s10: 8rem;
+
+  --pad-y: clamp(5rem, 9vw, 9rem);
+  --gut: clamp(1.25rem, 4.5vw, 4.5rem);
+  --maxw: 96rem;
+
+  /* ---------- MOTION ---------- */
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-io: cubic-bezier(0.65, 0, 0.35, 1);
+  --t1: 200ms;
+  --t2: 400ms;
+  --t3: 700ms;
+  --t4: 1100ms;
+
+  --radius: 4px;
+  --radius-lg: 10px;
+
+  --z-head: 80;
+  --z-nav: 95;
+}
+
+/* ============================================================
+   TONES — the light/dark rhythm of the page
+   ============================================================ */
+
+[data-tone='light'] {
+  --bg: var(--white);
+  --bg-2: var(--off);
+  --fg: var(--text);
+  --fg-2: var(--text-2);
+  --fg-3: var(--text-3);
+  --accent: var(--green-deep);
+  --line: var(--line-light);
+}
+
+[data-tone='off'] {
+  --bg: var(--off);
+  --bg-2: var(--off-2);
+  --fg: var(--text);
+  --fg-2: var(--text-2);
+  --fg-3: var(--text-3);
+  --accent: var(--green-deep);
+  --line: #dddddA;
+}
+
+[data-tone='dark'] {
+  --bg: var(--char);
+  --bg-2: var(--char-2);
+  --fg: var(--text-inv);
+  --fg-2: var(--text-inv-2);
+  --fg-3: var(--text-inv-3);
+  --accent: var(--green-bright);
+  --line: rgb(255 255 255 / 0.12);
+}
+
+[data-tone='ink'] {
+  --bg: var(--ink);
+  --bg-2: var(--char);
+  --fg: var(--text-inv);
+  --fg-2: var(--text-inv-2);
+  --fg-3: var(--text-inv-3);
+  --accent: var(--green-bright);
+  --line: rgb(255 255 255 / 0.1);
+}
+
+/* ============================================================
+   CONTRAST — computed, not assumed (WCAG 2.1)
+     --text         #14171A on #FFFFFF = 17.99:1  AAA
+     --text-2       #56606A on #FFFFFF =  6.41:1  AA
+     --text-3       #667079 on #FFFFFF =  5.05:1  AA   (4.59 on --off)
+     --green-deep   #2F6429 on #FFFFFF =  7.06:1  AAA  (6.41 on --off)
+     --green-bright #6FC96A on #14171A =  8.77:1  AAA  (9.30 on --ink)
+     --text-inv-2   #B7BFC6 on #14171A =  9.67:1  AAA
+     --text-inv-3   #79838C on #14171A =  4.66:1  AA
+   Raw --green #59AA54 is 2.88:1 on white — FILLS ONLY, never text.
+   ============================================================ */

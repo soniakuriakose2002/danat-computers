@@ -1,0 +1,369 @@
+---
+import Logo from './Logo.astro';
+import { site, whatsappLink } from '@data/site';
+
+interface Props {
+  /** Sit transparently over a dark hero until scrolled. */
+  overlay?: boolean;
+}
+const { overlay = false } = Astro.props;
+---
+
+<header class="hd" data-hd data-overlay={overlay ? '' : undefined}>
+  <div class="hd__in">
+    <a href="/" class="hd__brand" aria-label={`${site.nameFull} — home`}>
+      <Logo size={36} />
+      <span class="hd__name">
+        Danat<em>Computers</em>
+      </span>
+    </a>
+
+    <nav class="hd__nav" aria-label="Primary">
+      {site.nav.map((item) => (
+        <a
+          href={item.href}
+          class="hd__link"
+          aria-current={
+            item.href !== '/' && Astro.url.pathname.startsWith(item.href) ? 'page' : undefined
+          }
+        >
+          <span>{item.label}</span>
+          <span aria-hidden="true">{item.label}</span>
+        </a>
+      ))}
+    </nav>
+
+    <div class="hd__end">
+      <a class="hd__call" href={`tel:${site.phone.tel}`}>{site.phone.display}</a>
+      <a class="hd__wa" href={whatsappLink()} target="_blank" rel="noopener noreferrer">
+        <i aria-hidden="true"></i>WhatsApp
+      </a>
+      <button
+        class="hd__burger"
+        type="button"
+        aria-label="Open menu"
+        aria-expanded="false"
+        aria-controls="mnav"
+        data-burger
+      >
+        <span aria-hidden="true"></span><span aria-hidden="true"></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<div class="mnav" id="mnav" data-mnav hidden>
+  <nav aria-label="Mobile">
+    {site.nav.map((item, i) => (
+      <a href={item.href} style={`--i:${i}`}>
+        <span class="mnav__n">0{i + 1}</span>
+        {item.label}
+      </a>
+    ))}
+  </nav>
+  <div class="mnav__foot">
+    <a href={`tel:${site.phone.tel}`}>{site.phone.display}</a>
+    <a href={whatsappLink()} target="_blank" rel="noopener noreferrer">WhatsApp</a>
+  </div>
+</div>
+
+<style>
+  .hd {
+    position: fixed;
+    inset: 0 0 auto 0;
+    z-index: var(--z-head);
+    padding-top: env(safe-area-inset-top, 0px);
+    background: var(--white);
+    border-bottom: 1px solid var(--line-light);
+    color: var(--text);
+    transition:
+      background-color var(--t2) var(--ease),
+      border-color var(--t2) var(--ease),
+      color var(--t2) var(--ease),
+      transform var(--t3) var(--ease);
+  }
+
+  /* Over a dark hero: transparent, white text, no rule. */
+  .hd[data-overlay]:not([data-stuck]) {
+    background: transparent;
+    border-color: transparent;
+    color: #fff;
+  }
+
+  /* Scrolled: frosted white. */
+  .hd[data-stuck] {
+    background: rgb(255 255 255 / 0.86);
+    backdrop-filter: blur(16px) saturate(150%);
+    -webkit-backdrop-filter: blur(16px) saturate(150%);
+  }
+
+  /* Scrolling down hides it; scrolling up brings it back. */
+  .hd[data-hide] {
+    transform: translateY(-101%);
+  }
+
+  .hd__in {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s5);
+    max-width: var(--maxw);
+    margin-inline: auto;
+    padding: 0.85rem var(--gut);
+    transition: padding var(--t2) var(--ease);
+  }
+
+  .hd[data-stuck] .hd__in {
+    padding-block: 0.6rem;
+  }
+
+  .hd__brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .hd__name {
+    display: none;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+
+  .hd__name em {
+    display: block;
+    font-style: normal;
+    font-family: var(--font-mono);
+    font-size: 0.5rem;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    opacity: 0.6;
+    margin-top: 2px;
+  }
+
+  /* ---------- nav with a rolling label ---------- */
+
+  .hd__nav {
+    display: none;
+    gap: var(--s6);
+  }
+
+  .hd__link {
+    position: relative;
+    display: grid;
+    height: 1.25rem;
+    overflow: hidden;
+    font-size: 0.9375rem;
+    font-weight: 450;
+  }
+
+  .hd__link > span {
+    grid-area: 1 / 1;
+    transition: transform var(--t2) var(--ease);
+  }
+
+  .hd__link > span:last-child {
+    transform: translateY(100%);
+    color: var(--green-deep);
+  }
+
+  .hd[data-overlay]:not([data-stuck]) .hd__link > span:last-child {
+    color: var(--green-bright);
+  }
+
+  .hd__link:hover > span:first-child,
+  .hd__link[aria-current='page'] > span:first-child {
+    transform: translateY(-100%);
+  }
+
+  .hd__link:hover > span:last-child,
+  .hd__link[aria-current='page'] > span:last-child {
+    transform: translateY(0);
+  }
+
+  .hd__end {
+    display: flex;
+    align-items: center;
+    gap: var(--s4);
+  }
+
+  .hd__call {
+    display: none;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.04em;
+    opacity: 0.75;
+  }
+
+  .hd__call:hover {
+    opacity: 1;
+  }
+
+  .hd__wa {
+    display: none;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1.1rem;
+    border-radius: 999px;
+    background: var(--green);
+    color: #fff;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    transition: background-color var(--t1) var(--ease);
+  }
+
+  .hd__wa:hover {
+    background: #14171a;
+  }
+
+  .hd__wa i {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #fff;
+    opacity: 0.9;
+  }
+
+  .hd__burger {
+    display: grid;
+    gap: 5px;
+    padding: 10px 2px;
+  }
+
+  .hd__burger span {
+    display: block;
+    width: 22px;
+    height: 1.5px;
+    background: currentColor;
+    transition: transform var(--t2) var(--ease);
+  }
+
+  .hd__burger[aria-expanded='true'] span:first-child {
+    transform: translateY(3.25px) rotate(45deg);
+  }
+
+  .hd__burger[aria-expanded='true'] span:last-child {
+    transform: translateY(-3.25px) rotate(-45deg);
+  }
+
+  /* ---------- mobile panel ---------- */
+
+  .mnav {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-nav);
+    display: grid;
+    align-content: center;
+    gap: var(--s6);
+    padding: var(--gut);
+    padding-top: calc(env(safe-area-inset-top, 0px) + 6rem);
+    background: var(--ink);
+    color: var(--text-inv);
+  }
+
+  .mnav nav {
+    display: grid;
+  }
+
+  .mnav nav a {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    padding-block: 0.7rem;
+    border-bottom: 1px solid rgb(255 255 255 / 0.1);
+    font-size: clamp(1.75rem, 8vw, 2.75rem);
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fade-up var(--t3) var(--ease) forwards;
+    animation-delay: calc(var(--i) * 60ms + 60ms);
+  }
+
+  .mnav__n {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.16em;
+    color: var(--green-bright);
+  }
+
+  .mnav__foot {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s5);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-inv-2);
+  }
+
+  @media (min-width: 30rem) {
+    .hd__name {
+      display: block;
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .hd__nav,
+    .hd__wa,
+    .hd__call {
+      display: flex;
+    }
+    .hd__burger {
+      display: none;
+    }
+    .mnav {
+      display: none !important;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mnav nav a {
+      opacity: 1;
+      transform: none;
+      animation: none;
+    }
+    .hd[data-hide] {
+      transform: none;
+    }
+  }
+</style>
+
+<script>
+  const hd = document.querySelector<HTMLElement>('[data-hd]');
+  const burger = document.querySelector<HTMLButtonElement>('[data-burger]');
+  const panel = document.querySelector<HTMLElement>('[data-mnav]');
+
+  if (hd) {
+    let last = window.scrollY;
+    const onScroll = () => {
+      const y = window.scrollY;
+      hd.toggleAttribute('data-stuck', y > 40);
+      // Hide on downward scroll past the fold, reveal on the way back up.
+      const menuClosed = panel?.hidden ?? true;
+      hd.toggleAttribute('data-hide', y > 400 && y > last + 4 && menuClosed);
+      last = y;
+    };
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+  }
+
+  if (burger && panel) {
+    const toggle = (open: boolean) => {
+      panel.hidden = !open;
+      burger.setAttribute('aria-expanded', String(open));
+      burger.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+      document.documentElement.style.overflow = open ? 'hidden' : '';
+    };
+    burger.addEventListener('click', () =>
+      toggle(burger.getAttribute('aria-expanded') !== 'true')
+    );
+    panel.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => toggle(false)));
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !panel.hidden) toggle(false);
+    });
+  }
+</script>

@@ -1,0 +1,149 @@
+---
+interface Props {
+  href: string;
+  variant?: 'solid' | 'outline' | 'ghost' | 'ghost-light';
+  external?: boolean;
+  magnetic?: boolean;
+  class?: string;
+}
+
+const {
+  href,
+  variant = 'solid',
+  external = false,
+  magnetic = false,
+  class: klass = '',
+} = Astro.props;
+---
+
+<a
+  href={href}
+  rel={external ? 'noopener noreferrer' : undefined}
+  target={external ? '_blank' : undefined}
+  class:list={['btn', `btn--${variant}`, klass]}
+  data-magnetic={magnetic ? '' : undefined}
+>
+  <span class="btn__fill" aria-hidden="true"></span>
+  <span class="btn__label"><slot /></span>
+  <span class="btn__icon" aria-hidden="true">
+    <svg viewBox="0 0 16 16" width="13" height="13" fill="none">
+      <path
+        d="M3 8h9.5M8.5 4l4 4-4 4"
+        stroke="currentColor"
+        stroke-width="1.6"
+        stroke-linecap="round"
+        stroke-linejoin="round"></path>
+    </svg>
+  </span>
+</a>
+
+<style>
+  .btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 1rem 1.6rem;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    letter-spacing: -0.005em;
+    border-radius: 999px;
+    border: 1px solid transparent;
+    overflow: hidden;
+    isolation: isolate;
+    transition:
+      color var(--t2) var(--ease),
+      border-color var(--t2) var(--ease),
+      transform var(--t1) var(--ease);
+    will-change: transform;
+  }
+
+  .btn__label,
+  .btn__icon {
+    position: relative;
+    z-index: 1;
+  }
+
+  .btn__icon {
+    display: grid;
+    place-items: center;
+    transition: transform var(--t2) var(--ease);
+  }
+
+  .btn:hover .btn__icon {
+    transform: translateX(4px);
+  }
+
+  /* The fill wipes up from the bottom on hover — cheap, and reads
+     far more considered than a background-colour swap. */
+  .btn__fill {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    transform: translateY(101%);
+    transition: transform var(--t2) var(--ease-io);
+  }
+
+  .btn:hover .btn__fill {
+    transform: translateY(0);
+  }
+
+  /* ---------- solid ---------- */
+  .btn--solid {
+    background: var(--green);
+    color: #fff;
+  }
+  .btn--solid .btn__fill {
+    background: #14171a;
+  }
+
+  /* ---------- outline ---------- */
+  .btn--outline {
+    border-color: var(--line);
+    color: var(--fg);
+  }
+  .btn--outline .btn__fill {
+    background: var(--fg);
+  }
+  .btn--outline:hover {
+    color: var(--bg);
+    border-color: var(--fg);
+  }
+
+  /* ---------- ghost (on light) ---------- */
+  .btn--ghost {
+    border-color: var(--line);
+    color: var(--fg);
+  }
+  .btn--ghost .btn__fill {
+    background: var(--fg);
+  }
+  .btn--ghost:hover {
+    color: var(--bg);
+    border-color: var(--fg);
+  }
+
+  /* ---------- ghost-light (on imagery / dark) ---------- */
+  .btn--ghost-light {
+    border-color: rgb(255 255 255 / 0.32);
+    color: #fff;
+  }
+  .btn--ghost-light .btn__fill {
+    background: #fff;
+  }
+  .btn--ghost-light:hover {
+    color: #14171a;
+    border-color: #fff;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .btn,
+    .btn__icon,
+    .btn__fill {
+      transition: none;
+    }
+    .btn__fill {
+      display: none;
+    }
+  }
+</style>

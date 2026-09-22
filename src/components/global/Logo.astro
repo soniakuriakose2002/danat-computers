@@ -1,0 +1,53 @@
+---
+/**
+ * The official Danat mark.
+ *
+ * The supplied artwork is used AS-IS — never recoloured, redrawn or
+ * reproportioned. It carries a real alpha channel (77% transparent),
+ * so it sits correctly on both light and dark surfaces.
+ *
+ * NOTE: source artwork is 100x100. Swap in a higher-resolution file at
+ * the same path and nothing else needs to change.
+ */
+interface Props {
+  size?: number;
+  /** Show the "Danat" wordmark beside the mark. */
+  wordmark?: boolean;
+  class?: string;
+}
+
+const { size = 40, wordmark = false, class: klass = '' } = Astro.props;
+---
+
+<span class:list={['logo', klass]} style={`--logo-size:${size}px`}>
+  <img
+    src="/brand/danat-logo.webp"
+    alt="Danat"
+    width="100"
+    height="100"
+    decoding="async"
+    fetchpriority="high"
+  />
+  {wordmark && <span class="logo__word">Danat</span>}
+</span>
+
+<style>
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6em;
+  }
+
+  .logo img {
+    width: var(--logo-size);
+    height: var(--logo-size);
+    object-fit: contain;
+  }
+
+  .logo__word {
+    font-size: calc(var(--logo-size) * 0.42);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--fg);
+  }
+</style>

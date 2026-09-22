@@ -1,0 +1,330 @@
+---
+import Logo from './Logo.astro';
+import { site, branches, whatsappLink } from '@data/site';
+
+const year = new Date().getFullYear();
+
+const serviceLinks = [
+  ['Computer Repair', '/services/computer-repair'],
+  ['Printer Services', '/services/printer-services'],
+  ['CCTV & Security', '/services/cctv-services'],
+  ['Networking', '/services/networking'],
+  ['Data Recovery', '/services/data-recovery'],
+  ['Computer Sales', '/services/computer-sales'],
+];
+
+const companyLinks = [
+  ['About Danat', '/about'],
+  ['Our Branches', '/branches'],
+  ['Business Solutions', '/business'],
+  ['Contact', '/contact'],
+];
+---
+
+<footer class="ft" data-tone="ink">
+  <div class="ft__glow" aria-hidden="true"></div>
+
+  <!-- Call to action band -->
+  <div class="ft__cta shell">
+    <div>
+      <p class="label" data-rise>Get in touch</p>
+      <h2 class="d2 ft__h" data-rise style="--d:70ms">
+        Something broken?<br /><em>Bring it in.</em>
+      </h2>
+    </div>
+    <div class="ft__actions" data-rise style="--d:160ms">
+      <a class="ft__primary" href={whatsappLink()} target="_blank" rel="noopener noreferrer">
+        Message us on WhatsApp
+        <svg viewBox="0 0 16 16" width="15" height="15" fill="none" aria-hidden="true">
+          <path d="M3 8h9.5M8.5 4l4 4-4 4" stroke="currentColor" stroke-width="1.6"
+            stroke-linecap="round" stroke-linejoin="round"></path>
+        </svg>
+      </a>
+      <a class="ft__secondary" href={`tel:${site.phone.tel}`}>{site.phone.display}</a>
+    </div>
+  </div>
+
+  <div class="ft__rule shell"><span class="rule"></span></div>
+
+  <!-- Link grid -->
+  <div class="ft__grid shell">
+    <div class="ft__brand">
+      <Logo size={52} />
+      <p class="ft__about">
+        Danat Computers — trading as {site.legalName} — has repaired, supplied and
+        installed technology across Oman for over twenty years.
+      </p>
+      <div class="ft__social">
+        <a href={site.social.facebook} target="_blank" rel="noopener noreferrer">Facebook</a>
+        <a href={site.social.instagram} target="_blank" rel="noopener noreferrer">Instagram</a>
+      </div>
+    </div>
+
+    <nav class="ft__col" aria-label="Services">
+      <h3>Services</h3>
+      <ul>
+        {serviceLinks.map(([label, href]) => (
+          <li><a href={href}>{label}</a></li>
+        ))}
+      </ul>
+    </nav>
+
+    <nav class="ft__col" aria-label="Company">
+      <h3>Company</h3>
+      <ul>
+        {companyLinks.map(([label, href]) => (
+          <li><a href={href}>{label}</a></li>
+        ))}
+      </ul>
+    </nav>
+
+    <div class="ft__col">
+      <h3>Branches</h3>
+      <ul>
+        {branches.map((b) => (
+          <li>
+            <a href={`/branches#${b.slug}`}>
+              {b.name}
+              <span>{b.city}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    <div class="ft__col">
+      <h3>Head office</h3>
+      <address>
+        Computer Street, Ruwi<br />
+        PO Box 502, PC 118<br />
+        Sultanate of Oman
+      </address>
+      <a class="ft__mail" href={`mailto:${site.email}`}>{site.email}</a>
+    </div>
+  </div>
+
+  <div class="ft__base shell">
+    <p>&copy; {year} {site.legalName}. All rights reserved.</p>
+    <p>Ruwi &middot; Sohar &middot; Hail &middot; Salalah</p>
+  </div>
+</footer>
+
+<style>
+  .ft {
+    position: relative;
+    background: var(--ink);
+    color: var(--text-inv);
+    padding-top: clamp(4rem, 7vw, 6.5rem);
+    padding-bottom: calc(var(--s5) + env(safe-area-inset-bottom, 0px));
+    overflow: hidden;
+    isolation: isolate;
+  }
+
+  /* One soft green wash so the footer is not a flat black slab. */
+  .ft__glow {
+    position: absolute;
+    left: -10%;
+    bottom: -60%;
+    width: 70%;
+    aspect-ratio: 1;
+    z-index: -1;
+    background: radial-gradient(
+      circle,
+      color-mix(in oklab, var(--green) 26%, transparent) 0%,
+      transparent 62%
+    );
+    filter: blur(70px);
+    pointer-events: none;
+  }
+
+  /* ---------- CTA band ---------- */
+
+  .ft__cta {
+    display: grid;
+    gap: var(--s6);
+    padding-bottom: clamp(3rem, 5vw, 4.5rem);
+  }
+
+  .ft__h {
+    margin-top: var(--s4);
+  }
+
+  .ft__h em {
+    font-style: normal;
+    color: var(--green-bright);
+  }
+
+  .ft__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s4);
+  }
+
+  .ft__primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 1.05rem 1.7rem;
+    border-radius: 999px;
+    background: var(--green);
+    color: #fff;
+    font-weight: 500;
+    transition:
+      background-color var(--t2) var(--ease),
+      transform var(--t1) var(--ease);
+  }
+
+  .ft__primary:hover {
+    background: #fff;
+    color: var(--ink);
+  }
+
+  .ft__primary svg {
+    transition: transform var(--t2) var(--ease);
+  }
+
+  .ft__primary:hover svg {
+    transform: translateX(4px);
+  }
+
+  .ft__secondary {
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    letter-spacing: 0.04em;
+    color: var(--text-inv-2);
+    border-bottom: 1px solid rgb(255 255 255 / 0.25);
+    padding-bottom: 2px;
+    transition: color var(--t1) var(--ease), border-color var(--t1) var(--ease);
+  }
+
+  .ft__secondary:hover {
+    color: #fff;
+    border-color: #fff;
+  }
+
+  .ft__rule {
+    padding-block: 0;
+  }
+
+  .ft__rule .rule {
+    background: rgb(255 255 255 / 0.12);
+  }
+
+  /* ---------- link grid ---------- */
+
+  .ft__grid {
+    display: grid;
+    gap: var(--s7);
+    padding-block: clamp(3rem, 5vw, 4.5rem);
+  }
+
+  .ft__about {
+    max-width: 36ch;
+    margin-top: var(--s5);
+    font-size: var(--small);
+    line-height: 1.65;
+    color: var(--text-inv-2);
+  }
+
+  .ft__social {
+    display: flex;
+    gap: var(--s4);
+    margin-top: var(--s5);
+    font-size: var(--small);
+  }
+
+  .ft__social a {
+    color: var(--text-inv-2);
+    border-bottom: 1px solid transparent;
+    transition: color var(--t1) var(--ease), border-color var(--t1) var(--ease);
+  }
+
+  .ft__social a:hover {
+    color: var(--green-bright);
+    border-color: currentColor;
+  }
+
+  .ft__col h3 {
+    font-family: var(--font-mono);
+    font-size: var(--label);
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-inv-3);
+    margin-bottom: var(--s5);
+  }
+
+  .ft__col ul {
+    display: grid;
+    gap: 0.7rem;
+  }
+
+  .ft__col a,
+  .ft__col address {
+    font-size: var(--small);
+    font-style: normal;
+    line-height: 1.6;
+    color: var(--text-inv-2);
+    transition: color var(--t1) var(--ease);
+  }
+
+  .ft__col a {
+    display: inline-flex;
+    flex-direction: column;
+  }
+
+  .ft__col a span {
+    font-size: 0.75rem;
+    color: var(--text-inv-3);
+  }
+
+  .ft__col a:hover {
+    color: var(--green-bright);
+  }
+
+  .ft__mail {
+    display: inline-block;
+    margin-top: var(--s4);
+    font-size: var(--small);
+    color: var(--text-inv-2);
+    border-bottom: 1px solid rgb(255 255 255 / 0.2);
+    transition: color var(--t1) var(--ease), border-color var(--t1) var(--ease);
+  }
+
+  .ft__mail:hover {
+    color: #fff;
+    border-color: #fff;
+  }
+
+  /* ---------- base ---------- */
+
+  .ft__base {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--s3);
+    padding-top: var(--s5);
+    border-top: 1px solid rgb(255 255 255 / 0.1);
+    font-size: 0.8125rem;
+    color: var(--text-inv-3);
+  }
+
+  @media (min-width: 48rem) {
+    .ft__cta {
+      grid-template-columns: 1fr auto;
+      align-items: end;
+    }
+    .ft__grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: var(--s7) var(--s6);
+    }
+  }
+
+  @media (min-width: 72rem) {
+    .ft__grid {
+      grid-template-columns: 1.6fr repeat(4, 1fr);
+      gap: var(--s6);
+    }
+  }
+</style>
