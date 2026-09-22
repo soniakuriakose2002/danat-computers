@@ -1,25 +1,40 @@
 ---
+import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
 import PageLayout from '@layouts/PageLayout.astro';
 import Icon from '@components/ui/Icon.astro';
 import { site, whatsappLink, branches } from '@data/site';
+import { OMAN_PATH, OMAN_VIEWBOX, OMAN_PINS } from '@data/omanMap';
+import imgHero from '@assets/photos/support-agent.jpg';
 
 /**
- * The site is a static build with no server, so there is nothing to POST
- * a form to. Rather than fake a backend or drop a third-party embed, the
- * form composes the enquiry into a WhatsApp message — the channel this
- * business already runs on — with a mailto fallback. Everything it needs
- * is in the URL, so it works without any hosting change.
+ * Built on the pattern every good contact page uses: a photograph that
+ * says who picks up, the channels laid out as large rows rather than a
+ * paragraph, and the form last — because most people will phone or
+ * message instead of typing.
+ *
+ * The site is a static build with no server, so the form composes the
+ * enquiry into a WhatsApp message rather than pretending to POST.
  */
 
 const services = (await getCollection('services')).sort(
   (a, b) => a.data.index - b.data.index
 );
 
-const order = ['ruwi', 'sohar', 'hail', 'salalah'];
+const order = ['sohar', 'hail', 'ruwi', 'salalah'];
 const list = order.map((s) => branches.find((b) => b.slug === s)!);
+const ruwi = branches.find((b) => b.slug === 'ruwi')!;
+const unconfirmed = list.filter((b) => !b.verified).length;
 
-const channels = [
+const rows = [
+  {
+    icon: 'phone',
+    label: 'Call the counter',
+    value: site.phone.display,
+    href: `tel:${site.phone.tel}`,
+    note: 'Ruwi. They will route you to the right branch.',
+    external: false,
+  },
   {
     icon: 'whatsapp',
     label: 'WhatsApp',
@@ -29,141 +44,217 @@ const channels = [
     external: true,
   },
   {
-    icon: 'phone',
-    label: 'Call',
-    value: site.phone.display,
-    href: `tel:${site.phone.tel}`,
-    note: 'Ruwi counter. They will route you.',
-    external: false,
-  },
-  {
     icon: 'mail',
     label: 'Email',
     value: site.email,
     href: `mailto:${site.email}`,
-    note: 'For quotes, POs and trade accounts.',
+    note: 'Quotes, purchase orders and trade accounts.',
     external: false,
   },
 ] as const;
+
+const W = 1000;
+const H = 1342;
 ---
 
 <PageLayout
   title="Contact"
-  description={`Talk to Danat Computers — WhatsApp ${site.phone.display}, email ${site.email}, or visit one of four branches across Oman.`}
+  description={`Talk to Danat Computers — WhatsApp or call ${site.phone.display}, email ${site.email}, or walk into one of four branches across Oman.`}
 >
-  {/* ─────────────────────── 01 · head ─────────────────────── */}
-  <section class="ch">
-    <div class="ch__aura" aria-hidden="true">
-      <span class="ch__b1"></span>
-      <span class="ch__b2"></span>
+  {/* ─────────────────────── 01 · hero ─────────────────────── */}
+  <section class="hero">
+    <div class="hero__bg" aria-hidden="true">
+      <Image
+        src={imgHero}
+        alt=""
+        widths={[900, 1400, 2000]}
+        sizes="100vw"
+        quality={74}
+        format="webp"
+        loading="eager"
+        fetchpriority="high"
+      />
+      {/* Measured against the real crop: the windows blow out to 252/255,
+          so white text needs this much scrim. Worst case is 5.15:1. */}
+      <span class="hero__scrim"></span>
     </div>
 
-    <div class="shell">
-      <nav class="ch__crumb" aria-label="Breadcrumb" data-rise>
+    <div class="shell hero__in">
+      <nav class="hero__crumb" aria-label="Breadcrumb">
         <a href="/">Home</a>
         <span aria-hidden="true">/</span>
         <span aria-current="page">Contact</span>
       </nav>
 
-      <div class="ch__grid">
-        <div>
-          <p class="eyebrow" data-rise>
-            <i class="eyebrow__dot" aria-hidden="true"></i>
-            Get in touch
+      <p class="hero__eb">
+        <i class="hero__dot" aria-hidden="true"></i>
+        We pick up
+      </p>
+
+      <h1 class="hero__h">Contact us</h1>
+
+      <p class="hero__p">
+        Diagnosis is free and we quote before we touch anything. Message us a
+        photo of the fault and we usually know what we are looking at before
+        you arrive.
+      </p>
+
+      <div class="hero__acts">
+        <a class="btn-green" href="#enquiry">
+          Send an enquiry
+          <span class="btn-green__i" aria-hidden="true">
+            <Icon name="arrow" size={15} />
+          </span>
+        </a>
+        <a class="hero__call" href={`tel:${site.phone.tel}`}>
+          {site.phone.display}
+        </a>
+      </div>
+    </div>
+  </section>
+
+  {/* ─────────────────────── 02 · map + channels ─────────────────────── */}
+  <section class="reach section" data-tone="light">
+    <div class="shell reach__grid">
+      {/* Left: where we are. A real Google embed needs map links the
+          company has not supplied yet, so this is our own geography. */}
+      <div class="mapcard">
+        <div class="mapcard__top">
+          <p class="eyebrow">
             <i class="eyebrow__rule" aria-hidden="true"></i>
+            Where we are
           </p>
-
-          <h1 class="ch__h" data-rise style="--d:70ms">
-            Tell us what<br /><em>stopped working.</em>
-          </h1>
-
-          <p class="ch__p" data-rise style="--d:130ms">
-            Diagnosis is free and we quote before we touch anything. Send a
-            photo of the fault and we will usually know what we are looking
-            at before you arrive.
-          </p>
+          <p class="mapcard__n"><b>4</b> branches across Oman</p>
         </div>
 
-        {/* ── direct channels ── */}
-        <ul class="ch__ch">
-          {channels.map((c, i) => (
-            <li data-rise style={`--d:${190 + i * 70}ms`}>
+        <div class="mapcard__fig" data-rise>
+          <svg viewBox={OMAN_VIEWBOX} width="272" height="365" role="img"
+            aria-label="Map of Oman showing Danat branches in Sohar, Al Hail, Ruwi and Salalah">
+            <defs>
+              <linearGradient id="cFill" x1="0" y1="0" x2="0.4" y2="1">
+                <stop class="cs0" offset="0%" stop-color="#59aa54" stop-opacity="0.10" />
+                <stop class="cs1" offset="100%" stop-color="#59aa54" stop-opacity="0.26" />
+              </linearGradient>
+            </defs>
+            <path class="cland" d={OMAN_PATH} fill="url(#cFill)" />
+            <path class="cedge" d={OMAN_PATH} pathLength="1" fill="none"
+              stroke="#a6d4a2" stroke-width="3" />
+            {list.map((b, i) => (
+              <g class="cpin" style={`--i:${i}`}
+                transform={`translate(${OMAN_PINS[b.slug].x} ${OMAN_PINS[b.slug].y})`}>
+                <circle class="chalo" r="44" fill="#59aa54" opacity="0"></circle>
+                <circle class="cring" r="19" fill="#ffffff"></circle>
+                <circle class="cdot" r="11" fill="#2f6429"></circle>
+              </g>
+            ))}
+          </svg>
+
+          {list.map((b, i) => (
+            <a class="cchip" href={`/branches#${b.slug}`}
+              data-side={b.slug === 'sohar' ? 'left' : 'right'}
+              style={`--i:${i}; --x:${((OMAN_PINS[b.slug].x / W) * 100).toFixed(2)}%; --y:${((OMAN_PINS[b.slug].y / H) * 100).toFixed(2)}%; --dy:${b.slug === 'hail' ? '-3.4%' : b.slug === 'ruwi' ? '2.8%' : '0%'}`}>
+              {b.city.split(',')[0]}
+            </a>
+          ))}
+        </div>
+
+        <a class="mapcard__all" href="/branches">
+          Addresses and opening hours
+          <Icon name="arrow" size={15} />
+        </a>
+      </div>
+
+      {/* Right: the channels, as large rows. */}
+      <div class="rail" data-tone="ink">
+        <p class="rail__eb">Reach us</p>
+        <h2 class="rail__h">However suits you.</h2>
+
+        <ul class="rail__list">
+          {rows.map((r, i) => (
+            <li data-rise style={`--d:${i * 80}ms`}>
               <a
-                class="chan"
-                href={c.href}
-                target={c.external ? '_blank' : undefined}
-                rel={c.external ? 'noopener noreferrer' : undefined}
+                class="row"
+                href={r.href}
+                target={r.external ? '_blank' : undefined}
+                rel={r.external ? 'noopener noreferrer' : undefined}
               >
-                <span class="chan__i" aria-hidden="true">
-                  <Icon name={c.icon} size={19} />
+                <span class="row__i" aria-hidden="true">
+                  <Icon name={r.icon} size={22} />
                 </span>
-                <span class="chan__t">
-                  <b>{c.label}</b>
-                  <em>{c.value}</em>
-                  <i>{c.note}</i>
+                <span class="row__t">
+                  <b>{r.label}</b>
+                  <em>{r.value}</em>
+                  <i>{r.note}</i>
                 </span>
-                <span class="chan__go" aria-hidden="true">
+                <span class="row__go" aria-hidden="true">
                   <Icon name="arrow" size={15} />
                 </span>
               </a>
             </li>
           ))}
+
+          {/* The one address that is actually confirmed. */}
+          <li data-rise style="--d:240ms">
+            <div class="row row--static">
+              <span class="row__i" aria-hidden="true">
+                <Icon name="pin" size={22} />
+              </span>
+              <span class="row__t">
+                <b>Walk in</b>
+                <address>{ruwi.address.split('\n').map((l) => <>{l}<br /></>)}</address>
+                {unconfirmed > 0 && (
+                  <i>{unconfirmed} further branch addresses are being confirmed.</i>
+                )}
+              </span>
+            </div>
+          </li>
         </ul>
       </div>
     </div>
   </section>
 
-  {/* ─────────────────────── 02 · compose ─────────────────────── */}
-  <section class="cf section" data-tone="light">
-    <div class="shell cf__grid">
-      <div class="cf__intro" data-rise>
-        <p class="eyebrow">
+  {/* ─────────────────────── 03 · form ─────────────────────── */}
+  <section class="get section" data-tone="off">
+    <div class="shell">
+      <div class="get__head" data-rise>
+        <p class="eyebrow eyebrow--mid eyebrow--clay">
           <i class="eyebrow__rule" aria-hidden="true"></i>
           Send an enquiry
+          <i class="eyebrow__rule" aria-hidden="true"></i>
         </p>
-        <h2 class="cf__h">Write it once.<br /><em>We will pick it up.</em></h2>
-        <p class="cf__p">
-          Fill this in and it opens WhatsApp with your message ready to send —
-          nothing is stored on this site and nothing is sent until you press
-          send yourself.
+        <h2 class="get__h">Get in <em>touch</em></h2>
+        <p class="get__p">
+          Fill this in and it opens WhatsApp with your message ready. Nothing
+          is stored on this site and nothing sends until you press send.
         </p>
-
-        <dl class="cf__facts">
-          <div>
-            <dt>Trading since</dt>
-            <dd>{site.stats.since}</dd>
-          </div>
-          <div>
-            <dt>Registered as</dt>
-            <dd>{site.legalName}</dd>
-          </div>
-        </dl>
       </div>
 
-      <form class="cf__form" id="enquiry" data-rise style="--d:90ms">
-        <div class="f">
-          <label for="f-name">Your name</label>
-          <input id="f-name" name="name" type="text" autocomplete="name"
-            placeholder="So we know who we are talking to" required />
+      <form class="get__form" id="enquiry" data-rise style="--d:90ms">
+        <div class="f__row">
+          <div class="f">
+            <label for="f-name">Your name</label>
+            <input id="f-name" name="name" type="text" autocomplete="name"
+              placeholder="So we know who we are talking to" required />
+          </div>
+          <div class="f">
+            <label for="f-phone">Phone <span>optional</span></label>
+            <input id="f-phone" name="phone" type="tel" autocomplete="tel"
+              placeholder="If you would rather we called you" />
+          </div>
         </div>
 
         <div class="f__row">
           <div class="f">
             <label for="f-branch">Nearest branch</label>
             <select id="f-branch" name="branch">
-              {list.map((b) => (
-                <option value={b.name}>{b.city}</option>
-              ))}
+              {list.map((b) => <option value={b.name}>{b.city}</option>)}
               <option value="Not sure">Not sure</option>
             </select>
           </div>
-
           <div class="f">
             <label for="f-topic">What do you need?</label>
             <select id="f-topic" name="topic">
-              {services.map((s) => (
-                <option value={s.data.title}>{s.data.title}</option>
-              ))}
+              {services.map((s) => <option value={s.data.title}>{s.data.title}</option>)}
               <option value="Something else">Something else</option>
             </select>
           </div>
@@ -171,73 +262,36 @@ const channels = [
 
         <div class="f">
           <label for="f-msg">What is happening?</label>
-          <textarea id="f-msg" name="message" rows="4" required
+          <textarea id="f-msg" name="message" rows="5" required
             placeholder="It will not power on. No lights, no fan. It was fine yesterday."></textarea>
         </div>
 
-        <div class="cf__acts">
+        <div class="get__acts">
           <button class="btn-green" type="submit">
             Open in WhatsApp
             <span class="btn-green__i" aria-hidden="true">
               <Icon name="whatsapp" size={15} />
             </span>
           </button>
-          <button class="cf__alt" type="button" id="by-email">
+          <button class="get__alt" type="button" id="by-email">
             Send by email instead
           </button>
         </div>
 
-        <p class="cf__note">
+        <p class="get__note">
           Opens your own WhatsApp or mail app. Danat replies from
           {' '}{site.phone.display}.
         </p>
 
         <noscript>
-          <p class="cf__nojs">
+          <p class="get__nojs">
             This form needs JavaScript to compose your message. You can reach
-            us directly on <a href={whatsappLink()}>WhatsApp</a>, by phone on
+            us on <a href={whatsappLink()}>WhatsApp</a>, by phone on
             {' '}<a href={`tel:${site.phone.tel}`}>{site.phone.display}</a>, or
             by email at <a href={`mailto:${site.email}`}>{site.email}</a>.
           </p>
         </noscript>
       </form>
-    </div>
-  </section>
-
-  {/* ─────────────────────── 03 · branches ─────────────────────── */}
-  <section class="cb section" data-tone="off">
-    <div class="shell">
-      <div class="cb__head" data-rise>
-        <div>
-          <p class="eyebrow">
-            <i class="eyebrow__rule" aria-hidden="true"></i>
-            Or walk in
-          </p>
-          <h2 class="cb__h">Four counters across Oman</h2>
-        </div>
-        <a class="cb__all" href="/branches">
-          All branch details
-          <Icon name="arrow" size={15} />
-        </a>
-      </div>
-
-      <ul class="cb__grid">
-        {list.map((b, i) => (
-          <li data-rise style={`--d:${i * 70}ms`}>
-            <a class="bcard" href={`/branches#${b.slug}`}>
-              <span class="bcard__i" aria-hidden="true">
-                <Icon name="building" size={18} />
-              </span>
-              <b class="bcard__n">{b.name}</b>
-              <span class="bcard__c">{b.city}</span>
-              {!b.verified && <span class="bcard__todo">Address to confirm</span>}
-              <span class="bcard__go" aria-hidden="true">
-                <Icon name="arrow" size={14} />
-              </span>
-            </a>
-          </li>
-        ))}
-      </ul>
     </div>
   </section>
 
@@ -251,17 +305,12 @@ const channels = [
           Trading as {site.nameFull} since {site.stats.since}.
         </p>
       </div>
-
       <ul class="cl__soc" data-rise style="--d:170ms">
         <li>
-          <a href={site.social.facebook} target="_blank" rel="noopener noreferrer">
-            Facebook
-          </a>
+          <a href={site.social.facebook} target="_blank" rel="noopener noreferrer">Facebook</a>
         </li>
         <li>
-          <a href={site.social.instagram} target="_blank" rel="noopener noreferrer">
-            Instagram
-          </a>
+          <a href={site.social.instagram} target="_blank" rel="noopener noreferrer">Instagram</a>
         </li>
       </ul>
     </div>
@@ -269,41 +318,41 @@ const channels = [
 </PageLayout>
 
 <script is:inline define:vars={{ WA: site.phone.whatsapp, MAIL: site.email }}>
-  // Compose the enquiry into a message and hand it to WhatsApp or mail.
-  // Nothing leaves the page until the user sends it themselves.
+  // Compose the enquiry and hand it to WhatsApp or mail. Nothing leaves
+  // the page until the person sends it themselves.
   (() => {
     const form = document.getElementById('enquiry');
     if (!form) return;
 
     const compose = () => {
       const d = new FormData(form);
-      const name = String(d.get('name') || '').trim();
-      const branch = String(d.get('branch') || '');
-      const topic = String(d.get('topic') || '');
-      const msg = String(d.get('message') || '').trim();
+      const phone = String(d.get('phone') || '').trim();
       return [
-        `Hello Danat — this is ${name}.`,
+        `Hello Danat — this is ${String(d.get('name') || '').trim()}.`,
         ``,
-        `Branch: ${branch}`,
-        `Service: ${topic}`,
+        `Branch: ${d.get('branch')}`,
+        `Service: ${d.get('topic')}`,
+        ...(phone ? [`Phone: ${phone}`] : []),
         ``,
-        msg,
+        String(d.get('message') || '').trim(),
       ].join('\n');
     };
 
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       if (!form.reportValidity()) return;
-      const url = `https://wa.me/${WA}?text=${encodeURIComponent(compose())}`;
-      window.open(url, '_blank', 'noopener');
+      window.open(
+        `https://wa.me/${WA}?text=${encodeURIComponent(compose())}`,
+        '_blank',
+        'noopener'
+      );
     });
 
     document.getElementById('by-email')?.addEventListener('click', () => {
       if (!form.reportValidity()) return;
       const d = new FormData(form);
-      const subject = `${d.get('topic')} — ${d.get('branch')}`;
       window.location.href =
-        `mailto:${MAIL}?subject=${encodeURIComponent(subject)}` +
+        `mailto:${MAIL}?subject=${encodeURIComponent(`${d.get('topic')} — ${d.get('branch')}`)}` +
         `&body=${encodeURIComponent(compose())}`;
     });
   })();
@@ -311,286 +360,112 @@ const channels = [
 
 <style>
   /* ============================================================
-     01 · HEAD
+     01 · HERO
      ============================================================ */
 
-  .ch {
+  .hero {
     position: relative;
-    background: var(--white);
-    padding-block: clamp(6.5rem, 11vw, 9rem) clamp(2.5rem, 5vw, 4rem);
+    display: grid;
+    align-items: end;
+    min-height: clamp(30rem, 68vh, 44rem);
+    padding-block: clamp(8rem, 14vw, 11rem) clamp(3rem, 7vw, 5.5rem);
+    background: var(--ink);
+    color: #fff;
     overflow: hidden;
     isolation: isolate;
   }
 
-  .ch__aura {
+  .hero__bg { position: absolute; inset: 0; z-index: 0; }
+  .hero__bg :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 62% 38%;
+  }
+
+  /* Heaviest on the left, under the type; the right keeps the photograph. */
+  .hero__scrim {
     position: absolute;
     inset: 0;
-    z-index: -1;
-    pointer-events: none;
+    background:
+      linear-gradient(100deg,
+        rgb(8 10 12 / 0.88) 0%,
+        rgb(8 10 12 / 0.72) 38%,
+        rgb(8 10 12 / 0.30) 72%,
+        rgb(8 10 12 / 0.12) 100%),
+      linear-gradient(to top, rgb(8 10 12 / 0.55), transparent 45%);
   }
-  .ch__aura span {
-    position: absolute;
-    border-radius: 50%;
-    background: radial-gradient(
-      circle,
-      color-mix(in oklab, var(--green) 28%, transparent) 0%,
-      transparent 68%
-    );
-    filter: blur(30px);
-  }
-  .ch__b1 { top: -30%; left: -12%; width: 46%; aspect-ratio: 1; opacity: 0.45; }
-  .ch__b2 { top: 6%; right: -20%; width: 50%; aspect-ratio: 1; opacity: 0.34; }
 
-  @media (prefers-reduced-motion: no-preference) {
-    .ch__b1 { animation: ch-drift 28s var(--ease) infinite alternate; }
-    .ch__b2 { animation: ch-drift 34s var(--ease) infinite alternate-reverse; }
-  }
-  @keyframes ch-drift { to { transform: translate3d(5%, 6%, 0) scale(1.12); } }
+  .hero__in { position: relative; z-index: 1; }
 
-  .ch__crumb {
+  .hero__crumb {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 0.45rem;
     font-size: 0.8125rem;
-    color: var(--text-3);
+    color: rgb(255 255 255 / 0.68);
   }
-  .ch__crumb a { transition: color var(--t2) var(--ease); }
-  .ch__crumb a:hover { color: var(--green-deep); }
-  .ch__crumb [aria-current] { color: var(--text); }
+  .hero__crumb a { transition: color var(--t2) var(--ease); }
+  .hero__crumb a:hover { color: #fff; }
+  .hero__crumb [aria-current] { color: #fff; }
 
-  .ch__grid {
-    display: grid;
-    gap: clamp(2.5rem, 5vw, 4rem);
-    align-items: center;
-    margin-top: var(--s5);
-  }
-
-  .ch__h {
-    margin-top: var(--s4);
-    font-size: clamp(2.2rem, 5vw, 3.9rem);
-    line-height: 1.02;
-    letter-spacing: -0.042em;
-    font-weight: 700;
-  }
-  .ch__h em { font-style: normal; color: var(--green-deep); }
-
-  .ch__p {
-    margin-top: var(--s4);
-    max-width: 44ch;
-    font-size: var(--lead);
-    line-height: 1.62;
-    color: var(--text-2);
-  }
-
-  /* ---------- eyebrow (shared) ---------- */
-
-  .eyebrow {
+  .hero__eb {
     display: flex;
     align-items: center;
     gap: 0.6rem;
+    margin-top: var(--s5);
     font-family: var(--font-mono);
     font-size: 0.6875rem;
     letter-spacing: 0.18em;
     text-transform: uppercase;
-    color: var(--green-deep);
+    color: var(--green-bright);
   }
-  .eyebrow__dot {
+  .hero__dot {
     width: 9px;
     height: 9px;
     flex: none;
     border-radius: 50%;
-    background: var(--green);
-    box-shadow: 0 0 0 4px color-mix(in oklab, var(--green) 20%, transparent);
-  }
-  .eyebrow__rule {
-    width: 26px;
-    height: 1px;
-    flex: none;
-    background: color-mix(in oklab, var(--green) 55%, transparent);
+    background: var(--green-bright);
+    box-shadow: 0 0 0 4px rgb(111 201 106 / 0.22);
   }
 
-  /* ---------- channel cards ---------- */
-
-  .ch__ch { display: grid; gap: 0.75rem; }
-
-  .chan {
-    display: flex;
-    align-items: center;
-    gap: 0.9rem;
-    padding: 1rem 1.15rem;
-    border: 1px solid var(--line-light);
-    border-radius: 14px;
-    background: rgb(255 255 255 / 0.8);
-    backdrop-filter: blur(8px);
-    box-shadow: 0 12px 26px -24px rgb(0 0 0 / 0.5);
-    transition:
-      transform var(--t2) var(--ease),
-      border-color var(--t2) var(--ease),
-      box-shadow var(--t2) var(--ease);
-  }
-  .chan:hover {
-    transform: translateY(-3px);
-    border-color: color-mix(in oklab, var(--green) 34%, var(--line-light));
-    box-shadow: 0 18px 30px -22px rgb(0 0 0 / 0.45);
-  }
-
-  .chan__i {
-    display: grid;
-    place-items: center;
-    width: 40px;
-    height: 40px;
-    flex: none;
-    border-radius: 12px;
-    color: var(--green-deep);
-    background: color-mix(in oklab, var(--green) 14%, #fff);
-  }
-
-  .chan__t { display: grid; min-width: 0; }
-  .chan__t b {
-    font-family: var(--font-mono);
-    font-size: 0.5625rem;
-    font-weight: 500;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--text-3);
-  }
-  .chan__t em {
-    margin-top: 0.15rem;
-    font-style: normal;
-    font-size: 0.9375rem;
-    font-weight: 600;
-    letter-spacing: -0.012em;
-    overflow-wrap: anywhere;
-  }
-  .chan__t i {
-    margin-top: 0.15rem;
-    font-style: normal;
-    font-size: 0.75rem;
-    color: var(--text-3);
-  }
-
-  .chan__go {
-    display: grid;
-    place-items: center;
-    width: 32px;
-    height: 32px;
-    flex: none;
-    margin-left: auto;
-    border-radius: 50%;
-    color: var(--green-deep);
-    background: color-mix(in oklab, var(--green) 10%, #fff);
-    transition: transform var(--t2) var(--ease), background-color var(--t2) var(--ease);
-  }
-  .chan:hover .chan__go {
-    transform: translateX(3px);
-    background: color-mix(in oklab, var(--green) 22%, #fff);
-  }
-
-  /* ============================================================
-     02 · FORM
-     ============================================================ */
-
-  .cf { background: var(--white); }
-
-  .cf__grid { display: grid; gap: clamp(2rem, 4vw, 3.5rem); }
-
-  .cf__h {
+  .hero__h {
     margin-top: var(--s4);
-    font-size: clamp(1.7rem, 3.2vw, 2.5rem);
+    font-size: clamp(2.6rem, 8vw, 6rem);
+    line-height: 0.96;
+    letter-spacing: -0.045em;
     font-weight: 700;
-    letter-spacing: -0.038em;
-    line-height: 1.08;
   }
-  .cf__h em { font-style: normal; color: var(--green-deep); }
 
-  .cf__p {
+  .hero__p {
     margin-top: var(--s4);
-    max-width: 40ch;
-    font-size: 0.9375rem;
+    max-width: 46ch;
+    font-size: var(--lead);
     line-height: 1.6;
-    color: var(--text-2);
+    color: rgb(255 255 255 / 0.86);
   }
 
-  .cf__facts {
-    display: grid;
-    gap: var(--s4);
-    margin-top: var(--s5);
-    padding-top: var(--s5);
-    border-top: 1px solid var(--line-light);
-  }
-  .cf__facts dt {
-    font-family: var(--font-mono);
-    font-size: 0.5625rem;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--text-3);
-  }
-  .cf__facts dd {
-    margin-top: 0.25rem;
-    font-size: 0.9375rem;
-    font-weight: 600;
-    letter-spacing: -0.012em;
-  }
-
-  /* ---------- fields ---------- */
-
-  .cf__form {
-    display: grid;
-    gap: var(--s4);
-    padding: clamp(1.4rem, 3vw, 2rem);
-    border: 1px solid var(--line-light);
-    border-radius: 18px;
-    background: var(--off);
-  }
-
-  .f__row { display: grid; gap: var(--s4); }
-
-  .f { display: grid; gap: 0.45rem; }
-
-  .f label {
-    font-family: var(--font-mono);
-    font-size: 0.5625rem;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--text-3);
-  }
-
-  .f input,
-  .f select,
-  .f textarea {
-    width: 100%;
-    padding: 0.8rem 0.9rem;
-    border: 1px solid var(--line-light);
-    border-radius: 10px;
-    background: var(--white);
-    color: var(--text);
-    font: inherit;
-    font-size: 0.9375rem;
-    transition: border-color var(--t2) var(--ease), box-shadow var(--t2) var(--ease);
-  }
-  .f textarea { resize: vertical; min-height: 6rem; line-height: 1.55; }
-
-  .f input::placeholder,
-  .f textarea::placeholder { color: var(--text-3); }
-
-  .f input:focus-visible,
-  .f select:focus-visible,
-  .f textarea:focus-visible {
-    outline: none;
-    border-color: var(--green-deep);
-    box-shadow: 0 0 0 3px color-mix(in oklab, var(--green) 26%, transparent);
-  }
-
-  /* ---------- actions ---------- */
-
-  .cf__acts {
+  .hero__acts {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: var(--s4);
-    margin-top: var(--s3);
+    gap: var(--s4) var(--s5);
+    margin-top: var(--s5);
   }
+
+  .hero__call {
+    font-family: var(--font-mono);
+    font-size: 0.9375rem;
+    letter-spacing: 0.04em;
+    color: #fff;
+    border-bottom: 1px solid rgb(255 255 255 / 0.45);
+    padding-bottom: 2px;
+    transition: border-color var(--t2) var(--ease);
+  }
+  .hero__call:hover { border-color: #fff; }
+
+  /* ---------- shared green pill ---------- */
 
   .btn-green {
     position: relative;
@@ -609,8 +484,8 @@ const channels = [
     font-weight: 600;
     cursor: pointer;
     overflow: hidden;
-    box-shadow: 0 14px 28px -16px color-mix(in oklab, var(--green) 70%, #000);
-    transition: transform var(--t2) var(--ease), box-shadow var(--t2) var(--ease);
+    box-shadow: 0 14px 28px -16px rgb(0 0 0 / 0.6);
+    transition: transform var(--t2) var(--ease);
   }
   .btn-green:hover { transform: translateY(-2px); }
   .btn-green::after {
@@ -637,7 +512,360 @@ const channels = [
   }
   .btn-green:hover .btn-green__i { transform: translateX(3px); }
 
-  .cf__alt {
+  /* ---------- shared eyebrow ---------- */
+
+  .eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--green-deep);
+  }
+  .eyebrow__rule {
+    width: 26px;
+    height: 1px;
+    flex: none;
+    background: color-mix(in oklab, var(--green) 55%, transparent);
+  }
+  .eyebrow--mid { justify-content: center; }
+  .eyebrow--clay { color: var(--clay-deep); }
+  .eyebrow--clay .eyebrow__rule {
+    background: color-mix(in oklab, var(--clay) 55%, transparent);
+  }
+
+  /* ============================================================
+     02 · MAP + CHANNELS
+     ============================================================ */
+
+  .reach { background: var(--white); }
+
+  .reach__grid { display: grid; gap: clamp(1rem, 2.2vw, 1.5rem); }
+
+  /* ---------- map card ---------- */
+
+  .mapcard {
+    display: flex;
+    flex-direction: column;
+    padding: clamp(1.4rem, 3vw, 2rem);
+    border: 1px solid var(--line-light);
+    border-radius: 18px;
+    background: var(--off);
+  }
+
+  .mapcard__top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--s4);
+  }
+  .mapcard__n { font-size: 0.875rem; color: var(--text-2); }
+  .mapcard__n b {
+    font-weight: 700;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .mapcard__fig {
+    position: relative;
+    width: 100%;
+    max-width: 17rem;
+    margin: clamp(1.25rem, 3vw, 2rem) auto;
+  }
+  .mapcard__fig svg { display: block; width: 100%; height: auto; overflow: visible; }
+
+  .cs0 { stop-color: var(--green); stop-opacity: 0.10; }
+  .cs1 { stop-color: var(--green); stop-opacity: 0.26; }
+
+  .cland {
+    fill: url(#cFill);
+    opacity: 0;
+    transition: opacity 900ms var(--ease) 780ms;
+  }
+  .mapcard__fig[data-in] .cland { opacity: 1; }
+
+  .cedge {
+    fill: none;
+    stroke: color-mix(in oklab, var(--green) 48%, #fff);
+    stroke-width: 3;
+    stroke-linejoin: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset 1400ms var(--ease) 100ms;
+  }
+  .mapcard__fig[data-in] .cedge { stroke-dashoffset: 0; }
+
+  .cpin {
+    --pd: calc(1420ms + var(--i) * 140ms);
+    opacity: 0;
+    scale: 0.2;
+    transform-box: fill-box;
+    transform-origin: center;
+    transition:
+      opacity 380ms var(--ease) var(--pd),
+      scale 580ms cubic-bezier(0.3, 1.5, 0.5, 1) var(--pd);
+  }
+  .mapcard__fig[data-in] .cpin { opacity: 1; scale: 1; }
+
+  .cdot { fill: var(--green-deep); }
+  .cring { fill: #fff; }
+  .chalo {
+    fill: var(--green);
+    opacity: 0;
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  .mapcard__fig[data-in] .chalo {
+    animation: cping 3s var(--ease) calc(var(--pd) + 400ms) infinite;
+  }
+  @keyframes cping {
+    0% { opacity: 0.3; transform: scale(0.35); }
+    70%, 100% { opacity: 0; transform: scale(1); }
+  }
+
+  .cchip {
+    position: absolute;
+    top: calc(var(--y) + var(--dy, 0%));
+    left: var(--x);
+    padding: 0.26rem 0.6rem;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.94);
+    box-shadow: 0 6px 16px -10px rgb(0 0 0 / 0.55);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    white-space: nowrap;
+    color: var(--text);
+    opacity: 0;
+    transition:
+      opacity 360ms var(--ease) calc(1620ms + var(--i) * 140ms),
+      color var(--t2) var(--ease),
+      background-color var(--t2) var(--ease);
+  }
+  .cchip[data-side='right'] { translate: 1.2rem -50%; }
+  .cchip[data-side='left'] { translate: calc(-100% - 1.2rem) -50%; }
+  .mapcard__fig[data-in] .cchip { opacity: 1; }
+  .cchip:hover { background: var(--green-deep); color: #fff; }
+
+  .mapcard__all {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: auto;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--green-deep);
+    border-bottom: 1px solid transparent;
+    align-self: flex-start;
+    transition: border-color var(--t2) var(--ease);
+  }
+  .mapcard__all:hover { border-color: var(--green); }
+
+  /* ---------- dark channel rail ---------- */
+
+  .rail {
+    padding: clamp(1.5rem, 3.2vw, 2.25rem);
+    border-radius: 18px;
+    background: var(--ink);
+    color: #fff;
+  }
+
+  .rail__eb {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--green-bright);
+  }
+  .rail__h {
+    margin-top: var(--s4);
+    font-size: clamp(1.4rem, 2.6vw, 2rem);
+    font-weight: 700;
+    letter-spacing: -0.035em;
+  }
+
+  .rail__list {
+    display: grid;
+    gap: 0.4rem;
+    margin-top: var(--s5);
+  }
+
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.9rem;
+    border-radius: 14px;
+    transition: background-color var(--t2) var(--ease);
+  }
+  a.row:hover { background: rgb(255 255 255 / 0.07); }
+  .row--static { align-items: flex-start; }
+  /* The address is information, not a channel. Clay marks it as the one
+     row that does not go anywhere. */
+  .row--static .row__i {
+    color: var(--clay-bright);
+    border-color: rgb(224 139 84 / 0.4);
+  }
+
+  /* Outlined circle, the device these pages use to give a plain phone
+     number the weight of a button. */
+  .row__i {
+    display: grid;
+    place-items: center;
+    width: 54px;
+    height: 54px;
+    flex: none;
+    border-radius: 50%;
+    border: 1px solid rgb(255 255 255 / 0.3);
+    color: var(--green-bright);
+    transition: border-color var(--t2) var(--ease), background-color var(--t2) var(--ease);
+  }
+  a.row:hover .row__i {
+    border-color: var(--green-bright);
+    background: rgb(111 201 106 / 0.12);
+  }
+
+  .row__t { display: grid; min-width: 0; }
+  .row__t b {
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgb(255 255 255 / 0.62);
+  }
+  .row__t em,
+  .row__t address {
+    margin-top: 0.2rem;
+    font-style: normal;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+  }
+  .row__t i {
+    margin-top: 0.2rem;
+    font-style: normal;
+    font-size: 0.75rem;
+    color: rgb(255 255 255 / 0.62);
+  }
+
+  .row__go {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    flex: none;
+    margin-left: auto;
+    border-radius: 50%;
+    color: rgb(255 255 255 / 0.75);
+    transition: transform var(--t2) var(--ease), color var(--t2) var(--ease);
+  }
+  a.row:hover .row__go { transform: translateX(3px); color: #fff; }
+
+  /* ============================================================
+     03 · FORM
+     ============================================================ */
+
+  .get { background: var(--off); }
+
+  .get__head { text-align: center; }
+
+  .get__h {
+    margin-top: var(--s4);
+    font-size: clamp(1.9rem, 4vw, 3rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1.06;
+  }
+  /* Clay, not green. Green owns the buttons; the accent owns emphasis,
+     so the two never compete for the same job. */
+  .get__h em { font-style: normal; color: var(--clay-deep); }
+
+  .get__p {
+    max-width: 48ch;
+    margin: var(--s4) auto 0;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--text-2);
+  }
+
+  .get__form {
+    position: relative;
+    display: grid;
+    gap: var(--s4);
+    max-width: 46rem;
+    margin: clamp(2rem, 4vw, 3rem) auto 0;
+    padding: clamp(1.4rem, 3vw, 2.25rem);
+    border: 1px solid var(--line-light);
+    border-radius: 18px;
+    background: var(--white);
+    box-shadow: 0 30px 60px -48px rgb(0 0 0 / 0.5);
+  }
+
+  /* A clay rule across the top of the panel — the accent as a mark, not
+     a wash. */
+  .get__form::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: clamp(1.4rem, 3vw, 2.25rem);
+    width: 56px;
+    height: 3px;
+    border-radius: 0 0 3px 3px;
+    background: var(--clay);
+  }
+
+  .f__row { display: grid; gap: var(--s4); }
+  .f { display: grid; gap: 0.45rem; }
+
+  .f label {
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+  .f label span { opacity: 0.7; }
+
+  .f input,
+  .f select,
+  .f textarea {
+    width: 100%;
+    padding: 0.85rem 0.95rem;
+    border: 1px solid var(--line-light);
+    border-radius: 10px;
+    background: var(--off);
+    color: var(--text);
+    font: inherit;
+    font-size: 0.9375rem;
+    transition: border-color var(--t2) var(--ease), box-shadow var(--t2) var(--ease);
+  }
+  .f textarea { resize: vertical; min-height: 7rem; line-height: 1.55; }
+  .f input::placeholder,
+  .f textarea::placeholder { color: var(--text-3); }
+
+  .f input:focus-visible,
+  .f select:focus-visible,
+  .f textarea:focus-visible {
+    outline: none;
+    background: var(--white);
+    border-color: var(--green-deep);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--green) 26%, transparent);
+  }
+
+  .get__acts {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s4) var(--s5);
+    margin-top: var(--s3);
+  }
+
+  .get__alt {
     padding: 0;
     border: 0;
     border-bottom: 1px solid var(--line-light);
@@ -648,139 +876,19 @@ const channels = [
     cursor: pointer;
     transition: color var(--t2) var(--ease), border-color var(--t2) var(--ease);
   }
-  .cf__alt:hover { color: var(--green-deep); border-color: var(--green); }
+  .get__alt:hover { color: var(--green-deep); border-color: var(--green); }
 
-  .cf__note {
-    font-size: 0.75rem;
-    line-height: 1.5;
-    color: var(--text-3);
-  }
+  .get__note { font-size: 0.75rem; line-height: 1.5; color: var(--text-3); }
 
-  .cf__nojs {
+  .get__nojs {
     padding: 0.85rem 1rem;
     border-radius: 10px;
-    background: #fdf3dc;
-    color: #8a5a00;
+    background: #eceef0;
+    color: #4a5560;
     font-size: 0.8125rem;
     line-height: 1.55;
   }
-  .cf__nojs a { text-decoration: underline; }
-
-  /* ============================================================
-     03 · BRANCHES
-     ============================================================ */
-
-  .cb { background: var(--off); }
-
-  .cb__head {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: var(--s4);
-  }
-
-  .cb__h {
-    margin-top: var(--s4);
-    font-size: clamp(1.5rem, 2.8vw, 2.1rem);
-    font-weight: 700;
-    letter-spacing: -0.035em;
-    line-height: 1.1;
-  }
-
-  .cb__all {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--green-deep);
-    border-bottom: 1px solid transparent;
-    transition: border-color var(--t2) var(--ease);
-  }
-  .cb__all:hover { border-color: var(--green); }
-
-  .cb__grid {
-    display: grid;
-    gap: clamp(0.75rem, 1.6vw, 1rem);
-    margin-top: clamp(1.5rem, 3vw, 2.25rem);
-  }
-
-  .bcard {
-    position: relative;
-    display: grid;
-    height: 100%;
-    padding: 1.2rem 1.3rem;
-    border: 1px solid var(--line-light);
-    border-radius: 14px;
-    background: var(--white);
-    transition:
-      transform var(--t2) var(--ease),
-      border-color var(--t2) var(--ease),
-      box-shadow var(--t2) var(--ease);
-  }
-  .bcard:hover {
-    transform: translateY(-4px);
-    border-color: color-mix(in oklab, var(--green) 32%, var(--line-light));
-    box-shadow: 0 22px 40px -30px rgb(0 0 0 / 0.5);
-  }
-
-  .bcard__i {
-    display: grid;
-    place-items: center;
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    color: var(--green-deep);
-    background: color-mix(in oklab, var(--green) 13%, #fff);
-  }
-  .bcard__n {
-    margin-top: 0.8rem;
-    font-size: 1rem;
-    font-weight: 700;
-    letter-spacing: -0.025em;
-  }
-  .bcard__c {
-    margin-top: 0.2rem;
-    font-family: var(--font-mono);
-    font-size: 0.5625rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    color: var(--text-3);
-  }
-  .bcard__todo {
-    justify-self: start;
-    margin-top: 0.6rem;
-    padding: 0.2rem 0.5rem;
-    border-radius: 999px;
-    font-size: 0.625rem;
-    font-weight: 600;
-    color: #8a5a00;
-    background: #fdf3dc;
-  }
-  .bcard__go {
-    position: absolute;
-    top: 1.2rem;
-    right: 1.2rem;
-    display: grid;
-    place-items: center;
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    border: 1px solid var(--line-light);
-    color: var(--green-deep);
-    transition:
-      transform var(--t2) var(--ease),
-      background-color var(--t2) var(--ease),
-      border-color var(--t2) var(--ease),
-      color var(--t2) var(--ease);
-  }
-  .bcard:hover .bcard__go {
-    transform: translateX(3px);
-    background: var(--green-deep);
-    border-color: var(--green-deep);
-    color: #fff;
-  }
+  .get__nojs a { text-decoration: underline; }
 
   /* ============================================================
      04 · COMPANY
@@ -792,24 +900,15 @@ const channels = [
     padding-block: clamp(2.25rem, 4.5vw, 3.5rem);
   }
   .cl__in { display: grid; gap: var(--s5); align-items: center; }
-
   .cl__name {
     margin-top: var(--s4);
     font-size: clamp(1.15rem, 2.2vw, 1.6rem);
     font-weight: 700;
     letter-spacing: -0.03em;
   }
-  .cl__sub {
-    margin-top: 0.35rem;
-    font-size: 0.875rem;
-    color: rgb(255 255 255 / 0.72);
-  }
+  .cl__sub { margin-top: 0.35rem; font-size: 0.875rem; color: rgb(255 255 255 / 0.72); }
 
-  .cl__soc {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--s5);
-  }
+  .cl__soc { display: flex; flex-wrap: wrap; gap: var(--s5); }
   .cl__soc a {
     font-size: 0.875rem;
     color: #fff;
@@ -825,13 +924,10 @@ const channels = [
 
   @media (min-width: 40rem) {
     .f__row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .cb__grid { grid-template-columns: repeat(2, 1fr); }
   }
 
   @media (min-width: 62rem) {
-    .ch__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr); }
-    .cf__grid { grid-template-columns: minmax(0, 0.85fr) minmax(0, 1fr); }
-    .cb__grid { grid-template-columns: repeat(4, 1fr); }
+    .reach__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); }
     .cl__in { grid-template-columns: minmax(0, 1fr) auto; }
   }
 
@@ -840,13 +936,15 @@ const channels = [
      ============================================================ */
 
   @media (prefers-reduced-motion: reduce) {
-    .ch__aura span { animation: none; }
-    .chan, .chan:hover,
-    .bcard, .bcard:hover,
-    .btn-green, .btn-green:hover {
-      transform: none;
+    .mapcard__fig :is(.cland, .cpin, .cchip) {
+      opacity: 1;
+      scale: 1;
       transition: none;
+      animation: none !important;
     }
+    .cedge { stroke-dashoffset: 0; transition: none; }
+    .mapcard__fig[data-in] .chalo { animation: none; }
+    .btn-green, .btn-green:hover { transform: none; transition: none; }
     .btn-green::after { display: none; }
   }
 </style>
