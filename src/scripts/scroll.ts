@@ -46,25 +46,35 @@ export function initReveals(root: ParentNode = document) {
 /* ------------------------------------------------------------------
    2. SCROLL-LINKED — parallax, zoom, and per-section progress.
    Elements declare: data-parallax="0.18"  data-zoom="0.12"
+                     data-travel     -> receives --t from 0..1, unitless,
+                                        as the element crosses the screen
    Sections declare: data-progress  -> receives --p from 0..1
+
+   --t is the one to drive 3D from: it is a plain number, so it can be
+   multiplied into degrees. --py is a length and CSS cannot divide a
+   length by a length to get back to a scalar.
    ------------------------------------------------------------------ */
 type Linked = {
   el: HTMLElement;
   parallax: number;
   zoom: number;
   progress: boolean;
+  travel: boolean;
 };
 
 export function initScrollLink(root: ParentNode = document) {
   if (REDUCED) return;
 
   const items: Linked[] = [
-    ...root.querySelectorAll<HTMLElement>('[data-parallax], [data-zoom], [data-progress]'),
+    ...root.querySelectorAll<HTMLElement>(
+      '[data-parallax], [data-zoom], [data-progress], [data-travel]'
+    ),
   ].map((el) => ({
     el,
     parallax: parseFloat(el.dataset.parallax ?? '0'),
     zoom: parseFloat(el.dataset.zoom ?? '0'),
     progress: el.hasAttribute('data-progress'),
+    travel: el.hasAttribute('data-travel'),
   }));
 
   if (!items.length) return;
@@ -87,6 +97,9 @@ export function initScrollLink(root: ParentNode = document) {
       }
       if (it.zoom) {
         it.el.style.setProperty('--z', String(1 + (1 - clamped) * it.zoom));
+      }
+      if (it.travel) {
+        it.el.style.setProperty('--t', clamped.toFixed(4));
       }
       if (it.progress) {
         // Progress across the pinned track: 0 while entering, 1 at the end.
