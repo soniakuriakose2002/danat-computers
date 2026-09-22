@@ -4,9 +4,9 @@ import { site } from '@data/site';
 /**
  * 02 — Credibility, immediately after the hero.
  *
- * GEEKS uses press logos here. Danat has no press coverage, but it does
- * carry these brands — every name and the category beside it came out of
- * the company's own product catalogue, not from a wish list.
+ * Names and categories both come out of the company's own product
+ * catalogue. Set large, because at small sizes a brand list reads as
+ * filler; at this scale it reads as a statement of stock.
  */
 const brands = [
   { n: 'HP', k: 'Laptops · Printers' },
@@ -40,38 +40,31 @@ const rows = [brands.slice(0, half), brands.slice(half)];
     </svg>
   </div>
 
-  <div class="shell bs__grid">
-    <!-- statement -->
-    <div class="bs__say">
-      <p class="label" data-rise>What we carry</p>
-      <h2 class="bs__h" data-rise style="--d:70ms">
-        {brands.length} brands.<br />
-        <em>{site.stats.parts.toLocaleString('en-US')} lines.</em><br />
-        One counter.
-      </h2>
-      <p class="bs__p" data-rise style="--d:140ms">
-        Sold, serviced and stocked in-house — so the part is usually on our
-        shelf, not three weeks away.
-      </p>
-    </div>
+  <div class="shell bs__head">
+    <p class="label">What we carry</p>
+    <p class="bs__count">
+      <b>{brands.length}</b> brands
+      <span aria-hidden="true">·</span>
+      <b>{site.stats.parts.toLocaleString('en-US')}</b> lines in stock
+    </p>
+  </div>
 
-    <!-- two rails, opposing directions -->
-    <div class="bs__rails" data-rise="fade" style="--d:120ms">
-      {rows.map((row, r) => (
-        <div class="bs__rail" data-dir={r === 1 ? 'rev' : undefined}>
-          <div class="bs__track">
-            {[0, 1].map(() =>
-              row.map((b) => (
-                <span class="bs__chip">
-                  <b>{b.n}</b>
-                  <i>{b.k}</i>
-                </span>
-              ))
-            )}
-          </div>
+  <!-- Full-bleed rails, opposing directions -->
+  <div class="bs__rails">
+    {rows.map((row, r) => (
+      <div class="bs__rail" data-dir={r === 1 ? 'rev' : undefined}>
+        <div class="bs__track">
+          {[0, 1].map(() =>
+            row.map((b) => (
+              <span class="bs__item">
+                <span class="bs__n">{b.n}</span>
+                <span class="bs__k">{b.k}</span>
+              </span>
+            ))
+          )}
         </div>
-      ))}
-    </div>
+      </div>
+    ))}
   </div>
 </section>
 
@@ -113,63 +106,57 @@ const rows = [brands.slice(0, half), brands.slice(half)];
     to   { transform: translate3d(-1.2%, 3px, 0) scaleY(1); }
   }
 
-  /* ---------- layout ---------- */
+  /* ---------- head ---------- */
 
-  .bs__grid {
+  .bs__head {
     position: relative;
     z-index: 1;
-    display: grid;
-    gap: var(--s6);
-    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--s4);
+    padding-bottom: clamp(1.5rem, 3vw, 2.5rem);
   }
 
-  .bs__h {
-    margin-top: var(--s4);
-    font-size: clamp(1.6rem, 2.8vw, 2.4rem);
-    line-height: 1.08;
-    letter-spacing: -0.035em;
-    font-weight: 700;
-  }
-  .bs__h em {
-    font-style: normal;
-    color: var(--green-deep);
-    font-variant-numeric: tabular-nums;
-  }
-
-  .bs__p {
-    margin-top: var(--s4);
-    max-width: 34ch;
+  .bs__count {
     font-size: 0.9375rem;
-    line-height: 1.6;
     color: var(--text-2);
   }
+  .bs__count b {
+    font-weight: 700;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+  }
+  .bs__count span { margin-inline: 0.45rem; color: var(--green); }
 
   /* ---------- rails ---------- */
 
   .bs__rails {
+    position: relative;
+    z-index: 1;
     display: grid;
-    gap: 0.6rem;
-    min-width: 0;
+    gap: clamp(0.25rem, 0.8vw, 0.75rem);
   }
 
-  /* Edges fade, so chips never clip hard against the gutter. */
   .bs__rail {
     overflow: hidden;
-    mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
   }
 
   .bs__track {
     display: flex;
-    gap: 0.6rem;
+    align-items: baseline;
+    gap: clamp(2rem, 4.5vw, 4.5rem);
     width: max-content;
-    animation: bs-run 42s linear infinite;
+    animation: bs-run 44s linear infinite;
   }
 
-  /* Second row runs the other way — the counter-motion is what makes it
-     read as a moving wall rather than a single ticker. */
+  /* Second row runs the other way — the counter-motion is what stops it
+     reading as one long ticker. */
   .bs__rail[data-dir='rev'] .bs__track {
     animation-direction: reverse;
-    animation-duration: 52s;
+    animation-duration: 56s;
   }
 
   .bs__rails:hover .bs__track { animation-play-state: paused; }
@@ -179,53 +166,61 @@ const rows = [brands.slice(0, half), brands.slice(half)];
     to { transform: translate3d(-50%, 0, 0); }
   }
 
-  /* ---------- chips ---------- */
+  /* ---------- items ---------- */
 
-  .bs__chip {
-    display: grid;
-    gap: 0.1rem;
+  .bs__item {
+    position: relative;
+    display: block;
     flex: none;
-    padding: 0.7rem 1.1rem;
-    border: 1px solid var(--line-light);
-    border-radius: 10px;
-    background: var(--white);
-    transition:
-      border-color var(--t2) var(--ease),
-      background-color var(--t2) var(--ease),
-      transform var(--t2) var(--ease);
+    padding-bottom: 0.55rem;
+    cursor: default;
   }
 
-  .bs__chip:hover {
-    border-color: var(--green);
-    background: var(--green-wash);
-    transform: translateY(-2px);
-  }
-
-  .bs__chip b {
-    font-size: 1rem;
+  /* Large and pale at rest: a wall of stock, not a caption. */
+  .bs__n {
+    display: block;
+    font-size: clamp(1.6rem, 3.6vw, 3rem);
     font-weight: 700;
-    letter-spacing: -0.02em;
-    color: var(--text);
+    letter-spacing: -0.04em;
+    line-height: 1;
     white-space: nowrap;
-  }
-
-  .bs__chip i {
-    font-style: normal;
-    font-size: 0.6875rem;
-    letter-spacing: 0.02em;
-    color: var(--text-3);
-    white-space: nowrap;
+    color: var(--off-2);
     transition: color var(--t2) var(--ease);
   }
 
-  .bs__chip:hover i { color: var(--green-deep); }
-
-  @media (min-width: 62rem) {
-    .bs__grid {
-      grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.22fr);
-      gap: var(--s8);
-    }
+  /* Category is hidden until hover, then rises into the reserved space. */
+  .bs__k {
+    position: absolute;
+    left: 0;
+    bottom: -0.35rem;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--green-deep);
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity var(--t2) var(--ease), transform var(--t2) var(--ease);
   }
+
+  /* Green rule wipes in under the hovered name. */
+  .bs__item::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0.15rem;
+    height: 2px;
+    background: var(--green);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--t3) var(--ease);
+  }
+
+  .bs__item:hover .bs__n { color: var(--text); }
+  .bs__item:hover .bs__k { opacity: 1; transform: none; }
+  .bs__item:hover::after { transform: scaleX(1); }
 
   @media (prefers-reduced-motion: reduce) {
     .bs__track { animation: none; }
