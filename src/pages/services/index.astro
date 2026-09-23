@@ -82,13 +82,21 @@ const promises = [
         </div>
       </div>
 
-      {/* The curved inner edge is the mockup's, and the business hero's. */}
-      <figure class="sh__media" data-rise style="--d:160ms">
-        <Image src={imgHero} alt="A technician working on a laptop board at the bench"
-          widths={[700, 1100, 1500]} sizes="(min-width:62rem) 56vw, 100vw"
-          quality={78} format="webp" loading="eager" fetchpriority="high" />
-        <span class="sh__tint" aria-hidden="true"></span>
-        <figcaption class="sh__over">Reliable<br />Technology<br />Support</figcaption>
+      {/* Three layers, as drawn: a sage slab with a slanted edge, the
+          photograph inset on top of it with a long arc down its left,
+          and the pill straddling the join. The slab has to be a sibling
+          — inside the figure the photo's own radius would clip it to
+          exactly the same outline. */}
+      <div class="sh__stage" data-rise style="--d:160ms">
+        <span class="sh__slab" aria-hidden="true"></span>
+
+        <figure class="sh__media">
+          <Image src={imgHero} alt="A technician working on a laptop board at the bench"
+            widths={[700, 1100, 1500]} sizes="(min-width:62rem) 50vw, 100vw"
+            quality={78} format="webp" loading="eager" fetchpriority="high" />
+          <span class="sh__tint" aria-hidden="true"></span>
+          <figcaption class="sh__over">Reliable<br />Technology<br />Support</figcaption>
+        </figure>
 
         <p class="sh__pill">
           <span><b>{services.length}</b>Services</span>
@@ -97,7 +105,7 @@ const promises = [
           <i aria-hidden="true"></i>
           <span><b>{site.stats.since}</b>Trading since</span>
         </p>
-      </figure>
+      </div>
     </div>
   </section>
 
@@ -279,7 +287,7 @@ const promises = [
   /* The copy carries the header clearance so the photograph can run to
      the top of the section rather than starting below it. */
   .sh__copy { padding-block: clamp(5.5rem, 10vw, 8rem) clamp(2rem, 4vw, 3rem); }
-  .sh__copy, .sh__media { min-width: 0; }
+  .sh__copy, .sh__stage { min-width: 0; }
 
   .sh__crumb {
     display: flex;
@@ -317,23 +325,32 @@ const promises = [
     margin-top: var(--s5);
   }
 
+  .sh__stage { position: relative; margin-bottom: clamp(1.5rem, 3vw, 2.5rem); }
+  .sh__slab { display: none; }
   .sh__media {
     position: relative;
     aspect-ratio: 16 / 11;
-    margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
-    border-radius: 0 0 0 clamp(2rem, 6vw, 5rem);
+    border-radius: 18px;
     overflow: hidden;
   }
-  .sh__media :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  .sh__media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* The mockup's shot reads near-monochrome against the sage. Grading
+       ours toward that keeps the two in the same key. */
+    filter: saturate(0.62) brightness(0.88) contrast(1.06);
+  }
   .sh__tint {
     position: absolute;
     inset: 0;
-    background: linear-gradient(258deg, rgb(8 22 10 / 0.74) 0%, rgb(8 22 10 / 0.38) 48%,
-      rgb(8 22 10 / 0.14) 100%);
+    background: linear-gradient(258deg, rgb(8 22 10 / 0.78) 0%, rgb(8 22 10 / 0.46) 46%,
+      rgb(10 28 14 / 0.26) 100%);
   }
   .sh__over {
     position: absolute;
-    top: clamp(1.2rem, 3vw, 2.2rem);
+    /* Low enough that all three lines clear the section edge. */
+    top: clamp(2.5rem, 7vw, 5.5rem);
     right: clamp(1.2rem, 3vw, 2.2rem);
     font-size: clamp(1.1rem, 2.2vw, 1.6rem);
     font-weight: 700;
@@ -552,30 +569,52 @@ const promises = [
   }
 
   @media (min-width: 62rem) {
-    .sh__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.06fr); align-items: stretch; }
+    .sh__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.04fr); align-items: stretch; }
 
-    /* Full-bleed to the right edge of the window, top of the section to
-       bottom, with a convex left edge — the mockup's shape. An ellipse
-       anchored off the right gives the bulge without an SVG path. */
-    .sh__media {
-      aspect-ratio: auto;
-      min-height: clamp(26rem, 40vw, 34rem);
-      margin: 0 calc(50% - 50vw) 0 0;
-      border-radius: 0;
-      /* A large radius on the two left corners, not an ellipse clip.
-         The ellipse's centre moved with the row height, so the sweep
-         came out lopsided — straight at the top, curved at the bottom.
-         Corner radii are measured from the corners and cannot drift. */
-      border-radius: clamp(3rem, 11vw, 10rem) 0 0 clamp(3rem, 11vw, 10rem);
+    /* The layers anchor to the SECTION, not to this box. Bleeding the
+       box with margin-right: calc(50% - 50vw) resolves that 50% against
+       the grid column rather than the shell, so it overshot the window
+       by ~330px and everything pinned to its right edge — the caption,
+       the right of the photograph — sat outside the overflow clip.
+       Going static hands the children back to .sh, which really is the
+       full width of the page. */
+    .sh__stage {
+      position: static;
+      min-height: clamp(26rem, 38vw, 33rem);
+      margin: 0;
     }
-    .sh__media :global(img), .sh__tint { position: relative; z-index: 2; }
+
+    /* Measured off the mockup: the slab's left edge runs from 53% of
+       the page at the top to 47% at the bottom. 53vw wide, right
+       anchored, with the lean in the polygon gives exactly that. */
+    .sh__slab {
+      display: block;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      right: 0;
+      width: 53vw;
+      clip-path: polygon(11% 0, 100% 0, 100% 100%, 0 100%);
+      background: #89af93;
+    }
+    .sh__media {
+      position: absolute;
+      top: 0;
+      bottom: 8%;
+      right: 0;
+      width: 41vw;
+      aspect-ratio: auto;
+      border-radius: clamp(3rem, 9vw, 8.5rem) 0 0 clamp(3rem, 9vw, 8.5rem);
+    }
     .sh__media :global(img) { position: absolute; inset: 0; }
-    .sh__over, .sh__pill { z-index: 3; }
     .sh__pill {
-      left: clamp(1.5rem, 5vw, 4rem);
+      position: absolute;
+      left: 47vw;
       right: auto;
+      bottom: 3%;
       translate: none;
     }
+
     .sm__list { grid-template-columns: repeat(4, minmax(0, 1fr)); }
     .sl__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .sc__in { grid-template-columns: minmax(0, 1fr) auto; }
