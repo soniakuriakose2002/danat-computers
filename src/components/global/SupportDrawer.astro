@@ -104,77 +104,91 @@ const WA = site.phone.whatsapp;
     ride on the element instead, which cannot collide. */}
 <script is:inline>
   (() => {
-    const dlg = document.querySelector('[data-support]');
-    if (!dlg || typeof dlg.showModal !== 'function') return;
+    /* This site renders <ClientRouter />, so a nav click swaps the body
+       without a page load — and an is:inline script runs once, on the
+       first load, and never again. Everything below was therefore bound
+       to elements that had already been thrown away, and Get Support
+       fell through to its href. Re-bind on every astro:page-load, which
+       fires on the first load too. */
+    const setup = () => {
+      const dlg = document.querySelector('[data-support]');
+      if (!dlg || typeof dlg.showModal !== 'function') return;
 
-    const form = dlg.querySelector('[data-support-form]');
-    const wa = dlg.dataset.wa;
-    const mail = dlg.dataset.mail;
+      const form = dlg.querySelector('[data-support-form]');
+      const wa = dlg.dataset.wa;
+      const mail = dlg.dataset.mail;
 
-    const open = () => {
-      // The phone menu is one of the places this opens from. Closing it
-      // through its own button reuses whatever else that does — the
-      // scroll lock, aria-expanded — rather than half-closing it here.
-      const mnav = document.querySelector('[data-mnav]');
-      if (mnav && !mnav.hidden) document.querySelector('[aria-controls="mnav"]')?.click();
-      dlg.showModal();
-      // display:none -> block gives the transition no previous state to
-      // run from unless layout is flushed first. A double rAF is not
-      // enough; forcing reflow is.
-      void dlg.offsetWidth;
-      dlg.setAttribute('data-in', '');
-    };
+      const open = () => {
+        // The phone menu is one of the places this opens from. Closing it
+        // through its own button reuses whatever else that does — the
+        // scroll lock, aria-expanded — rather than half-closing it here.
+        const mnav = document.querySelector('[data-mnav]');
+        if (mnav && !mnav.hidden) document.querySelector('[aria-controls="mnav"]')?.click();
+        dlg.showModal();
+        // display:none -> block gives the transition no previous state to
+        // run from unless layout is flushed first. A double rAF is not
+        // enough; forcing reflow is.
+        void dlg.offsetWidth;
+        dlg.setAttribute('data-in', '');
+      };
 
-    const close = () => {
-      dlg.removeAttribute('data-in');
-      const done = () => dlg.close();
-      // Let the slide finish before the dialog disappears.
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) done();
-      else setTimeout(done, 260);
-    };
+      const close = () => {
+        dlg.removeAttribute('data-in');
+        const done = () => dlg.close();
+        // Let the slide finish before the dialog disappears.
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) done();
+        else setTimeout(done, 260);
+      };
 
-    // The trigger stays a working WhatsApp link; this only intercepts it.
-    document.querySelectorAll('[data-support-open], .hd__cta').forEach((el) =>
-      el.addEventListener('click', (e) => {
+      // The trigger stays a working WhatsApp link; this only intercepts it.
+      document.querySelectorAll('[data-support-open], .hd__cta').forEach((el) =>
+        el.addEventListener('click', (e) => {
+          e.preventDefault();
+          open();
+        })
+      );
+
+      dlg.querySelector('[data-support-close]')?.addEventListener('click', close);
+      // A click whose target IS the dialog landed on the backdrop.
+      dlg.addEventListener('click', (e) => { if (e.target === dlg) close(); });
+      dlg.addEventListener('cancel', (e) => { e.preventDefault(); close(); });
+
+      if (!form) return;
+
+      const compose = () => {
+        const d = new FormData(form);
+        const val = (k) => String(d.get(k) || '').trim();
+        const opt = (k, label) => (val(k) ? [label + ': ' + val(k)] : []);
+        return [
+          'Hello Danat — this is ' + val('name') + '.',
+          '',
+          ...opt('phone', 'Phone'),
+          ...opt('branch', 'Branch'),
+          '',
+          val('message'),
+        ].join(String.fromCharCode(10));
+      };
+
+      form.addEventListener('submit', (e) => {
         e.preventDefault();
-        open();
-      })
-    );
+        if (!form.reportValidity()) return;
+        window.open('https://wa.me/' + wa + '?text=' + encodeURIComponent(compose()),
+          '_blank', 'noopener');
+      });
 
-    dlg.querySelector('[data-support-close]')?.addEventListener('click', close);
-    // A click whose target IS the dialog landed on the backdrop.
-    dlg.addEventListener('click', (e) => { if (e.target === dlg) close(); });
-    dlg.addEventListener('cancel', (e) => { e.preventDefault(); close(); });
+      dlg.querySelector('[data-support-mail]')?.addEventListener('click', () => {
+        if (!form.reportValidity()) return;
+        window.location.href =
+          'mailto:' + mail + '?subject=' + encodeURIComponent('Support request')
+          + '&body=' + encodeURIComponent(compose());
+      });
 
-    if (!form) return;
-
-    const compose = () => {
-      const d = new FormData(form);
-      const val = (k) => String(d.get(k) || '').trim();
-      const opt = (k, label) => (val(k) ? [label + ': ' + val(k)] : []);
-      return [
-        'Hello Danat — this is ' + val('name') + '.',
-        '',
-        ...opt('phone', 'Phone'),
-        ...opt('branch', 'Branch'),
-        '',
-        val('message'),
-      ].join(String.fromCharCode(10));
     };
 
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      if (!form.reportValidity()) return;
-      window.open('https://wa.me/' + wa + '?text=' + encodeURIComponent(compose()),
-        '_blank', 'noopener');
-    });
-
-    dlg.querySelector('[data-support-mail]')?.addEventListener('click', () => {
-      if (!form.reportValidity()) return;
-      window.location.href =
-        'mailto:' + mail + '?subject=' + encodeURIComponent('Support request')
-        + '&body=' + encodeURIComponent(compose());
-    });
+    let ran = false;
+    document.addEventListener('astro:page-load', () => { ran = true; setup(); });
+    // If the router is ever removed, that event never comes.
+    window.addEventListener('load', () => { if (!ran) { ran = true; setup(); } });
   })();
 </script>
 

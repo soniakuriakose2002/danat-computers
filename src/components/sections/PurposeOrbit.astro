@@ -185,44 +185,57 @@ const promises = [
 </section>
 
 <script is:inline>
+  /* <ClientRouter /> swaps the body on a nav click without a page load,
+     and an is:inline script runs once on the first load and never again
+     — so everything below was binding to elements that had already been
+     thrown away. astro:page-load fires on the first load and after every
+     swap. */
   (() => {
-    const stage = document.querySelector('[data-stage]');
-    if (!stage) return;
+    const setup = () => {
+    (() => {
+      const stage = document.querySelector('[data-stage]');
+      if (!stage) return;
 
-    const panes = [...stage.querySelectorAll('.pane')];
-    const idx = [...document.querySelectorAll('[data-goto]')];
-    const n = panes.length;
-    if (!n) return;
+      const panes = [...stage.querySelectorAll('.pane')];
+      const idx = [...document.querySelectorAll('[data-goto]')];
+      const n = panes.length;
+      if (!n) return;
 
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    let at = 0;
-    let timer = null;
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      let at = 0;
+      let timer = null;
 
-    const show = (next) => {
-      at = ((next % n) + n) % n;
-      panes.forEach((p, i) => {
-        // centre, then right, then left, walking forward from the active
-        const d = (((i - at) % n) + n) % n;
-        p.setAttribute('data-pos', d === 0 ? 'c' : d === 1 ? 'r' : 'l');
-        p.querySelectorAll('.pane__bar i').forEach((b, bi) =>
-          b.toggleAttribute('data-on', bi === at)
-        );
-      });
-      idx.forEach((el, i) => el.toggleAttribute('data-on', i === at));
+      const show = (next) => {
+        at = ((next % n) + n) % n;
+        panes.forEach((p, i) => {
+          // centre, then right, then left, walking forward from the active
+          const d = (((i - at) % n) + n) % n;
+          p.setAttribute('data-pos', d === 0 ? 'c' : d === 1 ? 'r' : 'l');
+          p.querySelectorAll('.pane__bar i').forEach((b, bi) =>
+            b.toggleAttribute('data-on', bi === at)
+          );
+        });
+        idx.forEach((el, i) => el.toggleAttribute('data-on', i === at));
+      };
+
+      const stop = () => { if (timer) clearInterval(timer); timer = null; };
+      const start = () => { if (!reduced && !timer) timer = setInterval(() => show(at + 1), 5200); };
+
+      panes.forEach((p, i) =>
+        p.querySelector('.pane__hit')?.addEventListener('click', () => { stop(); show(i); })
+      );
+      idx.forEach((el, i) => el.addEventListener('click', () => { stop(); show(i); }));
+
+      new IntersectionObserver(([e]) => (e.isIntersecting ? start() : stop()), { threshold: 0.25 })
+        .observe(stage);
+
+      show(0);
+    })();
     };
 
-    const stop = () => { if (timer) clearInterval(timer); timer = null; };
-    const start = () => { if (!reduced && !timer) timer = setInterval(() => show(at + 1), 5200); };
-
-    panes.forEach((p, i) =>
-      p.querySelector('.pane__hit')?.addEventListener('click', () => { stop(); show(i); })
-    );
-    idx.forEach((el, i) => el.addEventListener('click', () => { stop(); show(i); }));
-
-    new IntersectionObserver(([e]) => (e.isIntersecting ? start() : stop()), { threshold: 0.25 })
-      .observe(stage);
-
-    show(0);
+    let ran = false;
+    document.addEventListener('astro:page-load', () => { ran = true; setup(); });
+    window.addEventListener('load', () => { if (!ran) { ran = true; setup(); } });
   })();
 </script>
 

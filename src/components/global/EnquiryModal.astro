@@ -152,83 +152,97 @@ const forms = [
     the same names is a SyntaxError that kills one of the scripts. */}
 <script is:inline>
   (() => {
-    const modals = {};
-    document.querySelectorAll('[data-enquiry-modal]').forEach((d) => {
-      modals[d.dataset.enquiryModal] = d;
-    });
-    if (!Object.keys(modals).length) return;
+    /* This site renders <ClientRouter />, so a nav click swaps the body
+       without a page load — and an is:inline script runs once, on the
+       first load, and never again. Everything below was therefore bound
+       to elements that had already been thrown away, and Get Support
+       fell through to its href. Re-bind on every astro:page-load, which
+       fires on the first load too. */
+    const setup = () => {
+      const modals = {};
+      document.querySelectorAll('[data-enquiry-modal]').forEach((d) => {
+        modals[d.dataset.enquiryModal] = d;
+      });
+      if (!Object.keys(modals).length) return;
 
-    const close = (d) => {
-      d.removeAttribute('data-in');
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) d.close();
-      else setTimeout(() => d.close(), 220);
-    };
-
-    const open = (key) => {
-      const d = modals[key];
-      if (!d || typeof d.showModal !== 'function') return false;
-      const mnav = document.querySelector('[data-mnav]');
-      if (mnav && !mnav.hidden) document.querySelector('[aria-controls="mnav"]')?.click();
-      d.showModal();
-      // display:none -> block leaves the transition no previous state to
-      // run from unless layout is flushed first.
-      void d.offsetWidth;
-      d.setAttribute('data-in', '');
-      return true;
-    };
-
-    document.querySelectorAll('[data-enquiry]').forEach((el) =>
-      el.addEventListener('click', (e) => {
-        // Only swallow the click if the dialog actually opened; the
-        // trigger's href is a working fallback otherwise.
-        if (open(el.dataset.enquiry)) e.preventDefault();
-      })
-    );
-
-    Object.values(modals).forEach((d) => {
-      d.querySelector('[data-enquiry-close]')?.addEventListener('click', () => close(d));
-      d.addEventListener('click', (e) => { if (e.target === d) close(d); });
-      d.addEventListener('cancel', (e) => { e.preventDefault(); close(d); });
-
-      const form = d.querySelector('[data-enquiry-form]');
-      const wa = d.dataset.wa;
-      const mail = d.dataset.mail;
-      if (!form) return;
-
-      const compose = () => {
-        const fd = new FormData(form);
-        const v = (k) => String(fd.get(k) || '').trim();
-        const opt = (k, label) => (v(k) ? [label + ': ' + v(k)] : []);
-        const kind = d.dataset.enquiryModal === 'quote'
-          ? 'I would like a quote.'
-          : 'I would like a free consultation.';
-        return [
-          'Hello Danat — this is ' + v('name') + '. ' + kind,
-          '',
-          ...opt('company', 'Company'),
-          ...opt('phone', 'Phone'),
-          ...opt('email', 'Email'),
-          ...opt('sector', 'Business type'),
-          ...opt('product', 'Product / service'),
-          '',
-          v('message'),
-        ].join(String.fromCharCode(10));
+      const close = (d) => {
+        d.removeAttribute('data-in');
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) d.close();
+        else setTimeout(() => d.close(), 220);
       };
 
-      form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        if (!form.reportValidity()) return;
-        window.open('https://wa.me/' + wa + '?text=' + encodeURIComponent(compose()),
-          '_blank', 'noopener');
+      const open = (key) => {
+        const d = modals[key];
+        if (!d || typeof d.showModal !== 'function') return false;
+        const mnav = document.querySelector('[data-mnav]');
+        if (mnav && !mnav.hidden) document.querySelector('[aria-controls="mnav"]')?.click();
+        d.showModal();
+        // display:none -> block leaves the transition no previous state to
+        // run from unless layout is flushed first.
+        void d.offsetWidth;
+        d.setAttribute('data-in', '');
+        return true;
+      };
+
+      document.querySelectorAll('[data-enquiry]').forEach((el) =>
+        el.addEventListener('click', (e) => {
+          // Only swallow the click if the dialog actually opened; the
+          // trigger's href is a working fallback otherwise.
+          if (open(el.dataset.enquiry)) e.preventDefault();
+        })
+      );
+
+      Object.values(modals).forEach((d) => {
+        d.querySelector('[data-enquiry-close]')?.addEventListener('click', () => close(d));
+        d.addEventListener('click', (e) => { if (e.target === d) close(d); });
+        d.addEventListener('cancel', (e) => { e.preventDefault(); close(d); });
+
+        const form = d.querySelector('[data-enquiry-form]');
+        const wa = d.dataset.wa;
+        const mail = d.dataset.mail;
+        if (!form) return;
+
+        const compose = () => {
+          const fd = new FormData(form);
+          const v = (k) => String(fd.get(k) || '').trim();
+          const opt = (k, label) => (v(k) ? [label + ': ' + v(k)] : []);
+          const kind = d.dataset.enquiryModal === 'quote'
+            ? 'I would like a quote.'
+            : 'I would like a free consultation.';
+          return [
+            'Hello Danat — this is ' + v('name') + '. ' + kind,
+            '',
+            ...opt('company', 'Company'),
+            ...opt('phone', 'Phone'),
+            ...opt('email', 'Email'),
+            ...opt('sector', 'Business type'),
+            ...opt('product', 'Product / service'),
+            '',
+            v('message'),
+          ].join(String.fromCharCode(10));
+        };
+
+        form.addEventListener('submit', (e) => {
+          e.preventDefault();
+          if (!form.reportValidity()) return;
+          window.open('https://wa.me/' + wa + '?text=' + encodeURIComponent(compose()),
+            '_blank', 'noopener');
+        });
+
+        d.querySelector('[data-enquiry-mail]')?.addEventListener('click', () => {
+          if (!form.reportValidity()) return;
+          const subj = d.dataset.enquiryModal === 'quote' ? 'Quote request' : 'Consultation request';
+          window.location.href = 'mailto:' + mail + '?subject=' + encodeURIComponent(subj)
+            + '&body=' + encodeURIComponent(compose());
+        });
       });
 
-      d.querySelector('[data-enquiry-mail]')?.addEventListener('click', () => {
-        if (!form.reportValidity()) return;
-        const subj = d.dataset.enquiryModal === 'quote' ? 'Quote request' : 'Consultation request';
-        window.location.href = 'mailto:' + mail + '?subject=' + encodeURIComponent(subj)
-          + '&body=' + encodeURIComponent(compose());
-      });
-    });
+    };
+
+    let ran = false;
+    document.addEventListener('astro:page-load', () => { ran = true; setup(); });
+    // If the router is ever removed, that event never comes.
+    window.addEventListener('load', () => { if (!ran) { ran = true; setup(); } });
   })();
 </script>
 

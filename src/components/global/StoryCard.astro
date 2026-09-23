@@ -84,35 +84,48 @@ const closing = 'Four counters, one standard — and a bench that opens the mach
 </dialog>
 
 <script is:inline>
+  /* <ClientRouter /> swaps the body on a nav click without a page load,
+     and an is:inline script runs once on the first load and never again
+     — so everything below was binding to elements that had already been
+     thrown away. astro:page-load fires on the first load and after every
+     swap. */
   (() => {
-    const dlg = document.querySelector('[data-story-modal]');
-    if (!dlg) return;
+    const setup = () => {
+    (() => {
+      const dlg = document.querySelector('[data-story-modal]');
+      if (!dlg) return;
 
-    const open = () => {
-      dlg.removeAttribute('data-in');
-      if (typeof dlg.showModal === 'function') dlg.showModal();
-      else dlg.setAttribute('open', '');
-      // Force a synchronous style recalc so the start state is real
-      // before the transition is armed. A double rAF is the usual trick
-      // but does not guarantee recalc for display:none -> visible.
-      void dlg.offsetWidth;
-      requestAnimationFrame(() => dlg.setAttribute('data-in', ''));
+      const open = () => {
+        dlg.removeAttribute('data-in');
+        if (typeof dlg.showModal === 'function') dlg.showModal();
+        else dlg.setAttribute('open', '');
+        // Force a synchronous style recalc so the start state is real
+        // before the transition is armed. A double rAF is the usual trick
+        // but does not guarantee recalc for display:none -> visible.
+        void dlg.offsetWidth;
+        requestAnimationFrame(() => dlg.setAttribute('data-in', ''));
+      };
+      const close = () => {
+        dlg.removeAttribute('data-in');
+        if (typeof dlg.close === 'function') dlg.close();
+        else dlg.removeAttribute('open');
+      };
+
+      document.querySelectorAll('[data-story-open]').forEach((b) =>
+        b.addEventListener('click', (e) => { e.preventDefault(); open(); })
+      );
+      dlg.querySelector('[data-story-close]')?.addEventListener('click', close);
+      dlg.addEventListener('click', (e) => { if (e.target === dlg) close(); });
+      dlg.addEventListener('close', () => dlg.removeAttribute('data-in'));
+
+      // "Watch the film" inside the card hands over to the video dialog.
+      dlg.querySelector('[data-video-open]')?.addEventListener('click', close);
+    })();
     };
-    const close = () => {
-      dlg.removeAttribute('data-in');
-      if (typeof dlg.close === 'function') dlg.close();
-      else dlg.removeAttribute('open');
-    };
 
-    document.querySelectorAll('[data-story-open]').forEach((b) =>
-      b.addEventListener('click', (e) => { e.preventDefault(); open(); })
-    );
-    dlg.querySelector('[data-story-close]')?.addEventListener('click', close);
-    dlg.addEventListener('click', (e) => { if (e.target === dlg) close(); });
-    dlg.addEventListener('close', () => dlg.removeAttribute('data-in'));
-
-    // "Watch the film" inside the card hands over to the video dialog.
-    dlg.querySelector('[data-video-open]')?.addEventListener('click', close);
+    let ran = false;
+    document.addEventListener('astro:page-load', () => { ran = true; setup(); });
+    window.addEventListener('load', () => { if (!ran) { ran = true; setup(); } });
   })();
 </script>
 

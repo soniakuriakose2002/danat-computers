@@ -406,50 +406,63 @@ const nudge: Record<string, string> = {
 </PageLayout>
 
 <script is:inline define:vars={{ WA: site.phone.whatsapp, MAIL: site.email }}>
+  /* <ClientRouter /> swaps the body on a nav click without a page load,
+     and an is:inline script runs once on the first load and never again
+     — so everything below was binding to elements that had already been
+     thrown away. astro:page-load fires on the first load and after every
+     swap. */
   (() => {
-    const form = document.getElementById('enquiry');
-    if (!form) return;
+    const setup = () => {
+    (() => {
+      const form = document.getElementById('enquiry');
+      if (!form) return;
 
-    const msg = document.getElementById('f-msg');
-    const count = document.getElementById('count');
-    if (msg && count) {
-      const tick = () => { count.textContent = `${msg.value.length}/500`; };
-      msg.addEventListener('input', tick);
-      tick();
-    }
+      const msg = document.getElementById('f-msg');
+      const count = document.getElementById('count');
+      if (msg && count) {
+        const tick = () => { count.textContent = `${msg.value.length}/500`; };
+        msg.addEventListener('input', tick);
+        tick();
+      }
 
-    // No server to POST to, so the enquiry is composed and handed to
-    // WhatsApp. Nothing leaves the page until the person sends it.
-    const compose = () => {
-      const d = new FormData(form);
-      const opt = (k, label) => {
-        const v = String(d.get(k) || '').trim();
-        return v ? [`${label}: ${v}`] : [];
+      // No server to POST to, so the enquiry is composed and handed to
+      // WhatsApp. Nothing leaves the page until the person sends it.
+      const compose = () => {
+        const d = new FormData(form);
+        const opt = (k, label) => {
+          const v = String(d.get(k) || '').trim();
+          return v ? [`${label}: ${v}`] : [];
+        };
+        return [
+          `Hello Danat — this is ${String(d.get('name') || '').trim()}.`,
+          ``,
+          ...opt('topic', 'Subject'),
+          ...opt('phone', 'Phone'),
+          ...opt('email', 'Email'),
+          ``,
+          String(d.get('message') || '').trim(),
+        ].join('\n');
       };
-      return [
-        `Hello Danat — this is ${String(d.get('name') || '').trim()}.`,
-        ``,
-        ...opt('topic', 'Subject'),
-        ...opt('phone', 'Phone'),
-        ...opt('email', 'Email'),
-        ``,
-        String(d.get('message') || '').trim(),
-      ].join('\n');
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (!form.reportValidity()) return;
+        window.open(`https://wa.me/${WA}?text=${encodeURIComponent(compose())}`,
+          '_blank', 'noopener');
+      });
+
+      document.getElementById('by-email')?.addEventListener('click', () => {
+        if (!form.reportValidity()) return;
+        const s = String(new FormData(form).get('topic') || 'Enquiry');
+        window.location.href =
+          `mailto:${MAIL}?subject=${encodeURIComponent(s)}&body=${encodeURIComponent(compose())}`;
+      });
+    })();
     };
 
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      if (!form.reportValidity()) return;
-      window.open(`https://wa.me/${WA}?text=${encodeURIComponent(compose())}`,
-        '_blank', 'noopener');
-    });
-
-    document.getElementById('by-email')?.addEventListener('click', () => {
-      if (!form.reportValidity()) return;
-      const s = String(new FormData(form).get('topic') || 'Enquiry');
-      window.location.href =
-        `mailto:${MAIL}?subject=${encodeURIComponent(s)}&body=${encodeURIComponent(compose())}`;
-    });
+    let ran = false;
+    document.addEventListener('astro:page-load', () => { ran = true; setup(); });
+    window.addEventListener('load', () => { if (!ran) { ran = true; setup(); } });
   })();
 </script>
 

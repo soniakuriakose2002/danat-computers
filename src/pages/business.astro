@@ -337,69 +337,82 @@ const figures = [
 </PageLayout>
 
 <script is:inline>
+  /* <ClientRouter /> swaps the body on a nav click without a page load,
+     and an is:inline script runs once on the first load and never again
+     — so everything below was binding to elements that had already been
+     thrown away. astro:page-load fires on the first load and after every
+     swap. */
   (() => {
-    const stage = document.querySelector('[data-deck]');
-    if (!stage) return;
+    const setup = () => {
+    (() => {
+      const stage = document.querySelector('[data-deck]');
+      if (!stage) return;
 
-    const cards = [...stage.querySelectorAll('.bc')];
-    const dots = [...stage.querySelectorAll('.bs__dots i')];
-    const idx = [...document.querySelectorAll('.bs__idx [data-goto]')];
-    const n = cards.length;
-    if (!n) return;
+      const cards = [...stage.querySelectorAll('.bc')];
+      const dots = [...stage.querySelectorAll('.bs__dots i')];
+      const idx = [...document.querySelectorAll('.bs__idx [data-goto]')];
+      const n = cards.length;
+      if (!n) return;
 
-    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    let at = 0;
-    let timer = null;
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      let at = 0;
+      let timer = null;
 
-    const show = (next) => {
-      at = ((next % n) + n) % n;
-      cards.forEach((c, i) => {
-        // Signed distance wrapped the short way round, so the deck turns
-        // through the nearer edge instead of unwinding the whole fan.
-        let o = i - at;
-        if (o > n / 2) o -= n;
-        if (o < -n / 2) o += n;
-        const a = Math.abs(o);
-        c.style.setProperty('--o', String(o));
-        c.style.setProperty('--a', String(a));
-        c.dataset.a = String(a);
-        // Falling z-index is what makes each neighbour reveal a fixed
-        // strip of itself rather than being buried by the one outside it.
-        c.style.zIndex = String(n - a);
-        c.toggleAttribute('data-on', o === 0);
-        c.toggleAttribute('data-far', a >= 3);
-        // A card on the left reveals its left edge; one on the right
-        // reveals its right edge, because each is overlapped from the
-        // side facing the centre. So the contents mirror, or half the
-        // deck hides its own title behind the active card.
-        c.dataset.side = o === 0 ? 'c' : o > 0 ? 'r' : 'l';
+      const show = (next) => {
+        at = ((next % n) + n) % n;
+        cards.forEach((c, i) => {
+          // Signed distance wrapped the short way round, so the deck turns
+          // through the nearer edge instead of unwinding the whole fan.
+          let o = i - at;
+          if (o > n / 2) o -= n;
+          if (o < -n / 2) o += n;
+          const a = Math.abs(o);
+          c.style.setProperty('--o', String(o));
+          c.style.setProperty('--a', String(a));
+          c.dataset.a = String(a);
+          // Falling z-index is what makes each neighbour reveal a fixed
+          // strip of itself rather than being buried by the one outside it.
+          c.style.zIndex = String(n - a);
+          c.toggleAttribute('data-on', o === 0);
+          c.toggleAttribute('data-far', a >= 3);
+          // A card on the left reveals its left edge; one on the right
+          // reveals its right edge, because each is overlapped from the
+          // side facing the centre. So the contents mirror, or half the
+          // deck hides its own title behind the active card.
+          c.dataset.side = o === 0 ? 'c' : o > 0 ? 'r' : 'l';
+        });
+        dots.forEach((d, i) => d.toggleAttribute('data-on', i === at));
+        idx.forEach((b, i) => b.toggleAttribute('data-on', i === at));
+        // Only the front card's link is in the tab order; the others are
+        // reached by selecting the card first, same as with a pointer.
+        cards.forEach((c, i) => {
+          const go = c.querySelector('.bc__go');
+          if (go) go.tabIndex = i === at ? 0 : -1;
+        });
+      };
+
+      const stop = () => { if (timer) clearInterval(timer); timer = null; };
+      const start = () => {
+        if (!reduced && !timer) timer = setInterval(() => show(at + 1), 4600);
+      };
+
+      document.querySelectorAll('[data-goto]').forEach((b) => {
+        b.addEventListener('click', () => { show(Number(b.dataset.goto)); stop(); start(); });
       });
-      dots.forEach((d, i) => d.toggleAttribute('data-on', i === at));
-      idx.forEach((b, i) => b.toggleAttribute('data-on', i === at));
-      // Only the front card's link is in the tab order; the others are
-      // reached by selecting the card first, same as with a pointer.
-      cards.forEach((c, i) => {
-        const go = c.querySelector('.bc__go');
-        if (go) go.tabIndex = i === at ? 0 : -1;
-      });
+
+      stage.addEventListener('pointerenter', stop);
+      stage.addEventListener('pointerleave', start);
+      stage.addEventListener('focusin', stop);
+      stage.addEventListener('focusout', start);
+
+      show(0);
+      start();
+    })();
     };
 
-    const stop = () => { if (timer) clearInterval(timer); timer = null; };
-    const start = () => {
-      if (!reduced && !timer) timer = setInterval(() => show(at + 1), 4600);
-    };
-
-    document.querySelectorAll('[data-goto]').forEach((b) => {
-      b.addEventListener('click', () => { show(Number(b.dataset.goto)); stop(); start(); });
-    });
-
-    stage.addEventListener('pointerenter', stop);
-    stage.addEventListener('pointerleave', start);
-    stage.addEventListener('focusin', stop);
-    stage.addEventListener('focusout', start);
-
-    show(0);
-    start();
+    let ran = false;
+    document.addEventListener('astro:page-load', () => { ran = true; setup(); });
+    window.addEventListener('load', () => { if (!ran) { ran = true; setup(); } });
   })();
 </script>
 

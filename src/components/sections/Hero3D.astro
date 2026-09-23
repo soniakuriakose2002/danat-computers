@@ -250,16 +250,29 @@ const nav = branches.map((b) => b.city.split(',')[0]);
 </style>
 
 <script is:inline>
-  // autoplay is a request, not a guarantee: low-power mode, data saver and
-  // reduced-motion all refuse it. The poster stays up in every such case.
+  /* <ClientRouter /> swaps the body on a nav click without a page load,
+     and an is:inline script runs once on the first load and never again
+     — so everything below was binding to elements that had already been
+     thrown away. astro:page-load fires on the first load and after every
+     swap. */
   (() => {
-    const v = document.querySelector('.h3__video');
-    if (!v) return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      v.removeAttribute('autoplay');
-      v.pause();
-      return;
-    }
-    v.play?.().catch(() => {});
+    const setup = () => {
+    // autoplay is a request, not a guarantee: low-power mode, data saver and
+    // reduced-motion all refuse it. The poster stays up in every such case.
+    (() => {
+      const v = document.querySelector('.h3__video');
+      if (!v) return;
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        v.removeAttribute('autoplay');
+        v.pause();
+        return;
+      }
+      v.play?.().catch(() => {});
+    })();
+    };
+
+    let ran = false;
+    document.addEventListener('astro:page-load', () => { ran = true; setup(); });
+    window.addEventListener('load', () => { if (!ran) { ran = true; setup(); } });
   })();
 </script>

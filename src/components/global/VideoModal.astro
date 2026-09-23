@@ -42,49 +42,62 @@ const ID = site.video.youtube;
 </dialog>
 
 <script is:inline>
+  /* <ClientRouter /> swaps the body on a nav click without a page load,
+     and an is:inline script runs once on the first load and never again
+     — so everything below was binding to elements that had already been
+     thrown away. astro:page-load fires on the first load and after every
+     swap. */
   (() => {
-    const dlg = document.querySelector('[data-video-modal]');
-    if (!dlg) return;
-    const frame = dlg.querySelector('[data-video-frame]');
+    const setup = () => {
+    (() => {
+      const dlg = document.querySelector('[data-video-modal]');
+      if (!dlg) return;
+      const frame = dlg.querySelector('[data-video-frame]');
 
-    const open = () => {
-      if (frame) frame.src = frame.dataset.src ?? 'about:blank';
-      if (typeof dlg.showModal === 'function') dlg.showModal();
-      else dlg.setAttribute('open', '');
-      // A frame later, or the transition has no previous state to run
-      // from and the player simply appears.
-      requestAnimationFrame(() =>
-        requestAnimationFrame(() => dlg.setAttribute('data-in', ''))
+      const open = () => {
+        if (frame) frame.src = frame.dataset.src ?? 'about:blank';
+        if (typeof dlg.showModal === 'function') dlg.showModal();
+        else dlg.setAttribute('open', '');
+        // A frame later, or the transition has no previous state to run
+        // from and the player simply appears.
+        requestAnimationFrame(() =>
+          requestAnimationFrame(() => dlg.setAttribute('data-in', ''))
+        );
+      };
+
+      const close = () => {
+        dlg.removeAttribute('data-in');
+        // Clearing src is what actually stops playback without the
+        // Player API; hiding the dialog alone leaves the audio running.
+        if (frame) frame.src = 'about:blank';
+        if (typeof dlg.close === 'function') dlg.close();
+        else dlg.removeAttribute('open');
+      };
+
+      document.querySelectorAll('[data-video-open]').forEach((b) =>
+        b.addEventListener('click', (e) => {
+          e.preventDefault();
+          open();
+        })
       );
+      dlg.querySelector('[data-video-close]')?.addEventListener('click', close);
+
+      // Clicking the backdrop: the dialog element itself is the backdrop
+      // area, so a click whose target IS the dialog fell outside the box.
+      dlg.addEventListener('click', (e) => {
+        if (e.target === dlg) close();
+      });
+      // Escape fires `cancel` before `close`; clear the frame either way.
+      dlg.addEventListener('close', () => {
+        dlg.removeAttribute('data-in');
+        if (frame) frame.src = 'about:blank';
+      });
+    })();
     };
 
-    const close = () => {
-      dlg.removeAttribute('data-in');
-      // Clearing src is what actually stops playback without the
-      // Player API; hiding the dialog alone leaves the audio running.
-      if (frame) frame.src = 'about:blank';
-      if (typeof dlg.close === 'function') dlg.close();
-      else dlg.removeAttribute('open');
-    };
-
-    document.querySelectorAll('[data-video-open]').forEach((b) =>
-      b.addEventListener('click', (e) => {
-        e.preventDefault();
-        open();
-      })
-    );
-    dlg.querySelector('[data-video-close]')?.addEventListener('click', close);
-
-    // Clicking the backdrop: the dialog element itself is the backdrop
-    // area, so a click whose target IS the dialog fell outside the box.
-    dlg.addEventListener('click', (e) => {
-      if (e.target === dlg) close();
-    });
-    // Escape fires `cancel` before `close`; clear the frame either way.
-    dlg.addEventListener('close', () => {
-      dlg.removeAttribute('data-in');
-      if (frame) frame.src = 'about:blank';
-    });
+    let ran = false;
+    document.addEventListener('astro:page-load', () => { ran = true; setup(); });
+    window.addEventListener('load', () => { if (!ran) { ran = true; setup(); } });
   })();
 </script>
 
