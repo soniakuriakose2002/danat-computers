@@ -4,18 +4,23 @@ import PageLayout from '@layouts/PageLayout.astro';
 import Icon from '@components/ui/Icon.astro';
 import { site, brands } from '@data/site';
 import pHp from '@assets/products/hp.png';
+import scLaptop from '@assets/products/scene/laptop.png';
 import scDesktop from '@assets/products/scene/desktop.png';
 import scRouter from '@assets/products/scene/router.png';
 import scCamera from '@assets/products/scene/camera.png';
 import scParts from '@assets/products/scene/parts.png';
+import scTower from '@assets/products/scene/tower.png';
 
-const heroShot = pHp;
+/* All six come off one sheet, so they share a light source and a grade.
+   The brand machines in the featured fan stay as they are. */
+const heroShot = scLaptop;
 
-/** The rest of the range standing around the dais, as the mockup places it. */
+/** The rest of the range standing around the dais. */
 const props = [
   { img: scDesktop, at: 'desk' },
   { img: scRouter, at: 'rout' },
   { img: scCamera, at: 'cam' },
+  { img: scTower, at: 'tower' },
   { img: scParts, at: 'part' },
 ];
 import pDell from '@assets/products/dell.png';
@@ -666,7 +671,7 @@ const helps = [
     left: 50%;
     bottom: 16%;
     translate: -50% 0;
-    width: min(23rem, 62%);
+    width: min(20rem, 52%);
     height: auto;
     z-index: 2;
     filter: drop-shadow(0 26px 34px rgb(10 30 12 / 0.22));
@@ -678,10 +683,11 @@ const helps = [
     height: auto;
     filter: drop-shadow(0 14px 18px rgb(10 30 12 / 0.14));
   }
-  .ph__prop[data-at='desk'] { z-index: 0; left: 3%;  bottom: 32%; width: 17%; }
-  .ph__prop[data-at='rout'] { z-index: 0; right: 19%; top: 5%;   width: 19%; }
-  .ph__prop[data-at='cam']  { z-index: 1; right: 8%;  top: 33%;  width: 15%; }
-  .ph__prop[data-at='part'] { z-index: 2; left: 0%;   bottom: 11%; width: 26%; }
+  .ph__prop[data-at='desk']  { z-index: 0; left: 0%;   bottom: 29%; width: 31%; }
+  .ph__prop[data-at='rout']  { z-index: 0; right: 17%; top: 3%;    width: 20%; }
+  .ph__prop[data-at='cam']   { z-index: 1; right: 4%;  top: 25%;   width: 15%; }
+  .ph__prop[data-at='tower'] { z-index: 0; right: 5%;  bottom: 22%; width: 10%; }
+  .ph__prop[data-at='part']  { z-index: 2; left: 3%;   bottom: 8%;  width: 22%; }
 
   .ph__dais {
     position: absolute;
@@ -1285,6 +1291,29 @@ const helps = [
   @media (min-width: 40rem) {
     .pc__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .pt__list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+
+  /* Below the two-column breakpoint the scene is only as wide as the phone,
+     but the chips keep their reading size — so they stop being labels
+     floating around the range and start burying it. Shrink them, pin them
+     to the outer edges, and give the scene more height to breathe. */
+  @media (max-width: 61.999rem) {
+    .ph__scene { aspect-ratio: 1 / 0.94; }
+    .ph__chip {
+      gap: 0.35rem;
+      max-width: 38%;
+      padding: 0.3rem 0.5rem;
+      border-radius: 9px;
+      font-size: 0.5rem;
+      letter-spacing: 0.1em;
+    }
+    .ph__chip i :global(svg) { width: 12px; height: 12px; }
+    .ph__chip[data-at='a'] { left: 0%;  top: 12%; }
+    .ph__chip[data-at='b'] { left: 32%; top: 0%; }
+    .ph__chip[data-at='c'] { right: 0%; top: 9%; }
+    .ph__chip[data-at='d'] { right: 0%; top: 33%; }
+    .ph__chip[data-at='e'] { right: 0%; bottom: 16%; }
+    .ph__chip[data-at='f'] { left: 0%;  bottom: 6%; }
   }
 
   @media (min-width: 62rem) {
