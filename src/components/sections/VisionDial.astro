@@ -1,0 +1,484 @@
+---
+import Icon from '@components/ui/Icon.astro';
+
+/**
+ * VISION · MISSION · VALUES — three faces on a turning ring.
+ *
+ * Positioning note, because the obvious approach is wrong: a node cannot
+ * be pushed out to the ring with `translateY(-42%)`, because a
+ * percentage translate resolves against the NODE's own box, not the
+ * dial's. Four 64px nodes all ended up ~27px from the centre, hidden
+ * behind the core. Instead each node is a full-size box that rotates
+ * about the dial's centre, with its chip pinned to the top edge — so the
+ * radius is the dial's, whatever size that is.
+ *
+ * The chip then counter-rotates by -(--th + --a) so it stays upright
+ * through the sweep. Rotation accumulates rather than resetting, so
+ * stepping from the last face to the first turns forward.
+ *
+ * ⚠ The vision and mission wording below is a DRAFT written from what is
+ * demonstrably true about the business (board-level repair, four
+ * branches, stock held in country). Danat has never published either
+ * statement. Get both signed off before launch.
+ */
+const faces = [
+  {
+    key: 'Vision',
+    icon: 'compass',
+    h: 'Technology that keeps Oman moving.',
+    p: 'A country where a failed machine is repaired, not replaced — and where the skill to do that is available locally, not shipped abroad.',
+    list: null,
+  },
+  {
+    key: 'Mission',
+    icon: 'chip',
+    h: 'Repair what others replace.',
+    p: 'Trace every fault to the component. Hold the parts in country. Quote before we touch anything, and charge for the repair rather than the replacement.',
+    list: null,
+  },
+  {
+    key: 'Values',
+    icon: 'shield',
+    h: 'Four things we do not compromise on.',
+    p: null,
+    list: [
+      'Diagnose before we quote',
+      'Repair the board, not the box',
+      'Hold the part before it is needed',
+      'One standard at every counter',
+    ],
+  },
+];
+---
+
+<section class="vd section">
+  <span class="vd__wash" aria-hidden="true"></span>
+
+  <div class="shell vd__head">
+    <p class="eb" data-rise><i class="eb__r" aria-hidden="true"></i>What we stand on</p>
+    <h2 class="vd__h" data-rise style="--d:70ms">
+      Vision, mission,<br /><em>and what we will not bend.</em>
+    </h2>
+  </div>
+
+  <div class="shell vd__stage" data-rise style="--d:130ms">
+    {/* The word either side of the dial, as a sense of what is next. */}
+    <button class="vd__side" type="button" data-step="-1" aria-label="Previous">
+      <span data-ghost="prev" aria-hidden="true"></span>
+      <i aria-hidden="true"><Icon name="arrow" size={17} /></i>
+    </button>
+
+    <div class="dial" data-dial style={`--n:${faces.length}`}>
+      <span class="dial__ring" aria-hidden="true"></span>
+      <span class="dial__sweep" aria-hidden="true"></span>
+
+      <div class="dial__rot">
+        {faces.map((f, i) => (
+          <div class="dial__node" style={`--th:${(i * 360) / faces.length}deg`}>
+            <button class="dial__chip" type="button" data-i={i} data-on={i === 0 ? '' : undefined}>
+              <i aria-hidden="true"><Icon name={f.icon} size={18} /></i>
+              <b>{f.key}</b>
+            </button>
+          </div>
+        ))}
+      </div>
+
+      <div class="dial__core">
+        {faces.map((f, i) => (
+          <article class="dial__panel" data-on={i === 0 ? '' : undefined}
+            aria-hidden={i === 0 ? undefined : 'true'}>
+            <p class="dial__k">{f.key}</p>
+            <h3>{f.h}</h3>
+            {f.p && <p class="dial__p">{f.p}</p>}
+            {f.list && (
+              <ul class="dial__list">
+                {f.list.map((l) => (
+                  <li><Icon name="check" size={13} />{l}</li>
+                ))}
+              </ul>
+            )}
+          </article>
+        ))}
+      </div>
+    </div>
+
+    <button class="vd__side vd__side--next" type="button" data-step="1" aria-label="Next">
+      <i aria-hidden="true"><Icon name="arrow" size={17} /></i>
+      <span data-ghost="next" aria-hidden="true"></span>
+    </button>
+  </div>
+
+  <div class="shell vd__dots" role="tablist" aria-label="Vision, mission and values">
+    {faces.map((f, i) => (
+      <button class="vd__dot" type="button" data-i={i} data-on={i === 0 ? '' : undefined}
+        role="tab" aria-selected={i === 0 ? 'true' : 'false'} aria-label={f.key}></button>
+    ))}
+  </div>
+
+  <p class="vd__note" data-rise>
+    Vision and mission wording is a draft for Danat to approve.
+  </p>
+</section>
+
+<script is:inline>
+  (() => {
+    const dial = document.querySelector('[data-dial]');
+    if (!dial) return;
+
+    const rot = dial.querySelector('.dial__rot');
+    const chips = [...dial.querySelectorAll('.dial__chip')];
+    const panels = [...dial.querySelectorAll('.dial__panel')];
+    const dots = [...document.querySelectorAll('.vd__dot')];
+    const ghosts = [...document.querySelectorAll('[data-ghost]')];
+    const n = chips.length;
+    if (!rot || !n) return;
+
+    const labels = chips.map((c) => c.querySelector('b')?.textContent ?? '');
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let at = 0;
+    let turns = 0;
+    let timer = null;
+
+    const show = (next) => {
+      let d = (((next - at) % n) + n) % n;
+      if (d > n / 2) d -= n;
+      turns += d;
+      at = ((next % n) + n) % n;
+
+      rot.style.setProperty('--a', `${-turns * (360 / n)}deg`);
+      chips.forEach((el, i) => el.toggleAttribute('data-on', i === at));
+      dots.forEach((el, i) => {
+        el.toggleAttribute('data-on', i === at);
+        el.setAttribute('aria-selected', i === at ? 'true' : 'false');
+      });
+      panels.forEach((el, i) => {
+        const on = i === at;
+        el.toggleAttribute('data-on', on);
+        if (on) el.removeAttribute('aria-hidden');
+        else el.setAttribute('aria-hidden', 'true');
+      });
+      ghosts.forEach((el) => {
+        const dir = el.getAttribute('data-ghost') === 'next' ? 1 : -1;
+        el.textContent = labels[(((at + dir) % n) + n) % n];
+      });
+    };
+
+    const stop = () => {
+      if (timer) clearInterval(timer);
+      timer = null;
+    };
+    const start = () => {
+      if (reduced || timer) return;
+      timer = setInterval(() => show(at + 1), 5000);
+    };
+
+    chips.forEach((el, i) => el.addEventListener('click', () => { stop(); show(i); }));
+    dots.forEach((el, i) => el.addEventListener('click', () => { stop(); show(i); }));
+    document.querySelectorAll('[data-step]').forEach((b) =>
+      b.addEventListener('click', () => { stop(); show(at + Number(b.getAttribute('data-step'))); })
+    );
+
+    const io = new IntersectionObserver(
+      ([e]) => (e.isIntersecting ? start() : stop()),
+      { threshold: 0.3 }
+    );
+    io.observe(dial);
+
+    show(0);
+  })();
+</script>
+
+<style>
+  .vd {
+    position: relative;
+    background: linear-gradient(185deg, #fbfdfb, #eff6ef 56%, #f8fbf8);
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .vd__wash {
+    position: absolute;
+    z-index: -1;
+    left: 50%;
+    top: 52%;
+    translate: -50% -50%;
+    width: min(50rem, 94vw);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      color-mix(in oklab, var(--green) 15%, transparent) 0%,
+      color-mix(in oklab, var(--clay) 8%, transparent) 48%,
+      transparent 72%
+    );
+    filter: blur(28px);
+  }
+
+  .eb {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--green-deep);
+  }
+  .eb__r { width: 26px; height: 1px; flex: none; background: currentColor; opacity: 0.6; }
+
+  .vd__head { text-align: center; }
+  .vd__head .eb { justify-content: center; }
+  .vd__h {
+    margin-top: var(--s4);
+    font-size: clamp(1.6rem, 3vw, 2.4rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+  }
+  .vd__h em { font-style: normal; color: var(--clay-deep); }
+
+  /* ───── stage ───── */
+
+  .vd__stage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(0.4rem, 1.6vw, 1.25rem);
+    margin-top: clamp(1.5rem, 3.5vw, 2.5rem);
+  }
+
+  .vd__side {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    color: var(--text-3);
+  }
+  .vd__side i {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    flex: none;
+    border: 1px solid var(--line-light);
+    border-radius: 50%;
+    background: var(--white);
+    color: var(--text-2);
+    transition:
+      background-color var(--t2) var(--ease),
+      border-color var(--t2) var(--ease),
+      color var(--t2) var(--ease),
+      transform var(--t2) var(--ease);
+  }
+  .vd__side i :global(svg) { transform: rotate(180deg); }
+  .vd__side--next i :global(svg) { transform: none; }
+  .vd__side:hover i {
+    transform: translateY(-2px);
+    border-color: var(--green-deep);
+    background: var(--green-deep);
+    color: #fff;
+  }
+  .vd__side:focus-visible i { outline: 2px solid var(--green-deep); outline-offset: 3px; }
+
+  /* The face either side, greyed — so you can see what turning gets you. */
+  .vd__side span {
+    display: none;
+    font-size: clamp(1.4rem, 3.4vw, 2.6rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    /* Large bold text, so the bar is 3:1 not 4.5:1 — but 42% measured
+       1.73:1, which is below even that. 80% is 3.16:1. */
+    color: color-mix(in oklab, var(--text-3) 80%, transparent);
+  }
+
+  /* ───── dial ───── */
+
+  .dial {
+    position: relative;
+    width: min(30rem, 76vw);
+    aspect-ratio: 1;
+    flex: none;
+  }
+
+  .dial__ring {
+    position: absolute;
+    inset: 6%;
+    border-radius: 50%;
+    border: 1px solid color-mix(in oklab, var(--green) 30%, transparent);
+  }
+  .dial__sweep {
+    position: absolute;
+    inset: 6%;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    border-top-color: var(--clay);
+    rotate: -60deg;
+  }
+
+  .dial__rot {
+    position: absolute;
+    inset: 0;
+    transform: rotate(var(--a, 0deg));
+    transition: transform 900ms cubic-bezier(0.65, 0, 0.35, 1);
+  }
+
+  /* Full-size box rotating about the dial's centre. The radius is the
+     dial's, so it scales with it — a percentage translate on the chip
+     itself would resolve against the chip and collapse to the middle. */
+  .dial__node {
+    position: absolute;
+    inset: 0;
+    transform: rotate(var(--th));
+    pointer-events: none;
+  }
+
+  .dial__chip {
+    position: absolute;
+    top: 6%;
+    left: 50%;
+    translate: -50% -50%;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 1rem;
+    border: 1px solid var(--line-light);
+    border-radius: 999px;
+    background: var(--white);
+    color: var(--text-2);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    pointer-events: auto;
+    box-shadow: 0 1px 2px rgb(10 30 12 / 0.06), 0 10px 24px -16px rgb(10 30 12 / 0.4);
+    /* stays level through the sweep */
+    transform: rotate(calc((var(--th) + var(--a, 0deg)) * -1));
+    transition:
+      transform 900ms cubic-bezier(0.65, 0, 0.35, 1),
+      background-color var(--t3) var(--ease),
+      border-color var(--t3) var(--ease),
+      color var(--t3) var(--ease),
+      scale var(--t3) var(--ease);
+  }
+  .dial__chip:hover { scale: 1.05; }
+  .dial__chip:focus-visible { outline: 2px solid var(--green-deep); outline-offset: 3px; }
+  .dial__chip[data-on] {
+    scale: 1.08;
+    background: var(--green-deep);
+    border-color: var(--green-deep);
+    color: #fff;
+  }
+
+  /* ───── centre ───── */
+
+  .dial__core {
+    position: absolute;
+    inset: 21%;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.92);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 1px 2px rgb(10 30 12 / 0.05), 0 26px 54px -30px rgb(10 30 12 / 0.45);
+    text-align: center;
+    padding: clamp(0.8rem, 3vw, 1.9rem);
+  }
+
+  .dial__panel {
+    grid-area: 1 / 1;
+    display: grid;
+    justify-items: center;
+    opacity: 0;
+    scale: 0.95;
+    pointer-events: none;
+    transition: opacity var(--t3) var(--ease), scale var(--t3) var(--ease);
+  }
+  .dial__panel[data-on] { opacity: 1; scale: 1; pointer-events: auto; }
+
+  .dial__k {
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--clay-deep);
+  }
+  .dial__panel h3 {
+    margin-top: 0.5rem;
+    max-width: 17ch;
+    font-size: clamp(0.9375rem, 1.7vw, 1.25rem);
+    font-weight: 700;
+    letter-spacing: -0.028em;
+    line-height: 1.2;
+  }
+  .dial__p {
+    margin-top: 0.5rem;
+    max-width: 30ch;
+    font-size: clamp(0.75rem, 1.15vw, 0.875rem);
+    line-height: 1.55;
+    color: var(--text-2);
+  }
+  .dial__list {
+    display: grid;
+    gap: 0.35rem;
+    margin-top: 0.7rem;
+    text-align: left;
+  }
+  .dial__list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.45rem;
+    font-size: clamp(0.6875rem, 1.05vw, 0.8125rem);
+    line-height: 1.45;
+    color: var(--text-2);
+  }
+  .dial__list :global(svg) { flex: none; margin-top: 2px; color: var(--green-deep); }
+
+  /* ───── dots + note ───── */
+
+  .vd__dots {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: clamp(1.1rem, 2.5vw, 1.75rem);
+  }
+  .vd__dot {
+    width: 30px;
+    height: 4px;
+    padding: 0;
+    border: 0;
+    border-radius: 4px;
+    background: var(--line-light);
+    cursor: pointer;
+    transition: background-color var(--t2) var(--ease), width var(--t3) var(--ease);
+  }
+  .vd__dot[data-on] { width: 46px; background: var(--clay); }
+  .vd__dot:focus-visible { outline: 2px solid var(--green-deep); outline-offset: 3px; }
+
+  .vd__note {
+    margin-top: var(--s4);
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+
+  @media (min-width: 62rem) {
+    .vd__side span { display: block; }
+  }
+
+  @media (max-width: 40rem) {
+    .dial__chip { padding: 0.45rem 0.7rem; font-size: 0.6875rem; gap: 0.35rem; }
+    .dial__core { inset: 19%; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .dial__rot, .dial__chip, .dial__panel { transition: none; }
+    .vd__side i, .vd__side:hover i { transform: none; transition: none; }
+    .vd__side i :global(svg) { transform: rotate(180deg); }
+    .vd__side--next i :global(svg) { transform: none; }
+  }
+</style>
