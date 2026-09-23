@@ -477,7 +477,17 @@ const helps = [
 
         slides.forEach((el) => {
           const mine = Number(el.dataset.c) === c;
-          if (!mine) { el.toggleAttribute('data-off', true); return; }
+          if (!mine) {
+            el.toggleAttribute('data-off', true);
+            // data-on has to come OFF too. Returning early left every
+            // category we had visited still flagged active, so those
+            // slides kept the float animation and, worse, kept the --o
+            // and --a they were last posed with — so returning to a
+            // category started it from a stale arrangement instead of
+            // fanning into place.
+            el.toggleAttribute('data-on', false);
+            return;
+          }
           el.removeAttribute('data-off');
           // Signed distance wrapped the short way, so the fan turns
           // through the nearer edge rather than unwinding the deck.
@@ -529,9 +539,14 @@ const helps = [
         b.addEventListener('click', () => { i += Number(b.dataset.step); show(); stop(); start(); })
       );
 
-      // Turning on its own, but never while someone is reading or using it.
-      root.addEventListener('pointerenter', stop);
-      root.addEventListener('pointerleave', start);
+      // It pauses while someone is actually working the controls. Holding
+      // on the whole section meant a pointer resting anywhere near it —
+      // over the heading, the card, the empty margin — stopped the fan,
+      // which is indistinguishable from it never animating at all.
+      root.querySelectorAll('.pf__nav, .pf__arrow').forEach((el) => {
+        el.addEventListener('pointerenter', stop);
+        el.addEventListener('pointerleave', start);
+      });
       root.addEventListener('focusin', stop);
       root.addEventListener('focusout', start);
 
