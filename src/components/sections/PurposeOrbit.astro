@@ -1,64 +1,54 @@
 ---
 import { Image } from 'astro:assets';
 import Icon from '@components/ui/Icon.astro';
-import shotA from '@assets/photos/support-desk.jpg';
-import shotB from '@assets/photos/retail-display.jpg';
-import shotC from '@assets/photos/network-eng.jpg';
+import shotTech from '@assets/photos/repair-solder.jpg';
+import shotShop from '@assets/photos/retail-display.jpg';
 
 /**
- * OUR PURPOSE — mission, vision and values on an orbit.
+ * OUR PURPOSE — three panes on a 3D stage.
  *
- * Three nodes sit on a ring; picking one turns the ring until it reaches
- * the top, and the centre cross-fades under it. Behind the nodes is a
- * photographic donut cut into three wedges with conic-gradient masks —
- * a mask rather than clip-path, because a 120° wedge needs arc points a
- * polygon cannot express without approximating the curve.
+ * The active pane stands square to the camera; the other two sit back
+ * and turn inward on a real perspective, so the set reads as objects in
+ * a space rather than three boxes in a row. Selecting one rotates the
+ * set: whatever was chosen comes forward and the rest fall back.
  *
- * Faces are stored in RING order (clockwise from the top), while the
- * numbered index on the left shows reading order. The two differ on
- * purpose: the arrows step around the circle, so "next" has to mean the
- * node physically to the right.
+ * Everything is CSS 3D on a preserve-3d stage — no library, no canvas.
+ * The orbital rings are SVG ellipses tipped in X and turning slowly,
+ * which is what gives the depth something to read against.
  *
  * ⚠ The mission, vision and values wording is a DRAFT. Danat has never
- * published any of the three. The mission text comes from the client's
- * mockup; the other two are written to match its tone. All three need
- * signing off before launch — the page says so.
+ * published any of the three. The mission text is the client's own from
+ * their mockup; the other two are written to match. The page says so.
  */
 const faces = [
   {
     no: '01',
     key: 'Mission',
-    sub: 'Creating real value today',
-    icon: 'chip',
-    shot: shotA,
+    kicker: 'Our mission',
+    lead: 'A more connected tomorrow',
     h: ['Make technology', 'work better', 'for people.'],
     accent: [1, 2],
-    p: 'Genuine products, expert service and practical solutions that help people and businesses work smarter.',
-  },
-  {
-    no: '03',
-    key: 'Values',
-    sub: 'What guides us always',
-    icon: 'heart',
-    shot: shotB,
-    h: ['Diagnose first.', 'Repair deeper.', 'Stand behind it.'],
-    accent: [1],
-    p: 'Free diagnosis before any quote. Faults traced to the component. The same standard at all four counters.',
+    p: 'We provide genuine products, expert service and practical technology solutions that help individuals, businesses and communities work smarter.',
   },
   {
     no: '02',
     key: 'Vision',
-    sub: 'A more connected tomorrow',
-    icon: 'eye',
-    shot: shotC,
+    kicker: 'Our vision',
+    lead: 'A more connected tomorrow',
     h: ['An Oman that', 'repairs, not', 'replaces.'],
     accent: [1],
-    p: 'Where a failed machine is worth mending, and the skill to mend it lives here.',
+    p: 'Where a failed machine is worth mending, and the skill to mend it lives here rather than being shipped abroad with the hardware.',
+  },
+  {
+    no: '03',
+    key: 'Values',
+    kicker: 'Our values',
+    lead: 'What guides us always',
+    h: ['Diagnose first.', 'Repair deeper.', 'Stand behind it.'],
+    accent: [1],
+    p: 'Free diagnosis before any quote. Faults traced to the component rather than the board. The same standard at all four counters.',
   },
 ];
-
-/** Reading order for the index on the left; the ring order differs. */
-const index = [...faces].sort((a, b) => a.no.localeCompare(b.no));
 
 const promises = [
   { icon: 'users', a: 'People', b: 'at the centre' },
@@ -69,14 +59,15 @@ const promises = [
 ---
 
 <section class="po">
-  <span class="po__wash" aria-hidden="true"></span>
+  <span class="po__sky" aria-hidden="true"></span>
+  <span class="po__haze" aria-hidden="true"></span>
 
   <div class="shell po__grid">
     {/* ── left ── */}
     <div class="po__left">
       <p class="eb" data-rise><i class="eb__r" aria-hidden="true"></i>Our purpose</p>
       <h2 class="po__h" data-rise style="--d:70ms">
-        Guided by<br /><em>a bigger purpose.</em>
+        Guided by<br /><em>a bigger<br />purpose.</em>
       </h2>
       <p class="po__p" data-rise style="--d:130ms">
         Our mission, vision and values reflect who we are, what we aim for,
@@ -84,120 +75,104 @@ const promises = [
       </p>
 
       <ol class="po__idx" data-rise style="--d:190ms">
-        {index.map((f) => (
+        {faces.map((f, i) => (
           <li>
-            <button type="button" data-goto={f.key} data-on={f.key === 'Mission' ? '' : undefined}>
-              <b>{f.no}</b><span>{f.key}</span>
+            <button type="button" data-goto={i} data-on={i === 0 ? '' : undefined}>
+              <b>{f.no}</b>
+              <i class="po__dot" aria-hidden="true"></i>
+              <span>{f.key}</span>
             </button>
           </li>
         ))}
       </ol>
 
       <p class="po__script" aria-hidden="true">
-        Technology<br />for a Brighter<br />Oman
-        <svg viewBox="0 0 150 14" fill="none">
-          <path d="M4 10C38 3 108 2 146 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" />
+        Technology<br />for a<br />Brighter Oman
+        <svg viewBox="0 0 160 14" fill="none">
+          <path d="M4 10C40 3 118 2 156 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
         </svg>
       </p>
     </div>
 
-    {/* ── orbit ── */}
-    <div class="po__mid">
-      <button class="po__side" type="button" data-step="-1" aria-label="Previous">
-        <i aria-hidden="true"><Icon name="arrow" size={16} /></i>
-        <span data-ghost="prev" aria-hidden="true"></span>
-      </button>
+    {/* ── stage ── */}
+    <div class="po__stage" data-stage>
+      {/* orbital rings, tipped back and turning */}
+      <svg class="po__rings" viewBox="0 0 200 200" fill="none" aria-hidden="true">
+        <ellipse class="po__ring po__ring--a" cx="100" cy="100" rx="94" ry="36"
+          stroke="currentColor" stroke-width="0.7" />
+        <ellipse class="po__ring po__ring--b" cx="100" cy="100" rx="78" ry="30"
+          stroke="currentColor" stroke-width="0.5" stroke-dasharray="2 4" />
+      </svg>
 
-      <div class="orb" data-orb>
-        {/* dashed guide arcs */}
-        <svg class="orb__arcs" viewBox="0 0 100 100" fill="none" aria-hidden="true">
-          <circle cx="50" cy="50" r="48" stroke="currentColor" stroke-width="0.3" stroke-dasharray="1.6 3.2" />
-          <circle cx="50" cy="50" r="42" stroke="currentColor" stroke-width="0.3" stroke-dasharray="0.8 5" />
-        </svg>
+      {/* floating spheres */}
+      <span class="orb" style="--x:8%;  --y:34%; --s:26px; --c:#e8efe9"></span>
+      <span class="orb" style="--x:30%; --y:18%; --s:14px; --c:#e8efe9"></span>
+      <span class="orb" style="--x:36%; --y:26%; --s:18px; --c:#2f6b2a"></span>
+      <span class="orb" style="--x:88%; --y:46%; --s:22px; --c:#2f6b2a"></span>
+      <span class="orb" style="--x:72%; --y:14%; --s:12px; --c:#e8efe9"></span>
 
-        {/* floating spheres */}
-        <span class="orb__ball" style="--x:78%; --y:8%;  --s:18px; --c:#c98a6a"></span>
-        <span class="orb__ball" style="--x:95%; --y:30%; --s:14px; --c:#3d8b3a"></span>
-        <span class="orb__ball" style="--x:12%; --y:40%; --s:26px; --c:#e9eeea"></span>
-        <span class="orb__ball" style="--x:6%;  --y:72%; --s:16px; --c:#e9eeea"></span>
-        <span class="orb__ball" style="--x:88%; --y:60%; --s:20px; --c:#e9eeea"></span>
+      {/* photo cards that ride the orbit */}
+      <figure class="po__shot po__shot--l">
+        <Image src={shotTech} alt="" widths={[320, 520]} sizes="220px"
+          quality={72} format="webp" loading="lazy" />
+        <figcaption>People<br />Power<br />Progress</figcaption>
+      </figure>
+      <figure class="po__shot po__shot--r">
+        <Image src={shotShop} alt="" widths={[320, 520]} sizes="220px"
+          quality={72} format="webp" loading="lazy" />
+        <figcaption>Rooted<br />in Oman</figcaption>
+      </figure>
 
-        {/* photographic donut, one wedge per face */}
-        <div class="orb__donut">
-          {faces.map((f, i) => (
-            <figure class="orb__wedge" style={`--from:${i * 120 - 60}deg`}>
-              <Image src={f.shot} alt="" widths={[420, 640]} sizes="34vw"
-                quality={72} format="webp" loading="lazy" />
-            </figure>
-          ))}
-        </div>
+      {/* the three panes */}
+      <div class="deck">
+        {faces.map((f, i) => (
+          <article class="pane" data-pos={i === 0 ? 'c' : i === 1 ? 'r' : 'l'} data-i={i}>
+            <button class="pane__hit" type="button" aria-label={`Show ${f.key}`}></button>
 
-        {/* the turning ring of nodes */}
-        <div class="orb__rot">
-          {faces.map((f, i) => (
-            <div class="orb__node" style={`--th:${i * 120}deg`}>
-              <button class="nd" type="button" data-i={i}
-                data-on={i === 0 ? '' : undefined} aria-label={`${f.key} — ${f.sub}`}>
-                <i aria-hidden="true"><Icon name={f.icon} size={20} /></i>
-                <b>{f.key}</b>
-                <em>{f.sub}</em>
-              </button>
-            </div>
-          ))}
-        </div>
+            <p class="pane__no">{f.no}</p>
+            <p class="pane__k">{f.kicker}</p>
 
-        {/* centre */}
-        <div class="orb__core">
-          {faces.map((f, i) => (
-            <article class="pn" data-on={i === 0 ? '' : undefined}
-              aria-hidden={i === 0 ? undefined : 'true'}>
-              <p class="pn__k">{f.key}</p>
-              <h3>
-                {f.h.map((line, li) => (
-                  <>{f.accent.includes(li) ? <em>{line}</em> : line}<br /></>
-                ))}
-              </h3>
-              <p class="pn__p">{f.p}</p>
-              <a class="pn__cta" href="/services">
-                Learn more<Icon name="arrow" size={15} />
-              </a>
-            </article>
-          ))}
+            <h3 class="pane__h">
+              {f.h.map((line, li) => (
+                <>{f.accent.includes(li) ? <em>{line}</em> : line}<br /></>
+              ))}
+            </h3>
 
-        </div>
+            <p class="pane__p">{f.p}</p>
+
+            <a class="pane__cta" href="/services">
+              Learn more<Icon name="arrow" size={15} />
+            </a>
+
+            <span class="pane__bar" aria-hidden="true">
+              {faces.map((_, bi) => <i data-on={bi === i ? '' : undefined}></i>)}
+            </span>
+          </article>
+        ))}
       </div>
 
-      <p class="orb__count" aria-hidden="true">
-        <span data-count-now>01</span> / 0{faces.length}
-        <i class="orb__bar"><b></b></i>
-      </p>
-
-      <button class="po__side po__side--next" type="button" data-step="1" aria-label="Next">
-        <span data-ghost="next" aria-hidden="true"></span>
-        <i aria-hidden="true"><Icon name="arrow" size={16} /></i>
-      </button>
+      {/* the plinth the deck stands on */}
+      <span class="po__plinth" aria-hidden="true"></span>
+      <p class="po__ground" aria-hidden="true">From people<br />to a brighter<br />tomorrow</p>
     </div>
 
     {/* ── right rail ── */}
     <div class="po__right" aria-hidden="true">
-      <p class="po__words">People<br />Technology<br />Progress<br />Together</p>
+      <p class="po__words">Technology<br />People<br />Progress<br />Together</p>
       <span class="po__rule"></span>
-      <p class="po__scroll">Scroll<br />to explore</p>
+      <p class="po__scroll">Scroll<br />the story</p>
     </div>
   </div>
 
   {/* ── foot ── */}
-  <div class="shell po__foot">
-    <ul class="po__proms">
-      {promises.map((p, i) => (
-        <li data-rise style={`--d:${i * 60}ms`}>
-          <i aria-hidden="true"><Icon name={p.icon} size={19} /></i>
-          <span><b>{p.a}</b>{p.b}</span>
-        </li>
-      ))}
-    </ul>
-    <p class="po__tag" aria-hidden="true">Same people.<br />A brighter tomorrow.</p>
-  </div>
+  <ul class="shell po__proms">
+    {promises.map((p, i) => (
+      <li data-rise style={`--d:${i * 60}ms`}>
+        <i aria-hidden="true"><Icon name={p.icon} size={19} /></i>
+        <span><b>{p.a}</b>{p.b}</span>
+      </li>
+    ))}
+  </ul>
 
   <p class="po__note" data-rise>
     Mission, vision and values wording is a draft for Danat to approve.
@@ -206,72 +181,41 @@ const promises = [
 
 <script is:inline>
   (() => {
-    const orb = document.querySelector('[data-orb]');
-    if (!orb) return;
+    const stage = document.querySelector('[data-stage]');
+    if (!stage) return;
 
-    const rot = orb.querySelector('.orb__rot');
-    const nodes = [...orb.querySelectorAll('.nd')];
-    const panels = [...orb.querySelectorAll('.pn')];
-    const wedges = [...orb.querySelectorAll('.orb__wedge')];
+    const panes = [...stage.querySelectorAll('.pane')];
     const idx = [...document.querySelectorAll('[data-goto]')];
-    const ghosts = [...document.querySelectorAll('[data-ghost]')];
-    const now = document.querySelector('[data-count-now]');
-    const bar = document.querySelector('.orb__bar b');
-    const n = nodes.length;
-    if (!rot || !n) return;
+    const n = panes.length;
+    if (!n) return;
 
-    const keys = nodes.map((el) => el.querySelector('b')?.textContent ?? '');
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     let at = 0;
-    let turns = 0;
     let timer = null;
 
     const show = (next) => {
-      let d = (((next - at) % n) + n) % n;
-      if (d > n / 2) d -= n;
-      turns += d;
       at = ((next % n) + n) % n;
-
-      const deg = -turns * (360 / n);
-      rot.style.setProperty('--a', `${deg}deg`);
-      orb.style.setProperty('--a', `${deg}deg`);
-
-      nodes.forEach((el, i) => el.toggleAttribute('data-on', i === at));
-      wedges.forEach((el, i) => el.toggleAttribute('data-on', i === at));
-      panels.forEach((el, i) => {
-        const on = i === at;
-        el.toggleAttribute('data-on', on);
-        if (on) el.removeAttribute('aria-hidden');
-        else el.setAttribute('aria-hidden', 'true');
+      panes.forEach((p, i) => {
+        // centre, then right, then left, walking forward from the active
+        const d = (((i - at) % n) + n) % n;
+        p.setAttribute('data-pos', d === 0 ? 'c' : d === 1 ? 'r' : 'l');
+        p.querySelectorAll('.pane__bar i').forEach((b, bi) =>
+          b.toggleAttribute('data-on', bi === at)
+        );
       });
-      idx.forEach((el) =>
-        el.toggleAttribute('data-on', el.getAttribute('data-goto') === keys[at])
-      );
-      ghosts.forEach((el) => {
-        const dir = el.getAttribute('data-ghost') === 'next' ? 1 : -1;
-        el.textContent = keys[(((at + dir) % n) + n) % n];
-      });
-      if (now) now.textContent = String(at + 1).padStart(2, '0');
-      if (bar) bar.style.setProperty('--p', String((at + 1) / n));
+      idx.forEach((el, i) => el.toggleAttribute('data-on', i === at));
     };
 
     const stop = () => { if (timer) clearInterval(timer); timer = null; };
-    const start = () => { if (!reduced && !timer) timer = setInterval(() => show(at + 1), 4000); };
+    const start = () => { if (!reduced && !timer) timer = setInterval(() => show(at + 1), 5200); };
 
-    nodes.forEach((el, i) => el.addEventListener('click', () => { stop(); show(i); }));
-    idx.forEach((el) =>
-      el.addEventListener('click', () => {
-        stop();
-        const i = keys.indexOf(el.getAttribute('data-goto') ?? '');
-        if (i >= 0) show(i);
-      })
+    panes.forEach((p, i) =>
+      p.querySelector('.pane__hit')?.addEventListener('click', () => { stop(); show(i); })
     );
-    document.querySelectorAll('[data-step]').forEach((b) =>
-      b.addEventListener('click', () => { stop(); show(at + Number(b.getAttribute('data-step'))); })
-    );
+    idx.forEach((el, i) => el.addEventListener('click', () => { stop(); show(i); }));
 
     new IntersectionObserver(([e]) => (e.isIntersecting ? start() : stop()), { threshold: 0.25 })
-      .observe(orb);
+      .observe(stage);
 
     show(0);
   })();
@@ -280,27 +224,30 @@ const promises = [
 <style>
   .po {
     position: relative;
-    background: linear-gradient(180deg, #fcfdfc, #f4f8f4 52%, #fafcfa);
     padding-block: clamp(3rem, 6vw, 5rem);
+    background: linear-gradient(180deg, #fbfdfc, #f2f7f4 54%, #fafcfb);
     overflow: hidden;
     isolation: isolate;
   }
-  .po__wash {
+  /* A soft horizon instead of the mockup's rendered mountains, which we
+     have no photography for. */
+  .po__sky {
+    position: absolute;
+    inset: 0 0 26% 0;
+    z-index: -2;
+    background: radial-gradient(120% 90% at 50% 100%, #e6efe9 0%, transparent 62%);
+  }
+  .po__haze {
     position: absolute;
     z-index: -1;
     left: 50%;
     top: 46%;
     translate: -50% -50%;
-    width: min(58rem, 96vw);
+    width: min(62rem, 98vw);
     aspect-ratio: 1;
     border-radius: 50%;
-    background: radial-gradient(
-      circle,
-      color-mix(in oklab, var(--green) 11%, transparent) 0%,
-      color-mix(in oklab, var(--clay) 6%, transparent) 50%,
-      transparent 72%
-    );
-    filter: blur(30px);
+    background: radial-gradient(circle, color-mix(in oklab, var(--green) 10%, transparent), transparent 66%);
+    filter: blur(34px);
   }
 
   .eb {
@@ -318,358 +265,293 @@ const promises = [
   .po__grid { display: grid; gap: clamp(1.5rem, 3vw, 2.5rem); align-items: center; }
 
   /* ───── left ───── */
-
   .po__h {
     margin-top: var(--s4);
-    font-size: clamp(1.9rem, 3.6vw, 2.9rem);
+    font-size: clamp(2rem, 4vw, 3.1rem);
     font-weight: 700;
-    letter-spacing: -0.042em;
-    line-height: 1.06;
+    letter-spacing: -0.045em;
+    line-height: 1.04;
   }
   .po__h em { font-style: normal; color: var(--green-deep); }
   .po__p {
     margin-top: var(--s4);
-    max-width: 34ch;
+    max-width: 32ch;
     font-size: 0.875rem;
-    line-height: 1.65;
+    line-height: 1.7;
     color: var(--text-2);
   }
 
-  .po__idx { display: grid; gap: 0.15rem; margin-top: var(--s5); }
+  .po__idx { display: grid; gap: 0; margin-top: var(--s5); }
+  .po__idx li { position: relative; }
+  /* The rail between the markers. */
+  .po__idx li:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: calc(1.9rem + 5px);
+    top: 1.85rem;
+    bottom: -0.15rem;
+    width: 1px;
+    background: var(--line-light);
+  }
   .po__idx button {
     display: flex;
     align-items: center;
     gap: 0.9rem;
     width: 100%;
-    padding: 0.4rem 0 0.4rem 0.7rem;
+    padding: 0.5rem 0;
     border: 0;
-    border-left: 2px solid transparent;
     background: none;
     cursor: pointer;
     text-align: left;
     color: var(--text-3);
-    transition: color var(--t2) var(--ease), border-color var(--t2) var(--ease);
+    transition: color var(--t2) var(--ease);
   }
-  .po__idx b {
-    font-family: var(--font-mono);
-    font-size: 0.625rem;
-    letter-spacing: 0.1em;
+  .po__idx b { width: 1.4rem; font-family: var(--font-mono); font-size: 0.6875rem; }
+  .po__dot {
+    width: 11px;
+    height: 11px;
+    flex: none;
+    border-radius: 50%;
+    background: var(--line-light);
+    transition: background-color var(--t2) var(--ease), box-shadow var(--t2) var(--ease);
   }
   .po__idx span { font-size: 0.9375rem; font-weight: 600; letter-spacing: -0.02em; }
   .po__idx button:hover { color: var(--text-2); }
-  .po__idx button[data-on] { color: var(--text); border-left-color: var(--green-deep); }
+  .po__idx button[data-on] { color: var(--text); }
+  .po__idx button[data-on] .po__dot {
+    background: var(--green-deep);
+    box-shadow: 0 0 0 4px color-mix(in oklab, var(--green) 20%, transparent);
+  }
   .po__idx button:focus-visible { outline: 2px solid var(--green-deep); outline-offset: 2px; }
 
   .po__script {
-    margin-top: clamp(1.5rem, 4vw, 2.75rem);
+    margin-top: clamp(1.5rem, 3.5vw, 2.5rem);
     font-family: var(--font-serif, Georgia, serif);
     font-style: italic;
-    font-size: clamp(1.2rem, 2.2vw, 1.8rem);
-    line-height: 1.24;
+    font-size: clamp(1.1rem, 2vw, 1.6rem);
+    line-height: 1.3;
     color: var(--green-deep);
-    rotate: -5deg;
+    rotate: -4deg;
     transform-origin: left center;
     pointer-events: none;
   }
-  .po__script svg { display: block; width: 8.5rem; margin-top: 0.3rem; color: var(--clay); }
+  .po__script svg { display: block; width: 9rem; margin-top: 0.3rem; color: var(--green); }
 
-  /* ───── orbit ───── */
-
-  .po__mid {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-    gap: clamp(0.4rem, 1.4vw, 1rem);
-  }
-
-  .po__side {
-    display: flex;
-    align-items: center;
-    gap: 0.7rem;
-    padding: 0;
-    border: 0;
-    background: none;
-    cursor: pointer;
-  }
-  .po__side i {
-    display: grid;
-    place-items: center;
-    width: 42px;
-    height: 42px;
-    flex: none;
-    border-radius: 50%;
-    background: var(--white);
-    color: var(--text-2);
-    box-shadow: 0 1px 2px rgb(10 30 12 / 0.06), 0 10px 24px -16px rgb(10 30 12 / 0.4);
-    transition:
-      background-color var(--t2) var(--ease),
-      color var(--t2) var(--ease),
-      transform var(--t2) var(--ease);
-  }
-  .po__side i :global(svg) { transform: rotate(180deg); }
-  .po__side--next i :global(svg) { transform: none; }
-  .po__side:hover i { transform: translateY(-2px); background: var(--green-deep); color: #fff; }
-  .po__side:focus-visible i { outline: 2px solid var(--green-deep); outline-offset: 3px; }
-  .po__side span {
-    display: none;
-    font-size: clamp(1.1rem, 2.2vw, 1.75rem);
-    font-weight: 700;
-    letter-spacing: -0.035em;
-    /* Large bold text: 3:1 is the bar, and this measures 3.16:1. */
-    color: color-mix(in oklab, var(--text-3) 80%, transparent);
-  }
-
-  .orb {
+  /* ───── stage ───── */
+  .po__stage {
     position: relative;
-    width: min(34rem, 82vw);
-    aspect-ratio: 1;
-    flex: none;
+    width: 100%;
+    aspect-ratio: 1 / 0.92;
+    perspective: 1700px;
+    perspective-origin: 50% 42%;
   }
 
-  .orb__arcs {
+  .po__rings {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
-    color: color-mix(in oklab, var(--text-3) 34%, transparent);
+    color: color-mix(in oklab, var(--green) 34%, transparent);
   }
-  /* The two rings turn against each other, slowly and forever, so the
-     orbit reads as live even between face changes. */
+  .po__ring { transform-origin: 50% 50%; }
   @media (prefers-reduced-motion: no-preference) {
-    .orb__arcs circle:first-child { animation: po-spin 64s linear infinite; }
-    .orb__arcs circle:last-child { animation: po-spin 44s linear infinite reverse; }
-    .orb__arcs circle { transform-origin: 50% 50%; }
+    .po__ring--a { animation: po-spin 48s linear infinite; }
+    .po__ring--b { animation: po-spin 34s linear infinite reverse; }
   }
   @keyframes po-spin { to { transform: rotate(360deg); } }
 
-  /* 3D-ish spheres, drifting */
-  .orb__ball {
+  .orb {
     position: absolute;
     left: var(--x);
     top: var(--y);
     width: var(--s);
     height: var(--s);
     border-radius: 50%;
-    background: radial-gradient(circle at 32% 28%, #fff, var(--c) 62%, color-mix(in oklab, var(--c) 70%, #000) 100%);
-    box-shadow: 0 6px 14px -6px rgb(10 30 12 / 0.4);
+    background: radial-gradient(circle at 32% 28%, #fff, var(--c) 64%, color-mix(in oklab, var(--c) 70%, #000));
+    box-shadow: 0 8px 18px -8px rgb(10 30 12 / 0.4);
   }
   @media (prefers-reduced-motion: no-preference) {
-    .orb__ball { animation: po-float 7s ease-in-out infinite alternate; }
-    .orb__ball:nth-child(3) { animation-duration: 9s; }
-    .orb__ball:nth-child(4) { animation-duration: 11s; }
-    .orb__ball:nth-child(5) { animation-duration: 8s; }
+    .orb { animation: po-float 8s ease-in-out infinite alternate; }
+    .orb:nth-of-type(2) { animation-duration: 10s; }
+    .orb:nth-of-type(3) { animation-duration: 12s; }
+    .orb:nth-of-type(4) { animation-duration: 9s; }
   }
-  @keyframes po-float { to { transform: translate3d(0, -12px, 0); } }
+  @keyframes po-float { to { transform: translate3d(0, -14px, 0); } }
 
-  /* ---- photographic donut ---- */
-
-  .orb__donut {
+  /* ---- photo cards riding the orbit ---- */
+  .po__shot {
     position: absolute;
-    inset: 11%;
-    border-radius: 50%;
+    top: 6%;
+    width: clamp(7rem, 15vw, 10rem);
+    border-radius: 16px;
     overflow: hidden;
+    box-shadow: 0 20px 44px -22px rgb(10 30 12 / 0.5);
   }
-  .orb__wedge {
+  .po__shot :global(img) { width: 100%; height: 100%; aspect-ratio: 4 / 3; object-fit: cover; }
+  .po__shot figcaption {
     position: absolute;
-    inset: 0;
-    /* A conic mask, not clip-path: a 120-degree wedge needs points along
-       an arc, which a polygon can only approximate. */
-    -webkit-mask-image: conic-gradient(from var(--from), #000 0deg 120deg, transparent 120deg);
-    mask-image: conic-gradient(from var(--from), #000 0deg 120deg, transparent 120deg);
-    filter: saturate(0.85);
-    opacity: 0.55;
-    transition: opacity var(--t3) var(--ease), filter var(--t3) var(--ease);
+    left: 0.6rem;
+    bottom: 0.5rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    line-height: 1.25;
+    color: #fff;
+    text-shadow: 0 1px 6px rgb(0 0 0 / 0.8);
   }
-  .orb__wedge[data-on] { opacity: 1; filter: saturate(1); }
-  .orb__wedge :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  .po__shot--l { left: 2%; rotate: -5deg; }
+  .po__shot--r { right: 2%; rotate: 5deg; }
 
-  /* ---- turning ring ---- */
-
-  .orb__rot {
+  /* ---- the three panes ---- */
+  .deck {
     position: absolute;
-    inset: 0;
-    transform: rotate(var(--a, 0deg));
-    transition: transform 950ms cubic-bezier(0.65, 0, 0.35, 1);
+    inset: 14% 6% 18%;
+    transform-style: preserve-3d;
   }
-  /* Full-size box rotating about the orbit centre; the chip pins to the
-     top edge. A percentage translate on the chip would resolve against
-     the chip itself and collapse to the middle. */
-  .orb__node {
+
+  .pane {
     position: absolute;
     inset: 0;
-    transform: rotate(var(--th));
+    display: grid;
+    align-content: center;
+    justify-items: center;
+    padding: clamp(1rem, 2.6vw, 2rem);
+    border-radius: 24px;
+    /* Frosted glass, so the rings and orbs read through it. */
+    background: rgb(255 255 255 / 0.72);
+    backdrop-filter: blur(16px) saturate(1.1);
+    border: 1px solid rgb(255 255 255 / 0.8);
+    box-shadow: 0 30px 70px -34px rgb(10 30 12 / 0.5);
+    text-align: center;
+    transition:
+      transform 760ms cubic-bezier(0.55, 0, 0.2, 1),
+      opacity 520ms var(--ease),
+      filter 520ms var(--ease);
+  }
+
+  /* Centre: square to the camera and forward. */
+  .pane[data-pos='c'] {
+    transform: translate3d(0, 0, 60px);
+    opacity: 1;
+    z-index: 3;
+  }
+  /* Sides: pushed out, back, and turned inward. */
+  .pane[data-pos='l'] {
+    transform: translate3d(-62%, 4%, -150px) rotateY(34deg) scale(0.82);
+    opacity: 0.94;
+    z-index: 1;
+  }
+  .pane[data-pos='r'] {
+    transform: translate3d(62%, 4%, -150px) rotateY(-34deg) scale(0.82);
+    opacity: 0.94;
+    z-index: 1;
+  }
+  /* A side pane shows only its heading — the body would be unreadable
+     at that angle anyway, and hiding it keeps the centre the subject. */
+  .pane[data-pos='l'] :is(.pane__p, .pane__cta, .pane__bar),
+  .pane[data-pos='r'] :is(.pane__p, .pane__cta, .pane__bar) {
+    opacity: 0;
     pointer-events: none;
   }
 
-  .nd {
+  .pane__hit {
     position: absolute;
-    isolation: isolate;
-    top: 0;
-    left: 50%;
-    translate: -50% 0;
-    display: grid;
-    justify-items: center;
-    gap: 0.1rem;
-    width: clamp(7.5rem, 20vw, 9.5rem);
-    aspect-ratio: 1;
-    padding: 0.6rem;
+    inset: 0;
     border: 0;
-    border-radius: 50%;
-    background: rgb(255 255 255 / 0.94);
-    backdrop-filter: blur(6px);
-    color: var(--text);
+    border-radius: 24px;
+    background: none;
     cursor: pointer;
-    pointer-events: auto;
-    align-content: center;
-    box-shadow: 0 1px 2px rgb(10 30 12 / 0.05), 0 18px 38px -22px rgb(10 30 12 / 0.45);
-    transform: rotate(calc((var(--th) + var(--a, 0deg)) * -1));
-    transition:
-      transform 950ms cubic-bezier(0.65, 0, 0.35, 1),
-      background-color var(--t3) var(--ease),
-      color var(--t3) var(--ease),
-      scale var(--t3) var(--ease);
   }
-  .nd:hover { scale: 1.04; }
-  .nd:focus-visible { outline: 2px solid var(--green-deep); outline-offset: 3px; }
-  .nd i { color: var(--green-deep); display: grid; place-items: center; }
-  .nd b { font-size: 0.9375rem; font-weight: 700; letter-spacing: -0.025em; }
-  .nd em {
-    font-style: normal;
-    max-width: 12ch;
-    font-size: 0.6875rem;
-    line-height: 1.3;
+  .pane[data-pos='c'] .pane__hit { pointer-events: none; }
+  .pane__hit:focus-visible { outline: 2px solid var(--green-deep); outline-offset: 3px; }
+
+  .pane__no {
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    font-weight: 600;
     color: var(--text-3);
   }
-  .nd[data-on] {
-    scale: 1.06;
-    /* #3d8b3a measured 4.24:1 for white, and the label is 15px bold —
-       large-text rules do not apply, so 4.5:1 is the bar. #3d7f35 is
-       4.90:1 at the light end, 8.26:1 at the dark. */
-    background: linear-gradient(160deg, #3d7f35, #1f5a22);
-    color: #fff;
-  }
-  .nd[data-on] i { color: #fff; }
-  .nd[data-on]::after {
-    content: '';
-    position: absolute;
-    inset: -6px;
-    border-radius: 50%;
-    border: 2px solid color-mix(in oklab, var(--green) 55%, transparent);
-    animation: po-pulse 2.4s var(--ease) infinite;
-    pointer-events: none;
-  }
-  @keyframes po-pulse {
-    0% { transform: scale(0.96); opacity: 0.9; }
-    70%, 100% { transform: scale(1.12); opacity: 0; }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .nd[data-on]::after { animation: none; opacity: 0.5; transform: none; }
-  }
-  .nd[data-on] em { color: rgb(255 255 255 / 0.82); }
-
-  /* ---- centre ---- */
-
-  .orb__core {
-    position: absolute;
-    inset: 19%;
-    display: grid;
-    /* Two rows, not absolute positioning: the counter used to be
-       position:absolute inside this circle and sat straight on top of
-       the Learn more button. The counter now lives outside the circle
-       entirely — a round container has far less usable area than its
-       bounding box, so it cannot be trusted to hold a stack. */
-    place-items: center;
-    border-radius: 50%;
-    background: rgb(255 255 255 / 0.96);
-    backdrop-filter: blur(10px);
-    box-shadow: 0 1px 2px rgb(10 30 12 / 0.05), 0 30px 60px -34px rgb(10 30 12 / 0.5);
-    text-align: center;
-    padding: clamp(0.9rem, 3vw, 2rem);
-  }
-
-  .pn {
-    grid-area: 1 / 1;
-    display: grid;
-    justify-items: center;
-    opacity: 0;
-    scale: 0.95;
-    pointer-events: none;
-    transition: opacity var(--t3) var(--ease), scale var(--t3) var(--ease);
-  }
-  .pn[data-on] { opacity: 1; scale: 1; pointer-events: auto; }
-
-  .pn__k {
+  .pane__k {
+    margin-top: 0.4rem;
     font-family: var(--font-mono);
     font-size: 0.5625rem;
     letter-spacing: 0.22em;
     text-transform: uppercase;
-    color: var(--clay-deep);
+    color: var(--green-deep);
   }
-  .pn h3 {
-    margin-top: 0.5rem;
-    font-size: clamp(0.95rem, 1.8vw, 1.35rem);
+  .pane__h {
+    margin-top: 0.7rem;
+    font-size: clamp(1rem, 2.1vw, 1.65rem);
     font-weight: 700;
-    letter-spacing: -0.03em;
-    line-height: 1.16;
+    letter-spacing: -0.035em;
+    line-height: 1.14;
   }
-  .pn h3 em { font-style: normal; color: var(--green-deep); }
-  .pn__p {
-    margin-top: 0.5rem;
-    max-width: 26ch;
+  .pane__h em { font-style: normal; color: var(--green-deep); }
+  .pane__p {
+    margin-top: 0.7rem;
+    max-width: 32ch;
     font-size: clamp(0.6875rem, 1.05vw, 0.8125rem);
-    line-height: 1.55;
+    line-height: 1.6;
     color: var(--text-2);
+    transition: opacity var(--t3) var(--ease);
   }
-  .pn__cta {
+  .pane__cta {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    margin-top: 0.85rem;
-    padding: 0.6rem 1.2rem;
+    margin-top: 1rem;
+    padding: 0.7rem 1.4rem;
     border-radius: 999px;
     /* white is 8.73:1 on #27551f and 4.90:1 on #3d7f35 */
     background: linear-gradient(100deg, #27551f, #3d7f35);
     color: #fff;
     font-size: 0.8125rem;
     font-weight: 600;
-    transition: transform var(--t2) var(--ease);
+    transition: transform var(--t2) var(--ease), opacity var(--t3) var(--ease);
   }
-  .pn__cta:hover { transform: translateY(-2px); }
+  .pane__cta:hover { transform: translateY(-2px); }
 
-  .orb__count {
-    order: 9;
-    flex-basis: 100%;
-    justify-content: center;
-    margin-top: 0.4rem;
+  .pane__bar {
     display: flex;
-    align-items: center;
-    gap: 0.6rem;
+    gap: 0.35rem;
+    margin-top: 1rem;
+    transition: opacity var(--t3) var(--ease);
+  }
+  .pane__bar i {
+    width: 26px;
+    height: 4px;
+    border-radius: 4px;
+    background: var(--line-light);
+    transition: background-color var(--t2) var(--ease), width var(--t3) var(--ease);
+  }
+  .pane__bar i[data-on] { width: 40px; background: var(--green-deep); }
+
+  /* ---- plinth ---- */
+  .po__plinth {
+    position: absolute;
+    left: 50%;
+    bottom: 9%;
+    translate: -50% 0;
+    width: 58%;
+    height: 14px;
+    border-radius: 50%;
+    background: radial-gradient(ellipse, color-mix(in oklab, var(--green) 26%, transparent), transparent 70%);
+    filter: blur(5px);
+  }
+  .po__ground {
+    position: absolute;
+    left: 50%;
+    bottom: 1%;
+    translate: -50% 0;
     font-family: var(--font-mono);
     font-size: 0.5625rem;
-    letter-spacing: 0.14em;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    line-height: 1.9;
+    text-align: center;
     color: var(--text-3);
-  }
-  .orb__bar {
-    display: block;
-    position: relative;
-    width: 5.5rem;
-    height: 3px;
-    border-radius: 3px;
-    background: var(--line-light);
-    overflow: hidden;
-  }
-  .orb__bar b {
-    position: absolute;
-    inset: 0 auto 0 0;
-    width: calc(var(--p, 0.33) * 100%);
-    border-radius: 3px;
-    background: var(--green-deep);
-    transition: width var(--t3) var(--ease);
   }
 
   /* ───── right rail ───── */
-
   .po__right { display: none; justify-items: end; gap: var(--s5); text-align: right; }
   .po__words,
   .po__scroll {
@@ -680,32 +562,20 @@ const promises = [
     line-height: 2.1;
     color: var(--text-3);
   }
-  .po__rule { width: 1px; height: 4.5rem; background: var(--line-light); justify-self: end; }
+  .po__rule { width: 1px; height: 4rem; background: var(--line-light); justify-self: end; }
 
   /* ───── foot ───── */
-
-  .po__foot {
+  .po__proms {
     display: grid;
-    gap: var(--s5);
-    align-items: center;
-    margin-top: clamp(1.75rem, 4vw, 3rem);
+    gap: var(--s4);
+    margin-top: clamp(1.75rem, 4vw, 2.75rem);
     padding-top: clamp(1.25rem, 3vw, 2rem);
     border-top: 1px solid var(--line-light);
   }
-  .po__proms { display: grid; gap: var(--s4); }
   .po__proms li { display: flex; align-items: center; gap: 0.7rem; }
   .po__proms i { color: var(--green-deep); display: grid; place-items: center; flex: none; }
   .po__proms span { display: grid; font-size: 0.8125rem; line-height: 1.3; color: var(--text-3); }
   .po__proms b { font-weight: 700; color: var(--text); }
-
-  .po__tag {
-    font-family: var(--font-mono);
-    font-size: 0.5625rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    line-height: 2;
-    color: var(--text-3);
-  }
 
   .po__note {
     margin-top: var(--s5);
@@ -718,33 +588,32 @@ const promises = [
   }
 
   /* ───── responsive ───── */
-
   @media (min-width: 48rem) {
     .po__proms { grid-template-columns: repeat(2, 1fr); }
   }
 
-  @media (min-width: 62rem) {
-    .po__side span { display: block; }
-  }
-
   @media (min-width: 76rem) {
-    .po__grid { grid-template-columns: minmax(0, 0.82fr) minmax(0, 2fr) auto; }
+    .po__grid { grid-template-columns: minmax(0, 0.8fr) minmax(0, 2fr) auto; }
     .po__right { display: grid; }
-    .po__foot { grid-template-columns: minmax(0, 1fr) auto; }
     .po__proms { grid-template-columns: repeat(4, 1fr); }
   }
 
-  @media (max-width: 40rem) {
-    .nd { width: clamp(6rem, 30vw, 7.5rem); padding: 0.4rem; }
-    .nd b { font-size: 0.8125rem; }
-    .nd em { display: none; }
-    .orb__core { inset: 20%; }
+  /* Below this the 3D turn costs more than it gives: the side panes are
+     mostly edge-on and the text in them unreadable. Flatten to a stack
+     of one. */
+  @media (max-width: 48rem) {
+    .po__stage { perspective: none; aspect-ratio: 1 / 1.15; }
+    .po__shot, .po__ground { display: none; }
+    .deck { inset: 8% 0 14%; transform-style: flat; }
+    .pane[data-pos='c'] { transform: none; }
+    .pane[data-pos='l'], .pane[data-pos='r'] { transform: none; opacity: 0; pointer-events: none; }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .orb__rot, .nd, .pn, .orb__wedge, .orb__bar b { transition: none; }
-    .po__side i, .po__side:hover i, .pn__cta, .pn__cta:hover { transform: none; transition: none; }
-    .po__side i :global(svg) { transform: rotate(180deg); }
-    .po__side--next i :global(svg) { transform: none; }
+    .po__ring, .orb { animation: none; }
+    .pane, .pane__cta, .pane__cta:hover { transition: none; transform: none; }
+    .pane[data-pos='c'] { transform: translate3d(0, 0, 60px); }
+    .pane[data-pos='l'] { transform: translate3d(-62%, 4%, -150px) rotateY(34deg) scale(0.82); }
+    .pane[data-pos='r'] { transform: translate3d(62%, 4%, -150px) rotateY(-34deg) scale(0.82); }
   }
 </style>
