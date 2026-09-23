@@ -564,7 +564,7 @@ const helps = [
   .pf__grid {
     display: grid;
     gap: clamp(1.25rem, 2.6vw, 2rem);
-    margin-top: clamp(1.75rem, 4vw, 2.75rem);
+    margin-top: clamp(1.25rem, 2.6vw, 1.75rem);
     align-items: center;
   }
 
@@ -602,11 +602,11 @@ const helps = [
   .pf__nav button:focus-visible { outline: 2px solid var(--green-deep); outline-offset: -2px; }
 
   /* the fan */
-  .pf__stage { position: relative; aspect-ratio: 1 / 0.8; perspective: 1400px; }
+  .pf__stage { position: relative; aspect-ratio: 1 / 0.66; perspective: 1400px; }
   .pf__deck {
     position: absolute;
     z-index: 2;
-    inset: 6% 0 17% 0;
+    inset: 2% 0 20% 0;
     transform-style: preserve-3d;
   }
   .pf__slide {
@@ -681,7 +681,7 @@ const helps = [
     position: absolute;
     z-index: 1;
     left: 50%;
-    bottom: 12%;
+    bottom: 14%;
     translate: -50% 0;
     display: block;
     width: 74%;
