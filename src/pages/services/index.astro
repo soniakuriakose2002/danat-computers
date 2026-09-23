@@ -147,24 +147,20 @@ const promises = [
       {services.map((s, i) => {
         const media = serviceMedia[s.id] ?? fallbackMedia;
         return (
-          <li data-rise style={`--d:${(i % 3) * 70}ms`}>
+          <li data-rise data-tone={['a', 'b', 'c', 'd'][i % 4]} style={`--d:${(i % 3) * 70}ms`}>
             <a class="sl__card" href={`/services/${s.id}`}>
-              <span class="sl__media">
+              <span class="sl__top">
+                <span class="sl__n">{String(s.data.index).padStart(2, '0')}</span>
+                <span class="sl__t">{s.data.title}</span>
+                <span class="sl__s">{s.data.summary}</span>
+              </span>
+              <span class="sl__shot">
                 <Image src={media.img} alt={media.alt}
                   widths={[400, 700, 1000]}
                   sizes="(max-width: 48rem) 100vw, (max-width: 72rem) 50vw, 33vw"
                   quality={80} format="webp" loading={i < 3 ? 'eager' : 'lazy'} />
-                <span class="sl__n">{String(s.data.index).padStart(2, '0')}</span>
               </span>
-
-              <span class="sl__body">
-                <span class="sl__t">{s.data.title}</span>
-                <span class="sl__s">{s.data.summary}</span>
-                <span class="sl__foot">
-                  <span>Read more</span>
-                  <span class="sl__go" aria-hidden="true"><Icon name="arrow" size={15} /></span>
-                </span>
-              </span>
+              <span class="sl__go" aria-hidden="true"><Icon name="arrow" size={15} /></span>
             </a>
           </li>
         );
@@ -470,65 +466,81 @@ const promises = [
   .sl { background: var(--white); padding-top: clamp(1.5rem, 3vw, 2.5rem); }
   .sl__grid { display: grid; gap: clamp(0.85rem, 1.8vw, 1.25rem); }
 
+  /* The numbered tinted card from the products page: words at the top,
+     the photograph filling the lower half, the arrow in the corner. */
+  /* Rows, not an absolutely placed photograph. At narrow widths the
+     summary wraps to three or four lines and ran straight into a shot
+     pinned to the bottom 52%; a row cannot be overlapped. */
   .sl__card {
+    position: relative;
     display: grid;
-    grid-template-rows: auto 1fr;
+    grid-template-rows: auto minmax(7rem, 1fr);
     height: 100%;
-    border: 1px solid var(--line-light);
-    border-radius: 20px;
+    min-height: clamp(14rem, 22vw, 17rem);
+    padding: 1.3rem 1.2rem 0;
+    border-radius: 22px;
     overflow: hidden;
-    background: var(--white);
-    transition: transform var(--t2) var(--ease), box-shadow var(--t2) var(--ease),
-      border-color var(--t2) var(--ease);
+    transition: transform var(--t2) var(--ease), box-shadow var(--t2) var(--ease);
   }
-  .sl__card:hover {
-    transform: translateY(-5px);
-    border-color: transparent;
-    box-shadow: 0 28px 50px -30px rgb(10 30 12 / 0.38);
-  }
+  .sl__card:hover { transform: translateY(-5px); box-shadow: 0 28px 50px -30px rgb(10 30 12 / 0.4); }
   .sl__card:focus-visible { outline: 2px solid var(--green-deep); outline-offset: 3px; }
 
-  .sl__media { position: relative; display: block; aspect-ratio: 16 / 10; }
-  .sl__media :global(img) { width: 100%; height: 100%; object-fit: cover; }
-  /* A solid chip rather than a shadow: it can be composited and measured
-     against any photograph, which a text-shadow cannot. */
-  .sl__n {
-    position: absolute;
-    top: 0.65rem;
-    left: 0.65rem;
-    padding: 0.2rem 0.5rem;
-    border-radius: 8px;
-    background: rgb(255 255 255 / 0.94);
-    font-family: var(--font-mono);
-    font-size: 0.6875rem;
-    font-weight: 600;
-    color: var(--text);
-  }
+  .sl__grid [data-tone='a'] .sl__card { background: #eaf3eb; }
+  .sl__grid [data-tone='b'] .sl__card { background: #f6efe8; }
+  .sl__grid [data-tone='c'] .sl__card { background: #eef4f6; }
+  .sl__grid [data-tone='d'] .sl__card { background: #f3f1ec; }
 
-  .sl__body { display: grid; align-content: start; gap: 0.35rem; padding: 1.1rem 1.2rem 1.05rem; }
-  .sl__t { font-size: 1rem; font-weight: 700; letter-spacing: -0.025em; }
-  .sl__s { font-size: 0.8438rem; line-height: 1.6; color: var(--text-2); }
-  .sl__foot {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.6rem;
-    margin-top: 0.85rem;
-    font-size: 0.8125rem;
+  .sl__n {
+    display: block;
+    font-size: clamp(1.6rem, 2.6vw, 2.1rem);
     font-weight: 700;
-    color: var(--text);
+    letter-spacing: -0.05em;
+    line-height: 1;
+    color: var(--green-deep);
+    font-variant-numeric: tabular-nums;
+  }
+  .sl__t {
+    display: block;
+    margin-top: 0.7rem;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+  }
+  .sl__s {
+    display: block;
+    margin-top: 0.25rem;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: var(--text-2);
+  }
+  .sl__top { padding-bottom: 1rem; }
+  .sl__shot {
+    position: relative;
+    margin: 0 -1.2rem;
+    overflow: hidden;
+  }
+  .sl__shot :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  .sl__shot::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgb(0 0 0 / 0), rgb(255 255 255 / 0.22));
   }
   .sl__go {
+    position: absolute;
+    z-index: 2;
+    left: 1.2rem;
+    bottom: 1.2rem;
     display: grid;
     place-items: center;
-    width: 32px;
-    height: 32px;
-    border: 1px solid var(--line-light);
+    width: 38px;
+    height: 38px;
     border-radius: 50%;
-    color: var(--green-deep);
-    transition: transform var(--t2) var(--ease), background-color var(--t2) var(--ease);
+    background: var(--green-deep);
+    color: #fff;
+    transition: transform var(--t2) var(--ease);
   }
-  .sl__card:hover .sl__go { transform: translateX(3px); background: #e9f3ea; }
+  .sl__card:hover .sl__go { transform: translateX(3px); }
 
   /* the ninth cell */
   .sl__talk {
@@ -536,13 +548,12 @@ const promises = [
     display: grid;
     align-content: center;
     gap: 0.4rem;
-    min-height: 15rem;
+    min-height: clamp(14rem, 22vw, 17rem);
     padding: clamp(1.5rem, 3vw, 2.1rem);
-    border-radius: 20px;
+    border-radius: 22px;
     overflow: hidden;
     background: linear-gradient(145deg, #eef6ef 0%, #e2efe4 100%);
   }
-  /* A quiet engraved corner rather than a picture. */
   .sl__lines {
     position: absolute;
     right: -3rem;
