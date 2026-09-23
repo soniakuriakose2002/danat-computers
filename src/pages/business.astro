@@ -2,421 +2,346 @@
 import { Image } from 'astro:assets';
 import PageLayout from '@layouts/PageLayout.astro';
 import Icon from '@components/ui/Icon.astro';
-import { site, whatsappLink, branches, brands } from '@data/site';
+import Logo from '@components/global/Logo.astro';
+import VideoModal from '@components/global/VideoModal.astro';
+import { site, whatsappLink, brands } from '@data/site';
+import imgOffice from '@assets/photos/support-desk.jpg';
 import imgRack from '@assets/photos/network-eng.jpg';
+import imgPrinter from '@assets/photos/printer-machine.jpg';
+import imgCctv from '@assets/photos/cctv-white.jpg';
 import imgPatch from '@assets/photos/network-patch.jpg';
 
 /**
- * BUSINESS SOLUTIONS.
+ * BUSINESS SOLUTIONS — built to the client's mockup.
  *
- * The B2B side is real and evidenced: the company's AR ledger shows
- * hospitals, enterprises and other computer retailers buying at trade.
- * Everything claimed here rests on that, on the catalogue export, or on
- * the branch list.
+ * Every figure traces to a record: years from the earliest ERP entry,
+ * products and categories from the catalogue export, branches from the
+ * journal codes.
  *
- * ⚠ Two things are NOT confirmed and are marked on the page rather than
- * asserted: on-site call-out coverage, and any response-time or SLA
- * commitment. Danat has published neither. Do not turn the "response
- * time" card into a number without the company confirming it.
+ * ⚠ The mockup carries a testimonial — "Danat Computers has been our
+ * trusted technology partner for years", attributed to "Business
+ * Customer, Muscat". It is invented. A fabricated review is not
+ * something to publish, so that section is a held slot.
  *
- * Clay carries the accent here — the consumer pages lead green, so the
- * trade side reading warmer gives it its own identity without leaving
- * the palette.
+ * Worth knowing when Danat fills it: the Aged Partner Balance export
+ * lists 20 healthcare accounts (Al Raffah Hospital, Gulf Specialized
+ * Hospital and Adrak Multi Speciality among them), 16 schools and
+ * colleges, and 202 trade accounts. Real references exist; they only
+ * need permission to be named.
  */
 const years = new Date().getFullYear() - site.stats.since;
 const brandCount = brands.flat().length;
 
-/**
- * Span and tone per card. Six equal boxes in a three-up grid is the most
- * conventional layout there is; an uneven grid with two dark tiles gives
- * the page somewhere for the eye to land.
- */
-const services = [
-  {
-    icon: 'box',
-    t: 'Supply at trade',
-    p: 'Laptops, desktops, peripherals and consumables from the same stock that serves the counter.',
-    points: [`${brandCount} brands carried`, `${site.stats.categories} product categories`, 'Held across four branches'],
-    span: 2,
-    tone: 'ink',
-    stat: { v: site.stats.parts, l: 'lines held, ready to go' },
-  },
-  {
-    icon: 'camera',
-    t: 'CCTV projects',
-    p: 'Surveyed, specified, installed and maintained. Hikvision, Dahua, Uniview and EZVIZ.',
-    points: ['Hikvision, Dahua, Uniview', 'Cameras, NVR and DVR', 'Supplied from stock'],
-    span: 1, tone: 'light', stat: null,
-  },
-  {
-    icon: 'network',
-    t: 'Networking',
-    p: 'Cabling, switching and Wi-Fi — set up new, or troubleshot where it already exists.',
-    points: ['TP-Link routers and switches', 'Cabling and Wi-Fi', 'Home or business'],
-    span: 1, tone: 'light', stat: null,
-  },
-  {
-    icon: 'chip',
-    t: 'Board-level repair',
-    p: 'The workshop that serves the counter serves you too. A failed board is traced to the component rather than written off — which is the difference between a repair bill and a replacement one.',
-    points: ['Free diagnosis, always', 'Quoted before any work', 'Component level, not board swap'],
-    span: 2, tone: 'green', stat: null,
-  },
-  {
-    icon: 'printer',
-    t: 'Print & consumables',
-    p: 'Printers supplied and repaired, with toner and ink on the shelf rather than on order.',
-    points: ['Supply and repair', 'Canon, Epson, HP, Brother', 'Toner and ink in stock'],
-    span: 1, tone: 'light', stat: null,
-  },
-  {
-    icon: 'drive',
-    t: 'Data recovery',
-    p: 'Failed drives, dead machines and deleted volumes — assessed, with an honest read on what is recoverable before any work begins.',
-    points: ['Assessed before any work', 'Told what is recoverable', 'Failed drives and deleted volumes'],
-    span: 1, tone: 'light', stat: null,
-  },
+const trust = [
+  { icon: 'shield', a: 'Trusted in Oman', b: `Since ${site.stats.since}` },
+  { icon: 'users', a: 'Business-focused', b: 'Trade accounts welcome' },
+  { icon: 'pin', a: 'Multiple branches', b: 'Across Oman' },
 ];
 
-/** Evidenced by the AR ledger, not aspirational. */
-const sectors = [
-  { icon: 'shield', t: 'Healthcare', p: 'Clinics and hospitals' },
-  { icon: 'box', t: 'Retail', p: 'Including other computer shops buying at trade' },
-  { icon: 'building', t: 'Offices', p: 'Single site and multi-branch' },
-  { icon: 'users', t: 'Education', p: 'Labs, admin and AV' },
+/** The ecosystem ring, clockwise from the top. */
+const ring = [
+  { icon: 'laptop', t: 'Computer support', p: 'Sales, repair and technical support' },
+  { icon: 'printer', t: 'Printer services', p: 'Servicing and repair for all brands' },
+  { icon: 'camera', t: 'CCTV solutions', p: 'Installation and maintenance' },
+  { icon: 'drive', t: 'Data recovery', p: 'Recover lost or inaccessible data' },
+  { icon: 'gear', t: 'Software support', p: 'Troubleshoot software and keep working' },
+  { icon: 'chip', t: 'Hardware support', p: 'Diagnose and fix hardware problems' },
+  { icon: 'network', t: 'Networking', p: 'Setup and troubleshooting for connectivity' },
 ];
 
-/** Why Danat, in a horizontal rail. Every line is defensible. */
-const reasons = [
-  { icon: 'search', t: 'Free diagnosis', p: 'Before a quote, every time — so you find out what it costs before you commit.' },
-  { icon: 'chip', t: 'Board-level repair', p: 'Faults traced to the component, not written off at the mainboard.' },
-  { icon: 'chart', t: '5,430 lines in stock', p: 'Across 249 categories, so most jobs do not start with an order.' },
-  { icon: 'building', t: 'Four branches', p: 'Ruwi, Sohar, Al Hail and Salalah — the same standard at each counter.' },
-  { icon: 'award', t: 'Twenty years in', p: 'Trading on Computer Street since 2003, under one registered company.' },
-  { icon: 'box', t: 'Sixteen brands', p: 'HP, Dell, Lenovo, Canon, Hikvision and others, from the company catalogue.' },
-];
-
-/**
- * Only what the rest of the site already states as policy. An earlier
- * draft had a four-step process describing site surveys and post-handover
- * support — neither is confirmed, and a process diagram reads as a
- * commitment.
- */
+/** Only what the rest of the site already states as policy. */
 const steps = [
-  { n: '01', t: 'Tell us what you need', p: 'A list, a floor plan, or just the problem.' },
-  { n: '02', t: 'Diagnosis is free', p: 'You are told what failed and what it costs before anything is agreed.' },
-  { n: '03', t: 'Work starts once you agree', p: 'Nothing is touched until the quote is accepted.' },
+  { n: '01', icon: 'search', t: 'Understand', p: 'We listen to your requirements and business needs.' },
+  { n: '02', icon: 'chat', t: 'Diagnose', p: 'We identify the right solution for your issue or upgrade.' },
+  { n: '03', icon: 'gear', t: 'Solve', p: 'Diagnosis is free, and nothing is touched until you agree the quote.' },
+  { n: '04', icon: 'check', t: 'Support', p: 'The same counter afterwards, at any of the four branches.' },
+];
+
+const cards = [
+  { img: imgOffice, t: 'Computer sales & support', p: 'Desktops, laptops and technical support for your office.' },
+  { img: imgPrinter, t: 'Printer services', p: 'Servicing and repair for Canon, Epson, HP and Brother.' },
+  { img: imgCctv, t: 'CCTV solutions', p: 'Hikvision, Dahua and Uniview — supplied and installed.' },
+  { img: imgPatch, t: 'Networking solutions', p: 'Cabling, switching and Wi-Fi, set up or troubleshot.' },
+];
+
+const figures = [
+  { v: years, suffix: '+', l: 'Years of experience' },
+  { v: site.stats.parts, suffix: '+', l: 'Products on our shelves' },
+  { v: site.stats.categories, suffix: '', l: 'Product categories' },
+  { v: site.stats.branches, suffix: '', l: 'Branches across Oman' },
 ];
 ---
 
 <PageLayout
   title="Business Solutions"
-  description={`Danat Computers supplies and supports business across Oman — trade supply, CCTV, networking, print and board-level repair from ${site.stats.parts.toLocaleString('en-US')} lines held across four branches.`}
+  description={`Danat Computers supports business across Oman — IT support, hardware, networking, printers and CCTV from ${site.stats.parts.toLocaleString('en-US')} lines held across four branches since ${site.stats.since}.`}
 >
   {/* ══════ 01 · hero ══════ */}
-  <section class="bh">
-    <div class="bh__bg" aria-hidden="true">
-      <Image src={imgRack} alt="" widths={[1100, 1700, 2200]} sizes="100vw"
-        quality={74} format="webp" loading="eager" fetchpriority="high" />
-      {/* Measured against the real crop, not guessed. */}
-      <span class="bh__tint"></span>
+  <section class="hero">
+    <div class="shell hero__grid">
+      <div class="hero__copy">
+        <p class="eb" data-rise>Business solutions</p>
+
+        <h1 class="hero__h" data-rise style="--d:70ms">
+          Technology That<br />Keeps Your Business<br /><em>Running.</em>
+        </h1>
+
+        <p class="hero__p" data-rise style="--d:130ms">
+          Reliable IT support, hardware, networking, printers, CCTV and more —
+          helping businesses across Oman work smarter, stay secure and move
+          forward.
+        </p>
+
+        <div class="hero__acts" data-rise style="--d:190ms">
+          <a class="btn" href="#quote">
+            Talk to our experts
+            <span class="btn__i" aria-hidden="true"><Icon name="arrow" size={15} /></span>
+          </a>
+          <button class="film" type="button" data-video-open>
+            <i aria-hidden="true"><Icon name="play" size={12} /></i>
+            <span>Watch video<small>See how we help businesses</small></span>
+          </button>
+        </div>
+
+        <ul class="hero__trust" data-rise style="--d:250ms">
+          {trust.map((t) => (
+            <li>
+              <i aria-hidden="true"><Icon name={t.icon} size={18} /></i>
+              <span><b>{t.a}</b>{t.b}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <figure class="hero__fig" data-rise style="--d:160ms">
+        <Image src={imgOffice} alt="An office team working at their desks"
+          widths={[640, 1000, 1500]} sizes="(min-width:62rem) 52vw, 100vw"
+          quality={76} format="webp" loading="eager" fetchpriority="high" />
+        <figcaption>
+          <span class="hero__script">Same People.<br />A Brighter<br />Tomorrow.</span>
+          <span class="hero__logo"><Logo /></span>
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
+  {/* ══════ 02 · ecosystem ══════ */}
+  <section class="eco section">
+    <span class="eco__wash" aria-hidden="true"></span>
+
+    <div class="shell eco__head">
+      <div>
+        <p class="eb" data-rise>A complete ecosystem</p>
+        <h2 class="eco__h" data-rise style="--d:70ms">
+          Business Solutions<br />for a Connected <em>Tomorrow.</em>
+        </h2>
+        <p class="eco__p" data-rise style="--d:130ms">
+          From computers and printers to CCTV, networking and data recovery,
+          Danat provides end-to-end technology support for businesses of all
+          sizes.
+        </p>
+      </div>
+      <p class="eco__aside" data-rise style="--d:190ms">
+        Different businesses. Different needs.<br />
+        One trusted partner — {site.nameFull}.
+      </p>
     </div>
 
-    <div class="shell bh__in">
-      <nav class="bh__crumb" aria-label="Breadcrumb">
-        <a href="/">Home</a>
-        <span aria-hidden="true">/</span>
-        <span aria-current="page">Business Solutions</span>
-      </nav>
+    <div class="shell eco__stage">
+      <p class="eco__note eco__note--l" aria-hidden="true">People<br />Technology<br />Progress<br />Together</p>
 
-      <p class="eb eb--inv"><i class="eb__r" aria-hidden="true"></i>For business</p>
+      <div class="ring" data-rise style="--d:120ms">
+        <svg class="ring__guide" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+          <circle cx="50" cy="50" r="38" stroke="currentColor" stroke-width="0.35" stroke-dasharray="1.2 2.4" />
+        </svg>
 
-      <h1 class="bh__h">
-        The same counter.<br /><em>Built for volume.</em>
-      </h1>
+        <div class="ring__hub">
+          <Logo />
+          <span>Business<br />technology<br />solutions</span>
+        </div>
 
-      <p class="bh__p">
-        Hospitals, retailers and offices across Oman buy from Danat at trade —
-        supply, projects and repair from the same stock and the same
-        technicians that serve the shop floor.
+        {ring.map((r, i) => (
+          <div class="ring__slot" style={`--th:${(i * 360) / ring.length}deg`}>
+            <div class="node">
+              <i aria-hidden="true"><Icon name={r.icon} size={20} /></i>
+              <b>{r.t}</b>
+              <em>{r.p}</em>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <p class="eco__note eco__note--r" aria-hidden="true">Keeping<br />Oman's Businesses<br />Connected</p>
+    </div>
+  </section>
+
+  {/* ══════ 03 · process ══════ */}
+  <section class="pr section">
+    <div class="shell pr__head">
+      <div>
+        <p class="eb" data-rise>How we support your business</p>
+        <h2 class="pr__h" data-rise style="--d:70ms">
+          A Simple Process. <em>Real Results.</em>
+        </h2>
+      </div>
+      <p class="pr__aside" data-rise style="--d:130ms">
+        We make technology support easy, so you can focus on what matters —
+        your business.
       </p>
+    </div>
 
-      <div class="bh__acts">
-        <a class="btn" href="#quote">
-          Get a trade quote
+    <ol class="shell pr__steps">
+      {steps.map((s, i) => (
+        <li data-rise style={`--d:${i * 80}ms`}>
+          <span class="pr__marks" aria-hidden="true">
+            <b>{s.n}</b>
+            <i><Icon name={s.icon} size={18} /></i>
+          </span>
+          <h3>{s.t}</h3>
+          <p>{s.p}</p>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  {/* ══════ 04 · service cards ══════ */}
+  <section class="sv section">
+    <div class="shell sv__head">
+      <div>
+        <p class="eb" data-rise>Our business services</p>
+        <h2 class="sv__h" data-rise style="--d:70ms">
+          Practical Solutions<br />for Everyday <em>Business Needs.</em>
+        </h2>
+      </div>
+      <p class="sv__aside" data-rise style="--d:130ms">
+        Proven technology services that help businesses stay secure,
+        productive and worry-free.
+      </p>
+    </div>
+
+    <div class="sv__rail">
+      <ul class="shell-wide sv__track">
+        {cards.map((c, i) => (
+          <li data-rise style={`--d:${i * 60}ms`}>
+            <a href="/services">
+              <span class="sc__shot">
+                <Image src={c.img} alt="" widths={[360, 560]} sizes="280px"
+                  quality={74} format="webp" loading="lazy" />
+              </span>
+              <span class="sc__body">
+                <b>{c.t}</b>
+                <em>{c.p}</em>
+                <i class="sc__go" aria-hidden="true"><Icon name="arrow" size={15} /></i>
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  {/* ══════ 05 · stat band ══════ */}
+  <section class="st" data-tone="ink">
+    <div class="st__bg" aria-hidden="true">
+      <Image src={imgRack} alt="" widths={[1000, 1600]} sizes="100vw"
+        quality={66} format="webp" loading="lazy" />
+      <span class="st__tint"></span>
+    </div>
+
+    <div class="shell st__in">
+      <div>
+        <p class="st__k">Over two decades of trust</p>
+        <h2 class="st__h">Supporting Businesses<br />Across Oman Since {site.stats.since}.</h2>
+      </div>
+
+      <dl class="st__figs">
+        {figures.map((f) => (
+          <div>
+            <dt><span data-count={f.v}>0</span>{f.suffix}</dt>
+            <dd>{f.l}</dd>
+          </div>
+        ))}
+      </dl>
+    </div>
+  </section>
+
+  {/* ══════ 06 · what customers say ══════ */}
+  <section class="tm section">
+    <div class="shell tm__grid">
+      <div class="tm__copy" data-rise>
+        <span class="tm__q" aria-hidden="true">&ldquo;</span>
+        {/* The mockup's quote is invented. A fabricated review is not
+            something to publish, so the frame is held until Danat
+            supplies a real one — the ledger has no shortage of
+            candidates. */}
+        <p class="tm__slot">
+          Customer quote to follow.
+          <small>
+            Danat has published no testimonial. Once a customer agrees to be
+            quoted and named, it drops straight in here.
+          </small>
+        </p>
+      </div>
+
+      <figure class="tm__fig" data-rise style="--d:90ms">
+        <Image src={imgRack} alt="" widths={[520, 820]} sizes="(min-width:62rem) 44vw, 92vw"
+          quality={74} format="webp" loading="lazy" />
+        <figcaption>Technology<br />People<br />Progress<br />Together</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  {/* ══════ 07 · cta ══════ */}
+  <section class="ct" id="quote">
+    <div class="shell ct__in">
+      <div>
+        <h2 class="ct__h" data-rise>Let's Keep Your Business <em>Connected.</em></h2>
+        <p class="ct__p" data-rise style="--d:70ms">
+          Talk to our team and find the right technology solutions for your
+          business.
+        </p>
+      </div>
+
+      <div class="ct__acts" data-rise style="--d:130ms">
+        <a class="btn" href={whatsappLink('Hello Danat — I would like to talk about business solutions for')}
+          target="_blank" rel="noopener noreferrer">
+          Get a free consultation
           <span class="btn__i" aria-hidden="true"><Icon name="arrow" size={15} /></span>
         </a>
-        <a class="bh__mail" href={`mailto:${site.email}`}>{site.email}</a>
+        <a class="ct__ghost" href={whatsappLink('Hello Danat — I would like a trade quote for')}
+          target="_blank" rel="noopener noreferrer">
+          <Icon name="mail" size={16} />Request a quote
+        </a>
       </div>
-    </div>
-
-    <dl class="bh__figs">
-      <div class="shell bh__figsin">
-        <div><dt><span data-count={site.stats.parts}>0</span></dt><dd>Lines held</dd></div>
-        <div><dt><span data-count={brandCount}>0</span></dt><dd>Brands carried</dd></div>
-        <div><dt><span data-count={site.stats.branches}>0</span></dt><dd>Branches</dd></div>
-        <div><dt><span data-count={years}>0</span>+</dt><dd>Years trading</dd></div>
-      </div>
-    </dl>
-  </section>
-
-  {/* ══════ 02 · what we do ══════ */}
-  <section class="sv section">
-    <div class="shell">
-      <div class="sv__head" data-rise>
-        <p class="eb eb--clay"><i class="eb__r" aria-hidden="true"></i>What we do</p>
-        <h2 class="sv__h">Six things we take on<br /><em>for business.</em></h2>
-      </div>
-
-      <ul class="sv__grid">
-        {services.map((s, i) => (
-          <li class="card" data-tone={s.tone} style={`--span:${s.span}; --d:${i * 60}ms`} data-rise>
-            <span class="card__i" aria-hidden="true"><Icon name={s.icon} size={21} /></span>
-            <h3>{s.t}</h3>
-            <p>{s.p}</p>
-
-            {s.stat && (
-              <p class="card__stat">
-                <b><span data-count={s.stat.v}>0</span></b>
-                <em>{s.stat.l}</em>
-              </p>
-            )}
-
-            <ul class="card__pts">
-              {s.points.map((pt) => (
-                <li><Icon name="check" size={13} />{pt}</li>
-              ))}
-            </ul>
-            <span class="card__n" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
-          </li>
-        ))}
-
-        {/* Closes the grid instead of leaving a hole in the last row. */}
-        <li class="tile">
-          <a href={whatsappLink('Hello Danat — I would like a trade quote for')}
-            target="_blank" rel="noopener noreferrer">
-            <span class="tile__i" aria-hidden="true"><Icon name="whatsapp" size={22} /></span>
-            <b>Send us your list</b>
-            <em>A spreadsheet, a photo of a shelf, or a floor plan.</em>
-            <span class="tile__go" aria-hidden="true"><Icon name="arrow" size={15} /></span>
-          </a>
-        </li>
-      </ul>
     </div>
   </section>
 
-  {/* ══════ 03 · who ══════ */}
-  <section class="wh section">
-    <div class="shell wh__grid">
-      <div class="wh__intro" data-rise>
-        <p class="eb"><i class="eb__r" aria-hidden="true"></i>Who buys from us</p>
-        <h2 class="wh__h">Already on the<br /><em>ledger.</em></h2>
-        <p class="wh__p">
-          This is not a new line of business. The company's own accounts
-          show these sectors buying at trade, some of them for years.
-        </p>
-
-        <p class="wh__ask">
-          Named references available on request — ask and we will put you in
-          touch with someone in your sector.
-        </p>
-      </div>
-
-      <ul class="wh__list">
-        {sectors.map((s, i) => (
-          <li data-rise style={`--d:${i * 70}ms`}>
-            <span aria-hidden="true"><Icon name={s.icon} size={19} /></span>
-            <div><b>{s.t}</b><em>{s.p}</em></div>
-          </li>
-        ))}
-      </ul>
-    </div>
-  </section>
-
-  {/* ══════ 03b · why ══════ */}
-  <section class="wy section">
-    <div class="shell wy__head" data-rise>
-      <p class="eb eb--clay"><i class="eb__r" aria-hidden="true"></i>Why Danat</p>
-      <h2 class="wy__h">Reasons you can<br /><em>actually check.</em></h2>
-    </div>
-
-    {/* A rail rather than a grid: it signals there is more than fits, and
-        it scrolls with a thumb as readily as a trackpad. */}
-    <div class="wy__rail">
-      <ul class="shell-wide wy__track">
-        {reasons.map((r, i) => (
-          <li data-rise style={`--d:${i * 50}ms`}>
-            <span aria-hidden="true"><Icon name={r.icon} size={22} /></span>
-            <b>{r.t}</b>
-            <em>{r.p}</em>
-          </li>
-        ))}
-      </ul>
-    </div>
-  </section>
-
-  {/* ══════ 04 · how ══════ */}
-  <section class="hw" data-tone="ink">
-    <div class="hw__bg" aria-hidden="true">
-      <Image src={imgPatch} alt="" widths={[1000, 1600]} sizes="100vw"
-        quality={70} format="webp" loading="lazy" />
-      <span class="hw__tint"></span>
-    </div>
-
-    <div class="shell hw__in">
-      <p class="eb eb--inv" data-rise><i class="eb__r" aria-hidden="true"></i>How it works</p>
-      <h2 class="hw__h" data-rise style="--d:70ms">No surprises.</h2>
-
-      <ol class="hw__steps">
-        {steps.map((s, i) => (
-          <li data-rise style={`--d:${130 + i * 70}ms`}>
-            <b>{s.n}</b>
-            <h3>{s.t}</h3>
-            <p>{s.p}</p>
-          </li>
-        ))}
-      </ol>
-
-      {/* Honest about what has not been settled. */}
-      <p class="hw__note" data-rise style="--d:420ms">
-        Annual contracts, on-site call-out coverage, delivery and trade
-        credit terms are still being confirmed with the company. Ask us and
-        we will tell you what we can actually do for your sites rather than
-        guess on a web page.
-      </p>
-    </div>
-  </section>
-
-  {/* ══════ 05 · quote ══════ */}
-  <section class="qt section" id="quote">
-    <span class="qt__wash" aria-hidden="true"></span>
-
-    <div class="shell qt__head" data-rise>
-      <p class="eb eb--clay eb--mid"><i class="eb__r" aria-hidden="true"></i>Open an account</p>
-      <h2 class="qt__h">Send us the list.<br /><em>We will price it.</em></h2>
-      <p class="qt__p">
-        A spreadsheet, a photo of a shelf, or a floor plan. Whatever you have
-        is enough to start.
-      </p>
-    </div>
-
-    <form class="shell qt__form" id="trade" data-rise style="--d:90ms">
-      <div class="qf__row">
-        <div class="qf">
-          <label for="q-name">Your name</label>
-          <input id="q-name" name="name" type="text" autocomplete="name" required
-            placeholder="Who we are quoting for" />
-        </div>
-        <div class="qf">
-          <label for="q-co">Company</label>
-          <input id="q-co" name="company" type="text" autocomplete="organization"
-            placeholder="Business or trade name" />
-        </div>
-      </div>
-
-      <div class="qf__row">
-        <div class="qf">
-          <label for="q-phone">Phone <span>optional</span></label>
-          <input id="q-phone" name="phone" type="tel" autocomplete="tel"
-            placeholder="If you would rather we called" />
-        </div>
-        <div class="qf">
-          <label for="q-need">What do you need?</label>
-          <select id="q-need" name="need">
-            {services.map((sv) => <option value={sv.t}>{sv.t}</option>)}
-            <option value="A mix of the above">A mix of the above</option>
-          </select>
-        </div>
-      </div>
-
-      <div class="qf">
-        <label for="q-msg">Scope, quantities, or the problem</label>
-        <textarea id="q-msg" name="message" rows="5" required
-          placeholder="40 laptops for a clinic refit, or 12 cameras across two floors — rough is fine."></textarea>
-      </div>
-
-      <div class="qt__acts">
-        <button class="btn" type="submit">
-          Send to Danat
-          <span class="btn__i" aria-hidden="true"><Icon name="whatsapp" size={15} /></span>
-        </button>
-        <a class="qt__call" href={`tel:${site.phone.tel}`}>{site.phone.display}</a>
-      </div>
-
-      <p class="qt__note">
-        Opens WhatsApp with your enquiry ready — nothing is stored on this
-        site and nothing sends until you press send.
-      </p>
-
-      <noscript>
-        <p class="qt__nojs">
-          This form needs JavaScript. Reach us on
-          {' '}<a href={whatsappLink()}>WhatsApp</a>, call
-          {' '}<a href={`tel:${site.phone.tel}`}>{site.phone.display}</a>, or email
-          {' '}<a href={`mailto:${site.email}`}>{site.email}</a>.
-        </p>
-      </noscript>
-    </form>
-  </section>
-
+  <VideoModal />
 </PageLayout>
-
-<script is:inline define:vars={{ WA: site.phone.whatsapp }}>
-  (() => {
-    const form = document.getElementById('trade');
-    if (!form) return;
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      if (!form.reportValidity()) return;
-      const d = new FormData(form);
-      const opt = (k, label) => {
-        const v = String(d.get(k) || '').trim();
-        return v ? [`${label}: ${v}`] : [];
-      };
-      const text = [
-        `Hello Danat — trade enquiry from ${String(d.get('name') || '').trim()}.`,
-        ``,
-        ...opt('company', 'Company'),
-        ...opt('need', 'Needs'),
-        ...opt('phone', 'Phone'),
-        ``,
-        String(d.get('message') || '').trim(),
-      ].join(String.fromCharCode(10));
-      window.open(`https://wa.me/${WA}?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
-    });
-  })();
-</script>
 
 <style>
   /* ───── shared ───── */
   .eb {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
     font-family: var(--font-mono);
     font-size: 0.6875rem;
     letter-spacing: 0.18em;
     text-transform: uppercase;
     color: var(--green-deep);
   }
-  .eb--clay { color: var(--clay-deep); }
-  .eb--inv { color: var(--green-bright); }
-  .eb__r { width: 26px; height: 1px; flex: none; background: currentColor; opacity: 0.6; }
 
   .btn {
     position: relative;
     display: inline-flex;
     align-items: center;
-    align-self: flex-start;
     gap: 0.7rem;
-    padding: 0.5rem 0.5rem 0.5rem 1.4rem;
+    padding: 0.55rem 0.55rem 0.55rem 1.5rem;
+    border: 0;
     border-radius: 999px;
     /* white is 8.73:1 on #27551f and 4.90:1 on #3d7f35 — AA across the ramp */
     background: linear-gradient(100deg, #27551f, #3d7f35);
     color: #fff;
     font-size: 0.9375rem;
     font-weight: 600;
-    overflow: hidden;
     transition: transform var(--t2) var(--ease);
   }
   .btn:hover { transform: translateY(-2px); }
@@ -432,439 +357,338 @@ const steps = [
   }
   .btn:hover .btn__i { transform: translateX(3px); }
 
+  .hero__script,
+  .eco__note,
+  .tm__fig figcaption {
+    font-family: var(--font-serif, Georgia, serif);
+    font-style: italic;
+    line-height: 1.3;
+    pointer-events: none;
+  }
+
   /* ───── 01 hero ───── */
-  .bh {
-    position: relative;
-    color: #fff;
-    padding-block: clamp(7rem, 12vw, 10rem) 0;
+  .hero {
+    background: linear-gradient(170deg, #f6fbf6, #eef6ee 62%, #f7fbf7);
+    padding-block: clamp(6rem, 10vw, 8rem) clamp(2.5rem, 5vw, 4rem);
     overflow: hidden;
-    isolation: isolate;
   }
-  .bh__bg { position: absolute; inset: 0; z-index: 0; }
-  .bh__bg :global(img) {
-    width: 100%; height: 100%; object-fit: cover; object-position: 56% 42%;
-  }
-  .bh__tint {
-    position: absolute;
-    inset: 0;
-    background:
-      linear-gradient(100deg, rgb(8 10 12 / 0.93) 0%, rgb(8 10 12 / 0.84) 44%,
-        rgb(8 10 12 / 0.55) 78%, rgb(8 10 12 / 0.4) 100%),
-      linear-gradient(to top, rgb(8 10 12 / 0.7), transparent 40%);
-  }
-  .bh__in { position: relative; z-index: 1; padding-bottom: clamp(3rem, 7vw, 5.5rem); }
+  .hero__grid { display: grid; gap: clamp(2rem, 4vw, 3rem); align-items: center; }
+  .hero__copy { display: grid; justify-items: start; }
 
-  .bh__crumb {
-    display: flex; flex-wrap: wrap; align-items: center; gap: 0.45rem;
-    margin-bottom: var(--s5);
-    font-size: 0.8125rem; color: rgb(255 255 255 / 0.66);
-  }
-  .bh__crumb a { transition: color var(--t2) var(--ease); }
-  .bh__crumb a:hover { color: #fff; }
-  .bh__crumb [aria-current] { color: #fff; }
-
-  .bh__h {
+  .hero__h {
     margin-top: var(--s4);
-    font-size: clamp(2.3rem, 6vw, 4.2rem);
-    line-height: 1.02;
-    letter-spacing: -0.046em;
-    font-weight: 700;
-  }
-  .bh__h em { font-style: normal; color: var(--clay-bright); }
-  .bh__p {
-    margin-top: var(--s4);
-    max-width: 46ch;
-    font-size: var(--lead);
-    line-height: 1.62;
-    color: rgb(255 255 255 / 0.84);
-  }
-  .bh__acts {
-    display: flex; flex-wrap: wrap; align-items: center;
-    gap: var(--s4) var(--s5); margin-top: var(--s5);
-  }
-  .bh__mail {
-    font-family: var(--font-mono); font-size: 0.875rem; color: #fff;
-    border-bottom: 1px solid rgb(255 255 255 / 0.45); padding-bottom: 2px;
-    overflow-wrap: anywhere;
-    transition: border-color var(--t2) var(--ease);
-  }
-  .bh__mail:hover { border-color: var(--clay-bright); }
-
-  /* The figures sit on a band at the base of the photograph. */
-  .bh__figs {
-    position: relative;
-    z-index: 1;
-    background: rgb(8 10 12 / 0.55);
-    backdrop-filter: blur(10px);
-    border-top: 1px solid rgb(255 255 255 / 0.14);
-  }
-  .bh__figsin {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--s5) var(--s4);
-    padding-block: clamp(1.25rem, 3vw, 2rem);
-  }
-  .bh__figs dt {
-    font-size: clamp(1.5rem, 2.6vw, 2.1rem);
-    font-weight: 700; letter-spacing: -0.04em; line-height: 1;
-    font-variant-numeric: tabular-nums;
-  }
-  .bh__figs dd {
-    margin-top: 0.3rem; font-size: 0.8125rem; color: rgb(255 255 255 / 0.7);
-  }
-
-  /* ───── 02 cards ───── */
-  .sv { background: var(--white); }
-  .sv__head { text-align: center; display: grid; justify-items: center; }
-  .sv__h {
-    margin-top: var(--s4);
-    font-size: clamp(1.7rem, 3.2vw, 2.5rem);
-    font-weight: 700;
-    letter-spacing: -0.04em;
+    font-size: clamp(2rem, 4.4vw, 3.2rem);
     line-height: 1.08;
-  }
-  .sv__h em { font-style: normal; color: var(--clay-deep); }
-
-  .sv__grid {
-    display: grid;
-    gap: clamp(0.9rem, 2vw, 1.4rem);
-    margin-top: clamp(2rem, 4vw, 3rem);
-  }
-
-  .card {
-    position: relative;
-    display: grid;
-    align-content: start;
-    height: 100%;
-    padding: clamp(1.4rem, 2.6vw, 1.9rem);
-    border-radius: 22px;
-    background: var(--white);
-    overflow: hidden;
-    box-shadow: 0 1px 2px rgb(30 20 10 / 0.05), 0 14px 32px -20px rgb(30 20 10 / 0.28);
-    transition: transform var(--t3) var(--ease), box-shadow var(--t3) var(--ease);
-  }
-  .card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 1px 2px rgb(30 20 10 / 0.05), 0 30px 52px -24px rgb(30 20 10 / 0.34);
-  }
-  /* A clay rule wipes across the base on hover — the accent as a mark. */
-  .card::after {
-    content: '';
-    position: absolute;
-    inset: auto 0 0 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--clay-deep), var(--clay));
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform var(--t3) var(--ease);
-  }
-  .card:hover::after { transform: scaleX(1); }
-  .card[data-tone='green']::after {
-    background: linear-gradient(90deg, var(--green-deep), var(--green-bright));
-  }
-
-  .card__i {
-    display: grid;
-    place-items: center;
-    width: 48px;
-    height: 48px;
-    border-radius: 15px;
-    color: var(--clay-deep);
-    background: linear-gradient(140deg, color-mix(in oklab, var(--clay) 18%, #fff), var(--clay-wash));
-    transition: transform var(--t3) var(--ease);
-  }
-  .card:hover .card__i { transform: scale(1.08) rotate(-6deg); }
-
-  .card h3 {
-    margin-top: 0.9rem;
-    font-size: 1.05rem;
+    letter-spacing: -0.042em;
     font-weight: 700;
-    letter-spacing: -0.025em;
   }
-  .card > p {
-    margin-top: 0.45rem;
-    font-size: 0.8125rem;
-    line-height: 1.6;
+  .hero__h em { font-style: normal; color: var(--green-deep); }
+  .hero__p {
+    margin-top: var(--s4);
+    max-width: 42ch;
+    font-size: 0.9375rem;
+    line-height: 1.65;
     color: var(--text-2);
   }
-
-  .card__pts {
-    display: grid;
-    gap: 0.35rem;
-    margin-top: 0.9rem;
-    padding-top: 0.8rem;
-    border-top: 1px solid var(--line-light);
-  }
-  .card__pts li {
+  .hero__acts {
     display: flex;
-    align-items: flex-start;
-    gap: 0.45rem;
-    font-size: 0.75rem;
-    line-height: 1.45;
-    color: var(--text-3);
-  }
-  .card__pts :global(svg) { flex: none; margin-top: 2px; color: var(--clay-deep); }
-
-  /* ---- tones ---- */
-
-  .card[data-tone='ink'] {
-    background: linear-gradient(150deg, #14171a, #0b1a12 58%, #101d14);
-    color: #fff;
-  }
-  .card[data-tone='green'] {
-    background: linear-gradient(150deg, #123a1c, #1e4a26 56%, #0f2d18);
-    color: #fff;
-  }
-  .card[data-tone='ink'] .card__i,
-  .card[data-tone='green'] .card__i {
-    background: rgb(255 255 255 / 0.1);
-    color: var(--clay-bright);
-  }
-  .card[data-tone='green'] .card__i { color: var(--green-bright); }
-  .card[data-tone='ink'] > p,
-  .card[data-tone='green'] > p { color: rgb(255 255 255 / 0.78); }
-  .card[data-tone='ink'] .card__pts,
-  .card[data-tone='green'] .card__pts { border-top-color: rgb(255 255 255 / 0.18); }
-  .card[data-tone='ink'] .card__pts li,
-  .card[data-tone='green'] .card__pts li { color: rgb(255 255 255 / 0.76); }
-  .card[data-tone='ink'] .card__pts :global(svg) { color: var(--clay-bright); }
-  .card[data-tone='green'] .card__pts :global(svg) { color: var(--green-bright); }
-  /* 50% measured 3.82:1 on the green card and this is 11px mono, so the
-     bar is 4.5:1 not 3:1. 62% is 5.01:1. */
-  .card[data-tone='ink'] .card__n,
-  .card[data-tone='green'] .card__n { color: rgb(255 255 255 / 0.62); }
-
-  /* ---- the big number on the lead card ---- */
-
-  .card__stat {
-    display: flex;
-    align-items: baseline;
-    gap: 0.6rem;
-    margin-top: 1rem;
-  }
-  .card__stat b {
-    font-size: clamp(2rem, 4.5vw, 3rem);
-    font-weight: 700;
-    letter-spacing: -0.045em;
-    line-height: 1;
-    font-variant-numeric: tabular-nums;
-    color: var(--clay-bright);
-  }
-  .card__stat em {
-    font-style: normal;
-    font-size: 0.75rem;
-    line-height: 1.35;
-    max-width: 12ch;
-    color: rgb(255 255 255 / 0.66);
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s4) var(--s5);
+    margin-top: var(--s5);
   }
 
-  /* ---- the closing tile ---- */
-
-  .tile { display: grid; }
-  .tile a {
-    position: relative;
-    display: grid;
-    align-content: center;
-    justify-items: start;
-    height: 100%;
-    padding: clamp(1.4rem, 2.6vw, 1.9rem);
-    border-radius: 22px;
-    background: linear-gradient(150deg, var(--clay-deep), #8a3a10);
-    color: #fff;
-    overflow: hidden;
-    transition: transform var(--t3) var(--ease), box-shadow var(--t3) var(--ease);
+  .film {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    text-align: left;
   }
-  .tile a:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 30px 52px -24px rgb(90 40 10 / 0.5);
-  }
-  .tile__i {
+  .film i {
     display: grid;
     place-items: center;
-    width: 48px;
-    height: 48px;
-    border-radius: 15px;
-    background: rgb(255 255 255 / 0.16);
+    width: 36px;
+    height: 36px;
+    flex: none;
+    border-radius: 50%;
+    background: var(--green-deep);
+    color: #fff;
+    transition: transform var(--t2) var(--ease);
   }
-  .tile b {
-    margin-top: 0.9rem;
-    font-size: 1.05rem;
-    font-weight: 700;
-    letter-spacing: -0.025em;
+  .film:hover i { transform: scale(1.08); }
+  .film:focus-visible i { outline: 2px solid var(--green-deep); outline-offset: 3px; }
+  .film > span { display: grid; font-size: 0.875rem; font-weight: 600; }
+  .film small {
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-3);
   }
-  .tile em {
-    margin-top: 0.4rem;
-    font-style: normal;
-    max-width: 22ch;
-    font-size: 0.8125rem;
-    line-height: 1.55;
-    /* 80% was 4.29:1 against the ramp's light end; 88% is 4.83:1. */
-    color: rgb(255 255 255 / 0.88);
+
+  .hero__trust {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s4) var(--s5);
+    margin-top: var(--s5);
+    padding-top: var(--s5);
+    border-top: 1px solid var(--line-light);
   }
-  .tile__go {
+  .hero__trust li { display: flex; align-items: center; gap: 0.6rem; }
+  .hero__trust i {
     display: grid;
     place-items: center;
     width: 34px;
     height: 34px;
-    margin-top: 1rem;
-    border-radius: 50%;
-    background: rgb(255 255 255 / 0.18);
-    transition: transform var(--t2) var(--ease);
+    flex: none;
+    border-radius: 10px;
+    color: var(--green-deep);
+    background: var(--green-wash);
   }
-  .tile a:hover .tile__go { transform: translateX(3px); }
+  .hero__trust span { display: grid; font-size: 0.75rem; color: var(--text-3); }
+  .hero__trust b { font-size: 0.8125rem; color: var(--text); }
 
-  .card__n {
+  .hero__fig { position: relative; }
+  .hero__fig :global(img) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 11;
+    object-fit: cover;
+    /* The curved inner edge from the mockup. */
+    border-radius: 44% 18px 18px 44% / 30% 18px 18px 30%;
+  }
+  .hero__fig figcaption {
     position: absolute;
-    top: clamp(1.4rem, 2.6vw, 1.9rem);
-    right: clamp(1.4rem, 2.6vw, 1.9rem);
-    font-family: var(--font-mono);
-    font-size: 0.6875rem;
-    letter-spacing: 0.12em;
-    color: var(--text-3);
+    top: 1rem;
+    right: 1rem;
+    display: grid;
+    justify-items: end;
+    gap: 0.5rem;
+    text-align: right;
+  }
+  .hero__script { font-size: clamp(0.85rem, 1.4vw, 1.1rem); color: var(--green-deep); }
+  .hero__logo { display: block; width: clamp(4.5rem, 8vw, 6.5rem); }
+  .hero__logo :global(img) {
+    width: 100%;
+    height: auto;
+    border-radius: 0;
+    aspect-ratio: auto;
   }
 
-  /* ───── 03 who ───── */
-  .wh { background: linear-gradient(185deg, #fdfcfa, #f7f3ef 60%, #fdfbf9); }
-  .wh__grid { display: grid; gap: clamp(1.75rem, 4vw, 3rem); align-items: center; }
-  .wh__intro { display: grid; justify-items: start; }
-  .wh__h {
+  /* ───── 02 ecosystem ───── */
+  .eco {
+    position: relative;
+    background: linear-gradient(180deg, #fafdfa, #f1f8f1 60%, #f8fbf8);
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .eco__wash {
+    position: absolute;
+    z-index: -1;
+    left: 50%;
+    top: 58%;
+    translate: -50% -50%;
+    width: min(56rem, 96vw);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(circle, color-mix(in oklab, var(--green) 12%, transparent), transparent 70%);
+    filter: blur(30px);
+  }
+
+  .eco__head { display: grid; gap: var(--s5); align-items: end; }
+  .eco__h {
     margin-top: var(--s4);
     font-size: clamp(1.7rem, 3.2vw, 2.4rem);
     font-weight: 700;
     letter-spacing: -0.04em;
-    line-height: 1.08;
+    line-height: 1.12;
   }
-  .wh__h em { font-style: normal; color: var(--green-deep); }
-  .wh__p {
+  .eco__h em { font-style: normal; color: var(--green-deep); }
+  .eco__p {
     margin-top: var(--s4);
-    max-width: 40ch;
-    font-size: 0.9375rem;
+    max-width: 46ch;
+    font-size: 0.875rem;
     line-height: 1.62;
     color: var(--text-2);
   }
-  .wh__ask {
-    max-width: 38ch;
-    margin-top: var(--s5);
-    padding-top: var(--s4);
-    border-top: 1px solid var(--line-light);
-    font-size: 0.8125rem;
-    line-height: 1.6;
-    color: var(--text-3);
+  .eco__aside { font-size: 0.8125rem; line-height: 1.7; color: var(--text-2); }
+
+  .eco__stage {
+    position: relative;
+    display: grid;
+    place-items: center;
+    margin-top: clamp(1.5rem, 3vw, 2.5rem);
+  }
+  .eco__note {
+    display: none;
+    position: absolute;
+    top: 46%;
+    font-size: clamp(0.85rem, 1.3vw, 1.05rem);
+    color: var(--green-deep);
+  }
+  .eco__note--l { left: 0; rotate: -6deg; }
+  .eco__note--r { right: 0; text-align: right; rotate: 5deg; }
+
+  /* ---- the ring ---- */
+  .ring {
+    position: relative;
+    width: min(46rem, 92vw);
+    aspect-ratio: 1;
+  }
+  .ring__guide {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    color: color-mix(in oklab, var(--green) 42%, transparent);
   }
 
-  .wh__list { display: grid; gap: 0.7rem; }
-  .wh__list li {
-    display: flex;
-    align-items: center;
-    gap: 0.9rem;
-    height: 100%;
-    padding: 1.15rem 1.2rem;
-    border-radius: 16px;
-    background: rgb(255 255 255 / 0.84);
-    backdrop-filter: blur(8px);
-    box-shadow: 0 1px 2px rgb(30 20 10 / 0.04), 0 10px 26px -20px rgb(30 20 10 / 0.26);
-    transition: transform var(--t2) var(--ease);
+  .ring__hub {
+    position: absolute;
+    inset: 31%;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    border-radius: 50%;
+    background: radial-gradient(circle at 36% 30%, #2f6b2a, #14311a 74%);
+    color: #fff;
+    text-align: center;
+    box-shadow: 0 24px 50px -24px rgb(10 40 14 / 0.6);
   }
-  .wh__list li:hover { transform: translateX(4px); }
-  .wh__list span {
+  .ring__hub :global(img) { width: clamp(3.5rem, 7vw, 5rem); height: auto; }
+  .ring__hub span {
+    font-family: var(--font-mono);
+    font-size: 0.5rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    line-height: 1.7;
+    color: var(--green-bright);
+  }
+
+  /* Full-size box rotated about the ring's centre, with the node pinned
+     to the top edge — so the radius is the ring's and scales with it. A
+     percentage translate on the node would resolve against the node. */
+  .ring__slot {
+    position: absolute;
+    inset: 0;
+    transform: rotate(var(--th));
+    pointer-events: none;
+  }
+  .node {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    translate: -50% -50%;
+    display: grid;
+    justify-items: center;
+    gap: 0.3rem;
+    width: clamp(8rem, 17vw, 10.5rem);
+    padding: 0.9rem 0.7rem;
+    border-radius: 18px;
+    background: rgb(255 255 255 / 0.95);
+    backdrop-filter: blur(6px);
+    text-align: center;
+    pointer-events: auto;
+    box-shadow: 0 1px 2px rgb(10 30 12 / 0.05), 0 14px 30px -18px rgb(10 30 12 / 0.4);
+    /* stays upright whatever angle its slot sits at */
+    transform: rotate(calc(var(--th) * -1));
+    transition: box-shadow var(--t2) var(--ease);
+  }
+  .node:hover {
+    box-shadow: 0 1px 2px rgb(10 30 12 / 0.05), 0 22px 40px -18px rgb(10 30 12 / 0.45);
+  }
+  .node i {
     display: grid;
     place-items: center;
     width: 42px;
     height: 42px;
-    flex: none;
-    border-radius: 13px;
+    border-radius: 50%;
     color: var(--green-deep);
     background: var(--green-wash);
   }
-  .wh__list b { font-size: 0.9375rem; font-weight: 700; letter-spacing: -0.02em; }
-  .wh__list em {
-    display: block;
-    margin-top: 0.15rem;
+  .node b { font-size: 0.8125rem; font-weight: 700; letter-spacing: -0.02em; }
+  .node em {
     font-style: normal;
-    font-size: 0.75rem;
+    font-size: 0.6875rem;
+    line-height: 1.4;
     color: var(--text-3);
   }
 
-  /* ───── 04 how ───── */
-  .hw {
-    position: relative;
-    color: #fff;
-    padding-block: clamp(3rem, 6vw, 5rem);
-    overflow: hidden;
-    isolation: isolate;
-  }
-  .hw__bg { position: absolute; inset: 0; z-index: 0; }
-  .hw__bg :global(img) { width: 100%; height: 100%; object-fit: cover; object-position: 50% 45%; }
-  /* Measured against the real crop — every stop clears AA for white. */
-  .hw__tint {
-    position: absolute;
-    inset: 0;
-    background:
-      linear-gradient(100deg, rgb(8 10 12 / 0.94) 0%, rgb(8 10 12 / 0.88) 48%, rgb(8 10 12 / 0.72) 100%),
-      linear-gradient(to top, rgb(8 10 12 / 0.55), transparent 44%);
-  }
-  .hw__in { position: relative; z-index: 1; }
-
-  .hw__h {
+  /* ───── 03 process ───── */
+  .pr { background: var(--white); }
+  .pr__head { display: grid; gap: var(--s5); align-items: end; }
+  .pr__h {
     margin-top: var(--s4);
-    font-size: clamp(1.6rem, 3vw, 2.3rem);
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
     font-weight: 700;
     letter-spacing: -0.04em;
   }
+  .pr__h em { font-style: normal; color: var(--green-deep); }
+  .pr__aside { font-size: 0.8125rem; line-height: 1.7; color: var(--text-2); }
 
-  .hw__steps {
+  .pr__steps {
     display: grid;
-    gap: clamp(1.1rem, 2.4vw, 1.75rem);
+    gap: clamp(1.5rem, 3vw, 2.25rem);
     margin-top: clamp(1.75rem, 4vw, 2.75rem);
   }
-  .hw__steps li {
-    padding-top: var(--s4);
-    border-top: 1px solid rgb(255 255 255 / 0.2);
-  }
-  .hw__steps b {
+  .pr__marks { display: flex; align-items: center; gap: 0.6rem; }
+  .pr__marks b {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 1px solid color-mix(in oklab, var(--green) 40%, transparent);
+    background: var(--green-wash);
     font-family: var(--font-mono);
     font-size: 0.6875rem;
-    letter-spacing: 0.14em;
-    color: var(--clay-bright);
+    color: var(--green-deep);
   }
-  .hw__steps h3 {
-    margin-top: 0.5rem;
+  .pr__marks i {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--green-deep);
+    color: #fff;
+  }
+  .pr__steps h3 {
+    margin-top: 0.85rem;
     font-size: 0.9375rem;
     font-weight: 700;
     letter-spacing: -0.02em;
   }
-  .hw__steps p {
+  .pr__steps p {
     margin-top: 0.35rem;
+    max-width: 26ch;
     font-size: 0.8125rem;
     line-height: 1.55;
-    color: rgb(255 255 255 / 0.76);
+    color: var(--text-3);
   }
 
-  /* Held open rather than asserted. */
-  .hw__note {
-    max-width: 62ch;
-    margin-top: clamp(1.75rem, 4vw, 2.5rem);
-    padding: 0.9rem 1.1rem;
-    border-radius: 12px;
-    background: rgb(255 255 255 / 0.08);
-    border: 1px dashed rgb(255 255 255 / 0.28);
-    font-size: 0.8125rem;
-    line-height: 1.6;
-    color: rgb(255 255 255 / 0.82);
-  }
-
-  /* ───── 03b why rail ───── */
-  .wy { background: var(--white); }
-  .wy__head { display: grid; justify-items: center; text-align: center; }
-  .wy__h {
+  /* ───── 04 service cards ───── */
+  .sv { background: linear-gradient(180deg, #fafcfa, #f3f8f3); }
+  .sv__head { display: grid; gap: var(--s5); align-items: end; }
+  .sv__h {
     margin-top: var(--s4);
-    font-size: clamp(1.7rem, 3.2vw, 2.5rem);
-    font-weight: 700; letter-spacing: -0.04em; line-height: 1.08;
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1.12;
   }
-  .wy__h em { font-style: normal; color: var(--clay-deep); }
+  .sv__h em { font-style: normal; color: var(--green-deep); }
+  .sv__aside { font-size: 0.8125rem; line-height: 1.7; color: var(--text-2); }
 
-  .wy__rail { margin-top: clamp(1.75rem, 4vw, 2.75rem); }
-  .wy__track {
+  .sv__rail { margin-top: clamp(1.75rem, 4vw, 2.75rem); }
+  .sv__track {
     display: grid;
     grid-auto-flow: column;
     grid-auto-columns: minmax(15rem, 1fr);
@@ -874,139 +698,239 @@ const steps = [
     scrollbar-width: none;
     padding-bottom: 0.5rem;
   }
-  .wy__track::-webkit-scrollbar { display: none; }
-  .wy__track li {
-    scroll-snap-align: start;
+  .sv__track::-webkit-scrollbar { display: none; }
+  .sv__track li { scroll-snap-align: start; }
+  .sv__track a {
+    display: grid;
+    height: 100%;
+    border-radius: 18px;
+    background: var(--white);
+    overflow: hidden;
+    box-shadow: 0 1px 2px rgb(10 30 12 / 0.05), 0 14px 32px -22px rgb(10 30 12 / 0.34);
+    transition: transform var(--t2) var(--ease), box-shadow var(--t2) var(--ease);
+  }
+  .sv__track a:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 1px 2px rgb(10 30 12 / 0.05), 0 26px 46px -22px rgb(10 30 12 / 0.4);
+  }
+  .sc__shot { display: block; aspect-ratio: 16 / 10; overflow: hidden; }
+  .sc__shot :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: scale var(--t3) var(--ease);
+  }
+  .sv__track a:hover .sc__shot :global(img) { scale: 1.06; }
+  .sc__body {
+    position: relative;
     display: grid;
     align-content: start;
-    padding: 1.5rem 1.4rem;
-    border-radius: 20px;
-    background: var(--off);
-    transition: background-color var(--t2) var(--ease), transform var(--t2) var(--ease);
+    padding: 1.1rem 1.2rem 1.3rem;
   }
-  .wy__track li:hover { transform: translateY(-4px); background: var(--clay-wash); }
-  .wy__track span {
-    display: grid; place-items: center; width: 46px; height: 46px;
-    border-radius: 15px; color: var(--clay-deep); background: #fff;
+  .sc__body b { font-size: 0.9375rem; font-weight: 700; letter-spacing: -0.02em; }
+  .sc__body em {
+    margin-top: 0.35rem;
+    font-style: normal;
+    max-width: 24ch;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: var(--text-3);
   }
-  .wy__track b {
-    margin-top: 0.9rem; font-size: 1rem; font-weight: 700; letter-spacing: -0.025em;
+  .sc__go {
+    position: absolute;
+    right: 1.1rem;
+    bottom: 1.2rem;
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid var(--line-light);
+    color: var(--green-deep);
+    transition:
+      transform var(--t2) var(--ease),
+      background-color var(--t2) var(--ease),
+      border-color var(--t2) var(--ease),
+      color var(--t2) var(--ease);
   }
-  .wy__track em {
-    margin-top: 0.4rem; font-style: normal;
-    font-size: 0.8125rem; line-height: 1.55; color: var(--text-2);
+  .sv__track a:hover .sc__go {
+    transform: translateX(3px);
+    background: var(--green-deep);
+    border-color: var(--green-deep);
+    color: #fff;
   }
 
-  /* ───── 05 quote ───── */
-  .qt {
+  /* ───── 05 stat band ───── */
+  .st {
     position: relative;
-    background: linear-gradient(180deg, #fdfbf9, #f7f1ea 56%, #fdfcfa);
+    color: #fff;
+    padding-block: clamp(2.25rem, 4.5vw, 3.5rem);
     overflow: hidden;
     isolation: isolate;
   }
-  .qt__wash {
-    position: absolute; z-index: -1; left: 50%; top: 40%;
-    translate: -50% -50%;
-    width: min(52rem, 94vw); aspect-ratio: 1; border-radius: 50%;
-    background: radial-gradient(circle, color-mix(in oklab, var(--clay) 13%, transparent), transparent 70%);
-    filter: blur(30px);
+  .st__bg { position: absolute; inset: 0; z-index: 0; }
+  .st__bg :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  /* Measured against the real crop; every stop clears AA for white. */
+  .st__tint {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(100deg, rgb(10 40 18 / 0.96), rgb(16 52 24 / 0.93) 55%, rgb(10 40 18 / 0.9));
   }
-  .qt__head { display: grid; justify-items: center; text-align: center; }
-  .eb--mid { justify-content: center; }
-  .qt__h {
+  .st__in { position: relative; z-index: 1; display: grid; gap: var(--s5); align-items: center; }
+  .st__k {
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--green-bright);
+  }
+  .st__h {
     margin-top: var(--s4);
-    font-size: clamp(1.8rem, 3.6vw, 2.7rem);
-    font-weight: 700; letter-spacing: -0.042em; line-height: 1.06;
+    font-size: clamp(1.4rem, 2.6vw, 2rem);
+    font-weight: 700;
+    letter-spacing: -0.038em;
+    line-height: 1.16;
   }
-  .qt__h em { font-style: normal; color: var(--clay-deep); }
-  .qt__p {
-    max-width: 44ch; margin-top: var(--s4);
-    font-size: 0.9375rem; line-height: 1.62; color: var(--text-2);
+  .st__figs { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--s5) var(--s4); }
+  .st__figs > div + div { padding-left: var(--s4); border-left: 1px solid rgb(255 255 255 / 0.22); }
+  .st__figs dt {
+    font-size: clamp(1.4rem, 2.4vw, 1.9rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
   }
+  .st__figs dd { margin-top: 0.3rem; font-size: 0.75rem; color: rgb(255 255 255 / 0.76); }
 
-  .qt__form {
-    display: grid;
-    gap: var(--s4);
-    max-width: 46rem;
-    margin: clamp(2rem, 4vw, 3rem) auto 0;
-    padding: clamp(1.4rem, 3vw, 2.25rem);
-    border-radius: 22px;
-    background: var(--white);
-    box-shadow: 0 1px 2px rgb(30 20 10 / 0.05), 0 30px 60px -44px rgb(30 20 10 / 0.5);
+  /* ───── 06 testimonial ───── */
+  .tm { background: var(--white); }
+  .tm__grid { display: grid; gap: clamp(1.75rem, 4vw, 3rem); align-items: center; }
+  .tm__copy { position: relative; }
+  .tm__q {
+    display: block;
+    font-family: var(--font-serif, Georgia, serif);
+    font-size: 4rem;
+    line-height: 0.6;
+    color: color-mix(in oklab, var(--green) 55%, transparent);
   }
-  .qf__row { display: grid; gap: var(--s4); }
-  .qf { display: grid; gap: 0.45rem; }
-  .qf label {
-    font-family: var(--font-mono); font-size: 0.5625rem;
-    letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-3);
-  }
-  .qf label span { opacity: 0.7; }
-  .qf input, .qf select, .qf textarea {
-    width: 100%;
-    padding: 0.85rem 0.95rem;
-    border: 1px solid var(--line-light);
-    border-radius: 11px;
+  /* Held, not invented. */
+  .tm__slot {
+    max-width: 44ch;
+    margin-top: var(--s4);
+    padding: 1.1rem 1.2rem;
+    border: 1px dashed color-mix(in oklab, var(--green) 34%, var(--line-light));
+    border-radius: 14px;
     background: var(--off);
-    color: var(--text);
-    font: inherit; font-size: 0.9375rem;
-    transition: border-color var(--t2) var(--ease), box-shadow var(--t2) var(--ease);
+    font-size: 1rem;
+    font-weight: 600;
+    line-height: 1.5;
+    color: var(--text-2);
   }
-  .qf textarea { resize: vertical; min-height: 7rem; line-height: 1.55; }
-  .qf input::placeholder, .qf textarea::placeholder { color: var(--text-3); }
-  .qf input:focus-visible, .qf select:focus-visible, .qf textarea:focus-visible {
-    outline: none;
-    background: var(--white);
-    border-color: var(--clay-deep);
-    box-shadow: 0 0 0 3px color-mix(in oklab, var(--clay) 24%, transparent);
+  .tm__slot small {
+    display: block;
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 400;
+    line-height: 1.55;
+    color: var(--text-3);
   }
 
-  .qt__acts {
-    display: flex; flex-wrap: wrap; align-items: center;
-    gap: var(--s4) var(--s5); margin-top: var(--s3);
+  .tm__fig { position: relative; }
+  .tm__fig :global(img) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: 18px;
   }
-  .qt__call {
-    font-family: var(--font-mono); font-size: 0.9375rem; color: var(--text);
-    border-bottom: 1px solid var(--line-light); padding-bottom: 2px;
+  .tm__fig figcaption {
+    position: absolute;
+    right: 1rem;
+    bottom: 1rem;
+    padding: 0.6rem 0.9rem;
+    border-radius: 12px;
+    background: rgb(255 255 255 / 0.92);
+    backdrop-filter: blur(6px);
+    font-size: 0.8125rem;
+    text-align: right;
+    color: var(--green-deep);
+  }
+
+  /* ───── 07 cta ───── */
+  .ct {
+    background: linear-gradient(180deg, #f8fbf8, #eef6ee);
+    padding-block: clamp(2.5rem, 5vw, 4rem);
+  }
+  .ct__in { display: grid; gap: var(--s5); align-items: center; }
+  .ct__h {
+    font-size: clamp(1.5rem, 2.8vw, 2.1rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+  }
+  .ct__h em { font-style: normal; color: var(--green-deep); }
+  .ct__p { margin-top: var(--s4); font-size: 0.9375rem; color: var(--text-2); }
+  .ct__acts { display: flex; flex-wrap: wrap; gap: var(--s4); }
+  .ct__ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.8rem 1.4rem;
+    border: 1px solid var(--line-light);
+    border-radius: 999px;
+    background: var(--white);
+    font-size: 0.9375rem;
+    font-weight: 600;
     transition: border-color var(--t2) var(--ease);
   }
-  .qt__call:hover { border-color: var(--clay); }
-  .qt__note { font-size: 0.75rem; line-height: 1.5; color: var(--text-3); }
-  .qt__nojs {
-    padding: 0.85rem 1rem; border-radius: 11px;
-    background: #eceef0; color: #4a5560;
-    font-size: 0.8125rem; line-height: 1.55;
-  }
-  .qt__nojs a { text-decoration: underline; }
+  .ct__ghost:hover { border-color: var(--green); }
+  .ct__ghost :global(svg) { color: var(--green-deep); }
 
   /* ───── responsive ───── */
   @media (min-width: 40rem) {
-    .qf__row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .bh__figsin { grid-template-columns: repeat(4, 1fr); }
-    .sv__grid { grid-template-columns: repeat(2, 1fr); }
-    /* Two up: only the lead card takes the full width. */
-    .card[style*='--span:2'] { grid-column: span 2; }
-    .bh__figs { grid-template-columns: repeat(4, 1fr); }
-    .hw__steps { grid-template-columns: repeat(2, 1fr); }
+    .pr__steps { grid-template-columns: repeat(2, 1fr); }
+    .st__figs { grid-template-columns: repeat(4, 1fr); }
   }
 
   @media (min-width: 62rem) {
-    .bh__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 0.95fr); }
-    .sv__grid { grid-template-columns: repeat(3, 1fr); }
-    /* Three up: the uneven grid is what stops it reading as six boxes.
-       2+1 / 1+2 / 1+1+1, so no row repeats the one above it. */
-    .card { grid-column: span var(--span, 1); }
-    .wh__grid { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); }
-    /* Two up, not four stacked: a full-width row in this column left most
-       of each card empty and opened a gap beside the copy. */
-    .wh__list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .hw__steps { grid-template-columns: repeat(4, 1fr); }
+    .hero__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); }
+    .eco__head { grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.8fr); }
+    .pr__head { grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr); }
+    .pr__steps { grid-template-columns: repeat(4, 1fr); }
+    .sv__head { grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr); }
+    .st__in { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.3fr); }
+    .tm__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); }
+    .ct__in { grid-template-columns: minmax(0, 1fr) auto; }
+  }
+
+  @media (min-width: 80rem) {
+    .eco__note { display: block; }
+  }
+
+  @media (max-width: 48rem) {
+    /* A seven-node ring is unreadable on a phone — stack the nodes. */
+    .ring { aspect-ratio: auto; width: 100%; }
+    .ring__guide, .ring__hub { display: none; }
+    .ring__slot { position: static; transform: none; }
+    .node {
+      position: static;
+      translate: none;
+      transform: none;
+      width: 100%;
+      margin-bottom: 0.6rem;
+      grid-template-columns: auto 1fr;
+      justify-items: start;
+      text-align: left;
+      gap: 0.2rem 0.8rem;
+    }
+    .node i { grid-row: span 2; }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .btn, .btn:hover, .card, .card:hover, .card__i,
-    .tile a, .tile a:hover, .tile__go,
-    .wh__list li, .wh__list li:hover,
-    .wy__track li, .wy__track li:hover { transform: none; transition: none; }
-    .card::after { transform: scaleX(1); }
+    .btn, .btn:hover, .film i,
+    .sv__track a, .sv__track a:hover, .sc__go {
+      transform: none;
+      transition: none;
+    }
+    .node { transform: rotate(calc(var(--th) * -1)); }
   }
 </style>
