@@ -1,0 +1,899 @@
+---
+import { Image } from 'astro:assets';
+import PageLayout from '@layouts/PageLayout.astro';
+import Icon from '@components/ui/Icon.astro';
+import VideoModal from '@components/global/VideoModal.astro';
+import { site, brands } from '@data/site';
+import imgRetail from '@assets/photos/retail-display.jpg';
+import imgPatch from '@assets/photos/network-patch.jpg';
+import imgCctv from '@assets/photos/cctv-white.jpg';
+import imgDrive from '@assets/photos/drive-macro.jpg';
+import imgBoard from '@assets/photos/repair-board.jpg';
+import imgDesk from '@assets/photos/support-desk.jpg';
+
+/**
+ * PRODUCTS — built to the client's mockup.
+ *
+ * ⚠ Danat has no online catalogue: no prices, no stock levels, no cart.
+ * The old site's product page had none either. So every call to action
+ * here ends in a conversation rather than pretending to a basket —
+ * "Browse all products" moves down to the categories, and the per-
+ * category buttons open the quote modal. Nothing claims a price.
+ *
+ * The five categories are the ones the old product page carried, minus
+ * the four entries on it that were actually services and already live
+ * on /services — CCTV installation, wired networking, wireless
+ * networking and spare parts.
+ *
+ * Brand names are set as type. Danat has no licence on file for HP,
+ * Dell, Apple, ASUS or Lenovo artwork, and their marks are not ours to
+ * redraw; the sixteen names come from the catalogue export.
+ */
+/**
+ * The five titles the old product page carries, verbatim apart from
+ * sentence case — "HP Laptops and Desktops: Unleash Power and
+ * Performance with HP" and so on. The mockup's featured rail is a brand
+ * rail, not a category one: five dots, and the card reads "HP Laptops".
+ *
+ * ⚠ No brand product photography is in the project, so each brand shows
+ * a Danat photograph for now. Send the product shots and they drop in.
+ */
+const makes = [
+  { k: 'hp', b: 'HP', t: 'HP laptops and desktops', p: 'Unleash power and performance with HP.',
+    img: imgRetail, alt: 'Retail display of computers and accessories' },
+  { k: 'dell', b: 'Dell', t: 'Dell laptops and desktops', p: 'Precision and innovation with Dell.',
+    img: imgDesk, alt: 'Danat staff working at the support desk' },
+  { k: 'asus', b: 'ASUS', t: 'Asus laptops and desktops', p: 'Elevate your experience with Asus.',
+    img: imgBoard, alt: 'A technician working on a mainboard' },
+  { k: 'apple', b: 'Apple', t: 'Apple laptops and desktops', p: 'Seamless integration with Apple.',
+    img: imgRetail, alt: 'Retail display of computers and accessories' },
+  { k: 'lenovo', b: 'Lenovo', t: 'Lenovo laptops and desktops', p: 'Innovation redefined with Lenovo.',
+    img: imgDesk, alt: 'Danat staff working at the support desk' },
+];
+
+/**
+ * The grid groups the rest of the old page's items rather than dropping
+ * them: wired and wireless networking together, CCTV installation under
+ * security, spare parts under accessories, and refurbished desktop on
+ * its own.
+ */
+const cats = [
+  { n: '01', icon: 'laptop', t: 'Laptops & desktops', sub: 'Work. Learn. Create.',
+    p: 'HP, Dell, Asus, Apple and Lenovo.', img: imgRetail,
+    alt: 'Retail display of computers and accessories' },
+  { n: '02', icon: 'network', t: 'Networking', sub: 'Stay connected.',
+    p: 'Wired and wireless networking.', img: imgPatch,
+    alt: 'Network patch panel with structured cabling' },
+  { n: '03', icon: 'camera', t: 'Security & CCTV', sub: 'Safer environments.',
+    p: 'CCTV installation and maintenance.', img: imgCctv,
+    alt: 'Security cameras mounted on a white wall' },
+  { n: '04', icon: 'drive', t: 'Accessories & parts', sub: 'Enhance your setup.',
+    p: 'Spare parts and consumables.', img: imgDrive,
+    alt: 'Close detail of a storage drive' },
+  { n: '05', icon: 'chip', t: 'Refurbished desktops', sub: 'Smart value.',
+    p: 'Reliable performance, better value.', img: imgBoard,
+    alt: 'A technician working on a desktop mainboard' },
+];
+
+const marks = [
+  { icon: 'shield', t: 'Genuine products', p: 'Trusted brands' },
+  { icon: 'headset', t: 'Expert support', p: 'Across Oman' },
+  { icon: 'pin', t: 'Visit our branches', p: `${site.stats.branches} locations` },
+];
+
+const helps = [
+  { icon: 'users', t: 'Expert guidance', p: 'Get the right solution' },
+  { icon: 'pin', t: 'Multiple branches', p: 'Service across Oman' },
+  { icon: 'chat', t: 'Ongoing support', p: "We're always here" },
+];
+---
+
+<PageLayout
+  title="Products"
+  description={`Laptops, desktops, networking, security and accessories from ${brands.flat().length} brands — supplied across Oman from ${site.stats.branches} branches since ${site.stats.since}.`}
+>
+  {/* ══════ 01 · hero ══════ */}
+  <section class="ph">
+    <span class="ph__sky" aria-hidden="true"></span>
+
+    <div class="shell ph__grid">
+      <div class="ph__copy">
+        <p class="eb" data-rise>Explore products</p>
+        <h1 class="ph__h" data-mask>
+          <span class="mask"><span class="mask__i" style="--d:90ms">Technology,</span></span>
+          <span class="mask"><span class="mask__i" style="--d:170ms">chosen for the way</span></span>
+          <span class="mask"><span class="mask__i" style="--d:250ms"><em>you work.</em></span></span>
+        </h1>
+        <p class="ph__p" data-rise style="--d:260ms">
+          Laptops, desktops, networking, security and more — genuine products
+          and trusted technology solutions for businesses and individuals
+          across Oman.
+        </p>
+
+        <div class="ph__acts" data-rise style="--d:320ms">
+          <a class="btn" href="#categories">
+            Browse all products
+            <span class="btn__i" aria-hidden="true"><Icon name="arrow" size={15} /></span>
+          </a>
+          <button class="film" type="button" data-video-open>
+            <i aria-hidden="true"><Icon name="play" size={12} /></i>
+            <span>Watch video<small>Explore our range</small></span>
+          </button>
+        </div>
+
+        <ul class="ph__marks" data-rise style="--d:380ms">
+          {marks.map((m) => (
+            <li>
+              <i aria-hidden="true"><Icon name={m.icon} size={17} /></i>
+              <span><b>{m.t}</b>{m.p}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* Same layered treatment as the services hero. Every decoration is
+          a sibling of the figure — inside it they would be clipped to the
+          picture's own frame. */}
+      <div class="ph__stage" data-mask>
+        <span class="ph__slab" aria-hidden="true"></span>
+        <span class="ph__dots" aria-hidden="true"></span>
+
+        <figure class="ph__media">
+          <Image src={imgDesk} alt="Danat staff at the support desk"
+            widths={[700, 1100, 1500]} sizes="(min-width:62rem) 48vw, 100vw"
+            quality={78} format="webp" loading="eager" fetchpriority="high" />
+        </figure>
+
+        <p class="ph__chip" data-rise style="--d:560ms">
+          <i aria-hidden="true"><Icon name="bolt" size={15} /></i>
+          <span><b>Reliable tech</b>Brighter tomorrow</span>
+        </p>
+
+        <p class="ph__script" aria-hidden="true">Better Technology<br />A Smarter Oman</p>
+      </div>
+    </div>
+  </section>
+
+  {/* ══════ 02 · featured ══════ */}
+  <section class="pf section" data-pick>
+    <p class="eb eb--mid" data-rise>Featured products</p>
+    <h2 class="pf__h" data-rise style="--d:70ms">Premium brands. Wider choices.</h2>
+
+    <div class="shell pf__grid">
+      <ul class="pf__nav" data-rise>
+        {makes.map((m, i) => (
+          <li>
+            <button type="button" data-go={i} data-on={i === 0 ? '' : undefined}>
+              <i aria-hidden="true"><Icon name="laptop" size={18} /></i>
+              <span><b>{m.b}</b>Laptops &amp; desktops</span>
+            </button>
+          </li>
+        ))}
+      </ul>
+
+      <div class="pf__stage" data-rise style="--d:120ms">
+        <button class="pf__arrow pf__arrow--l" type="button" data-step="-1" aria-label="Previous brand">
+          <Icon name="arrow" size={16} />
+        </button>
+
+        <div class="pf__shots">
+          {makes.map((m, i) => (
+            <figure data-i={i} data-on={i === 0 ? '' : undefined}>
+              <Image src={m.img} alt={m.alt} widths={[420, 700]} sizes="420px"
+                quality={78} format="webp" loading={i === 0 ? 'eager' : 'lazy'} />
+            </figure>
+          ))}
+          <span class="pf__plinth" aria-hidden="true"></span>
+        </div>
+
+        <button class="pf__arrow pf__arrow--r" type="button" data-step="1" aria-label="Next brand">
+          <Icon name="arrow" size={16} />
+        </button>
+
+        <p class="pf__ring" aria-hidden="true">
+          {makes.map((m) => <span>{m.b}</span>)}
+        </p>
+      </div>
+
+      <div class="pf__card" data-rise style="--d:180ms">
+        {makes.map((m, i) => (
+          <div class="pf__pane" data-i={i} data-on={i === 0 ? '' : undefined}>
+            <p class="pf__makes">{m.b}</p>
+            <h3 class="pf__t">{m.t}</h3>
+            <p class="pf__sub">{m.p}</p>
+            <p class="pf__blurb">
+              Supplied and supported by the same team that runs the workshop,
+              from {site.stats.branches} branches across Oman.
+            </p>
+            <a class="btn" href="/contact" data-enquiry="quote">
+              View {m.b} products
+              <span class="btn__i" aria-hidden="true"><Icon name="arrow" size={15} /></span>
+            </a>
+          </div>
+        ))}
+        <span class="pf__dots" aria-hidden="true">
+          {makes.map((_, i) => <i data-on={i === 0 ? '' : undefined}></i>)}
+        </span>
+      </div>
+    </div>
+  </section>
+
+  {/* ══════ 03 · categories ══════ */}
+  <section class="pc section" id="categories">
+    <div class="shell pc__head">
+      <div>
+        <p class="eb" data-rise>Product categories</p>
+        <h2 class="pc__h" data-rise style="--d:70ms">Solutions for every need.</h2>
+      </div>
+      <p class="pc__p" data-rise style="--d:130ms">
+        From leading global brands to essential accessories — {site.stats.parts.toLocaleString('en-US')}
+        lines across {site.stats.categories} categories, held across
+        {' '}{site.stats.branches} branches.
+      </p>
+      <a class="pc__all" href="/contact" data-enquiry="quote" data-rise style="--d:190ms">
+        Ask for a list<Icon name="arrow" size={15} />
+      </a>
+    </div>
+
+    <ul class="shell pc__grid">
+      {cats.map((c, i) => (
+        <li data-rise data-tone={['a', 'b', 'c', 'd', 'a'][i]} style={`--d:${i * 60}ms`}>
+          <a href="/contact" data-enquiry="quote">
+            <span class="pc__n">{c.n}</span>
+            <span class="pc__t">{c.t}</span>
+            <span class="pc__s">{c.p}</span>
+            <span class="pc__shot">
+              <Image src={c.img} alt="" widths={[320, 520]} sizes="240px"
+                quality={74} format="webp" loading="lazy" />
+            </span>
+            <span class="pc__go" aria-hidden="true"><Icon name="arrow" size={15} /></span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  {/* ══════ 04 · brands ══════ */}
+  <section class="pb">
+    <div class="shell pb__in">
+      <div>
+        <p class="eb" data-rise>Trusted global brands</p>
+        <h2 class="pb__h" data-rise style="--d:70ms">
+          World-class technology.<br /><em>Closer to you.</em>
+        </h2>
+      </div>
+
+      {/* Set as type: the marks are not ours to redraw and no licence is
+          on file. The names come from the catalogue export. */}
+      <ul class="pb__list" data-rise style="--d:130ms">
+        {brands.flat().map((b) => <li>{b}</li>)}
+      </ul>
+
+      <p class="pb__note" data-rise style="--d:190ms">
+        Genuine products.<br />Authorised sources.<br />Lasting value.
+      </p>
+    </div>
+  </section>
+
+  {/* ══════ 05 · cta ══════ */}
+  <section class="pt">
+    <span class="pt__wash" aria-hidden="true"></span>
+    <div class="shell pt__in">
+      <div>
+        <h2 class="pt__h" data-rise>Need help choosing?</h2>
+        <p class="pt__p" data-rise style="--d:70ms">
+          Our experts are here to help you find the right products for your
+          home or business.
+        </p>
+        <div class="pt__acts" data-rise style="--d:130ms">
+          <a class="btn btn--light" href="/contact" data-enquiry="consult">
+            Talk to Danat
+            <span class="btn__i" aria-hidden="true"><Icon name="arrow" size={15} /></span>
+          </a>
+          <a class="pt__ghost" href="/branches">
+            <Icon name="pin" size={16} />Visit a branch
+          </a>
+        </div>
+      </div>
+
+      <ul class="pt__list" data-rise style="--d:160ms">
+        {helps.map((h) => (
+          <li>
+            <i aria-hidden="true"><Icon name={h.icon} size={17} /></i>
+            <span><b>{h.t}</b>{h.p}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <VideoModal />
+</PageLayout>
+
+<script is:inline>
+  /* <ClientRouter /> swaps the body on a nav click without a page load,
+     and an is:inline script runs once and never again — so the wiring
+     has to be re-run on astro:page-load. */
+  (() => {
+    const setup = () => {
+      const root = document.querySelector('[data-pick]');
+      if (!root) return;
+
+      const navs = [...root.querySelectorAll('[data-go]')];
+      const shots = [...root.querySelectorAll('.pf__shots figure')];
+      const panes = [...root.querySelectorAll('.pf__pane')];
+      const dots = [...root.querySelectorAll('.pf__dots i')];
+      const n = shots.length;
+      if (!n) return;
+
+      let at = 0;
+      const show = (next) => {
+        at = ((next % n) + n) % n;
+        const mark = (els) =>
+          els.forEach((e, i) => e.toggleAttribute('data-on', i === at));
+        mark(navs);
+        mark(shots);
+        mark(panes);
+        mark(dots);
+      };
+
+      navs.forEach((b) => b.addEventListener('click', () => show(Number(b.dataset.go))));
+      root.querySelectorAll('[data-step]').forEach((b) =>
+        b.addEventListener('click', () => show(at + Number(b.dataset.step)))
+      );
+      show(0);
+    };
+
+    let ran = false;
+    document.addEventListener('astro:page-load', () => { ran = true; setup(); });
+    window.addEventListener('load', () => { if (!ran) { ran = true; setup(); } });
+  })();
+</script>
+
+<style>
+  /* ───────── shared ───────── */
+  .eb {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--green-deep);
+  }
+  .eb::before { content: ''; width: 28px; height: 1px; background: currentColor; }
+  .eb--mid { justify-content: center; }
+  .eb--mid::before { display: none; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.85rem 0.85rem 0.85rem 1.4rem;
+    border-radius: 999px;
+    background: var(--green-deep);
+    color: #fff;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    transition: background-color var(--t2) var(--ease);
+  }
+  .btn:hover { background: #26551f; }
+  .btn__i {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.2);
+    transition: transform var(--t2) var(--ease);
+  }
+  .btn:hover .btn__i { transform: translateX(3px); }
+  .btn--light { background: #fff; color: #10301a; }
+  .btn--light:hover { background: var(--green-bright); }
+  .btn--light .btn__i { background: rgb(16 48 26 / 0.14); }
+
+  .film {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    text-align: left;
+  }
+  .film i {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    flex: none;
+    border-radius: 50%;
+    background: var(--green-deep);
+    color: #fff;
+    transition: transform var(--t2) var(--ease);
+  }
+  .film:hover i { transform: scale(1.08); }
+  .film:focus-visible i { outline: 2px solid var(--green-deep); outline-offset: 3px; }
+  .film > span { display: grid; min-width: 0; font-size: 0.9375rem; font-weight: 700; }
+  .film small {
+    overflow-wrap: anywhere;
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+
+  /* ───────── 01 hero ───────── */
+  .ph { position: relative; overflow: hidden; isolation: isolate; }
+  .ph__sky {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(880px 520px at 12% 16%, #e6f1e8 0%, rgb(230 241 232 / 0) 62%),
+      linear-gradient(162deg, #eff6f0 0%, #f5faf5 58%, #f1f7f2 100%);
+  }
+  .ph__grid { display: grid; gap: clamp(1.75rem, 3.5vw, 2.75rem); align-items: center; }
+  .ph__copy, .ph__stage { min-width: 0; }
+  .ph__copy { padding-block: clamp(5.5rem, 10vw, 8rem) clamp(2rem, 4vw, 3rem); }
+
+  .ph__h {
+    margin-top: var(--s4);
+    font-size: clamp(2.1rem, 4.2vw, 3.1rem);
+    font-weight: 700;
+    letter-spacing: -0.045em;
+    line-height: 1.05;
+  }
+  .ph__h em { font-style: normal; color: var(--green-deep); }
+  .ph__p {
+    max-width: 44ch;
+    margin-top: var(--s4);
+    font-size: 0.9375rem;
+    line-height: 1.68;
+    color: var(--text-2);
+  }
+  .ph__acts {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s4) var(--s5);
+    margin-top: var(--s5);
+  }
+  .ph__marks {
+    display: grid;
+    gap: var(--s4);
+    margin-top: var(--s5);
+    padding-top: var(--s5);
+    border-top: 1px solid var(--line-light);
+  }
+  .ph__marks li { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 0.7rem; }
+  .ph__marks i {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    background: #e9f3ea;
+    color: var(--green-deep);
+  }
+  .ph__marks span { display: grid; font-size: 0.75rem; color: var(--text-3); }
+  .ph__marks b { font-size: 0.8125rem; font-weight: 700; color: var(--text); }
+
+  .ph__stage { position: relative; margin-bottom: clamp(1.5rem, 3vw, 2.5rem); }
+  .ph__slab, .ph__dots, .ph__script { display: none; }
+  .ph__media {
+    position: relative;
+    aspect-ratio: 16 / 11;
+    border-radius: 18px;
+    overflow: hidden;
+  }
+  .ph__media :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  .ph__chip {
+    position: absolute;
+    top: clamp(0.7rem, 2vw, 1.2rem);
+    left: clamp(0.7rem, 2vw, 1.2rem);
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.6rem 0.9rem;
+    border-radius: 14px;
+    background: rgb(255 255 255 / 0.95);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 16px 34px -18px rgb(8 22 10 / 0.5);
+  }
+  .ph__chip i { display: grid; place-items: center; color: var(--green-deep); }
+  .ph__chip span { display: grid; font-size: 0.6875rem; color: var(--text-3); }
+  .ph__chip b { font-size: 0.8125rem; font-weight: 700; color: var(--text); }
+
+  /* ───────── 02 featured ───────── */
+  .pf { background: var(--white); }
+  .pf__h {
+    max-width: 22ch;
+    margin: var(--s4) auto 0;
+    font-size: clamp(1.5rem, 2.8vw, 2.1rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1.12;
+    text-align: center;
+  }
+  .pf__grid {
+    display: grid;
+    gap: clamp(1.25rem, 2.6vw, 2rem);
+    margin-top: clamp(1.75rem, 4vw, 2.75rem);
+    align-items: center;
+  }
+
+  .pf__nav { display: grid; gap: 0.4rem; align-content: start; }
+  .pf__nav button {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 0.8rem;
+    width: 100%;
+    padding: 0.85rem 1rem;
+    border: 0;
+    border-radius: 14px;
+    background: var(--off);
+    text-align: left;
+    cursor: pointer;
+    transition: background-color var(--t2) var(--ease), color var(--t2) var(--ease);
+  }
+  .pf__nav i { display: grid; place-items: center; color: var(--green-deep); }
+  .pf__nav span { display: grid; min-width: 0; font-size: 0.6875rem; color: var(--text-3); }
+  .pf__nav b { font-size: 0.875rem; font-weight: 700; color: var(--text); }
+  .pf__nav button:hover { background: #e9f3ea; }
+  .pf__nav [data-on] { background: var(--green-deep); }
+  .pf__nav [data-on] i { color: var(--green-bright); }
+  .pf__nav [data-on] span { color: rgb(255 255 255 / 0.76); }
+  .pf__nav [data-on] b { color: #fff; }
+  .pf__nav button:focus-visible { outline: 2px solid var(--green-deep); outline-offset: 2px; }
+
+  .pf__stage { position: relative; display: grid; place-items: center; }
+  .pf__shots { position: relative; width: 100%; aspect-ratio: 4 / 3; }
+  .pf__shots figure {
+    position: absolute;
+    inset: 0 0 12% 0;
+    border-radius: 20px;
+    overflow: hidden;
+    opacity: 0;
+    scale: 0.94;
+    transition: opacity 420ms var(--ease), scale 620ms var(--ease);
+  }
+  .pf__shots figure[data-on] { opacity: 1; scale: 1; }
+  .pf__shots :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  .pf__plinth {
+    position: absolute;
+    left: 50%;
+    bottom: 2%;
+    translate: -50% 0;
+    width: 74%;
+    height: 8%;
+    border-radius: 50%;
+    background: radial-gradient(ellipse at 50% 50%, #dfeee1, rgb(223 238 225 / 0) 72%);
+  }
+  .pf__arrow {
+    position: absolute;
+    top: 42%;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--line-light);
+    border-radius: 50%;
+    background: var(--white);
+    color: var(--green-deep);
+    cursor: pointer;
+    box-shadow: 0 10px 24px -14px rgb(10 30 12 / 0.5);
+    transition: background-color var(--t2) var(--ease);
+  }
+  .pf__arrow:hover { background: #e9f3ea; }
+  .pf__arrow:focus-visible { outline: 2px solid var(--green-deep); outline-offset: 2px; }
+  .pf__arrow--l { left: -6px; rotate: 180deg; }
+  .pf__arrow--r { right: -6px; }
+  .pf__ring {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.4rem 1rem;
+    margin-top: 0.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+
+  .pf__card {
+    position: relative;
+    display: grid;
+    align-content: start;
+    padding: clamp(1.25rem, 2.6vw, 1.75rem);
+    border: 1px solid var(--line-light);
+    border-radius: 22px;
+    background: var(--white);
+    box-shadow: 0 26px 54px -34px rgb(10 30 12 / 0.4);
+  }
+  .pf__pane { display: none; }
+  .pf__pane[data-on] { display: grid; }
+  .pf__makes {
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--green-deep);
+  }
+  .pf__t {
+    margin-top: 0.7rem;
+    font-size: clamp(1.15rem, 2vw, 1.5rem);
+    font-weight: 700;
+    letter-spacing: -0.035em;
+  }
+  .pf__sub { margin-top: 0.2rem; font-size: 0.9375rem; color: var(--text-2); }
+  .pf__blurb {
+    margin-top: 0.8rem;
+    font-size: 0.8438rem;
+    line-height: 1.62;
+    color: var(--text-2);
+  }
+  .pf__pane .btn { justify-self: start; margin-top: 1.1rem; }
+  .pf__dots { display: flex; gap: 0.35rem; margin-top: 1.1rem; }
+  .pf__dots i {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #d3e0d2;
+    transition: background-color var(--t2) var(--ease), width var(--t2) var(--ease);
+  }
+  .pf__dots i[data-on] { width: 18px; border-radius: 4px; background: var(--green-deep); }
+
+  /* ───────── 03 categories ───────── */
+  .pc { background: linear-gradient(180deg, #f4faf5, #ffffff); }
+  .pc__head { display: grid; gap: var(--s4); align-items: end; }
+  .pc__h {
+    margin-top: var(--s4);
+    font-size: clamp(1.7rem, 3.4vw, 2.5rem);
+    font-weight: 700;
+    letter-spacing: -0.042em;
+    line-height: 1.08;
+  }
+  .pc__p { max-width: 44ch; font-size: 0.875rem; line-height: 1.64; color: var(--text-2); }
+  .pc__all {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-self: start;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--green-deep);
+  }
+
+  .pc__grid { display: grid; gap: clamp(0.75rem, 1.6vw, 1.1rem); margin-top: clamp(1.75rem, 4vw, 2.75rem); }
+  .pc__grid a {
+    position: relative;
+    display: grid;
+    align-content: start;
+    height: 100%;
+    min-height: clamp(14rem, 22vw, 17rem);
+    padding: 1.3rem 1.2rem 1.2rem;
+    border-radius: 22px;
+    overflow: hidden;
+    transition: transform var(--t2) var(--ease), box-shadow var(--t2) var(--ease);
+  }
+  .pc__grid a:hover { transform: translateY(-5px); box-shadow: 0 28px 50px -30px rgb(10 30 12 / 0.4); }
+  .pc__grid a:focus-visible { outline: 2px solid var(--green-deep); outline-offset: 3px; }
+  .pc__grid [data-tone='a'] a { background: #eaf3eb; }
+  .pc__grid [data-tone='b'] a { background: #f6efe8; }
+  .pc__grid [data-tone='c'] a { background: #eef4f6; }
+  .pc__grid [data-tone='d'] a { background: #f3f1ec; }
+  .pc__n {
+    position: relative;
+    z-index: 1;
+    font-size: clamp(1.6rem, 2.6vw, 2.1rem);
+    font-weight: 700;
+    letter-spacing: -0.05em;
+    line-height: 1;
+    color: var(--green-deep);
+    font-variant-numeric: tabular-nums;
+  }
+  .pc__t { position: relative; z-index: 1; margin-top: 0.7rem; font-size: 0.9375rem; font-weight: 700; letter-spacing: -0.025em; }
+  .pc__s { position: relative; z-index: 1; margin-top: 0.25rem; font-size: 0.75rem; line-height: 1.5; color: var(--text-2); }
+  /* The picture is the lower half of the card and the words sit above
+     it — the first pass floated it over the title. */
+  .pc__shot {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 52%;
+    overflow: hidden;
+  }
+  .pc__shot::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgb(0 0 0 / 0), rgb(255 255 255 / 0.22));
+  }
+  .pc__shot :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  .pc__go {
+    position: absolute;
+    z-index: 2;
+    left: 1.2rem;
+    bottom: 1.2rem;
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: var(--green-deep);
+    color: #fff;
+    transition: transform var(--t2) var(--ease);
+  }
+  .pc__grid a:hover .pc__go { transform: translateX(3px); }
+
+  /* ───────── 04 brands ───────── */
+  .pb { background: var(--white); padding-block: clamp(1.75rem, 3.5vw, 2.75rem); }
+  .pb__in { display: grid; gap: var(--s5); align-items: center; }
+  .pb__h {
+    margin-top: var(--s4);
+    font-size: clamp(1.25rem, 2.2vw, 1.6rem);
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    line-height: 1.16;
+  }
+  .pb__h em { font-style: normal; color: var(--green-deep); }
+  .pb__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.4rem;
+  }
+  .pb__list li {
+    font-size: clamp(0.9375rem, 1.6vw, 1.15rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--text-2);
+  }
+  .pb__note {
+    font-size: 0.8125rem;
+    line-height: 1.7;
+    color: var(--text-3);
+  }
+
+  /* ───────── 05 cta ───────── */
+  .pt {
+    position: relative;
+    padding-block: clamp(3rem, 6vw, 5rem);
+    background: linear-gradient(135deg, #12351a 0%, #0b2110 56%, #143a1d 100%);
+    color: #fff;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .pt__wash {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: radial-gradient(720px 400px at 88% 96%, rgb(143 221 138 / 0.18), transparent 70%);
+  }
+  .pt__in { display: grid; gap: var(--s5); align-items: center; }
+  .pt__h {
+    font-size: clamp(1.7rem, 3.4vw, 2.4rem);
+    font-weight: 700;
+    letter-spacing: -0.042em;
+    line-height: 1.1;
+  }
+  .pt__p {
+    max-width: 42ch;
+    margin-top: var(--s4);
+    font-size: 0.9375rem;
+    line-height: 1.64;
+    color: rgb(255 255 255 / 0.82);
+  }
+  .pt__acts { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s4) var(--s5); margin-top: var(--s5); }
+  .pt__ghost {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.85rem 1.3rem;
+    border: 1px solid rgb(255 255 255 / 0.32);
+    border-radius: 999px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    transition: background-color var(--t2) var(--ease), border-color var(--t2) var(--ease);
+  }
+  .pt__ghost:hover { background: rgb(255 255 255 / 0.12); border-color: rgb(255 255 255 / 0.6); }
+  .pt__list { display: grid; gap: 1rem; }
+  .pt__list li { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 0.75rem; }
+  .pt__list i {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+    background: rgb(255 255 255 / 0.1);
+    color: var(--green-bright);
+  }
+  .pt__list span { display: grid; font-size: 0.75rem; color: rgb(255 255 255 / 0.74); }
+  .pt__list b { font-size: 0.875rem; font-weight: 700; color: #fff; }
+
+  /* ───────── responsive ───────── */
+  @media (min-width: 40rem) {
+    .ph__marks { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .pc__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .pt__list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  }
+
+  @media (min-width: 62rem) {
+    .ph__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.04fr); align-items: stretch; }
+    .ph__stage { position: static; min-height: clamp(30rem, 42vw, 36rem); margin: 0; }
+    .ph__media {
+      position: absolute;
+      z-index: 2;
+      inset: 5.5rem 6% 4.5rem auto;
+      width: 46vw;
+      aspect-ratio: auto;
+      border: clamp(8px, 0.7vw, 12px) solid #fff;
+      border-radius: clamp(1.5rem, 3vw, 2.5rem);
+      rotate: -1.6deg;
+      box-shadow: 0 40px 80px -40px rgb(10 30 12 / 0.5);
+    }
+    .ph__media :global(img) { position: absolute; inset: 0; }
+    .ph__slab {
+      display: block;
+      position: absolute;
+      z-index: 1;
+      inset: 4rem 2.5% 6.25rem auto;
+      width: 43vw;
+      border-radius: clamp(1.5rem, 3vw, 2.5rem);
+      background: #17431f;
+      rotate: 1.8deg;
+    }
+    .ph__dots {
+      display: block;
+      position: absolute;
+      z-index: 1;
+      right: 2vw;
+      bottom: 2.5rem;
+      width: clamp(4rem, 6vw, 5.5rem);
+      height: clamp(3.5rem, 5vw, 4.5rem);
+      background-image: radial-gradient(circle, color-mix(in oklab, var(--green) 55%, transparent) 1.6px, transparent 1.6px);
+      background-size: 14px 14px;
+    }
+    .ph__chip { z-index: 4; top: 8rem; left: 45vw; }
+    .ph__script {
+      display: block;
+      position: absolute;
+      z-index: 4;
+      right: 3vw;
+      top: 2rem;
+      max-width: 12ch;
+      font-family: var(--font-serif, Georgia, serif);
+      font-style: italic;
+      font-size: clamp(0.9375rem, 1.5vw, 1.2rem);
+      line-height: 1.3;
+      text-align: right;
+      color: var(--green-deep);
+    }
+
+    .pf__grid { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.5fr) minmax(0, 0.95fr); }
+    .pc__head { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; }
+    .pc__grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+    .pb__in { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.6fr) auto; }
+    .pt__in { grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr); }
+    .pt__list { grid-template-columns: minmax(0, 1fr); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .btn, .btn:hover .btn__i, .film:hover i,
+    .pc__grid a, .pc__grid a:hover, .pc__grid a:hover .pc__go {
+      transform: none;
+      transition: none;
+    }
+    .pf__shots figure { transition: none; }
+  }
+</style>

@@ -77,6 +77,7 @@ export const site = {
     { label: 'Home', href: '/' },
     { label: 'About', href: '/about' },
     { label: 'Services', href: '/services' },
+    { label: 'Products', href: '/products' },
     { label: 'Business Solutions', href: '/business' },
     { label: 'Branches', href: '/branches' },
     { label: 'Leadership', href: '/leadership' },
