@@ -282,10 +282,25 @@ const helps = [
       </div>
 
       {/* Set as type: the marks are not ours to redraw and no licence is
-          on file. The names come from the catalogue export. */}
-      <ul class="pb__list" data-rise style="--d:130ms">
+          on file. The names come from the catalogue export.
+
+          Two rails running opposite ways, each holding its row twice so
+          the loop has something to scroll into. Duplicated content is
+          noise to a screen reader, so the rails are hidden from it and
+          the real list sits behind them. */}
+      <ul class="pb__sr">
         {brands.flat().map((b) => <li>{b}</li>)}
       </ul>
+
+      <div class="pb__rails" data-rise style="--d:130ms" aria-hidden="true">
+        {brands.map((row, r) => (
+          <div class="pb__rail" data-dir={r === 1 ? 'rev' : undefined}>
+            <div class="pb__track">
+              {[0, 1].map(() => row.map((b) => <span>{b}</span>))}
+            </div>
+          </div>
+        ))}
+      </div>
 
       <p class="pb__note" data-rise style="--d:190ms">
         Genuine products.<br />Authorised sources.<br />Lasting value.
@@ -944,16 +959,47 @@ const helps = [
     line-height: 1.16;
   }
   .pb__h em { font-style: normal; color: var(--green-deep); }
-  .pb__list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem 1.4rem;
+  /* the real names, for anything that reads rather than looks */
+  .pb__sr {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
-  .pb__list li {
+
+  .pb__rails { display: grid; gap: clamp(0.3rem, 1vw, 0.8rem); min-width: 0; }
+  .pb__rail {
+    overflow: hidden;
+    /* the names fade out rather than being cut at the edge */
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  }
+  .pb__track {
+    display: flex;
+    align-items: baseline;
+    gap: clamp(1.4rem, 3.2vw, 3rem);
+    width: max-content;
+    animation: pbRun 40s linear infinite;
+  }
+  .pb__rail[data-dir='rev'] .pb__track {
+    animation-direction: reverse;
+    animation-duration: 52s;
+  }
+  .pb__rails:hover .pb__track { animation-play-state: paused; }
+  .pb__track span {
     font-size: clamp(0.9375rem, 1.6vw, 1.15rem);
     font-weight: 700;
     letter-spacing: -0.02em;
+    white-space: nowrap;
     color: var(--text-2);
+  }
+  /* Half, because each rail holds its row twice. */
+  @keyframes pbRun {
+    from { transform: translate3d(0, 0, 0); }
+    to { transform: translate3d(-50%, 0, 0); }
   }
   .pb__note {
     font-size: 0.8125rem;
@@ -1038,6 +1084,7 @@ const helps = [
   }
 
   @media (prefers-reduced-motion: reduce) {
+    .pb__track { animation: none; }
     .btn, .btn:hover .btn__i, .film:hover i,
     .pc__grid a, .pc__grid a:hover, .pc__grid a:hover .pc__go {
       transform: none;
