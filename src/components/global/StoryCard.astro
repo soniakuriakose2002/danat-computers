@@ -1,6 +1,11 @@
 ---
 import Icon from '@components/ui/Icon.astro';
 import Logo from '@components/global/Logo.astro';
+import { Image } from 'astro:assets';
+/* The bench, not the shop floor: the story's point is that a board
+   fault is traced to the component rather than swapped wholesale, and
+   this is that work. There is no photograph of the Ruwi shopfront. */
+import imgShop from '@assets/photos/repair-solder.jpg';
 import { site, branches } from '@data/site';
 
 /**
@@ -40,21 +45,24 @@ const closing = 'Four counters, one standard — and a bench that opens the mach
     </button>
 
     <div class="sc__grid">
-      {/* shield */}
+      {/* The green half. A photograph behind a wash, rather than an empty
+          panel with a device drawn on it. */}
       <div class="sc__badge" style="--d:60ms">
-        {/* A hexagon rather than a rounded rectangle: it reads as a
-            component on a board, which is the part of the business the
-            story is actually about. */}
-        <span class="sc__mark" style="--d:0ms">
-          <svg class="sc__hex" viewBox="0 0 100 110" fill="none" aria-hidden="true">
-            <polygon class="sc__hexA" points="50,1 96,27.5 96,82.5 50,109 4,82.5 4,27.5" />
-            <polygon class="sc__hexB" points="50,9 89,31.5 89,78.5 50,101 11,78.5 11,31.5" />
-          </svg>
-          <span class="sc__markin">
-            <Logo />
-            <span class="sc__since">Since {site.stats.since}</span>
-          </span>
-        </span>
+        <Image class="sc__shot" src={imgShop} alt=""
+          widths={[560, 900]} sizes="(max-width: 56rem) 100vw, 34vw"
+          quality={76} format="webp" loading="lazy" />
+        <span class="sc__wash" aria-hidden="true"></span>
+
+        <div class="sc__panel" style="--d:0ms">
+          {/* The mark keeps its own colours on its own ground — it is a
+              green and black raster and neither survives being laid on a
+              dark green wash. */}
+          <span class="sc__plate"><Logo /></span>
+          <div>
+            <p class="sc__tag">A journey that<br />keeps Oman running.</p>
+            <span class="sc__rule" aria-hidden="true"></span>
+          </div>
+        </div>
       </div>
 
       {/* story */}
@@ -190,57 +198,60 @@ const closing = 'Four counters, one standard — and a bench that opens the mach
   .sc__badge {
     position: relative;
     z-index: 1;
-    display: grid;
-    place-items: center;
-    padding: clamp(2rem, 5vw, 3rem);
-    background: linear-gradient(160deg, #10301a, #1e4a26 56%, #0e2a17);
+    overflow: hidden;
+    min-height: clamp(16rem, 34vw, 26rem);
+    background: #10301a;
     box-shadow: 0 40px 90px -36px rgb(0 0 0 / 0.55);
   }
-  .sc__mark {
-    position: relative;
-    display: block;
-    width: min(15rem, 66%);
-    aspect-ratio: 100 / 110;
-  }
-  .sc__hex { position: absolute; inset: 0; width: 100%; height: 100%; }
-  /* Outer ring breathes; inner plate holds the mark. */
-  .sc__hexA {
-    fill: none;
-    stroke: rgb(255 255 255 / 0.42);
-    stroke-width: 1;
-    transform-origin: 50% 50%;
-  }
-  .sc__hexB {
-    fill: rgb(255 255 255 / 0.08);
-    stroke: rgb(255 255 255 / 0.3);
-    stroke-width: 0.8;
-  }
-  @media (prefers-reduced-motion: no-preference) {
-    .sc__hexA { animation: sc-breathe 5.5s var(--ease) infinite alternate; }
-  }
-  @keyframes sc-breathe {
-    to { transform: scale(1.045); opacity: 0.55; }
-  }
-
-  .sc__markin {
+  .sc__shot {
     position: absolute;
     inset: 0;
-    display: grid;
-    place-content: center;
-    justify-items: center;
-    gap: 0.9rem;
-    padding: 1.4rem;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
   }
-  .sc__markin :global(img),
-  .sc__markin :global(svg) { max-width: 100%; height: auto; }
-  .sc__since {
-    font-family: var(--font-mono);
-    font-size: 0.5625rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    /* --green-bright is 3.97:1 on the hex plate and this is small text,
-       so 4.5:1 is the bar. #8fdd8a is 5.00:1 and still reads green. */
-    color: #8fdd8a;
+  /* Deep enough at the foot that white type clears AA over the brightest
+     part of the photograph underneath — measured, not guessed. */
+  .sc__wash {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(170deg, rgb(11 38 20 / 0.72) 0%, rgb(9 32 17 / 0.88) 52%, rgb(7 26 14 / 0.95) 100%);
+  }
+  .sc__panel {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    align-content: space-between;
+    gap: var(--s5);
+    min-height: inherit;
+    height: 100%;
+    padding: clamp(1.5rem, 3.4vw, 2.4rem);
+  }
+  .sc__plate {
+    justify-self: start;
+    display: grid;
+    place-items: center;
+    padding: 0.6rem 0.9rem;
+    border-radius: 12px;
+    background: var(--white);
+  }
+  .sc__plate :global(img),
+  .sc__plate :global(svg) { max-width: 100%; height: auto; }
+  .sc__tag {
+    font-size: clamp(1.05rem, 2.1vw, 1.4rem);
+    font-weight: 500;
+    line-height: 1.34;
+    letter-spacing: -0.02em;
+    color: #fff;
+  }
+  .sc__rule {
+    display: block;
+    width: 34px;
+    height: 2px;
+    margin-top: var(--s4);
+    border-radius: 2px;
+    background: rgb(255 255 255 / 0.6);
   }
 
   /* ---- story ---- */
@@ -349,13 +360,6 @@ const closing = 'Four counters, one standard — and a bench that opens the mach
   .sc { --join: 940ms; }
 
   /* The mark scales up once its panel has landed. */
-  .sc__mark {
-    opacity: 0;
-    scale: 0.82;
-    transition:
-      opacity 420ms var(--ease) var(--join),
-      scale 620ms cubic-bezier(0.22, 1.3, 0.36, 1) var(--join);
-  }
   .sc[data-in] .sc__mark { opacity: 1; scale: 1; }
 
   /* The title DROPS in from above — it is the third beat, and coming
@@ -403,7 +407,7 @@ const closing = 'Four counters, one standard — and a bench that opens the mach
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .sc__box, .sc__badge, .sc__body, .sc__mark, .sc__x,
+    .sc__box, .sc__badge, .sc__body, .sc__panel, .sc__x,
     .sc__k, .sc__h, .sc__p, .sc__close, .sc__acts {
       opacity: 1;
       scale: 1;
@@ -411,7 +415,4 @@ const closing = 'Four counters, one standard — and a bench that opens the mach
       transition: none;
     }
     .sc__x, .sc__x:hover, .sc__cta, .sc__cta:hover { transform: none; transition: none; }
-    .sc__hexA { animation: none; }
-    .sc__x :global(svg) { transform: rotate(45deg); }
-  }
-</style>
+  </style>

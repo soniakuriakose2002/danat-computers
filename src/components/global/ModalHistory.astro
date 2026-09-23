@@ -1,0 +1,106 @@
+---
+/**
+ * BACK CLOSES THE MODAL.
+ *
+ * Every overlay on the site is a real <dialog> opened with showModal(),
+ * which gives us the inert background, Escape and the focus trap for
+ * free — but the platform puts nothing in the history stack. So a person
+ * who opens Our story, reads it, and presses Back does not close the
+ * card: they leave /about entirely and land on whatever page they were
+ * on before. On a phone, where Back is the system gesture, that is the
+ * normal way to dismiss something.
+ *
+ * This watches the `open` attribute rather than patching each dialog,
+ * so all four — story, film, support drawer, enquiry — are covered and
+ * any dialog added later is covered without being told about it.
+ *
+ * The listener is in the CAPTURE phase and stops propagation on the
+ * entries it consumes, because <ClientRouter /> also listens for
+ * popstate; left alone it would run a page transition underneath the
+ * card we are only trying to close.
+ */
+---
+
+<script is:inline>
+  (() => {
+    const setup = () => {
+      if (window.__danatModalHistory) return;
+      window.__danatModalHistory = true;
+
+      /* How many entries WE have pushed. */
+      let depth = 0;
+      /* Set while we are the ones rewinding, so our own popstate is
+         swallowed instead of being read as the user pressing Back. */
+      let selfPop = false;
+      /* Set while a popstate is what is closing the dialog, so the close
+         does not try to rewind a second time. */
+      let fromPop = false;
+
+      const openDialogs = () =>
+        Array.from(document.querySelectorAll('dialog[open]'));
+
+      const onOpen = () => {
+        depth += 1;
+        history.pushState({ danatModal: depth }, '');
+      };
+
+      const onClose = () => {
+        if (fromPop || depth === 0) return;
+        depth -= 1;
+        selfPop = true;
+        history.back();
+      };
+
+      window.addEventListener(
+        'popstate',
+        (e) => {
+          if (selfPop) {
+            /* Ours. Consume it so the router does not act on it. */
+            selfPop = false;
+            e.stopImmediatePropagation();
+            return;
+          }
+          const open = openDialogs();
+          if (!open.length || depth === 0) return;
+
+          depth -= 1;
+          e.stopImmediatePropagation();
+          fromPop = true;
+          /* Topmost first — a card can open the film over itself. */
+          const d = open[open.length - 1];
+          if (typeof d.close === 'function') d.close();
+          else d.removeAttribute('open');
+          fromPop = false;
+        },
+        true
+      );
+
+      const obs = new MutationObserver((muts) => {
+        for (const m of muts) {
+          const el = m.target;
+          if (!el || el.tagName !== 'DIALOG') continue;
+          if (el.hasAttribute('open')) onOpen();
+          else onClose();
+        }
+      });
+      obs.observe(document.body, {
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['open'],
+      });
+
+      /* A page swap throws away every dialog, so anything we pushed for
+         them is stale. */
+      document.addEventListener('astro:before-swap', () => {
+        depth = 0;
+      });
+    };
+
+    /* is:inline runs once; astro:page-load fires on the first load and
+       after every view transition. The guard at the top keeps the
+       observer single even though this re-runs. */
+    let ran = false;
+    document.addEventListener('astro:page-load', () => { ran = true; setup(); });
+    window.addEventListener('load', () => { if (!ran) { ran = true; setup(); } });
+  })();
+</script>
