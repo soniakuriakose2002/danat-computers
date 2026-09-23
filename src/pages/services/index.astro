@@ -516,10 +516,23 @@ const promises = [
   .sl__top { padding-bottom: 1rem; }
   .sl__shot {
     position: relative;
+    /* A grid row sized minmax(7rem, 1fr) still takes its minimum from the
+       content, and an in-flow <img> contributes its intrinsic height. The
+       Computer Sales photo is a tall portrait, so that one card grew to
+       505px against 305 for the rest and dragged its whole row with it. */
+    min-height: 0;
     margin: 0 -1.2rem;
     overflow: hidden;
   }
-  .sl__shot :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  /* Out of flow, so the photograph fills the row it is given and never
+     sets it. */
+  .sl__shot :global(img) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
   .sl__shot::after {
     content: '';
     position: absolute;

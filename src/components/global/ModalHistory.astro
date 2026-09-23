@@ -83,7 +83,12 @@
           else onClose();
         }
       });
-      obs.observe(document.body, {
+      /* documentElement, NOT body. <ClientRouter /> replaces the body on a
+         client-side navigation, so an observer bound to it is watching a
+         discarded element from the second page onwards — the dialog opens,
+         nothing is pushed, and Back leaves the page. documentElement
+         survives every swap. */
+      obs.observe(document.documentElement, {
         subtree: true,
         attributes: true,
         attributeFilter: ['open'],
