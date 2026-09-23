@@ -33,7 +33,7 @@ const faces = [
     shot: shotA,
     h: ['Make technology', 'work better', 'for people.'],
     accent: [1, 2],
-    p: 'We provide genuine products, expert service and practical technology solutions that help individuals, businesses and communities work smarter and achieve more.',
+    p: 'Genuine products, expert service and practical solutions that help people and businesses work smarter.',
   },
   {
     no: '03',
@@ -43,7 +43,7 @@ const faces = [
     shot: shotB,
     h: ['Diagnose first.', 'Repair deeper.', 'Stand behind it.'],
     accent: [1],
-    p: 'Free diagnosis before any quote. Faults traced to the component rather than the board. The same stock and the same standard at all four counters.',
+    p: 'Free diagnosis before any quote. Faults traced to the component. The same standard at all four counters.',
   },
   {
     no: '02',
@@ -53,7 +53,7 @@ const faces = [
     shot: shotC,
     h: ['An Oman that', 'repairs, not', 'replaces.'],
     accent: [1],
-    p: 'Where a failed machine is worth mending, and the skill to mend it lives here rather than being shipped abroad with the hardware.',
+    p: 'Where a failed machine is worth mending, and the skill to mend it lives here.',
   },
 ];
 
@@ -164,12 +164,13 @@ const promises = [
             </article>
           ))}
 
-          <p class="orb__count" aria-hidden="true">
-            <span data-count-now>01</span> / 0{faces.length}
-            <i class="orb__bar"><b></b></i>
-          </p>
         </div>
       </div>
+
+      <p class="orb__count" aria-hidden="true">
+        <span data-count-now>01</span> / 0{faces.length}
+        <i class="orb__bar"><b></b></i>
+      </p>
 
       <button class="po__side po__side--next" type="button" data-step="1" aria-label="Next">
         <span data-ghost="next" aria-hidden="true"></span>
@@ -376,6 +377,7 @@ const promises = [
 
   .po__mid {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: center;
     gap: clamp(0.4rem, 1.4vw, 1rem);
@@ -570,15 +572,14 @@ const promises = [
 
   .orb__core {
     position: absolute;
-    inset: 22%;
+    inset: 19%;
     display: grid;
     /* Two rows, not absolute positioning: the counter used to be
        position:absolute inside this circle and sat straight on top of
-       the Learn more button. Panels share row 1 so they can cross-fade;
-       the counter owns row 2 and cannot collide. */
-    grid-template-rows: 1fr auto;
-    justify-items: center;
-    align-content: center;
+       the Learn more button. The counter now lives outside the circle
+       entirely — a round container has far less usable area than its
+       bounding box, so it cannot be trusted to hold a stack. */
+    place-items: center;
     border-radius: 50%;
     background: rgb(255 255 255 / 0.96);
     backdrop-filter: blur(10px);
@@ -615,8 +616,8 @@ const promises = [
   .pn h3 em { font-style: normal; color: var(--green-deep); }
   .pn__p {
     margin-top: 0.5rem;
-    max-width: 30ch;
-    font-size: clamp(0.6875rem, 1.1vw, 0.8125rem);
+    max-width: 26ch;
+    font-size: clamp(0.6875rem, 1.05vw, 0.8125rem);
     line-height: 1.55;
     color: var(--text-2);
   }
@@ -637,8 +638,10 @@ const promises = [
   .pn__cta:hover { transform: translateY(-2px); }
 
   .orb__count {
-    grid-row: 2;
-    margin-top: 0.8rem;
+    order: 9;
+    flex-basis: 100%;
+    justify-content: center;
+    margin-top: 0.4rem;
     display: flex;
     align-items: center;
     gap: 0.6rem;
