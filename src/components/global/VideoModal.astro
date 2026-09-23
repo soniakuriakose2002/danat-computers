@@ -51,9 +51,15 @@ const ID = site.video.youtube;
       if (frame) frame.src = frame.dataset.src ?? 'about:blank';
       if (typeof dlg.showModal === 'function') dlg.showModal();
       else dlg.setAttribute('open', '');
+      // A frame later, or the transition has no previous state to run
+      // from and the player simply appears.
+      requestAnimationFrame(() =>
+        requestAnimationFrame(() => dlg.setAttribute('data-in', ''))
+      );
     };
 
     const close = () => {
+      dlg.removeAttribute('data-in');
       // Clearing src is what actually stops playback without the
       // Player API; hiding the dialog alone leaves the audio running.
       if (frame) frame.src = 'about:blank';
@@ -76,6 +82,7 @@ const ID = site.video.youtube;
     });
     // Escape fires `cancel` before `close`; clear the frame either way.
     dlg.addEventListener('close', () => {
+      dlg.removeAttribute('data-in');
       if (frame) frame.src = 'about:blank';
     });
   })();
@@ -95,8 +102,19 @@ const ID = site.video.youtube;
     backdrop-filter: blur(6px);
   }
 
-  .vm__box { position: relative; }
+  /* Pops up rather than appearing: down a little, slightly small, then
+     settles. The overshoot curve is what makes it read as a pop. */
+  .vm__box {
+    position: relative;
+    opacity: 0;
+    transform: translate3d(0, 22px, 0) scale(0.92);
+    transition:
+      opacity 340ms var(--ease),
+      transform 520ms cubic-bezier(0.22, 1.2, 0.36, 1);
+  }
+  .vm[data-in] .vm__box { opacity: 1; transform: none; }
 
+  /* The close button arrives after the frame has landed. */
   .vm__x {
     position: absolute;
     top: -3rem;
@@ -110,8 +128,13 @@ const ID = site.video.youtube;
     background: rgb(255 255 255 / 0.08);
     color: #fff;
     cursor: pointer;
-    transition: background-color var(--t2) var(--ease), transform var(--t2) var(--ease);
+    opacity: 0;
+    transition:
+      opacity 260ms var(--ease) 320ms,
+      background-color var(--t2) var(--ease),
+      transform var(--t2) var(--ease);
   }
+  .vm[data-in] .vm__x { opacity: 1; }
   /* There is no dedicated close glyph in the set, so the plus is turned
      into one rather than adding a near-duplicate icon. */
   .vm__x :global(svg) { transform: rotate(45deg); }
@@ -139,7 +162,8 @@ const ID = site.video.youtube;
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .vm__x, .vm__x:hover { transform: none; transition: none; }
+    .vm__box, .vm__x { opacity: 1; transform: none; transition: none; }
+    .vm__x:hover { transform: none; }
     .vm__x :global(svg) { transform: rotate(45deg); }
   }
 </style>

@@ -163,6 +163,8 @@ const closing = 'Four counters, one standard — and a bench that opens the mach
   /* ---- shield ---- */
 
   .sc__badge {
+    position: relative;
+    z-index: 1;
     display: grid;
     place-items: center;
     padding: clamp(2rem, 5vw, 3rem);
@@ -289,7 +291,25 @@ const closing = 'Four counters, one standard — and a bench that opens the mach
 
   /* ---- the reveal ---- */
 
+  /* The two halves fly in from opposite sides and meet in the middle,
+     then the story stacks in behind them. The grid clips, so neither
+     half is ever seen outside the card. */
+  .sc__grid { overflow: hidden; border-radius: 26px; }
+
   .sc__badge,
+  .sc__body {
+    opacity: 0;
+    transition:
+      opacity 520ms var(--ease),
+      transform 720ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .sc__badge { transform: translate3d(-100%, 0, 0); }
+  .sc__body { transform: translate3d(100%, 0, 0); }
+
+  .sc[data-in] .sc__badge,
+  .sc[data-in] .sc__body { opacity: 1; transform: none; }
+
+  /* The story's own lines follow once the halves have landed. */
   .sc__k,
   .sc__h,
   .sc__p,
@@ -298,23 +318,27 @@ const closing = 'Four counters, one standard — and a bench that opens the mach
     opacity: 0;
     transform: translate3d(0, 16px, 0);
     transition:
-      opacity var(--t3) var(--ease) var(--d, 0ms),
-      transform var(--t3) var(--ease) var(--d, 0ms);
+      opacity var(--t3) var(--ease) calc(var(--d, 0ms) + 420ms),
+      transform var(--t3) var(--ease) calc(var(--d, 0ms) + 420ms);
   }
-  .sc__badge { transform: translate3d(0, 0, 0) scale(0.96); }
-
   .sc[data-in] :is(.sc__k, .sc__h, .sc__p, .sc__close, .sc__acts) {
     opacity: 1;
     transform: none;
   }
-  .sc[data-in] .sc__badge { opacity: 1; transform: none; }
 
   @media (min-width: 56rem) {
-    .sc__grid { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); }
+    .sc__grid { grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.22fr); }
+    /* The seam is an arc, not a straight rule: the green panel's right
+       edge bows into the white, and the story is padded clear of it. */
+    .sc__badge {
+      border-radius: 0 34% 34% 0 / 0 52% 48% 0;
+      margin-right: -2.5rem;
+    }
+    .sc__body { padding-left: clamp(3rem, 6vw, 4.5rem); }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .sc__badge, .sc__k, .sc__h, .sc__p, .sc__close, .sc__acts {
+    .sc__badge, .sc__body, .sc__k, .sc__h, .sc__p, .sc__close, .sc__acts {
       opacity: 1;
       transform: none;
       transition: none;
