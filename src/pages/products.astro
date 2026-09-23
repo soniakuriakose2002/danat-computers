@@ -3,11 +3,11 @@ import { Image } from 'astro:assets';
 import PageLayout from '@layouts/PageLayout.astro';
 import Icon from '@components/ui/Icon.astro';
 import { site, brands } from '@data/site';
-import pHp from '@assets/products/hp.jpg';
-import pDell from '@assets/products/dell.jpg';
-import pAsus from '@assets/products/asus.jpg';
-import pApple from '@assets/products/apple.jpg';
-import pLenovo from '@assets/products/lenovo.jpg';
+import pHp from '@assets/products/hp.png';
+import pDell from '@assets/products/dell.png';
+import pAsus from '@assets/products/asus.png';
+import pApple from '@assets/products/apple.png';
+import pLenovo from '@assets/products/lenovo.png';
 import pWired from '@assets/products/wired.jpg';
 import pWireless from '@assets/products/wireless.jpg';
 import pCctv from '@assets/products/cctv.jpg';
@@ -49,15 +49,15 @@ const cats = [
   {
     icon: 'laptop', t: 'Laptops & Desktops', sub: 'Leading brands. Reliable performance.',
     items: [
-      { b: 'HP', t: 'HP Laptops & Desktops', img: pHp,
+      { b: 'HP', t: 'HP Laptops & Desktops', img: pHp, cut: true,
         p: 'Power your ideas with HP. Designed for work, learning and everyday performance.' },
-      { b: 'Dell', t: 'Dell Laptops & Desktops', img: pDell,
+      { b: 'Dell', t: 'Dell Laptops & Desktops', img: pDell, cut: true,
         p: 'Precision and innovation with Dell, for the desk and the site office alike.' },
-      { b: 'Asus', t: 'Asus Laptops & Desktops', img: pAsus,
+      { b: 'Asus', t: 'Asus Laptops & Desktops', img: pAsus, cut: true,
         p: 'Elevate your experience with Asus — everyday machines that keep up.' },
-      { b: 'Apple', t: 'Apple Laptops & Desktops', img: pApple,
+      { b: 'Apple', t: 'Apple Laptops & Desktops', img: pApple, cut: true,
         p: 'Seamless integration with Apple, supported by the same counter.' },
-      { b: 'Lenovo', t: 'Lenovo Laptops & Desktops', img: pLenovo,
+      { b: 'Lenovo', t: 'Lenovo Laptops & Desktops', img: pLenovo, cut: true,
         p: 'Innovation redefined with Lenovo, built to be worked rather than admired.' },
     ],
   },
@@ -158,7 +158,7 @@ const helps = [
         <div class="pf__deck">
           {cats.map((cat, ci) =>
             cat.items.map((it, ii) => (
-              <figure class="pf__slide" data-c={ci} data-i={ii}>
+              <figure class="pf__slide" data-c={ci} data-i={ii} data-cut={it.cut ? '' : undefined}>
                 <Image src={it.img} alt={it.t} widths={[360, 620]} sizes="320px"
                   quality={82} format="webp" loading={ci === 0 && ii === 0 ? 'eager' : 'lazy'} />
               </figure>
@@ -372,11 +372,26 @@ const helps = [
         }
       };
 
-      navs.forEach((b) => b.addEventListener('click', () => { c = Number(b.dataset.go); i = 0; show(); }));
+      navs.forEach((b) => b.addEventListener('click', () => { c = Number(b.dataset.go); i = 0; show(); stop(); start(); }));
+      let timer = null;
+      const stop = () => { if (timer) clearInterval(timer); timer = null; };
+      const start = () => {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        if (!timer) timer = setInterval(() => { i += 1; show(); }, 3600);
+      };
+
       root.querySelectorAll('[data-step]').forEach((b) =>
-        b.addEventListener('click', () => { i += Number(b.dataset.step); show(); })
+        b.addEventListener('click', () => { i += Number(b.dataset.step); show(); stop(); start(); })
       );
+
+      // Turning on its own, but never while someone is reading or using it.
+      root.addEventListener('pointerenter', stop);
+      root.addEventListener('pointerleave', start);
+      root.addEventListener('focusin', stop);
+      root.addEventListener('focusout', start);
+
       show();
+      start();
     };
 
     let ran = false;
@@ -610,11 +625,13 @@ const helps = [
     width: auto;
     object-fit: contain;
     object-position: 50% 100%;
-    /* The shots are products on white. Multiplying them against the pale
-       stage drops that white out, so they read as machines standing
-       there rather than as photographs in boxes — which is what made the
-       row look like cards butted together. */
-    mix-blend-mode: multiply;
+  }
+  /* A photograph with a real background still needs a frame; a cut-out
+     must not have one, or it reads as a box sitting on the stage. */
+  .pf__slide:not([data-cut]) {
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgb(10 30 12 / 0.05), 0 26px 50px -28px rgb(10 30 12 / 0.4);
   }
   .pf__slide:not([data-on]) { opacity: calc(1 - var(--a, 0) * 0.16); }
   .pf__slide[data-off] { opacity: 0; pointer-events: none; }
