@@ -45,7 +45,7 @@ const closing = 'Four counters, one standard — and a bench that opens the mach
         {/* A hexagon rather than a rounded rectangle: it reads as a
             component on a board, which is the part of the business the
             story is actually about. */}
-        <span class="sc__mark">
+        <span class="sc__mark" style="--d:0ms">
           <svg class="sc__hex" viewBox="0 0 100 110" fill="none" aria-hidden="true">
             <polygon class="sc__hexA" points="50,1 96,27.5 96,82.5 50,109 4,82.5 4,27.5" />
             <polygon class="sc__hexB" points="50,9 89,31.5 89,78.5 50,101 11,78.5 11,31.5" />
@@ -59,18 +59,18 @@ const closing = 'Four counters, one standard — and a bench that opens the mach
 
       {/* story */}
       <div class="sc__body">
-        <p class="sc__k" style="--d:120ms">Our story</p>
-        <h2 class="sc__h" style="--d:170ms">
+        <p class="sc__k" style="--d:0ms">Our story</p>
+        <h2 class="sc__h" style="--d:110ms">
           It started on<br /><em>Computer Street.</em>
         </h2>
 
         {paras.map((t, i) => (
-          <p class="sc__p" style={`--d:${230 + i * 70}ms`}>{t}</p>
+          <p class="sc__p" style={`--d:${330 + i * 80}ms`}>{t}</p>
         ))}
 
-        <p class="sc__close" style={`--d:${230 + paras.length * 70}ms`}>{closing}</p>
+        <p class="sc__close" style={`--d:${330 + paras.length * 80}ms`}>{closing}</p>
 
-        <div class="sc__acts" style={`--d:${290 + paras.length * 70}ms`}>
+        <div class="sc__acts" style={`--d:${410 + paras.length * 80}ms`}>
           <a class="sc__cta" href="/branches">
             Our branches<Icon name="arrow" size={15} />
           </a>
@@ -309,18 +309,42 @@ const closing = 'Four counters, one standard — and a bench that opens the mach
   .sc[data-in] .sc__badge,
   .sc[data-in] .sc__body { opacity: 1; transform: none; }
 
-  /* The story's own lines follow once the halves have landed. */
+  /* Nothing inside either half moves until they have met. The slide
+     takes 720ms, so everything below waits on --join. */
+  .sc { --join: 760ms; }
+
+  /* The mark scales up once its panel has landed. */
+  .sc__mark {
+    opacity: 0;
+    scale: 0.82;
+    transition:
+      opacity 420ms var(--ease) var(--join),
+      scale 620ms cubic-bezier(0.22, 1.3, 0.36, 1) var(--join);
+  }
+  .sc[data-in] .sc__mark { opacity: 1; scale: 1; }
+
+  /* The title DROPS in from above — it is the third beat, and coming
+     down distinguishes it from the body, which rises. */
   .sc__k,
-  .sc__h,
+  .sc__h {
+    opacity: 0;
+    transform: translate3d(0, -26px, 0);
+    transition:
+      opacity 460ms var(--ease) calc(var(--join) + var(--d, 0ms)),
+      transform 620ms cubic-bezier(0.22, 1.2, 0.36, 1) calc(var(--join) + var(--d, 0ms));
+  }
+
+  /* The body rises, after the title has landed. */
   .sc__p,
   .sc__close,
   .sc__acts {
     opacity: 0;
-    transform: translate3d(0, 16px, 0);
+    transform: translate3d(0, 18px, 0);
     transition:
-      opacity var(--t3) var(--ease) calc(var(--d, 0ms) + 420ms),
-      transform var(--t3) var(--ease) calc(var(--d, 0ms) + 420ms);
+      opacity var(--t3) var(--ease) calc(var(--join) + var(--d, 0ms)),
+      transform var(--t3) var(--ease) calc(var(--join) + var(--d, 0ms));
   }
+
   .sc[data-in] :is(.sc__k, .sc__h, .sc__p, .sc__close, .sc__acts) {
     opacity: 1;
     transform: none;
@@ -338,8 +362,10 @@ const closing = 'Four counters, one standard — and a bench that opens the mach
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .sc__badge, .sc__body, .sc__k, .sc__h, .sc__p, .sc__close, .sc__acts {
+    .sc__badge, .sc__body, .sc__mark,
+    .sc__k, .sc__h, .sc__p, .sc__close, .sc__acts {
       opacity: 1;
+      scale: 1;
       transform: none;
       transition: none;
     }
