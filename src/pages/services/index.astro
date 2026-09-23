@@ -61,8 +61,11 @@ const promises = [
         </nav>
 
         <p class="eb" data-rise>All services</p>
-        <h1 class="sh__h" data-rise style="--d:70ms">
-          Everything we do,<br /><em>in one place.</em>
+        {/* data-mask is purely a trigger — it has no base styles of its
+            own, so the lines wipe without also fading. */}
+        <h1 class="sh__h" data-mask>
+          <span class="mask"><span class="mask__i" style="--d:90ms">Everything we do,</span></span>
+          <span class="mask"><span class="mask__i" style="--d:190ms"><em>in one place.</em></span></span>
         </h1>
         <p class="sh__p" data-rise style="--d:130ms">
           From repairs and networking to CCTV and data recovery, our own
@@ -87,21 +90,29 @@ const promises = [
           and the pill straddling the join. The slab has to be a sibling
           — inside the figure the photo's own radius would clip it to
           exactly the same outline. */}
-      <div class="sh__stage" data-rise style="--d:160ms">
-        <span class="sh__slab" aria-hidden="true"></span>
-
+      <div class="sh__stage" data-mask>
+        {/* Not data-curtain. That utility starts the element at
+            clip-path: inset(0 0 100%), and an element clipped to zero
+            never reports as intersecting — so it can never trigger its
+            own reveal. Proven by forcing data-in: the CSS was always
+            correct, the observer simply never fired. The reveal is
+            driven from the stage instead, which is unclipped. */}
         <figure class="sh__media">
           <Image src={imgHero} alt="A technician working on a laptop board at the bench"
             widths={[700, 1100, 1500]} sizes="(min-width:62rem) 50vw, 100vw"
             quality={78} format="webp" loading="eager" fetchpriority="high" />
           <span class="sh__tint" aria-hidden="true"></span>
-          <figcaption class="sh__over">Reliable<br />Technology<br />Support</figcaption>
+          <figcaption class="sh__over">
+            <span class="mask"><span class="mask__i" style="--d:620ms">Reliable</span></span>
+            <span class="mask"><span class="mask__i" style="--d:700ms">Technology</span></span>
+            <span class="mask"><span class="mask__i" style="--d:780ms">Support</span></span>
+          </figcaption>
         </figure>
 
-        <p class="sh__pill">
-          <span><b>{services.length}</b>Services</span>
+        <p class="sh__pill" data-rise style="--d:880ms">
+          <span><b data-count={services.length}>0</b>Services</span>
           <i aria-hidden="true"></i>
-          <span><b>{site.stats.branches}</b>Branches</span>
+          <span><b data-count={site.stats.branches}>0</b>Branches</span>
           <i aria-hidden="true"></i>
           <span><b>{site.stats.since}</b>Trading since</span>
         </p>
@@ -281,7 +292,9 @@ const promises = [
     position: absolute;
     inset: 0;
     z-index: -1;
-    background: linear-gradient(162deg, #eef5ef 0%, #f3f9f4 58%, #f1f7f2 100%);
+    background:
+      radial-gradient(900px 560px at 14% 18%, #e6f1e8 0%, rgb(230 241 232 / 0) 62%),
+      linear-gradient(162deg, #eff6f0 0%, #f4faf5 58%, #f1f7f2 100%);
   }
   .sh__grid { display: grid; gap: clamp(1.75rem, 3.5vw, 2.75rem); align-items: center; }
   /* The copy carries the header clearance so the photograph can run to
@@ -326,7 +339,6 @@ const promises = [
   }
 
   .sh__stage { position: relative; margin-bottom: clamp(1.5rem, 3vw, 2.5rem); }
-  .sh__slab { display: none; }
   .sh__media {
     position: relative;
     aspect-ratio: 16 / 11;
@@ -337,6 +349,9 @@ const promises = [
     width: 100%;
     height: 100%;
     object-fit: cover;
+    /* Uses the scale property, not transform, so it composes with the
+       curtain's counter-scale instead of fighting it. */
+    animation: shDrift 20s var(--ease) infinite;
     /* The mockup's shot reads near-monochrome against the sage. Grading
        ours toward that keeps the two in the same key. */
     filter: saturate(0.62) brightness(0.88) contrast(1.06);
@@ -398,6 +413,11 @@ const promises = [
     font-variant-numeric: tabular-nums;
   }
   .sh__pill i { width: 1px; height: 18px; background: var(--line-light); }
+
+  @keyframes shDrift {
+    0%, 100% { scale: 1; }
+    50% { scale: 1.05; }
+  }
 
   /* ───────── 02 marks ───────── */
   /* Same panel as the hero — in the mockup the pale ground runs
@@ -586,37 +606,30 @@ const promises = [
       margin: 0;
     }
 
-    /* The slab reads as a thin crescent beside the arc and a wedge
-       under it, not a band: left edge at 48% of the page at the top,
-       46% at the bottom, with the photo's own edge at 50%. */
-    .sh__slab {
-      display: block;
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      right: 0;
-      width: 54vw;
-      clip-path: polygon(4% 0, 100% 0, 100% 100%, 0 100%);
-      background: #89af93;
-    }
+    .sh__stage[data-in] .sh__media { clip-path: inset(0 0 0% 0); }
+    .sh__media :global(img) { transform: scale(1.18); transition: transform 1600ms var(--ease-io) 220ms; }
+    .sh__stage[data-in] .sh__media :global(img) { transform: none; }
+    /* No frame and no hard edge. The photograph runs the full height of
+       the section and its left side is feathered away with a mask, so it
+       dissolves into the page instead of being bordered by a slab. */
     .sh__media {
       position: absolute;
-      top: 0;
-      bottom: 8%;
-      right: 0;
-      width: 50vw;
+      inset: 0 0 0 auto;
+      width: 54vw;
       aspect-ratio: auto;
-      /* Measured off the mockup at 4x: the photo's left edge sits at 51%
-         of the page at the top, 50% at mid-height and 56% at the bottom
-         — one long arc, so both left corners take a large radius. */
-      border-radius: clamp(3.5rem, 10vw, 9.5rem) 0 0 clamp(3.5rem, 10vw, 9.5rem);
+      border-radius: 0;
+      -webkit-mask-image: linear-gradient(100deg, transparent 0%, #000 26%, #000 100%);
+      mask-image: linear-gradient(100deg, transparent 0%, #000 26%, #000 100%);
+      clip-path: inset(0 0 100% 0);
+      transition: clip-path 1100ms var(--ease-io);
+      transition-delay: 200ms;
     }
     .sh__media :global(img) { position: absolute; inset: 0; }
     .sh__pill {
       position: absolute;
-      left: 57vw;
+      left: 58vw;
       right: auto;
-      bottom: 3%;
+      bottom: 8%;
       translate: none;
     }
 
@@ -631,5 +644,7 @@ const promises = [
       transform: none;
       transition: none;
     }
+    .sh__media :global(img) { animation: none; transform: none; transition: none; }
+    .sh__media { clip-path: none; transition: none; }
   }
 </style>
