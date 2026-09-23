@@ -224,21 +224,27 @@ const helps = [
   {/* ══════ 02 · featured ══════ */}
   <section class="pf section" data-pick
     data-cats={JSON.stringify(cats.map((x) => ({ n: x.items.length, t: x.t, s: x.sub })))}>
+    {/* Not the hero's shape again: a ruled band, the title on the left and
+        the supporting line and marks set against it on the right. */}
     <div class="shell pf__head">
-      <p class="eb" data-rise>Explore our products</p>
-      <h2 class="pf__h" data-rise style="--d:70ms">
-        <span data-cat-a>{cats[0].t.split(' ').slice(0, -1).join(' ')}</span>
-        {' '}
-        <em data-cat-b>{cats[0].t.split(' ').slice(-1)[0]}</em>
-      </h2>
-      <p class="pf__sub" data-cat-s data-rise style="--d:110ms">{cats[0].sub}</p>
+      <span class="pf__hr" aria-hidden="true"></span>
+      <div class="pf__lede">
+        <p class="eb" data-rise>Explore our products</p>
+        <h2 class="pf__h" data-rise style="--d:70ms">
+          <span data-cat-a>{cats[0].t.split(' ').slice(0, -1).join(' ')}</span>
+          {' '}
+          <em data-cat-b>{cats[0].t.split(' ').slice(-1)[0]}</em>
+        </h2>
+      </div>
+      <div class="pf__aside">
+        <p class="pf__sub" data-cat-s data-rise style="--d:110ms">{cats[0].sub}</p>
+        <ul class="pf__over" data-rise style="--d:150ms">
+          {plinth.map((m) => (
+            <li><i aria-hidden="true"><Icon name={m.icon} size={15} /></i>{m.t}</li>
+          ))}
+        </ul>
+      </div>
     </div>
-
-    <ul class="shell pf__over" data-rise style="--d:150ms">
-      {plinth.map((m) => (
-        <li><i aria-hidden="true"><Icon name={m.icon} size={16} /></i>{m.t}</li>
-      ))}
-    </ul>
 
     <div class="shell pf__grid">
       <ul class="pf__nav" data-rise>
@@ -680,12 +686,14 @@ const helps = [
   .ph__hero {
     position: absolute;
     left: 50%;
-    bottom: 23%;
+    bottom: 21%;
     translate: -50% 0;
     width: min(15rem, 32%);
     height: auto;
     z-index: 2;
-    filter: drop-shadow(0 16px 22px rgb(10 30 12 / 0.2));
+    filter:
+      drop-shadow(0 3px 2px rgb(10 30 12 / 0.34))
+      drop-shadow(0 14px 18px rgb(10 30 12 / 0.16));
   }
   /* The rest of the range. Depth is carried by z-index against the dais:
      the desktop and the router stand BEHIND it, the drives in front. */
@@ -728,10 +736,10 @@ const helps = [
   .ph__dais {
     position: absolute;
     left: 51%;
-    bottom: 13%;
+    bottom: 12%;
     translate: -50% 0;
     z-index: 1;
-    width: 37%;
+    width: 41%;
     aspect-ratio: 3.4 / 1;
     border-radius: 50%;
     background: radial-gradient(ellipse at 50% 30%, #ffffff 0%, #f1f8f3 58%, #e4f0e7 100%);
@@ -810,7 +818,7 @@ const helps = [
     background:
       radial-gradient(1100px 620px at 52% 62%, #e9f4ea 0%, rgb(233 244 234 / 0) 68%),
       linear-gradient(180deg, #f6fbf7 0%, #ffffff 62%);
-    padding-block: clamp(5rem, 9vw, 7rem) clamp(2rem, 4vw, 3.25rem);
+    padding-block: clamp(2.25rem, 4.5vw, 3.5rem) clamp(2rem, 4vw, 3.25rem);
   }
   /* Same as every other heading block on the site: a leading rule, left
      aligned, and the emphasis on its own line in green. */
@@ -827,26 +835,29 @@ const helps = [
   .eb::before { content: ''; width: 28px; height: 1px; background: currentColor; }
   .eb--low { margin-top: clamp(2.25rem, 4.5vw, 3.5rem); }
   .pf__h em { font-style: normal; color: var(--green-deep); }
+  .pf__head { display: grid; gap: clamp(0.9rem, 2vw, 1.4rem); }
+  .pf__hr { grid-column: 1 / -1; height: 1px; background: var(--line-light); }
   .pf__h {
-    margin-top: var(--s4);
-    font-size: clamp(2.1rem, 4.4vw, 3.3rem);
+    margin-top: var(--s3);
+    /* Deliberately smaller than the hero's — the same size twice in a
+       column reads as the same section repeated. */
+    font-size: clamp(1.5rem, 2.7vw, 2.15rem);
     font-weight: 700;
-    letter-spacing: -0.045em;
-    line-height: 1.04;
+    letter-spacing: -0.035em;
+    line-height: 1.06;
   }
   .pf__sub {
-    max-width: 46ch;
-    margin-top: var(--s4);
-    font-size: var(--lead);
-    line-height: 1.62;
+    max-width: 40ch;
+    font-size: 0.9375rem;
+    line-height: 1.6;
     color: var(--text-2);
   }
   .pf__over {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 0.5rem clamp(0.9rem, 2.4vw, 2rem);
-    margin-top: var(--s5);
+    gap: 0.5rem clamp(0.8rem, 2vw, 1.5rem);
+    margin-top: var(--s4);
   }
   .pf__over li {
     display: flex;
@@ -1415,6 +1426,8 @@ const helps = [
        the pale ground under the photograph. */
 
     .ph__grid { grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.2fr); }
+    .pf__head { grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr); align-items: end; }
+    .pf__aside { padding-bottom: 0.3rem; }
     .pf__grid { grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.6fr) minmax(0, 0.88fr); }
     .pb__row { grid-template-columns: minmax(0, 1fr) auto; }
     .pc__head { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; }
