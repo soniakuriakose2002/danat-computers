@@ -3,45 +3,118 @@ import { getCollection } from 'astro:content';
 import { Image } from 'astro:assets';
 import PageLayout from '@layouts/PageLayout.astro';
 import Icon from '@components/ui/Icon.astro';
-import { site, whatsappLink } from '@data/site';
+import VideoModal from '@components/global/VideoModal.astro';
+import { site } from '@data/site';
 import { serviceMedia, fallbackMedia } from '@data/serviceMedia';
+import imgHero from '@assets/photos/repair-solder.jpg';
 
+/**
+ * SERVICES — built to the client's mockup, which deliberately echoes the
+ * business page: curved photo hero, a trust strip, a three-column grid,
+ * and a dark closing band.
+ *
+ * Eight services divide badly by three, so the ninth cell is the
+ * mockup's own answer — a "Let's talk" card. The grid comes out square.
+ *
+ * ⚠ Three claims in the mockup are not carried over. "Trusted by
+ * thousands" appears twice and has no source — the customer count has
+ * never been confirmed, and the same claim was cut from another page
+ * once already. "Certified team" asserts a qualification nobody has
+ * evidenced. "Quick response" is a response-time commitment, which is
+ * the exact thing the business page states is still being confirmed
+ * with the company. Each is replaced with something the record supports.
+ */
 const services = (await getCollection('services')).sort(
   (a, b) => a.data.index - b.data.index
 );
+
+/** Stated policy across the site, or straight from the ERP export. */
+const marks = [
+  { icon: 'users', t: 'Our own technicians', p: 'In-house, not subcontracted' },
+  { icon: 'shield', t: 'Genuine parts', p: 'From the same stock we sell' },
+  { icon: 'check', t: 'Transparent pricing', p: 'Quoted before any work' },
+  { icon: 'pin', t: 'Across Oman', p: `Service from ${site.stats.branches} branches` },
+];
+
+const promises = [
+  { icon: 'search', t: 'Diagnosis is free' },
+  { icon: 'chip', t: 'Repaired to the component' },
+  { icon: 'pin', t: `Service from ${site.stats.branches} branches` },
+  { icon: 'calendar', t: `Trading since ${site.stats.since}` },
+];
 ---
 
 <PageLayout
   title="Services"
   description="Computer repair, printer services, CCTV, networking, data recovery and IT support across Oman — from four branches."
 >
-  <!-- ─────────── head ─────────── -->
-  <section class="sx">
-    <div class="shell">
-      <nav class="sx__crumb" aria-label="Breadcrumb">
-        <a href="/">Home</a>
-        <span aria-hidden="true">/</span>
-        <span aria-current="page">Services</span>
-      </nav>
+  {/* ══════ 01 · hero ══════ */}
+  <section class="sh">
+    <span class="sh__sky" aria-hidden="true"></span>
 
-      <div class="sx__head">
-        <div>
-          <p class="label sx__l">All services</p>
-          <h1 class="sx__h">
-            Everything we do,<br /><em>in one place.</em>
-          </h1>
-        </div>
-        <p class="sx__p">
-          {services.length} services, all handled in-house by our own
-          technicians from {site.stats.branches} branches. Diagnosis is free
-          and you get a fixed price before any work starts.
+    <div class="shell sh__grid">
+      <div class="sh__copy">
+        <nav class="sh__crumb" aria-label="Breadcrumb">
+          <a href="/">Home</a>
+          <span aria-hidden="true">/</span>
+          <span aria-current="page">Services</span>
+        </nav>
+
+        <p class="eb" data-rise>All services</p>
+        <h1 class="sh__h" data-rise style="--d:70ms">
+          Everything we do,<br /><em>in one place.</em>
+        </h1>
+        <p class="sh__p" data-rise style="--d:130ms">
+          From repairs and networking to CCTV and data recovery, our own
+          technicians keep your business and your devices running — with a
+          fixed price agreed before any work starts.
         </p>
+
+        <div class="sh__acts" data-rise style="--d:190ms">
+          <a class="btn" href="/contact" data-enquiry="consult">
+            Get a service
+            <span class="btn__i" aria-hidden="true"><Icon name="arrow" size={15} /></span>
+          </a>
+          <button class="film" type="button" data-video-open>
+            <i aria-hidden="true"><Icon name="play" size={12} /></i>
+            <span>Watch our story<small>See how we help</small></span>
+          </button>
+        </div>
       </div>
+
+      {/* The curved inner edge is the mockup's, and the business hero's. */}
+      <figure class="sh__media" data-rise style="--d:160ms">
+        <Image src={imgHero} alt="A technician working on a laptop board at the bench"
+          widths={[700, 1100, 1500]} sizes="(min-width:62rem) 56vw, 100vw"
+          quality={78} format="webp" loading="eager" fetchpriority="high" />
+        <span class="sh__tint" aria-hidden="true"></span>
+        <figcaption class="sh__over">Reliable<br />Technology<br />Support</figcaption>
+
+        <p class="sh__pill">
+          <span><b>{services.length}</b>Services</span>
+          <i aria-hidden="true"></i>
+          <span><b>{site.stats.branches}</b>Branches</span>
+          <i aria-hidden="true"></i>
+          <span><b>{site.stats.since}</b>Trading since</span>
+        </p>
+      </figure>
     </div>
   </section>
 
-  <!-- ─────────── list ─────────── -->
-  <section class="sl section" data-tone="light">
+  {/* ══════ 02 · marks ══════ */}
+  <section class="sm">
+    <ul class="shell sm__list">
+      {marks.map((m, i) => (
+        <li data-rise style={`--d:${i * 60}ms`}>
+          <i aria-hidden="true"><Icon name={m.icon} size={19} /></i>
+          <span><b>{m.t}</b><em>{m.p}</em></span>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  {/* ══════ 03 · the grid ══════ */}
+  <section class="sl section">
     <ul class="shell sl__grid">
       {services.map((s, i) => {
         const media = serviceMedia[s.id] ?? fallbackMedia;
@@ -49,251 +122,444 @@ const services = (await getCollection('services')).sort(
           <li data-rise style={`--d:${(i % 3) * 70}ms`}>
             <a class="sl__card" href={`/services/${s.id}`}>
               <span class="sl__media">
-                <Image
-                  src={media.img}
-                  alt={media.alt}
+                <Image src={media.img} alt={media.alt}
                   widths={[400, 700, 1000]}
                   sizes="(max-width: 48rem) 100vw, (max-width: 72rem) 50vw, 33vw"
-                  quality={80}
-                  format="webp"
-                  loading={i < 3 ? 'eager' : 'lazy'}
-                />
+                  quality={80} format="webp" loading={i < 3 ? 'eager' : 'lazy'} />
                 <span class="sl__n">{String(s.data.index).padStart(2, '0')}</span>
               </span>
 
               <span class="sl__body">
                 <span class="sl__t">{s.data.title}</span>
                 <span class="sl__s">{s.data.summary}</span>
-              </span>
-
-              <span class="sl__foot">
-                <span>Read more</span>
-                <span class="sl__go" aria-hidden="true"><Icon name="arrow" size={15} /></span>
+                <span class="sl__foot">
+                  <span>Read more</span>
+                  <span class="sl__go" aria-hidden="true"><Icon name="arrow" size={15} /></span>
+                </span>
               </span>
             </a>
           </li>
         );
       })}
+
+      {/* The ninth cell, so eight cards fill three rows squarely. */}
+      <li class="sl__talk" data-rise style="--d:140ms">
+        <span class="sl__lines" aria-hidden="true"></span>
+        <span class="sl__rule" aria-hidden="true"></span>
+        <p class="sl__tk">Need a custom solution?</p>
+        <p class="sl__th">Let's<br />Talk.</p>
+        <a class="btn" href="/contact" data-enquiry="consult">
+          Contact us
+          <span class="btn__i" aria-hidden="true"><Icon name="arrow" size={15} /></span>
+        </a>
+      </li>
     </ul>
   </section>
 
-  <!-- ─────────── cta ─────────── -->
-  <section class="sc" data-tone="ink">
+  {/* ══════ 04 · cta ══════ */}
+  <section class="sc">
+    <span class="sc__wash" aria-hidden="true"></span>
     <div class="shell sc__in">
       <div>
-        <p class="label">Not sure which you need?</p>
-        <h2 class="sc__h">Describe the problem.<br /><em>We will tell you.</em></h2>
+        <p class="eb eb--inv" data-rise>Not sure which service you need?</p>
+        <h2 class="sc__h" data-rise style="--d:70ms">
+          Describe the problem.<br /><em>We will tell you.</em>
+        </h2>
+        <p class="sc__p" data-rise style="--d:130ms">
+          Tell us what is happening and we will tell you what it needs — free,
+          before anything is quoted.
+        </p>
+        <a class="btn btn--light" href="/contact" data-support-open data-rise style="--d:190ms">
+          Get support
+          <span class="btn__i" aria-hidden="true"><Icon name="arrow" size={15} /></span>
+        </a>
       </div>
-      <a class="sc__wa" href={whatsappLink()} target="_blank" rel="noopener noreferrer"
-        title="Chat on WhatsApp" aria-label="Chat with Danat on WhatsApp">
-        <Icon name="whatsapp" size={20} />
-      </a>
+
+      <ul class="sc__list" data-rise style="--d:160ms">
+        {promises.map((p) => (
+          <li><i aria-hidden="true"><Icon name={p.icon} size={17} /></i>{p.t}</li>
+        ))}
+      </ul>
     </div>
   </section>
+
+  <VideoModal />
 </PageLayout>
 
 <style>
-  /* ---------- head ---------- */
+  /* ───────── shared ───────── */
+  .eb {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--green-deep);
+  }
+  .eb::before { content: ''; width: 28px; height: 1px; background: currentColor; }
+  .eb--inv { color: var(--green-bright); }
 
-  .sx {
-    background: var(--off);
-    padding-block: clamp(7rem, 12vw, 10rem) clamp(2.5rem, 5vw, 4rem);
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.85rem 0.85rem 0.85rem 1.4rem;
+    border-radius: 999px;
+    background: var(--green-deep);
+    color: #fff;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    transition: background-color var(--t2) var(--ease);
+  }
+  .btn:hover { background: #26551f; }
+  .btn__i {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.2);
+    transition: transform var(--t2) var(--ease);
+  }
+  .btn:hover .btn__i { transform: translateX(3px); }
+  .btn--light { background: #fff; color: #10301a; }
+  .btn--light:hover { background: var(--green-bright); }
+  .btn--light .btn__i { background: rgb(16 48 26 / 0.14); }
+
+  .film {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    text-align: left;
+  }
+  .film i {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    flex: none;
+    border-radius: 50%;
+    background: var(--green-deep);
+    color: #fff;
+    transition: transform var(--t2) var(--ease);
+  }
+  .film:hover i { transform: scale(1.08); }
+  .film:focus-visible i { outline: 2px solid var(--green-deep); outline-offset: 3px; }
+  .film > span { display: grid; min-width: 0; font-size: 0.9375rem; font-weight: 700; }
+  .film small {
+    overflow-wrap: anywhere;
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-3);
   }
 
-  .sx__crumb {
+  /* ───────── 01 hero ───────── */
+  .sh {
+    position: relative;
+    padding-block: clamp(5.5rem, 10vw, 8rem) 0;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .sh__sky {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(162deg, #eef5ef 0%, #f6faf6 54%, #ffffff 100%);
+  }
+  .sh__grid { display: grid; gap: clamp(1.75rem, 3.5vw, 2.75rem); align-items: center; }
+  .sh__copy, .sh__media { min-width: 0; }
+
+  .sh__crumb {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: 0.45rem;
+    margin-bottom: var(--s5);
     font-size: 0.8125rem;
     color: var(--text-3);
   }
-  .sx__crumb a { transition: color var(--t2) var(--ease); }
-  .sx__crumb a:hover { color: var(--green-deep); }
-  .sx__crumb [aria-current] { color: var(--text); }
+  .sh__crumb a { transition: color var(--t2) var(--ease); }
+  .sh__crumb a:hover { color: var(--green-deep); }
+  .sh__crumb [aria-current] { color: var(--text); }
 
-  .sx__head {
-    display: grid;
-    gap: var(--s5);
+  .sh__h {
+    margin-top: var(--s4);
+    font-size: clamp(2.1rem, 4.4vw, 3.3rem);
+    font-weight: 700;
+    letter-spacing: -0.045em;
+    line-height: 1.04;
+  }
+  .sh__h em { font-style: normal; color: var(--green-deep); }
+  .sh__p {
+    max-width: 44ch;
+    margin-top: var(--s4);
+    font-size: 0.9375rem;
+    line-height: 1.68;
+    color: var(--text-2);
+  }
+  .sh__acts {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s4) var(--s5);
     margin-top: var(--s5);
   }
 
-  .sx__l { display: flex; }
-
-  .sx__h {
-    margin-top: var(--s4);
-    font-size: clamp(2rem, 4vw, 3.4rem);
-    line-height: 1.04;
-    letter-spacing: -0.038em;
-    font-weight: 700;
+  .sh__media {
+    position: relative;
+    aspect-ratio: 16 / 11;
+    border-radius: 0 0 0 clamp(2rem, 6vw, 5rem);
+    overflow: hidden;
   }
-  .sx__h em { font-style: normal; color: var(--green-deep); }
-
-  .sx__p {
-    max-width: 46ch;
-    align-self: end;
-    font-size: 0.9375rem;
-    line-height: 1.65;
+  .sh__media :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  .sh__tint {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(258deg, rgb(8 22 10 / 0.74) 0%, rgb(8 22 10 / 0.38) 48%,
+      rgb(8 22 10 / 0.14) 100%);
+  }
+  .sh__over {
+    position: absolute;
+    top: clamp(1.2rem, 3vw, 2.2rem);
+    right: clamp(1.2rem, 3vw, 2.2rem);
+    font-size: clamp(1.1rem, 2.2vw, 1.6rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.22;
+    text-align: right;
+    color: #fff;
+  }
+  .sh__over::after {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 2px;
+    margin: 0.7rem 0 0 auto;
+    border-radius: 2px;
+    background: var(--green-bright);
+  }
+  .sh__pill {
+    position: absolute;
+    left: 50%;
+    bottom: clamp(0.9rem, 2.2vw, 1.5rem);
+    translate: -50% 0;
+    display: flex;
+    align-items: center;
+    gap: clamp(0.6rem, 1.6vw, 1.1rem);
+    max-width: calc(100% - 2rem);
+    padding: 0.65rem clamp(0.9rem, 2vw, 1.3rem);
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.95);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 14px 34px -18px rgb(8 22 10 / 0.5);
+  }
+  .sh__pill span {
+    display: flex;
+    align-items: baseline;
+    gap: 0.35rem;
+    font-size: 0.75rem;
+    white-space: nowrap;
     color: var(--text-2);
   }
-
-  /* ---------- list ---------- */
-
-  .sl { background: var(--white); }
-
-  .sl__grid {
-    display: grid;
-    gap: clamp(1.25rem, 2vw, 1.75rem);
-    grid-template-columns: 1fr;
+  .sh__pill b {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    color: var(--green-deep);
+    font-variant-numeric: tabular-nums;
   }
+  .sh__pill i { width: 1px; height: 18px; background: var(--line-light); }
+
+  /* ───────── 02 marks ───────── */
+  .sm { background: var(--white); padding-block: clamp(1.4rem, 3vw, 2.2rem); }
+  .sm__list { display: grid; gap: clamp(1rem, 2.2vw, 1.6rem); }
+  .sm__list li { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 0.85rem; }
+  .sm__list i {
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    background: #e9f3ea;
+    color: var(--green-deep);
+  }
+  .sm__list span { display: grid; min-width: 0; }
+  .sm__list b { font-size: 0.875rem; font-weight: 700; letter-spacing: -0.02em; }
+  .sm__list em {
+    margin-top: 0.15rem;
+    font-style: normal;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: var(--text-3);
+  }
+
+  /* ───────── 03 the grid ───────── */
+  .sl { background: var(--white); padding-top: clamp(1.5rem, 3vw, 2.5rem); }
+  .sl__grid { display: grid; gap: clamp(0.85rem, 1.8vw, 1.25rem); }
 
   .sl__card {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-rows: auto 1fr;
     height: 100%;
     border: 1px solid var(--line-light);
-    border-radius: 12px;
+    border-radius: 20px;
     overflow: hidden;
     background: var(--white);
-    transition:
-      border-color var(--t2) var(--ease),
-      box-shadow var(--t2) var(--ease),
-      transform var(--t2) var(--ease);
+    transition: transform var(--t2) var(--ease), box-shadow var(--t2) var(--ease),
+      border-color var(--t2) var(--ease);
   }
+  .sl__card:hover {
+    transform: translateY(-5px);
+    border-color: transparent;
+    box-shadow: 0 28px 50px -30px rgb(10 30 12 / 0.38);
+  }
+  .sl__card:focus-visible { outline: 2px solid var(--green-deep); outline-offset: 3px; }
 
-  .sl__media {
-    position: relative;
-    display: block;
-    aspect-ratio: 16 / 10;
-    overflow: hidden;
-    background: var(--off);
-  }
-  .sl__media :global(img) {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 900ms var(--ease);
-  }
-
+  .sl__media { position: relative; display: block; aspect-ratio: 16 / 10; }
+  .sl__media :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  /* A solid chip rather than a shadow: it can be composited and measured
+     against any photograph, which a text-shadow cannot. */
   .sl__n {
     position: absolute;
-    left: 0.85rem;
-    top: 0.85rem;
-    padding: 0.3rem 0.6rem;
-    border-radius: 6px;
+    top: 0.65rem;
+    left: 0.65rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 8px;
     background: rgb(255 255 255 / 0.94);
     font-family: var(--font-mono);
-    font-size: 0.625rem;
-    letter-spacing: 0.14em;
+    font-size: 0.6875rem;
+    font-weight: 600;
     color: var(--text);
   }
 
-  .sl__body { display: block; padding: 1.15rem 1.25rem 0; }
-
-  .sl__t {
-    display: block;
-    font-size: 1.1875rem;
-    font-weight: 600;
-    letter-spacing: -0.02em;
-  }
-
-  .sl__s {
-    display: block;
-    margin-top: 0.45rem;
-    font-size: var(--small);
-    line-height: 1.6;
-    color: var(--text-2);
-  }
-
+  .sl__body { display: grid; align-content: start; gap: 0.35rem; padding: 1.1rem 1.2rem 1.05rem; }
+  .sl__t { font-size: 1rem; font-weight: 700; letter-spacing: -0.025em; }
+  .sl__s { font-size: 0.8438rem; line-height: 1.6; color: var(--text-2); }
   .sl__foot {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: var(--s4);
-    margin-top: auto;
-    padding: 1.1rem 1.25rem 1.25rem;
-    font-size: 0.875rem;
-    font-weight: 500;
+    gap: 0.6rem;
+    margin-top: 0.85rem;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: var(--text);
   }
-
   .sl__go {
     display: grid;
     place-items: center;
-    width: 2.25rem;
-    height: 2.25rem;
-    border-radius: 50%;
+    width: 32px;
+    height: 32px;
     border: 1px solid var(--line-light);
-    color: var(--text-2);
-    transition:
-      background-color var(--t2) var(--ease),
-      border-color var(--t2) var(--ease),
-      color var(--t2) var(--ease),
-      transform var(--t2) var(--ease);
+    border-radius: 50%;
+    color: var(--green-deep);
+    transition: transform var(--t2) var(--ease), background-color var(--t2) var(--ease);
   }
+  .sl__card:hover .sl__go { transform: translateX(3px); background: #e9f3ea; }
 
-  .sl__card:hover,
-  .sl__card:focus-within {
-    border-color: var(--green);
-    box-shadow: 0 18px 40px -26px rgb(20 23 26 / 0.35);
-    transform: translateY(-3px);
-  }
-  .sl__card:hover .sl__media :global(img) { transform: scale(1.05); }
-  .sl__card:hover .sl__go {
-    background: var(--green);
-    border-color: var(--green);
-    color: #fff;
-    transform: translateX(3px);
-  }
-
-  /* ---------- cta ---------- */
-
-  .sc {
-    background: var(--ink);
-    color: var(--text-inv);
-    padding-block: clamp(2.5rem, 5vw, 4rem);
-  }
-
-  .sc__in {
+  /* the ninth cell */
+  .sl__talk {
+    position: relative;
     display: grid;
-    gap: var(--s5);
-    align-items: center;
+    align-content: center;
+    gap: 0.4rem;
+    min-height: 15rem;
+    padding: clamp(1.5rem, 3vw, 2.1rem);
+    border-radius: 20px;
+    overflow: hidden;
+    background: linear-gradient(145deg, #eef6ef 0%, #e2efe4 100%);
   }
+  /* A quiet engraved corner rather than a picture. */
+  .sl__lines {
+    position: absolute;
+    right: -3rem;
+    bottom: -4rem;
+    width: 16rem;
+    height: 16rem;
+    border-radius: 50%;
+    background: repeating-radial-gradient(circle at 50% 50%,
+      rgb(47 100 41 / 0.09) 0 1px, transparent 1px 9px);
+  }
+  .sl__rule { width: 34px; height: 2px; border-radius: 2px; background: var(--green); }
+  .sl__tk { margin-top: 0.7rem; font-size: 0.875rem; color: var(--text-2); }
+  .sl__th {
+    font-size: clamp(1.6rem, 3vw, 2.1rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1.06;
+  }
+  .sl__talk .btn { justify-self: start; margin-top: 0.9rem; }
 
+  /* ───────── 04 cta ───────── */
+  .sc {
+    position: relative;
+    padding-block: clamp(3rem, 6vw, 5rem);
+    background: linear-gradient(135deg, #12351a 0%, #0b2110 56%, #143a1d 100%);
+    color: #fff;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .sc__wash {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: radial-gradient(760px 420px at 88% 92%, rgb(143 221 138 / 0.18), transparent 70%);
+  }
+  .sc__in { display: grid; gap: var(--s5); align-items: center; }
   .sc__h {
     margin-top: var(--s4);
-    font-size: clamp(1.5rem, 2.8vw, 2.25rem);
-    line-height: 1.1;
-    letter-spacing: -0.035em;
+    font-size: clamp(1.7rem, 3.4vw, 2.5rem);
     font-weight: 700;
+    letter-spacing: -0.042em;
+    line-height: 1.1;
   }
   .sc__h em { font-style: normal; color: var(--green-bright); }
-
-  /* Mark only, no label. White on --green (#59AA54) is 2.88:1, under the
-     3:1 WCAG asks of a non-text graphic, so these sit on --green-deep
-     (7.06:1) instead. */
-  .sc__wa {
+  .sc__p {
+    max-width: 44ch;
+    margin-top: var(--s4);
+    margin-bottom: var(--s5);
+    font-size: 0.9375rem;
+    line-height: 1.64;
+    color: rgb(255 255 255 / 0.8);
+  }
+  .sc__list { display: grid; gap: 0.9rem; }
+  .sc__list li {
     display: grid;
-    place-items: center;
-    justify-self: start;
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-    background: var(--green-deep);
-    color: #fff;
-    transition: background-color var(--t2) var(--ease), transform var(--t2) var(--ease);
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.9375rem;
+    color: rgb(255 255 255 / 0.9);
   }
-  .sc__wa:hover { background: #fff; color: var(--ink); transform: translateY(-2px); }
+  .sc__list i { display: grid; place-items: center; color: var(--green-bright); }
 
-  /* ---------- layout ---------- */
-
-  @media (min-width: 48rem) {
-    .sl__grid { grid-template-columns: repeat(2, 1fr); }
-    .sx__head { grid-template-columns: 1.1fr 1fr; gap: var(--s7); }
+  /* ───────── responsive ───────── */
+  @media (min-width: 40rem) {
+    .sm__list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .sl__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
 
-  @media (min-width: 72rem) {
-    .sl__grid { grid-template-columns: repeat(3, 1fr); }
-    .sc__in { grid-template-columns: 1fr auto; }
-    .sc__wa { justify-self: end; }
+  @media (min-width: 62rem) {
+    .sh__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr); }
+    .sm__list { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .sl__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .sc__in { grid-template-columns: minmax(0, 1fr) auto; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sl__card, .sl__card:hover, .sl__go, .sl__card:hover .sl__go,
+    .btn:hover .btn__i, .film:hover i {
+      transform: none;
+      transition: none;
+    }
   }
 </style>
