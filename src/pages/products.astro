@@ -195,8 +195,10 @@ const helps = [
         <span class="ph__dais" aria-hidden="true"><i></i></span>
 
         {props.map((x) => (
-          <img class="ph__prop" data-at={x.at} src={x.img.src}
-            width={x.img.width} height={x.img.height} alt="" loading="lazy" />
+          <span class="ph__prop" data-at={x.at} aria-hidden="true">
+            <img src={x.img.src} width={x.img.width} height={x.img.height}
+              alt="" loading="lazy" />
+          </span>
         ))}
         <img class="ph__hero" src={heroShot.src} width={heroShot.width}
           height={heroShot.height} alt="" loading="eager" fetchpriority="high" />
@@ -678,11 +680,36 @@ const helps = [
   }
   /* The rest of the range. Depth is carried by z-index against the dais:
      the desktop and the router stand BEHIND it, the drives in front. */
-  .ph__prop {
-    position: absolute;
+  .ph__prop { position: absolute; display: block; }
+  .ph__prop img {
+    position: relative;
+    z-index: 1;
+    display: block;
+    width: 100%;
     height: auto;
-    filter: drop-shadow(0 14px 18px rgb(10 30 12 / 0.14));
+    filter: drop-shadow(0 10px 12px rgb(10 30 12 / 0.16));
   }
+  /* Each group stands on its own podium, as the mockup draws it — without
+     one everything but the laptop reads as hanging in the air. Stacked
+     offsets give the side of the cylinder; the dais uses the same trick. */
+  .ph__prop::after {
+    content: '';
+    position: absolute;
+    z-index: 0;
+    left: 50%;
+    bottom: -5%;
+    translate: -50% 0;
+    width: 116%;
+    aspect-ratio: 3.4 / 1;
+    border-radius: 50%;
+    background: radial-gradient(ellipse at 50% 30%, #ffffff 0%, #f3f9f4 58%, #e8f3ea 100%);
+    box-shadow:
+      0 5px 0 #fcfefc, 0 11px 0 #f4faf5, 0 18px 0 #ecf6ee,
+      0 26px 20px -14px rgb(47 100 41 / 0.26);
+  }
+  /* The drives lie flat and are wide — a podium as broad as the rest would
+     swamp them. */
+  .ph__prop[data-at='part']::after { width: 84%; bottom: -9%; }
   .ph__prop[data-at='desk']  { z-index: 0; left: 0%;   bottom: 29%; width: 31%; }
   .ph__prop[data-at='rout']  { z-index: 0; right: 17%; top: 3%;    width: 20%; }
   .ph__prop[data-at='cam']   { z-index: 1; right: 4%;  top: 25%;   width: 15%; }
@@ -737,7 +764,8 @@ const helps = [
   .ph__chip[data-at='a'] { left: 4%; top: 22%; }
   .ph__chip[data-at='b'] { left: 31%; top: 6%; }
   .ph__chip[data-at='c'] { right: 4%; top: 17%; }
-  .ph__chip[data-at='d'] { right: 1%; top: 40%; }
+  /* Clear of the camera's podium, which reaches ~43% of the scene. */
+  .ph__chip[data-at='d'] { right: 1%; top: 50%; }
   .ph__chip[data-at='e'] { right: 5%; bottom: 22%; }
   .ph__chip[data-at='f'] { left: 1%; bottom: 20%; }
   @keyframes phBob {
@@ -1311,7 +1339,7 @@ const helps = [
     .ph__chip[data-at='a'] { left: 0%;  top: 12%; }
     .ph__chip[data-at='b'] { left: 32%; top: 0%; }
     .ph__chip[data-at='c'] { right: 0%; top: 9%; }
-    .ph__chip[data-at='d'] { right: 0%; top: 33%; }
+    .ph__chip[data-at='d'] { right: 0%; top: 47%; }
     .ph__chip[data-at='e'] { right: 0%; bottom: 16%; }
     .ph__chip[data-at='f'] { left: 0%;  bottom: 6%; }
   }
