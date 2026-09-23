@@ -2,62 +2,120 @@
 import { Image } from 'astro:assets';
 import PageLayout from '@layouts/PageLayout.astro';
 import Icon from '@components/ui/Icon.astro';
-import { site, whatsappLink, branches, brands } from '@data/site';
-import imgBench from '@assets/photos/repair-solder.jpg';
-import imgBoard from '@assets/photos/repair-board.jpg';
-import imgTeam from '@assets/photos/support-agent.jpg';
+import { site, whatsappLink, branches } from '@data/site';
+import { OMAN_PATH, OMAN_VIEWBOX, OMAN_PINS } from '@data/omanMap';
+import imgHero from '@assets/photos/repair-solder.jpg';
+import imgCta from '@assets/renders/01.png';
 
-/**
- * Everything on this page is traceable to the company's own records or
- * to something Danat has published. Nothing here is a founder story I
- * made up, because a made-up founder story is the fastest way to make a
- * real twenty-year-old business look like a template.
- *
- * Where a claim would need the client to confirm it, the slot is held
- * open and labelled rather than filled.
- */
 const years = new Date().getFullYear() - site.stats.since;
 
+/**
+ * Figures. Each carries the record it came from, and anything the company
+ * has not given us is marked rather than rounded up. The mockup's "1000+
+ * happy customers" is not a number anyone here can stand behind, so the
+ * card keeps its place in the layout and says so.
+ */
 const figures = [
-  { v: years, suffix: '+', l: 'Years trading', src: 'Earliest ERP record, 2003' },
-  { v: site.stats.branches, suffix: '', l: 'Branches in Oman', src: 'Four ERP journal codes' },
-  { v: site.stats.parts, suffix: '', l: 'Lines in stock', src: 'Catalogue export' },
-  { v: site.stats.categories, suffix: '', l: 'Product categories', src: 'Catalogue export' },
-];
-
-/** What actually separates Danat, stated plainly rather than as a boast. */
-const principles = [
   {
-    icon: 'search',
-    t: 'We diagnose before we quote',
-    p: 'Free, and before anything is agreed. You are told what failed, what it costs and how long it takes — then you decide.',
+    icon: 'calendar',
+    v: years, suffix: '+',
+    l: 'Years in business',
+    sub: `Since ${site.stats.since}`,
+    pending: false,
   },
   {
-    icon: 'chip',
-    t: 'We repair the board, not the box',
-    p: 'Most shops trace a fault to the mainboard and quote you a replacement. We trace it to the component. That is the single thing this business is built on.',
+    icon: 'building',
+    v: site.stats.branches, suffix: '',
+    l: 'Branches in Oman',
+    sub: branches.map((b) => b.city.split(',')[0]).join(', '),
+    pending: false,
   },
   {
     icon: 'box',
-    t: 'We already have the part',
-    p: `${site.stats.parts.toLocaleString('en-US')} lines across ${site.stats.categories} categories, held across four branches. Most repairs do not wait on an order.`,
+    v: site.stats.parts, suffix: '',
+    l: 'Products in stock',
+    sub: `Across ${site.stats.categories} categories`,
+    pending: false,
   },
   {
     icon: 'users',
-    t: 'The same standard at every counter',
-    p: 'Ruwi, Sohar, Al Hail and Salalah run the same diagnosis, the same stock and the same technicians. A branch is not a lesser version of the shop.',
+    v: null, suffix: '',
+    l: 'Customers served',
+    sub: 'Figure to confirm with Danat',
+    pending: true,
   },
 ];
 
-const list = branches;
-const brandCount = brands.flat().length;
+/**
+ * Timeline. 2003 is the earliest record in the company's own ERP export.
+ * The middle milestones in the mockup carried invented years — a real
+ * twenty-year-old company's history is not something to guess at — so
+ * they are held open until Danat confirms the dates.
+ */
+const story = [
+  {
+    year: String(site.stats.since),
+    t: 'We started our journey',
+    p: 'The first counter opened on Computer Street in Ruwi, Muscat.',
+    pending: false,
+  },
+  {
+    year: null,
+    t: 'The range widened',
+    p: 'More brands, and the move beyond retail into IT solutions and supply.',
+    pending: true,
+  },
+  {
+    year: null,
+    t: 'We grew across Oman',
+    p: 'Branches opened in Sohar, Al Hail and Salalah.',
+    pending: true,
+  },
+  {
+    year: 'Today',
+    t: 'A stronger tomorrow',
+    p: 'Supporting individuals, businesses and organisations across the country with repair, supply and support.',
+    pending: false,
+  },
+];
+
+const values = [
+  {
+    icon: 'shield',
+    t: 'Genuine products',
+    p: 'Only authentic stock from the brands we are supplied by directly.',
+  },
+  {
+    icon: 'person',
+    t: 'Expert service',
+    p: 'Technicians who trace a fault to the component, not to the invoice.',
+  },
+  {
+    icon: 'gem',
+    t: 'Customer first',
+    p: 'Honest advice, fair pricing, and a free diagnosis before you commit.',
+  },
+  {
+    icon: 'chart',
+    t: 'Continuous improvement',
+    p: 'Always learning, always adapting as the hardware changes.',
+  },
+];
+
+const mapOrder = ['sohar', 'hail', 'ruwi', 'salalah'];
+const mapList = mapOrder.map((s) => branches.find((b) => b.slug === s)!);
+const W = 1000;
+const H = 1342;
+const nudge: Record<string, string> = {
+  sohar: '0%', hail: '-3.4%', ruwi: '2.8%', salalah: '0%',
+};
 ---
 
 <PageLayout
   title="About"
-  description={`${site.nameFull} has repaired and supplied computers in Oman since ${site.stats.since}. Board-level repair, ${site.stats.parts.toLocaleString('en-US')} lines in stock, four branches.`}
+  description={`${site.nameFull} has repaired and supplied computers across Oman since ${site.stats.since} — four branches, ${site.stats.parts.toLocaleString('en-US')} lines in stock, board-level repair.`}
 >
-  {/* ═══════════ 01 · head ═══════════ */}
+  {/* ═══════════ 01 · hero ═══════════ */}
   <section class="ah">
     <div class="ah__aura" aria-hidden="true"><span></span><span></span></div>
 
@@ -69,179 +127,221 @@ const brandCount = brands.flat().length;
       </nav>
 
       <div class="ah__grid">
-        <div>
-          <p class="eb" data-rise>
-            <i class="eb__dot" aria-hidden="true"></i>About Danat
-            <i class="eb__rule" aria-hidden="true"></i>
-          </p>
+        <div class="ah__copy">
+          <p class="eb" data-rise><i class="eb__rule" aria-hidden="true"></i>About Danat</p>
 
           <h1 class="ah__h" data-rise style="--d:70ms">
-            {years} years on<br /><em>Computer Street.</em>
+            Technology<br />that keeps<br /><em>Oman moving.</em>
           </h1>
 
           <p class="ah__p" data-rise style="--d:130ms">
-            Danat Computers has been repairing, supplying and supporting
-            computers in Oman since {site.stats.since}. Four branches, one
-            counter standard, and a bench that opens the machine rather than
-            replacing it.
+            For over two decades, Danat Computers has been a trusted name in
+            computer products, services and business solutions across Oman.
           </p>
 
           <div class="ah__acts" data-rise style="--d:200ms">
             <a class="btn" href="/services">
-              What we do
+              Our services
               <span class="btn__i" aria-hidden="true"><Icon name="arrow" size={15} /></span>
             </a>
-            <a class="ah__call" href={`tel:${site.phone.tel}`}>{site.phone.display}</a>
+
+            {/* No film exists yet, so this is a held slot rather than a
+                button that goes nowhere. */}
+            <span class="ah__film" aria-disabled="true" title="Company film to follow">
+              <i aria-hidden="true"><Icon name="play" size={13} /></i>
+              <span>
+                Watch our story
+                <small>Film to follow</small>
+              </span>
+            </span>
           </div>
         </div>
 
-        <figure class="ah__fig" data-rise style="--d:160ms">
-          <Image src={imgBench} alt="A Danat technician probing a laptop mainboard at the bench"
-            widths={[560, 900, 1300]} sizes="(min-width: 62rem) 46vw, 92vw"
-            quality={74} format="webp" loading="eager" fetchpriority="high" />
-          <figcaption>At the bench — fault tracing before a quote is given.</figcaption>
-        </figure>
+        <div class="ah__media" data-rise style="--d:160ms">
+          <figure class="ah__fig">
+            <Image src={imgHero} alt="A Danat technician working on a machine at the bench"
+              widths={[560, 900, 1300]} sizes="(min-width: 62rem) 46vw, 92vw"
+              quality={74} format="webp" loading="eager" fetchpriority="high" />
+          </figure>
+
+          <p class="ah__mantra">
+            People.<br />Products.<br />Support.<br /><b>A brighter tomorrow.</b>
+          </p>
+
+          <p class="ah__trust">
+            <i aria-hidden="true"><Icon name="users" size={17} /></i>
+            <span>
+              Trusted across Oman
+              <small>Customer count to confirm</small>
+            </span>
+          </p>
+        </div>
       </div>
     </div>
   </section>
 
-  {/* ═══════════ 02 · figures ═══════════ */}
-  <section class="af section" data-tone="light">
+  {/* ═══════════ 02 · numbers ═══════════ */}
+  <section class="an section" data-tone="light">
     <div class="shell">
       <p class="eb eb--mid" data-rise>
         <i class="eb__rule" aria-hidden="true"></i>By the numbers
         <i class="eb__rule" aria-hidden="true"></i>
       </p>
 
-      <dl class="af__grid">
+      <dl class="an__grid">
         {figures.map((f, i) => (
-          <div data-rise style={`--d:${i * 70}ms`}>
-            <dt><span data-count={f.v}>0</span>{f.suffix}</dt>
+          <div class="nc" data-rise style={`--d:${i * 70}ms`} data-pending={f.pending ? '' : undefined}>
+            <span class="nc__i" aria-hidden="true"><Icon name={f.icon} size={19} /></span>
+            <dt>
+              {f.pending
+                ? <span class="nc__blank" aria-label="Figure not yet confirmed"></span>
+                : <><span data-count={f.v}>0</span>{f.suffix}</>}
+            </dt>
             <dd>{f.l}</dd>
-            {/* Where each figure comes from, so none of them is a claim. */}
-            <small>{f.src}</small>
+            <small>{f.sub}</small>
           </div>
         ))}
       </dl>
-
-      <p class="af__note" data-rise style="--d:300ms">
-        Every figure above is drawn from Danat's own records rather than
-        rounded up for effect. We have deliberately not published a customer
-        count, because nobody has given us one we can stand behind.
-      </p>
     </div>
   </section>
 
-  {/* ═══════════ 03 · principles ═══════════ */}
-  <section class="ap section" data-tone="light">
-    <div class="shell ap__grid">
-      <div class="ap__intro" data-rise>
-        <p class="eb"><i class="eb__rule" aria-hidden="true"></i>How we work</p>
-        <h2 class="ap__h">Four things we<br /><em>do not compromise on.</em></h2>
-        <p class="ap__p">
-          None of this is unusual in principle. It is unusual in practice,
-          which is why it is worth writing down.
+  {/* ═══════════ 03 · story ═══════════ */}
+  <section class="as section" data-tone="light">
+    <div class="shell as__grid">
+      <div class="as__intro" data-rise>
+        <p class="eb"><i class="eb__rule" aria-hidden="true"></i>Our story</p>
+        <h2 class="as__h">From a small shop<br /><em>to a trusted brand.</em></h2>
+        <p class="as__p">
+          What started as a single counter has grown into a company with four
+          branches. The focus has not changed — genuine products, expert
+          service and long relationships.
         </p>
+        <a class="btn" href="/branches">
+          Our branches
+          <span class="btn__i" aria-hidden="true"><Icon name="arrow" size={15} /></span>
+        </a>
       </div>
 
-      <ul class="ap__list">
-        {principles.map((p, i) => (
-          <li data-rise style={`--d:${i * 70}ms`}>
-            <span class="ap__i" aria-hidden="true"><Icon name={p.icon} size={20} /></span>
-            <div>
-              <h3>{p.t}</h3>
-              <p>{p.p}</p>
+      <ol class="as__line">
+        {story.map((s, i) => (
+          <li data-rise style={`--d:${i * 80}ms`} data-pending={s.pending ? '' : undefined}>
+            <span class="as__dot" aria-hidden="true"></span>
+            <span class="as__yr">
+              {s.year ?? <i class="as__q" aria-label="Year to confirm">Year?</i>}
+            </span>
+            <div class="as__t">
+              <h3>{s.t}</h3>
+              <p>{s.p}</p>
+              {s.pending && <small>Date to confirm with Danat</small>}
             </div>
+          </li>
+        ))}
+      </ol>
+
+      <p class="as__script" aria-hidden="true">Same Commitment<br />Bigger Possibilities</p>
+    </div>
+  </section>
+
+  {/* ═══════════ 04 · values ═══════════ */}
+  <section class="av section" data-tone="light">
+    <div class="shell">
+      <p class="eb" data-rise><i class="eb__rule" aria-hidden="true"></i>Our values</p>
+      <h2 class="av__h" data-rise style="--d:70ms">
+        Four things we <em>never compromise on.</em>
+      </h2>
+
+      <ul class="av__grid">
+        {values.map((v, i) => (
+          <li data-rise style={`--d:${120 + i * 70}ms`}>
+            <span class="av__i" aria-hidden="true"><Icon name={v.icon} size={20} /></span>
+            <b>{v.t}</b>
+            <span>{v.p}</span>
           </li>
         ))}
       </ul>
     </div>
   </section>
 
-  {/* ═══════════ 04 · the bench ═══════════ */}
-  <section class="ab" data-tone="ink">
-    <div class="ab__bg" aria-hidden="true">
-      <Image src={imgBoard} alt="" widths={[1000, 1600, 2000]} sizes="100vw"
-        quality={70} format="webp" loading="lazy" />
-      <span class="ab__tint"></span>
-    </div>
-
-    <div class="shell ab__in">
-      <p class="eb eb--inv" data-rise>
-        <i class="eb__rule" aria-hidden="true"></i>The difference
-      </p>
-      <h2 class="ab__h" data-rise style="--d:70ms">
-        Most shops replace the board.<br /><em>We repair it.</em>
-      </h2>
-      <p class="ab__p" data-rise style="--d:130ms">
-        A replacement mainboard is often most of the value of the machine. A
-        failed component on it is usually worth a fraction of that. Tracing
-        the fault to the component takes a bench, a meter and someone who
-        knows what they are looking at — which is what {years} years buys
-        you, and what almost nobody else in Oman does in-house.
-      </p>
-    </div>
-  </section>
-
-  {/* ═══════════ 05 · reach ═══════════ */}
-  <section class="ar section" data-tone="light">
-    <div class="shell">
-      <div class="ar__head" data-rise>
-        <div>
-          <p class="eb"><i class="eb__rule" aria-hidden="true"></i>Where we are</p>
-          <h2 class="ar__h">Four branches, one standard</h2>
-        </div>
-        <a class="ar__all" href="/branches">
-          Addresses and hours<Icon name="arrow" size={15} />
+  {/* ═══════════ 05 · presence ═══════════ */}
+  <section class="ap section" data-tone="light">
+    <div class="shell ap__grid">
+      <div class="ap__intro" data-rise>
+        <p class="eb"><i class="eb__rule" aria-hidden="true"></i>Our presence</p>
+        <h2 class="ap__h">Four branches,<br /><em>one standard.</em></h2>
+        <p class="ap__p">
+          Whichever branch you visit, you get the same diagnosis, the same
+          stock and the same team. A branch is not a lesser version of the
+          shop.
+        </p>
+        <a class="ap__ghost" href="/branches">
+          View all branches
+          <span aria-hidden="true"><Icon name="arrow" size={14} /></span>
         </a>
       </div>
 
-      <ul class="ar__grid">
-        {list.map((b, i) => (
+      <div class="ap__map" data-rise style="--d:90ms">
+        <svg viewBox={OMAN_VIEWBOX} width="290" height="389" role="img"
+          aria-label="Map of Oman showing Danat branches in Sohar, Al Hail, Ruwi and Salalah">
+          <path class="ap__land" d={OMAN_PATH} fill="#e3eee2" />
+          <text class="ap__wm" x="430" y="900" aria-hidden="true">OMAN</text>
+          {mapList.map((b, i) => (
+            <g class="ap__pin" style={`--i:${i}`}
+              transform={`translate(${OMAN_PINS[b.slug].x} ${OMAN_PINS[b.slug].y}) scale(1.45)`}>
+              <path fill="#2f6429"
+                d="M0,0 C-8,-11 -14,-18 -14,-25 A14,14 0 1 1 14,-25 C14,-18 8,-11 0,0 Z" />
+              <circle cx="0" cy="-25" r="5" fill="#ffffff"></circle>
+            </g>
+          ))}
+        </svg>
+
+        {mapList.map((b, i) => (
+          <a class="ap__chip" href={`/branches#${b.slug}`}
+            style={`--i:${i}; --x:${((OMAN_PINS[b.slug].x / W) * 100).toFixed(2)}%; --y:${((OMAN_PINS[b.slug].y / H) * 100).toFixed(2)}%; --dy:${nudge[b.slug]}`}>
+            {b.city.split(',')[0]}
+          </a>
+        ))}
+      </div>
+
+      <ul class="ap__list">
+        {branches.map((b, i) => (
           <li data-rise style={`--d:${i * 60}ms`}>
-            <a class="ar__card" href={`/branches#${b.slug}`}>
-              <span class="ar__i" aria-hidden="true"><Icon name="building" size={18} /></span>
-              <b>{b.name}</b>
-              <span class="ar__c">{b.city}</span>
-              {!b.verified && <span class="ar__todo">Address to confirm</span>}
+            <a class="bl" href={`/branches#${b.slug}`}>
+              <span class="bl__i" aria-hidden="true"><Icon name="building" size={18} /></span>
+              <span class="bl__t">
+                <b>{b.name}</b>
+                <em>{b.city}</em>
+              </span>
+              <span class="bl__go" aria-hidden="true"><Icon name="arrow" size={15} /></span>
             </a>
           </li>
         ))}
       </ul>
-
-      <p class="ar__brands" data-rise>
-        We carry <b>{brandCount}</b> brands, including HP, Dell, Lenovo,
-        Hikvision and Canon — all of them drawn from the company's own
-        catalogue rather than a logo wall.
-      </p>
     </div>
   </section>
 
-  {/* ═══════════ 06 · company + cta ═══════════ */}
+  {/* ═══════════ 06 · cta ═══════════ */}
   <section class="ac" data-tone="ink">
     <div class="shell ac__in">
-      <figure class="ac__fig" data-rise>
-        <Image src={imgTeam} alt="Danat support staff at the counter"
-          widths={[420, 700]} sizes="(min-width: 62rem) 30vw, 92vw"
-          quality={72} format="webp" loading="lazy" />
+      <div class="ac__copy">
+        <p class="eb eb--inv" data-rise>
+          <i class="eb__rule" aria-hidden="true"></i>Let's build a brighter tomorrow
+        </p>
+        <h2 class="ac__h" data-rise style="--d:70ms">Need expert advice?</h2>
+        <p class="ac__p" data-rise style="--d:130ms">
+          Our team is here to help you find the right solution.
+        </p>
+        <a class="btn" href="/contact" data-rise style="--d:190ms">
+          Contact us
+          <span class="btn__i" aria-hidden="true"><Icon name="arrow" size={15} /></span>
+        </a>
+      </div>
+
+      <figure class="ac__fig" aria-hidden="true">
+        <Image src={imgCta} alt="" widths={[420, 640]} sizes="(min-width: 62rem) 34vw, 70vw"
+          quality={80} format="webp" loading="lazy" />
       </figure>
 
-      <div>
-        <p class="eb eb--inv" data-rise>Registered as</p>
-        <p class="ac__legal" data-rise style="--d:70ms">{site.legalName}</p>
-        <p class="ac__sub" data-rise style="--d:120ms">
-          Trading as {site.nameFull}. Head counter on Computer Street, Ruwi,
-          PO Box 502, Postal Code 118, Sultanate of Oman.
-        </p>
-
-        <div class="ac__acts" data-rise style="--d:180ms">
-          <a class="ac__wa" href={whatsappLink()} target="_blank" rel="noopener noreferrer"
-            title="Chat on WhatsApp" aria-label="Chat with Danat on WhatsApp">
-            <Icon name="whatsapp" size={20} />
-          </a>
-          <a class="ac__link" href="/contact">Contact us<Icon name="arrow" size={14} /></a>
-        </div>
-      </div>
+      <p class="ac__script" aria-hidden="true">Technology<br />for a Brighter<br />Tomorrow</p>
     </div>
   </section>
 </PageLayout>
@@ -261,19 +361,11 @@ const brandCount = brands.flat().length;
   }
   .eb--mid { justify-content: center; }
   .eb--inv { color: var(--green-bright); }
-  .eb__dot {
-    width: 9px;
-    height: 9px;
-    flex: none;
-    border-radius: 50%;
-    background: var(--green);
-    box-shadow: 0 0 0 4px color-mix(in oklab, var(--green) 20%, transparent);
-  }
   .eb__rule {
     width: 28px;
     height: 1px;
     flex: none;
-    background: color-mix(in oklab, var(--green) 55%, transparent);
+    background: color-mix(in oklab, var(--green) 58%, transparent);
   }
   .eb--inv .eb__rule { background: color-mix(in oklab, var(--green-bright) 60%, transparent); }
 
@@ -281,8 +373,10 @@ const brandCount = brands.flat().length;
     position: relative;
     display: inline-flex;
     align-items: center;
+    align-self: flex-start;
     gap: 0.7rem;
-    padding: 0.55rem 0.55rem 0.55rem 1.5rem;
+    padding: 0.5rem 0.5rem 0.5rem 1.4rem;
+    border: 0;
     border-radius: 999px;
     /* white is 8.73:1 on #27551f and 4.90:1 on #3d7f35 — AA across the ramp */
     background: linear-gradient(100deg, #27551f, #3d7f35);
@@ -293,11 +387,20 @@ const brandCount = brands.flat().length;
     transition: transform var(--t2) var(--ease);
   }
   .btn:hover { transform: translateY(-2px); }
+  .btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(100deg, transparent 35%, rgb(255 255 255 / 0.22) 50%, transparent 65%);
+    transform: translate3d(-100%, 0, 0);
+    transition: transform var(--t4) var(--ease);
+  }
+  .btn:hover::after { transform: translate3d(100%, 0, 0); }
   .btn__i {
     display: grid;
     place-items: center;
-    width: 32px;
-    height: 32px;
+    width: 30px;
+    height: 30px;
     flex: none;
     border-radius: 50%;
     background: rgb(255 255 255 / 0.2);
@@ -305,12 +408,12 @@ const brandCount = brands.flat().length;
   }
   .btn:hover .btn__i { transform: translateX(3px); }
 
-  /* ───────── 01 · head ───────── */
+  /* ───────── 01 · hero ───────── */
 
   .ah {
     position: relative;
-    background: var(--white);
-    padding-block: clamp(6.5rem, 11vw, 9rem) clamp(2.5rem, 5vw, 4rem);
+    background: linear-gradient(175deg, #fbfdfb, #f1f7f1 62%, #fafcfa);
+    padding-block: clamp(6.5rem, 11vw, 9rem) clamp(3rem, 6vw, 4.5rem);
     overflow: hidden;
     isolation: isolate;
   }
@@ -318,11 +421,11 @@ const brandCount = brands.flat().length;
   .ah__aura span {
     position: absolute;
     border-radius: 50%;
-    background: radial-gradient(circle, color-mix(in oklab, var(--green) 26%, transparent), transparent 68%);
-    filter: blur(30px);
+    background: radial-gradient(circle, color-mix(in oklab, var(--green) 24%, transparent), transparent 68%);
+    filter: blur(32px);
   }
-  .ah__aura span:first-child { top: -28%; left: -12%; width: 44%; aspect-ratio: 1; opacity: 0.45; }
-  .ah__aura span:last-child { bottom: -34%; right: -10%; width: 42%; aspect-ratio: 1; opacity: 0.32; }
+  .ah__aura span:first-child { top: -26%; left: -14%; width: 44%; aspect-ratio: 1; opacity: 0.42; }
+  .ah__aura span:last-child { bottom: -30%; right: -12%; width: 46%; aspect-ratio: 1; opacity: 0.32; }
 
   .ah__crumb {
     display: flex;
@@ -342,20 +445,21 @@ const brandCount = brands.flat().length;
     align-items: center;
     margin-top: var(--s5);
   }
+  .ah__copy { display: grid; justify-items: start; }
 
   .ah__h {
     margin-top: var(--s4);
-    font-size: clamp(2.2rem, 5vw, 3.8rem);
-    line-height: 1.03;
-    letter-spacing: -0.042em;
+    font-size: clamp(2.2rem, 5vw, 3.6rem);
+    line-height: 1.02;
+    letter-spacing: -0.045em;
     font-weight: 700;
   }
   .ah__h em { font-style: normal; color: var(--green-deep); }
 
   .ah__p {
     margin-top: var(--s4);
-    max-width: 44ch;
-    font-size: var(--lead);
+    max-width: 38ch;
+    font-size: 0.9375rem;
     line-height: 1.62;
     color: var(--text-2);
   }
@@ -367,58 +471,132 @@ const brandCount = brands.flat().length;
     gap: var(--s4) var(--s5);
     margin-top: var(--s5);
   }
-  .ah__call {
-    font-family: var(--font-mono);
-    font-size: 0.9375rem;
-    color: var(--text);
-    border-bottom: 1px solid var(--line-light);
-    padding-bottom: 2px;
-    transition: border-color var(--t2) var(--ease);
-  }
-  .ah__call:hover { border-color: var(--green); }
 
-  .ah__fig { position: relative; }
-  .ah__fig :global(img) {
-    width: 100%;
-    height: auto;
-    aspect-ratio: 4 / 3;
-    object-fit: cover;
-    border-radius: 16px;
+  /* Held, not linked. There is no film yet. */
+  .ah__film {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    cursor: not-allowed;
   }
-  .ah__fig figcaption {
-    margin-top: 0.6rem;
-    font-size: 0.75rem;
+  .ah__film i {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    flex: none;
+    border-radius: 50%;
+    border: 1px dashed var(--line-light);
+    color: var(--text-3);
+  }
+  .ah__film > span { display: grid; font-size: 0.875rem; color: var(--text-2); }
+  .ah__film small {
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
     color: var(--text-3);
   }
 
-  /* ───────── 02 · figures ───────── */
+  /* ---- media stack ---- */
 
-  .af { background: var(--off); }
+  .ah__media { position: relative; }
+  .ah__fig :global(img) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 11;
+    object-fit: cover;
+    border-radius: 16px;
+  }
 
-  .af__grid {
+  .ah__mantra,
+  .ah__trust {
+    padding: 0.9rem 1.1rem;
+    border-radius: 14px;
+    background: rgb(255 255 255 / 0.94);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 18px 38px -26px rgb(10 30 12 / 0.55);
+  }
+
+  .ah__mantra {
+    margin-top: 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    line-height: 1.7;
+    color: var(--green-deep);
+  }
+  .ah__mantra b { color: var(--text); font-weight: 700; }
+
+  .ah__trust {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin-top: 0.6rem;
+  }
+  .ah__trust i {
     display: grid;
-    gap: clamp(1rem, 2.4vw, 1.75rem);
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    flex: none;
+    border-radius: 10px;
+    color: var(--green-deep);
+    background: var(--green-wash);
+  }
+  .ah__trust > span { display: grid; font-size: 0.875rem; font-weight: 600; }
+  .ah__trust small {
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+
+  /* ───────── 02 · numbers ───────── */
+
+  .an { background: var(--white); }
+
+  .an__grid {
+    display: grid;
+    gap: clamp(0.75rem, 1.8vw, 1.15rem);
     margin-top: clamp(1.75rem, 4vw, 2.75rem);
   }
-  .af__grid > div {
-    padding: 1.25rem 1.3rem;
+
+  .nc {
+    padding: 1.3rem 1.35rem;
     border: 1px solid var(--line-light);
-    border-radius: 14px;
+    border-radius: 16px;
     background: var(--white);
+    transition: transform var(--t2) var(--ease), box-shadow var(--t2) var(--ease);
   }
-  .af__grid dt {
-    font-size: clamp(1.7rem, 3vw, 2.4rem);
+  .nc:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 22px 40px -30px rgb(10 30 12 / 0.5);
+  }
+  .nc__i {
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    color: var(--green-deep);
+    background: var(--green-wash);
+  }
+  .nc dt {
+    margin-top: 0.9rem;
+    font-size: clamp(1.6rem, 2.8vw, 2.1rem);
     font-weight: 700;
     letter-spacing: -0.04em;
     line-height: 1;
     font-variant-numeric: tabular-nums;
   }
-  .af__grid dd { margin-top: 0.4rem; font-size: 0.875rem; color: var(--text-2); }
-  .af__grid small {
+  .nc dd { margin-top: 0.4rem; font-size: 0.875rem; color: var(--text-2); }
+  .nc small {
     display: block;
-    margin-top: 0.5rem;
-    padding-top: 0.5rem;
-    border-top: 1px solid var(--line-light);
+    margin-top: 0.45rem;
     font-family: var(--font-mono);
     font-size: 0.5625rem;
     letter-spacing: 0.1em;
@@ -426,20 +604,167 @@ const brandCount = brands.flat().length;
     color: var(--text-3);
   }
 
-  .af__note {
-    max-width: 62ch;
-    margin: clamp(1.5rem, 3vw, 2.25rem) auto 0;
-    text-align: center;
-    font-size: 0.875rem;
-    line-height: 1.6;
-    color: var(--text-3);
+  /* A figure nobody has supplied. Held open, never invented. */
+  .nc[data-pending] { background: var(--off); }
+  .nc__blank {
+    display: inline-block;
+    width: 3.2ch;
+    height: 0.62em;
+    border-bottom: 2px dashed #b9bfc5;
   }
 
-  /* ───────── 03 · principles ───────── */
+  /* ───────── 03 · story ───────── */
 
-  .ap { background: var(--white); }
-  .ap__grid { display: grid; gap: clamp(1.75rem, 4vw, 3rem); }
+  .as { background: var(--off); }
+  .as__grid { position: relative; display: grid; gap: clamp(2rem, 4vw, 3rem); }
 
+  .as__intro { display: grid; justify-items: start; }
+  .as__h {
+    margin-top: var(--s4);
+    font-size: clamp(1.7rem, 3.2vw, 2.4rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1.08;
+  }
+  .as__h em { font-style: normal; color: var(--green-deep); }
+  .as__p {
+    margin-top: var(--s4);
+    margin-bottom: var(--s5);
+    max-width: 36ch;
+    font-size: 0.9375rem;
+    line-height: 1.62;
+    color: var(--text-2);
+  }
+
+  .as__line { display: grid; gap: clamp(1.1rem, 2.4vw, 1.6rem); }
+  .as__line li {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto 4.5rem minmax(0, 1fr);
+    align-items: start;
+    gap: 0 var(--s4);
+    padding-bottom: clamp(1.1rem, 2.4vw, 1.6rem);
+  }
+  /* The rail runs between the dots, not past the last one. */
+  .as__line li:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: 1.1rem;
+    bottom: -0.3rem;
+    width: 1px;
+    background: color-mix(in oklab, var(--green) 40%, transparent);
+  }
+  .as__line li:last-child { padding-bottom: 0; }
+
+  .as__dot {
+    width: 11px;
+    height: 11px;
+    margin-top: 0.3rem;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--green) 18%, transparent);
+  }
+  .as__line li[data-pending] .as__dot {
+    background: #fff;
+    box-shadow: inset 0 0 0 2px #b9bfc5;
+  }
+
+  .as__yr {
+    font-size: 0.9375rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+  .as__q {
+    font-style: normal;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    color: #4a5560;
+  }
+
+  .as__t h3 { font-size: 0.9375rem; font-weight: 700; letter-spacing: -0.02em; }
+  .as__t p {
+    margin-top: 0.25rem;
+    max-width: 46ch;
+    font-size: 0.8125rem;
+    line-height: 1.6;
+    color: var(--text-2);
+  }
+  .as__t small {
+    display: inline-block;
+    margin-top: 0.45rem;
+    padding: 0.18rem 0.5rem;
+    border-radius: 999px;
+    background: #eceef0;
+    box-shadow: inset 0 0 0 1px #d7dade;
+    font-family: var(--font-mono);
+    font-size: 0.5rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #4a5560;
+  }
+
+  .as__script {
+    font-family: var(--font-serif, Georgia, serif);
+    font-style: italic;
+    font-size: clamp(1.05rem, 1.8vw, 1.5rem);
+    line-height: 1.3;
+    color: var(--green-deep);
+    rotate: -7deg;
+    justify-self: center;
+    pointer-events: none;
+  }
+
+  /* ───────── 04 · values ───────── */
+
+  .av { background: var(--white); }
+  .av__h {
+    margin-top: var(--s4);
+    font-size: clamp(1.7rem, 3.2vw, 2.4rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+  }
+  .av__h em { font-style: normal; color: var(--clay-deep); }
+
+  .av__grid {
+    display: grid;
+    gap: clamp(1.25rem, 3vw, 2rem);
+    margin-top: clamp(1.75rem, 4vw, 2.75rem);
+  }
+  .av__grid li { display: grid; justify-items: start; }
+  .av__i {
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    color: var(--green-deep);
+    background: var(--green-wash);
+  }
+  .av__grid b {
+    margin-top: 0.85rem;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+  }
+  .av__grid span {
+    margin-top: 0.4rem;
+    max-width: 30ch;
+    font-size: 0.875rem;
+    line-height: 1.58;
+    color: var(--text-2);
+  }
+
+  /* ───────── 05 · presence ───────── */
+
+  .ap { background: var(--off); }
+  .ap__grid { display: grid; gap: clamp(1.75rem, 4vw, 3rem); align-items: center; }
+
+  .ap__intro { display: grid; justify-items: start; }
   .ap__h {
     margin-top: var(--s4);
     font-size: clamp(1.7rem, 3.2vw, 2.4rem);
@@ -447,125 +772,94 @@ const brandCount = brands.flat().length;
     letter-spacing: -0.04em;
     line-height: 1.08;
   }
-  .ap__h em { font-style: normal; color: var(--clay-deep); }
-
+  .ap__h em { font-style: normal; color: var(--green-deep); }
   .ap__p {
     margin-top: var(--s4);
-    max-width: 32ch;
+    margin-bottom: var(--s5);
+    max-width: 34ch;
     font-size: 0.9375rem;
-    line-height: 1.6;
-    color: var(--text-2);
-  }
-
-  .ap__list { display: grid; gap: clamp(1rem, 2.2vw, 1.5rem); }
-  .ap__list li {
-    display: flex;
-    gap: var(--s4);
-    padding-bottom: clamp(1rem, 2.2vw, 1.5rem);
-    border-bottom: 1px solid var(--line-light);
-  }
-  .ap__list li:last-child { border-bottom: 0; padding-bottom: 0; }
-
-  .ap__i {
-    display: grid;
-    place-items: center;
-    width: 44px;
-    height: 44px;
-    flex: none;
-    border-radius: 12px;
-    color: var(--green-deep);
-    background: var(--green-wash);
-  }
-  .ap__list h3 { font-size: 1.05rem; font-weight: 700; letter-spacing: -0.025em; }
-  .ap__list p {
-    margin-top: 0.35rem;
-    max-width: 52ch;
-    font-size: 0.875rem;
     line-height: 1.62;
     color: var(--text-2);
   }
-
-  /* ───────── 04 · the bench ───────── */
-
-  .ab {
-    position: relative;
-    color: #fff;
-    padding-block: clamp(3rem, 7vw, 5.5rem);
-    overflow: hidden;
-    isolation: isolate;
-  }
-  .ab__bg { position: absolute; inset: 0; z-index: 0; }
-  .ab__bg :global(img) {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: 55% 45%;
-  }
-  /* Measured: white on this ramp clears AA at every stop. */
-  .ab__tint {
-    position: absolute;
-    inset: 0;
-    background:
-      linear-gradient(100deg, rgb(8 10 12 / 0.93) 0%, rgb(8 10 12 / 0.84) 46%, rgb(8 10 12 / 0.62) 100%),
-      linear-gradient(to top, rgb(8 10 12 / 0.5), transparent 46%);
-  }
-  .ab__in { position: relative; z-index: 1; }
-
-  .ab__h {
-    margin-top: var(--s4);
-    font-size: clamp(1.7rem, 3.4vw, 2.6rem);
-    font-weight: 700;
-    letter-spacing: -0.04em;
-    line-height: 1.08;
-  }
-  .ab__h em { font-style: normal; color: var(--green-bright); }
-  .ab__p {
-    margin-top: var(--s4);
-    max-width: 58ch;
-    font-size: 0.9375rem;
-    line-height: 1.65;
-    color: rgb(255 255 255 / 0.84);
-  }
-
-  /* ───────── 05 · reach ───────── */
-
-  .ar { background: var(--off); }
-
-  .ar__head {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: var(--s4);
-  }
-  .ar__h {
-    margin-top: var(--s4);
-    font-size: clamp(1.5rem, 2.8vw, 2.1rem);
-    font-weight: 700;
-    letter-spacing: -0.035em;
-  }
-  .ar__all {
+  .ap__ghost {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.6rem;
+    padding: 0.7rem 0.7rem 0.7rem 1.3rem;
+    border: 1px solid var(--line-light);
+    border-radius: 999px;
+    background: var(--white);
     font-size: 0.875rem;
     font-weight: 600;
-    color: var(--green-deep);
-    border-bottom: 1px solid transparent;
     transition: border-color var(--t2) var(--ease);
   }
-  .ar__all:hover { border-color: var(--green); }
-
-  .ar__grid {
+  .ap__ghost:hover { border-color: var(--green); }
+  .ap__ghost span {
     display: grid;
-    gap: clamp(0.75rem, 1.6vw, 1rem);
-    margin-top: clamp(1.5rem, 3vw, 2.25rem);
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: var(--green-wash);
+    color: var(--green-deep);
+    transition: transform var(--t2) var(--ease);
   }
-  .ar__card {
-    position: relative;
-    display: grid;
-    height: 100%;
-    padding: 1.2rem 1.3rem;
+  .ap__ghost:hover span { transform: translateX(3px); }
+
+  /* ---- map ---- */
+
+  .ap__map { position: relative; width: 100%; max-width: 17rem; justify-self: center; }
+  .ap__map svg { display: block; width: 100%; height: auto; overflow: visible; }
+  /* Decorative — aria-hidden, and the map carries its own label. But at
+     #c7d6c6 it measured 1.38:1 against the land, which is not a faint
+     watermark, it is an invisible one. This is 3.0:1. */
+  .ap__wm { fill: #72906f; font-size: 76px; font-weight: 600; letter-spacing: 13px; }
+
+  .ap__land { opacity: 0; transition: opacity 760ms var(--ease) 100ms; }
+  .ap__map[data-in] .ap__land { opacity: 1; }
+
+  .ap__pin {
+    --pd: calc(720ms + var(--i) * 130ms);
+    opacity: 0;
+    scale: 0.3;
+    transform-box: fill-box;
+    transform-origin: bottom center;
+    transition:
+      opacity 320ms var(--ease) var(--pd),
+      scale 540ms cubic-bezier(0.3, 1.6, 0.5, 1) var(--pd);
+  }
+  .ap__map[data-in] .ap__pin { opacity: 1; scale: 1; }
+
+  .ap__chip {
+    position: absolute;
+    top: calc(var(--y) + var(--dy, 0%));
+    left: var(--x);
+    translate: 1.3rem -145%;
+    padding: 0.22rem 0.6rem;
+    border-radius: 999px;
+    background: #fff;
+    box-shadow: 0 6px 16px -9px rgb(10 30 12 / 0.5);
+    font-size: 0.6875rem;
+    font-weight: 600;
+    white-space: nowrap;
+    color: var(--text);
+    opacity: 0;
+    transition:
+      opacity 320ms var(--ease) calc(880ms + var(--i) * 130ms),
+      color var(--t2) var(--ease),
+      background-color var(--t2) var(--ease);
+  }
+  .ap__map[data-in] .ap__chip { opacity: 1; }
+  .ap__chip:hover { background: var(--green-deep); color: #fff; }
+
+  /* ---- branch list ---- */
+
+  .ap__list { display: grid; gap: 0.6rem; }
+  .bl {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.9rem 1rem;
     border: 1px solid var(--line-light);
     border-radius: 14px;
     background: var(--white);
@@ -574,139 +868,140 @@ const brandCount = brands.flat().length;
       border-color var(--t2) var(--ease),
       box-shadow var(--t2) var(--ease);
   }
-  .ar__card:hover {
-    transform: translateY(-4px);
+  .bl:hover {
+    transform: translateY(-3px);
     border-color: color-mix(in oklab, var(--green) 32%, var(--line-light));
-    box-shadow: 0 22px 40px -30px rgb(0 0 0 / 0.5);
+    box-shadow: 0 20px 38px -30px rgb(10 30 12 / 0.5);
   }
-  .ar__i {
+  .bl__i {
     display: grid;
     place-items: center;
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
+    width: 38px;
+    height: 38px;
+    flex: none;
+    border-radius: 11px;
     color: var(--green-deep);
     background: var(--green-wash);
   }
-  .ar__card b {
-    margin-top: 0.8rem;
-    font-size: 1rem;
-    font-weight: 700;
-    letter-spacing: -0.025em;
-  }
-  .ar__c {
-    margin-top: 0.2rem;
-    font-family: var(--font-mono);
-    font-size: 0.5625rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
+  .bl__t { display: grid; min-width: 0; }
+  .bl__t b { font-size: 0.9375rem; font-weight: 700; letter-spacing: -0.02em; }
+  .bl__t em {
+    margin-top: 0.1rem;
+    font-style: normal;
+    font-size: 0.75rem;
     color: var(--text-3);
   }
-  /* Pending, not a warning — the address simply has not arrived yet. */
-  .ar__todo {
-    justify-self: start;
-    margin-top: 0.6rem;
-    padding: 0.2rem 0.5rem;
-    border-radius: 999px;
-    font-size: 0.625rem;
-    font-weight: 600;
-    color: #4a5560;
-    background: #eceef0;
-    box-shadow: inset 0 0 0 1px #d7dade;
+  .bl__go {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    flex: none;
+    margin-left: auto;
+    border-radius: 50%;
+    color: var(--green-deep);
+    transition: transform var(--t2) var(--ease);
   }
+  .bl:hover .bl__go { transform: translateX(3px); }
 
-  .ar__brands {
-    max-width: 58ch;
-    margin-top: clamp(1.5rem, 3vw, 2.25rem);
-    font-size: 0.875rem;
-    line-height: 1.6;
-    color: var(--text-3);
-  }
-  .ar__brands b { color: var(--text); font-weight: 700; }
-
-  /* ───────── 06 · company ───────── */
+  /* ───────── 06 · cta ───────── */
 
   .ac {
-    background: var(--ink);
+    position: relative;
+    background: linear-gradient(105deg, #0f2d16, #1c4423 55%, #0f2d16);
     color: #fff;
-    padding-block: clamp(2.5rem, 5vw, 4rem);
+    padding-block: clamp(2.5rem, 5vw, 3.75rem);
+    overflow: hidden;
   }
-  .ac__in { display: grid; gap: clamp(1.5rem, 3vw, 2.5rem); align-items: center; }
+  .ac__in { display: grid; gap: var(--s5); align-items: center; }
+  .ac__copy { display: grid; justify-items: start; }
+
+  .ac__h {
+    margin-top: var(--s4);
+    font-size: clamp(1.6rem, 3vw, 2.3rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1.06;
+  }
+  .ac__p {
+    margin-top: var(--s4);
+    margin-bottom: var(--s5);
+    max-width: 34ch;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: rgb(255 255 255 / 0.78);
+  }
+  .ac .btn { background: #fff; color: #0f2d16; }
+  .ac .btn__i { background: rgb(15 45 22 / 0.14); }
+
   .ac__fig :global(img) {
     width: 100%;
     height: auto;
-    aspect-ratio: 5 / 4;
-    object-fit: cover;
-    border-radius: 14px;
+    object-fit: contain;
   }
 
-  .ac__legal {
-    margin-top: var(--s4);
-    font-size: clamp(1.15rem, 2.2vw, 1.6rem);
-    font-weight: 700;
-    letter-spacing: -0.03em;
+  .ac__script {
+    font-family: var(--font-serif, Georgia, serif);
+    font-style: italic;
+    font-size: clamp(1rem, 1.7vw, 1.35rem);
+    line-height: 1.3;
+    color: rgb(255 255 255 / 0.62);
+    rotate: -7deg;
+    justify-self: center;
+    pointer-events: none;
   }
-  .ac__sub {
-    margin-top: 0.45rem;
-    max-width: 44ch;
-    font-size: 0.875rem;
-    line-height: 1.6;
-    color: rgb(255 255 255 / 0.72);
-  }
-
-  .ac__acts {
-    display: flex;
-    align-items: center;
-    gap: var(--s4);
-    margin-top: var(--s5);
-  }
-  .ac__wa {
-    display: grid;
-    place-items: center;
-    width: 46px;
-    height: 46px;
-    flex: none;
-    border-radius: 50%;
-    /* A white mark on WhatsApp green is 1.98:1, under the 3:1 WCAG asks
-       of a non-text graphic. This green is 5.97:1. */
-    background: #0e7333;
-    color: #fff;
-    transition: background-color var(--t2) var(--ease), transform var(--t2) var(--ease);
-  }
-  .ac__wa:hover { background: #0a5c29; transform: translateY(-2px); }
-
-  .ac__link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.45rem;
-    font-size: 0.9375rem;
-    font-weight: 600;
-    color: #fff;
-    border-bottom: 1px solid rgb(255 255 255 / 0.4);
-    padding-bottom: 2px;
-    transition: color var(--t2) var(--ease), border-color var(--t2) var(--ease);
-  }
-  .ac__link:hover { color: var(--green-bright); border-color: var(--green-bright); }
 
   /* ───────── responsive ───────── */
 
   @media (min-width: 40rem) {
-    .af__grid { grid-template-columns: repeat(2, 1fr); }
-    .ar__grid { grid-template-columns: repeat(2, 1fr); }
+    .an__grid { grid-template-columns: repeat(2, 1fr); }
+    .av__grid { grid-template-columns: repeat(2, 1fr); }
   }
 
   @media (min-width: 62rem) {
-    .ah__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 0.95fr); }
-    .af__grid { grid-template-columns: repeat(4, 1fr); }
-    .ap__grid { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.4fr); }
-    .ar__grid { grid-template-columns: repeat(4, 1fr); }
-    .ac__in { grid-template-columns: minmax(0, 0.42fr) minmax(0, 1fr); }
+    .ah__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); }
+    .ah__media {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: start;
+      gap: 0;
+    }
+    .ah__fig { grid-column: 1 / -1; grid-row: 1; }
+    .ah__mantra {
+      grid-column: 2;
+      grid-row: 1;
+      justify-self: end;
+      width: 11rem;
+      margin: 1.5rem -1.5rem 0 0;
+    }
+    .ah__trust {
+      grid-column: 2;
+      grid-row: 1;
+      align-self: end;
+      justify-self: end;
+      width: 14rem;
+      margin: 0 -2.5rem -1.5rem 0;
+    }
+
+    .an__grid { grid-template-columns: repeat(4, 1fr); }
+    .av__grid { grid-template-columns: repeat(4, 1fr); }
+
+    .as__grid { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.2fr) minmax(0, 0.5fr); }
+    .ap__grid { grid-template-columns: minmax(0, 0.9fr) minmax(0, 0.8fr) minmax(0, 1fr); }
+    .ac__in { grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr) auto; }
+  }
+
+  @media (max-width: 62rem) {
+    .as__script, .ac__script { rotate: none; }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .btn, .btn:hover, .ar__card, .ar__card:hover, .ac__wa, .ac__wa:hover {
-      transform: none;
+    .ap__map :is(.ap__land, .ap__pin, .ap__chip) {
+      opacity: 1;
+      scale: 1;
       transition: none;
     }
+    .btn, .btn:hover, .nc, .nc:hover, .bl, .bl:hover { transform: none; transition: none; }
+    .btn::after { display: none; }
   }
 </style>
