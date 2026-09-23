@@ -348,7 +348,7 @@ const values = [
 
   .lh__h {
     margin-top: var(--s4);
-    font-size: clamp(2.1rem, 4.6vw, 3.4rem);
+    font-size: clamp(2.1rem, 4.2vw, 3.1rem);
     font-weight: 700;
     letter-spacing: -0.045em;
     line-height: 1.03;
@@ -373,7 +373,7 @@ const values = [
   .lh__shot { position: relative; display: grid; justify-items: center; }
   .lh__img {
     width: 100%;
-    max-width: 24rem;
+    max-width: 26rem;
     height: auto;
     aspect-ratio: 660 / 797;
     object-fit: cover;
@@ -435,14 +435,15 @@ const values = [
     background: var(--green);
   }
   .lh__quote {
-    max-width: 26ch;
+    max-width: 30ch;
     margin-top: var(--s4);
     font-size: 0.9375rem;
     line-height: 1.6;
     color: var(--text-2);
   }
   .lh__chip {
-    display: inline-flex;
+    display: flex;
+    justify-content: flex-start;
     align-items: center;
     gap: 0.6rem;
     margin-top: var(--s5);
@@ -652,7 +653,7 @@ const values = [
   }
 
   @media (min-width: 62rem) {
-    .lh__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr) minmax(0, 0.72fr); }
+    .lh__grid { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr) minmax(0, 0.9fr); }
     .vl__in { grid-template-columns: minmax(0, 1fr) minmax(0, 0.34fr); }
     .vl__list { grid-template-columns: repeat(4, minmax(0, 1fr)); }
     .st__head { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.3fr); }
