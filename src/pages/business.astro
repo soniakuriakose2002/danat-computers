@@ -10,6 +10,9 @@ import imgRack from '@assets/photos/network-eng.jpg';
 import imgPrinter from '@assets/photos/printer-machine.jpg';
 import imgCctv from '@assets/photos/cctv-white.jpg';
 import imgPatch from '@assets/photos/network-patch.jpg';
+import imgDrive from '@assets/photos/datarecovery-drive.jpg';
+import imgAgent from '@assets/photos/support-agent.jpg';
+import imgBoard from '@assets/photos/repair-board.jpg';
 
 /**
  * BUSINESS SOLUTIONS — built to the client's mockup.
@@ -38,15 +41,19 @@ const trust = [
   { icon: 'pin', a: 'Multiple branches', b: 'Across Oman' },
 ];
 
-/** The ecosystem ring, clockwise from the top. */
-const ring = [
-  { icon: 'laptop', t: 'Computer support', p: 'Sales, repair and technical support' },
-  { icon: 'printer', t: 'Printer services', p: 'Servicing and repair for all brands' },
-  { icon: 'camera', t: 'CCTV solutions', p: 'Installation and maintenance' },
-  { icon: 'drive', t: 'Data recovery', p: 'Recover lost or inaccessible data' },
-  { icon: 'gear', t: 'Software support', p: 'Troubleshoot software and keep working' },
-  { icon: 'chip', t: 'Hardware support', p: 'Diagnose and fix hardware problems' },
-  { icon: 'network', t: 'Networking', p: 'Setup and troubleshooting for connectivity' },
+/**
+ * The seven services, in the order the client's mockup lists them.
+ * Same seven the ecosystem ring carried — the wording is unchanged,
+ * only the way they are presented.
+ */
+const deck = [
+  { icon: 'laptop', img: imgOffice, t: 'Computer support', p: 'Sales, repair and technical support for business.' },
+  { icon: 'printer', img: imgPrinter, t: 'Printer services', p: 'Servicing and repair for all brands.' },
+  { icon: 'drive', img: imgDrive, t: 'Data recovery', p: 'Recover lost or inaccessible data.' },
+  { icon: 'gear', img: imgAgent, t: 'Software support', p: 'Troubleshoot software and keep you working.' },
+  { icon: 'network', img: imgPatch, t: 'Networking', p: 'Setup and troubleshooting for connectivity.' },
+  { icon: 'camera', img: imgCctv, t: 'CCTV solutions', p: 'Installation and maintenance for safer premises.' },
+  { icon: 'chip', img: imgBoard, t: 'Hardware support', p: 'Diagnose and fix hardware problems.' },
 ];
 
 /** Only what the rest of the site already states as policy. */
@@ -125,70 +132,97 @@ const figures = [
     </div>
   </section>
 
-  {/* ══════ 02 · ecosystem ══════ */}
-  <section class="eco section">
-    <span class="eco__wash" aria-hidden="true"></span>
+  {/* ══════ 02 · the stage ══════ */}
+  <section class="bs">
+    <span class="bs__sky" aria-hidden="true"></span>
 
-    <div class="shell eco__head">
-      <div>
+    <div class="shell bs__grid">
+      {/* ── left ── */}
+      <div class="bs__copy">
         <p class="eb" data-rise>A complete ecosystem</p>
-        <h2 class="eco__h" data-rise style="--d:70ms">
+
+        <h2 class="bs__h" data-rise style="--d:70ms">
           Business Solutions<br />for a Connected <em>Tomorrow.</em>
         </h2>
-        <p class="eco__p" data-rise style="--d:130ms">
+
+        <p class="bs__p" data-rise style="--d:130ms">
           From computers and printers to CCTV, networking and data recovery,
           Danat provides end-to-end technology support for businesses of all
           sizes.
         </p>
+
+        <p class="bs__aside" data-rise style="--d:190ms">
+          Different businesses. Different needs.<br />
+          One trusted partner &mdash; {site.nameFull}.
+        </p>
+
+        <p class="bs__script" aria-hidden="true">
+          People<br />Technology<br />Progress<br />Together
+          <svg viewBox="0 0 150 14" fill="none">
+            <path d="M4 10C38 3 114 2 146 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+          </svg>
+        </p>
       </div>
-      <p class="eco__aside" data-rise style="--d:190ms">
-        Different businesses. Different needs.<br />
-        One trusted partner — {site.nameFull}.
-      </p>
-    </div>
 
-    <div class="shell eco__stage">
-      <p class="eco__note eco__note--l" aria-hidden="true">People<br />Technology<br />Progress<br />Together</p>
+      {/* ── the fanned deck ── */}
+      <div class="bs__stage" data-deck>
+        <div class="bs__deck">
+          {deck.map((d, i) => (
+            <article class="bc" data-i={i}>
+              <button class="bc__hit" type="button" data-goto={i}
+                aria-label={`Show ${d.t}`}></button>
 
-      <div class="ring" data-rise style="--d:120ms">
-        <svg class="ring__guide" viewBox="0 0 100 100" fill="none" aria-hidden="true">
-          {/* A spoke per node, drawn out from the hub on reveal. */}
-          {ring.map((_, i) => {
-            const a = ((i * 360) / ring.length - 90) * (Math.PI / 180);
-            return (
-              <line class="ring__spoke" style={`--i:${i}`}
-                x1={50 + Math.cos(a) * 17} y1={50 + Math.sin(a) * 17}
-                x2={50 + Math.cos(a) * 38} y2={50 + Math.sin(a) * 38}
-                stroke="currentColor" stroke-width="0.4" pathLength="1" />
-            );
-          })}
-          <circle class="ring__orbit" cx="50" cy="50" r="38"
-            stroke="currentColor" stroke-width="0.35" stroke-dasharray="1.2 2.4" />
-        </svg>
+              <figure class="bc__shot">
+                <span class="bc__badge" aria-hidden="true"><Icon name={d.icon} size={19} /></span>
+                <Image src={d.img} alt="" widths={[380, 620]} sizes="320px"
+                  quality={76} format="webp"
+                  loading={i === 0 ? 'eager' : 'lazy'}
+                  fetchpriority={i === 0 ? 'high' : undefined} />
+                <figcaption>{String(i + 1).padStart(2, '0')}</figcaption>
+              </figure>
 
-        {/* A signal running the orbit — the ring is a network, so
-            something should be moving on it. */}
-        <div class="ring__run" aria-hidden="true"><span></span></div>
-
-        <div class="ring__hub">
-          <span class="ring__pulse" aria-hidden="true"></span>
-          <Logo />
-          <span>Business<br />technology<br />solutions</span>
+              <div class="bc__body">
+                <h2 class="bc__t">{d.t}</h2>
+                <p class="bc__p">{d.p}</p>
+                <span class="bc__go">Learn more<Icon name="arrow" size={14} /></span>
+              </div>
+            </article>
+          ))}
         </div>
 
-        {ring.map((r, i) => (
-          <div class="ring__slot" style={`--th:${(i * 360) / ring.length}deg; --i:${i}`}>
-            <div class="node">
-              <i aria-hidden="true"><Icon name={r.icon} size={20} /></i>
-              <b>{r.t}</b>
-              <em>{r.p}</em>
-            </div>
-          </div>
-        ))}
+        <div class="bs__dots" aria-hidden="true">
+          {deck.map((_, i) => <i data-on={i === 0 ? '' : undefined}></i>)}
+        </div>
       </div>
 
-      <p class="eco__note eco__note--r" aria-hidden="true">Keeping<br />Oman's Businesses<br />Connected</p>
+      {/* ── right rail ── */}
+      <div class="bs__rail">
+        <p class="bs__script bs__script--r" aria-hidden="true">
+          Keeping<br />Oman's Businesses<br />Connected
+          <svg viewBox="0 0 150 14" fill="none">
+            <path d="M4 10C38 3 114 2 146 7" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+          </svg>
+        </p>
+
+        <ol class="bs__idx">
+          {deck.map((d, i) => (
+            <li>
+              <button type="button" data-goto={i} data-on={i === 0 ? '' : undefined}>
+                <b>{String(i + 1).padStart(2, '0')}</b>
+                <i class="bs__dot" aria-hidden="true"></i>
+                <span>{d.t}</span>
+              </button>
+            </li>
+          ))}
+        </ol>
+
+        <p class="bs__scroll" aria-hidden="true">
+          <span class="bs__mouse"></span>
+          Scroll<br />to explore
+        </p>
+      </div>
     </div>
+
   </section>
 
   {/* ══════ 03 · process ══════ */}
@@ -335,6 +369,67 @@ const figures = [
   <VideoModal />
 </PageLayout>
 
+<script is:inline>
+  (() => {
+    const stage = document.querySelector('[data-deck]');
+    if (!stage) return;
+
+    const cards = [...stage.querySelectorAll('.bc')];
+    const dots = [...stage.querySelectorAll('.bs__dots i')];
+    const idx = [...document.querySelectorAll('.bs__idx [data-goto]')];
+    const n = cards.length;
+    if (!n) return;
+
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let at = 0;
+    let timer = null;
+
+    const show = (next) => {
+      at = ((next % n) + n) % n;
+      cards.forEach((c, i) => {
+        // Signed distance wrapped the short way round, so the deck turns
+        // through the nearer edge instead of unwinding the whole fan.
+        let o = i - at;
+        if (o > n / 2) o -= n;
+        if (o < -n / 2) o += n;
+        const a = Math.abs(o);
+        c.style.setProperty('--o', String(o));
+        c.style.setProperty('--a', String(a));
+        c.dataset.a = String(a);
+        // Falling z-index is what makes each neighbour reveal a fixed
+        // strip of itself rather than being buried by the one outside it.
+        c.style.zIndex = String(n - a);
+        c.toggleAttribute('data-on', o === 0);
+        c.toggleAttribute('data-far', a >= 3);
+        // A card on the left reveals its left edge; one on the right
+        // reveals its right edge, because each is overlapped from the
+        // side facing the centre. So the contents mirror, or half the
+        // deck hides its own title behind the active card.
+        c.dataset.side = o === 0 ? 'c' : o > 0 ? 'r' : 'l';
+      });
+      dots.forEach((d, i) => d.toggleAttribute('data-on', i === at));
+      idx.forEach((b, i) => b.toggleAttribute('data-on', i === at));
+    };
+
+    const stop = () => { if (timer) clearInterval(timer); timer = null; };
+    const start = () => {
+      if (!reduced && !timer) timer = setInterval(() => show(at + 1), 4600);
+    };
+
+    document.querySelectorAll('[data-goto]').forEach((b) => {
+      b.addEventListener('click', () => { show(Number(b.dataset.goto)); stop(); start(); });
+    });
+
+    stage.addEventListener('pointerenter', stop);
+    stage.addEventListener('pointerleave', start);
+    stage.addEventListener('focusin', stop);
+    stage.addEventListener('focusout', start);
+
+    show(0);
+    start();
+  })();
+</script>
+
 <style>
   /* ───── shared ───── */
   .eb {
@@ -373,8 +468,8 @@ const figures = [
   }
   .btn:hover .btn__i { transform: translateX(3px); }
 
+  .bs__script,
   .hero__script,
-  .eco__note,
   .tm__fig figcaption {
     font-family: var(--font-serif, Georgia, serif);
     font-style: italic;
@@ -412,39 +507,6 @@ const figures = [
     align-items: center;
     gap: var(--s4) var(--s5);
     margin-top: var(--s5);
-  }
-
-  .film {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.7rem;
-    padding: 0;
-    border: 0;
-    background: none;
-    cursor: pointer;
-    text-align: left;
-  }
-  .film i {
-    display: grid;
-    place-items: center;
-    width: 36px;
-    height: 36px;
-    flex: none;
-    border-radius: 50%;
-    background: var(--green-deep);
-    color: #fff;
-    transition: transform var(--t2) var(--ease);
-  }
-  .film:hover i { transform: scale(1.08); }
-  .film:focus-visible i { outline: 2px solid var(--green-deep); outline-offset: 3px; }
-  .film > span { display: grid; font-size: 0.875rem; font-weight: 600; }
-  .film small {
-    font-family: var(--font-mono);
-    font-size: 0.5625rem;
-    font-weight: 400;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--text-3);
   }
 
   .hero__trust {
@@ -496,220 +558,348 @@ const figures = [
     aspect-ratio: auto;
   }
 
-  /* ───── 02 ecosystem ───── */
-  .eco {
+  /* ═════ 02 · the stage ═════
+     A fanned deck on a real perspective. Card centres are spaced about
+     10.5rem apart while each card is 19rem wide, and z-index falls away
+     from the active one — so every neighbour reveals a fixed strip of
+     its own left edge rather than being half-buried. That is what keeps
+     the titles readable instead of sliced.
+
+     Offsets come from --o (signed, for direction) and --a (absolute,
+     for depth and scale). Both are set in script: CSS has no portable
+     abs() yet, and deriving one from the other in calc is not worth the
+     trouble when the script already knows both. */
+  .bs {
     position: relative;
-    background: linear-gradient(180deg, #fafdfa, #f1f8f1 60%, #f8fbf8);
+    padding-block: clamp(3.5rem, 7vw, 6rem);
     overflow: hidden;
     isolation: isolate;
   }
-  .eco__wash {
-    position: absolute;
-    z-index: -1;
-    left: 50%;
-    top: 58%;
-    translate: -50% -50%;
-    width: min(56rem, 96vw);
-    aspect-ratio: 1;
-    border-radius: 50%;
-    background: radial-gradient(circle, color-mix(in oklab, var(--green) 12%, transparent), transparent 70%);
-    filter: blur(30px);
-  }
-
-  .eco__head { display: grid; gap: var(--s5); align-items: end; }
-  .eco__h {
-    margin-top: var(--s4);
-    font-size: clamp(1.7rem, 3.2vw, 2.4rem);
-    font-weight: 700;
-    letter-spacing: -0.04em;
-    line-height: 1.12;
-  }
-  .eco__h em { font-style: normal; color: var(--green-deep); }
-  .eco__p {
-    margin-top: var(--s4);
-    max-width: 46ch;
-    font-size: 0.875rem;
-    line-height: 1.62;
-    color: var(--text-2);
-  }
-  .eco__aside { font-size: 0.8125rem; line-height: 1.7; color: var(--text-2); }
-
-  .eco__stage {
-    position: relative;
-    display: grid;
-    place-items: center;
-    margin-top: clamp(1.5rem, 3vw, 2.5rem);
-  }
-  .eco__note {
-    display: none;
-    position: absolute;
-    top: 46%;
-    font-size: clamp(0.85rem, 1.3vw, 1.05rem);
-    color: var(--green-deep);
-  }
-  .eco__note { max-width: 9rem; }
-  .eco__note--l { left: 0.5rem; rotate: -6deg; }
-  .eco__note--r { right: 0.5rem; text-align: right; rotate: 5deg; }
-
-  /* ---- the ring ---- */
-  .ring {
-    position: relative;
-    width: min(46rem, 92vw);
-    aspect-ratio: 1;
-  }
-  .ring__guide {
+  .bs__sky {
     position: absolute;
     inset: 0;
-    width: 100%;
-    height: 100%;
-    color: color-mix(in oklab, var(--green) 42%, transparent);
+    z-index: -1;
+    background:
+      radial-gradient(1100px 620px at 62% 8%, #ffffff 0%, rgb(255 255 255 / 0) 62%),
+      linear-gradient(168deg, #eef5ef 0%, #f4f9f4 42%, #fbfdfb 100%);
   }
 
-  /* Spokes draw from the hub outward, one after another. */
-  .ring__spoke {
-    stroke-dasharray: 1;
-    stroke-dashoffset: 1;
-    transition: stroke-dashoffset 560ms var(--ease) calc(320ms + var(--i) * 90ms);
-  }
-  .ring[data-in] .ring__spoke { stroke-dashoffset: 0; }
-
-  /* The dashed orbit turns slowly, so the ring is never quite still. */
-  .ring__orbit { transform-origin: 50% 50%; }
-  @media (prefers-reduced-motion: no-preference) {
-    .ring__orbit { animation: ring-turn 90s linear infinite; }
-  }
-  @keyframes ring-turn { to { transform: rotate(360deg); } }
-
-  /* A lit dot running the orbit. Same trick as the nodes: a full-size
-     box rotating about the centre with the dot pinned to its top edge,
-     so the radius is the ring's. */
-  .ring__run {
-    position: absolute;
-    inset: 12%;
-    pointer-events: none;
-  }
-  .ring__run span {
-    position: absolute;
-    top: 0;
-    left: 50%;
-    translate: -50% -50%;
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background: var(--green);
-    box-shadow: 0 0 0 4px color-mix(in oklab, var(--green) 22%, transparent),
-      0 0 14px 2px color-mix(in oklab, var(--green) 55%, transparent);
-  }
-  @media (prefers-reduced-motion: no-preference) {
-    .ring__run { animation: ring-turn 14s linear infinite; }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .ring__run { display: none; }
-  }
-
-  .ring__hub {
-    position: absolute;
-    inset: 31%;
+  .bs__grid {
     display: grid;
-    place-content: center;
-    justify-items: center;
-    gap: 0.5rem;
-    padding: 1rem;
-    border-radius: 50%;
-    background: radial-gradient(circle at 36% 30%, #2f6b2a, #14311a 74%);
-    color: #fff;
-    text-align: center;
-    box-shadow: 0 24px 50px -24px rgb(10 40 14 / 0.6);
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(1.75rem, 3.5vw, 3rem);
+    align-items: center;
   }
-  .ring__hub :global(img) { position: relative; z-index: 1; width: clamp(3.5rem, 7vw, 5rem); height: auto; }
+  .bs__copy, .bs__stage, .bs__rail { min-width: 0; }
 
-  /* The hub breathes — a slow ring of light leaving it. */
-  .ring__pulse {
-    position: absolute;
-    inset: -6%;
+  /* ── left ── */
+  .bs__h {
+    margin-top: var(--s4);
+    font-size: clamp(2.1rem, 4vw, 3.05rem);
+    font-weight: 700;
+    letter-spacing: -0.045em;
+    line-height: 1.04;
+  }
+  .bs__h em { font-style: normal; color: var(--green-deep); }
+  .bs__p {
+    max-width: 38ch;
+    margin-top: var(--s4);
+    font-size: 0.9375rem;
+    line-height: 1.66;
+    color: var(--text-2);
+  }
+  .film {
+    display: inline-flex;
+    align-items: center;
+    min-width: 0;
+    gap: 0.7rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    text-align: left;
+  }
+  .film i {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    flex: none;
     border-radius: 50%;
-    border: 2px solid color-mix(in oklab, var(--green) 45%, transparent);
-    pointer-events: none;
+    background: var(--green-deep);
+    color: #fff;
+    transition: transform var(--t2) var(--ease);
   }
-  @media (prefers-reduced-motion: no-preference) {
-    .ring__pulse { animation: hub-pulse 3.6s var(--ease) infinite; }
-  }
-  @keyframes hub-pulse {
-    0% { transform: scale(0.92); opacity: 0.85; }
-    70%, 100% { transform: scale(1.18); opacity: 0; }
-  }
-  .ring__hub span {
+  .film:hover i { transform: scale(1.08); }
+  .film:focus-visible i { outline: 2px solid var(--green-deep); outline-offset: 3px; }
+  .film > span { display: grid; min-width: 0; font-size: 0.875rem; font-weight: 600; }
+  .film small {
+    overflow-wrap: anywhere;
     font-family: var(--font-mono);
-    font-size: 0.5rem;
+    font-size: 0.5625rem;
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+
+  .bs__aside {
+    max-width: 34ch;
+    margin-top: var(--s5);
+    padding-top: var(--s5);
+    border-top: 1px solid var(--line-light);
+    font-size: 0.8125rem;
+    line-height: 1.6;
+    color: var(--text-3);
+  }
+
+  .bs__script {
+    margin-top: clamp(1.75rem, 4vw, 3rem);
+    font-family: var(--font-serif);
+    font-size: clamp(1.05rem, 1.8vw, 1.45rem);
+    font-style: italic;
+    line-height: 1.34;
+    color: var(--green-deep);
+  }
+  .bs__script svg {
+    display: block;
+    width: clamp(5.5rem, 9vw, 7.5rem);
+    margin-top: 0.3rem;
+    color: var(--green);
+  }
+  .bs__script--r { margin-top: 0; text-align: right; }
+  .bs__script--r svg { margin-left: auto; }
+
+  /* ── the stage ── */
+  .bs__stage {
+    position: relative;
+    aspect-ratio: 1 / 0.62;
+    perspective: 1800px;
+  }
+  .bs__deck {
+    position: absolute;
+    inset: 0;
+    transform-style: preserve-3d;
+  }
+
+  .bc {
+    --fan: 9rem;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    /* The individual translate property resolves before transform, so
+       the card is centred first and every fan offset below is measured
+       from the middle of the stage. */
+    translate: -50% -50%;
+    width: min(17rem, 72%);
+    border-radius: 22px;
+    background: var(--white);
+    border: 1px solid var(--line-light);
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgb(10 30 12 / 0.05), 0 34px 64px -34px rgb(10 30 12 / 0.4);
+    transform:
+      translateX(calc(var(--o, 0) * var(--fan)))
+      translateY(calc(var(--a, 0) * 0.55rem))
+      translateZ(calc(var(--a, 0) * -120px))
+      rotateY(calc(var(--o, 0) * -9deg))
+      scale(calc(1 - var(--a, 0) * 0.035));
+    transition:
+      transform 720ms cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 480ms var(--ease),
+      box-shadow 480ms var(--ease);
+  }
+  .bc[data-on] {
+    box-shadow: 0 2px 4px rgb(10 30 12 / 0.06), 0 54px 90px -36px rgb(10 30 12 / 0.48);
+  }
+  .bc:not([data-on]) { opacity: calc(1 - var(--a, 0) * 0.06); }
+  /* Seven cards will not fit the column at a readable spacing, so the
+     deck shows five and the far one falls away. It is a wrap, not a
+     loss: every service stays reachable from the rail and the dots. */
+  .bc[data-far] { --fan: 6rem; opacity: 0; pointer-events: none; }
+
+  .bc__hit {
+    position: absolute;
+    inset: 0;
+    z-index: 3;
+    border: 0;
+    background: none;
+    cursor: pointer;
+  }
+  .bc[data-on] .bc__hit { cursor: default; }
+  .bc__hit:focus-visible { outline: 2px solid var(--green-deep); outline-offset: -4px; }
+
+  .bc__shot { position: relative; aspect-ratio: 4 / 3; }
+  .bc__shot :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  /* The number sits on the photograph, so it carries its own scrim
+     rather than a text-shadow — a shadow cannot be measured. */
+  /* A corner wedge was fine over the dark photographs and failed over
+     the light ones — the hard-drive shot left the number at 2.8:1. A
+     flat chip is the only form that can be guaranteed: at 62% over the
+     worst case, a pure white photograph, white text still reads 5.6:1. */
+  .bc__shot figcaption {
+    position: absolute;
+    top: 0.6rem;
+    left: 0.6rem;
+    padding: 0.16rem 0.45rem;
+    border-radius: 8px;
+    background: rgb(8 13 9 / 0.62);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #fff;
+  }
+
+  .bc__badge {
+    position: absolute;
+    bottom: -1.55rem;
+    left: 1.05rem;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 3.1rem;
+    height: 3.1rem;
+    border-radius: 50%;
+    background: var(--white);
+    color: var(--green-deep);
+    box-shadow: 0 8px 20px -10px rgb(10 30 12 / 0.45);
+  }
+
+  .bc__body { padding: 2.55rem 1.05rem 1.3rem; }
+  .bc__t {
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+  }
+  .bc__p {
+    margin-top: 0.4rem;
+    font-size: 0.8438rem;
+    line-height: 1.56;
+    color: var(--text-2);
+  }
+  .bc__go {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.9rem;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--green-deep);
+  }
+  .bc__go :global(svg) { transition: transform var(--t2) var(--ease); }
+  .bc__hit:hover ~ .bc__body .bc__go :global(svg) { transform: translateX(4px); }
+
+  /* The fan mirrors: see the note in the script. */
+  .bc[data-side='r'] .bc__body { text-align: right; }
+  .bc[data-side='r'] .bc__badge { left: auto; right: 1.05rem; }
+  .bc[data-side='r'] .bc__shot figcaption { left: auto; right: 0.6rem; }
+
+  .bs__dots {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    translate: -50% 0;
+    display: flex;
+    gap: 0.35rem;
+  }
+  .bs__dots i {
+    width: 1.35rem;
+    height: 3px;
+    border-radius: 2px;
+    background: #d3e0d2;
+    transition: background-color var(--t2) var(--ease), width var(--t2) var(--ease);
+  }
+  .bs__dots i[data-on] { width: 2.1rem; background: var(--green-deep); }
+
+  /* ── right rail ── */
+  .bs__rail { display: none; }
+  .bs__idx {
+    display: grid;
+    gap: 0.15rem;
+    margin-top: clamp(1.5rem, 3vw, 2.5rem);
+  }
+  .bs__idx button {
+    display: grid;
+    grid-template-columns: auto auto 1fr;
+    align-items: center;
+    gap: 0.9rem;
+    width: 100%;
+    padding: 0.4rem 0;
+    border: 0;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+  }
+  .bs__idx b {
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    font-weight: 500;
+    color: var(--text-3);
+    transition: color var(--t2) var(--ease);
+  }
+  .bs__dot {
+    position: relative;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #bcd4bb;
+    transition: background-color var(--t2) var(--ease), scale var(--t2) var(--ease);
+  }
+  /* The connecting thread between stations. */
+  .bs__idx li:not(:last-child) .bs__dot::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    width: 1px;
+    height: 1.4rem;
+    translate: -50% 0;
+    background: var(--line-light);
+  }
+  .bs__idx span {
+    font-size: 0.875rem;
+    color: var(--text-2);
+    transition: color var(--t2) var(--ease);
+  }
+  .bs__idx [data-on] b { color: var(--green-deep); }
+  .bs__idx [data-on] .bs__dot { background: var(--green-deep); scale: 1.25; }
+  .bs__idx [data-on] span { color: var(--text); font-weight: 600; }
+  .bs__idx button:focus-visible { outline: 2px solid var(--green-deep); outline-offset: 3px; border-radius: 6px; }
+
+  .bs__scroll {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 0.7rem;
+    margin-top: clamp(1.75rem, 3.5vw, 2.75rem);
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
     letter-spacing: 0.18em;
     text-transform: uppercase;
     line-height: 1.7;
-    color: var(--green-bright);
-  }
-
-  /* Full-size box rotated about the ring's centre, with the node pinned
-     to the top edge — so the radius is the ring's and scales with it. A
-     percentage translate on the node would resolve against the node. */
-  .ring__slot {
-    position: absolute;
-    inset: 0;
-    transform: rotate(var(--th));
-    pointer-events: none;
-  }
-  .node {
-    position: absolute;
-    top: 0;
-    left: 50%;
-    translate: -50% -50%;
-    display: grid;
-    justify-items: center;
-    gap: 0.3rem;
-    width: clamp(8rem, 17vw, 10.5rem);
-    padding: 0.9rem 0.7rem;
-    border-radius: 18px;
-    background: rgb(255 255 255 / 0.95);
-    backdrop-filter: blur(6px);
-    text-align: center;
-    pointer-events: auto;
-    box-shadow: 0 1px 2px rgb(10 30 12 / 0.05), 0 14px 30px -18px rgb(10 30 12 / 0.4);
-    /* stays upright whatever angle its slot sits at */
-    transform: rotate(calc(var(--th) * -1));
-    /* Deployed from the hub: each starts pulled back down the spoke and
-       small, then settles at its station. --th keeps it upright
-       throughout. */
-    opacity: 0;
-    scale: 0.6;
-    transition:
-      opacity 420ms var(--ease) calc(420ms + var(--i) * 90ms),
-      scale 680ms cubic-bezier(0.22, 1.35, 0.36, 1) calc(420ms + var(--i) * 90ms),
-      box-shadow var(--t2) var(--ease);
-  }
-  .ring[data-in] .node { opacity: 1; scale: 1; }
-  .node:hover {
-    box-shadow: 0 1px 2px rgb(10 30 12 / 0.05), 0 22px 40px -18px rgb(10 30 12 / 0.45);
-  }
-  .node i {
-    display: grid;
-    place-items: center;
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    color: var(--green-deep);
-    background: var(--green-wash);
-    transition: background-color var(--t2) var(--ease), color var(--t2) var(--ease),
-      transform var(--t2) var(--ease);
-  }
-  .node:hover i {
-    transform: scale(1.08) rotate(-6deg);
-    background: var(--green-deep);
-    color: #fff;
-  }
-  .node b { font-size: 0.8125rem; font-weight: 700; letter-spacing: -0.02em; }
-  .node em {
-    font-style: normal;
-    font-size: 0.6875rem;
-    line-height: 1.4;
     color: var(--text-3);
+  }
+  .bs__mouse {
+    position: relative;
+    width: 15px;
+    height: 24px;
+    border: 1px solid #9db69c;
+    border-radius: 8px;
+  }
+  .bs__mouse::after {
+    content: '';
+    position: absolute;
+    top: 4px;
+    left: 50%;
+    width: 2px;
+    height: 5px;
+    border-radius: 1px;
+    translate: -50% 0;
+    background: var(--green-deep);
+    animation: bsWheel 1.9s var(--ease) infinite;
+  }
+  @keyframes bsWheel {
+    0%, 100% { transform: translateY(0); opacity: 1; }
+    60% { transform: translateY(7px); opacity: 0.2; }
   }
 
   /* ───── 03 process ───── */
@@ -977,6 +1167,15 @@ const figures = [
   .ct__ghost :global(svg) { color: var(--green-deep); }
 
   /* ───── responsive ───── */
+  /* A five-card fan needs width it does not have on a phone. Tighter
+     spacing, and only the immediate neighbours stay — the rest of the
+     seven are still one tap away on the dots. */
+  @media (max-width: 48rem) {
+    .bs__stage { aspect-ratio: 1 / 1.02; perspective: 1200px; }
+    .bc { --fan: 5rem; width: min(17rem, 78%); }
+    .bc[data-a='2'] { opacity: 0; pointer-events: none; }
+  }
+
   @media (min-width: 40rem) {
     .pr__steps { grid-template-columns: repeat(2, 1fr); }
     .st__figs { grid-template-columns: repeat(4, 1fr); }
@@ -984,7 +1183,6 @@ const figures = [
 
   @media (min-width: 62rem) {
     .hero__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); }
-    .eco__head { grid-template-columns: minmax(0, 1.4fr) minmax(0, 0.8fr); }
     .pr__head { grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr); }
     .pr__steps { grid-template-columns: repeat(4, 1fr); }
     .sv__head { grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr); }
@@ -993,43 +1191,21 @@ const figures = [
     .ct__in { grid-template-columns: minmax(0, 1fr) auto; }
   }
 
-  @media (min-width: 80rem) {
-    .eco__note { display: block; }
-  }
-
-  @media (max-width: 48rem) {
-    /* A seven-node ring is unreadable on a phone — stack the nodes. */
-    .ring { aspect-ratio: auto; width: 100%; }
-    .ring__guide, .ring__hub { display: none; }
-    .ring__slot { position: static; transform: none; }
-    .node {
-      position: static;
-      translate: none;
-      transform: none;
-      width: 100%;
-      margin-bottom: 0.6rem;
-      grid-template-columns: auto 1fr;
-      justify-items: start;
-      text-align: left;
-      gap: 0.2rem 0.8rem;
-    }
-    .node i { grid-row: span 2; }
+  @media (min-width: 76rem) {
+    .bs__grid { grid-template-columns: minmax(0, 0.95fr) minmax(0, 2fr) auto; }
+    .bs__rail { display: block; }
   }
 
   @media (prefers-reduced-motion: reduce) {
     .btn, .btn:hover, .film i,
-    .sv__track a, .sv__track a:hover, .sc__go {
+    .sv__track a, .sv__track a:hover, .sc__go,
+    .bc__go :global(svg) {
       transform: none;
       transition: none;
     }
-    /* Nodes are drawn at their stations, still. */
-    .node {
-      opacity: 1;
-      scale: 1;
-      transform: rotate(calc(var(--th) * -1));
-      transition: none;
-    }
-    .ring__spoke { stroke-dashoffset: 0; transition: none; }
-    .ring__orbit, .ring__pulse { animation: none; }
+    /* The deck still fans — it is the layout, not decoration — but it
+       stops moving on its own and stops easing between states. */
+    .bc { transition: none; }
+    .bs__mouse::after { animation: none; }
   }
 </style>
