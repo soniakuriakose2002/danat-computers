@@ -22,7 +22,8 @@ import { site, whatsappLink, branches } from '@data/site';
 const WA = site.phone.whatsapp;
 ---
 
-<dialog class="sd" data-support aria-label="Get support from Danat Computers">
+<dialog class="sd" data-support data-wa={WA} data-mail={site.email}
+  aria-label="Get support from Danat Computers">
   <div class="sd__panel">
     <button class="sd__x" type="button" data-support-close aria-label="Close">
       <Icon name="plus" size={18} />
@@ -96,12 +97,19 @@ const WA = site.phone.whatsapp;
   </div>
 </dialog>
 
-<script is:inline define:vars={{ WA, MAIL: site.email }}>
+{/* NOT define:vars. On an inline script Astro emits those as
+    top-level consts in the page's shared global scope, so a second
+    component declaring WA and MAIL threw "Identifier has already been
+    declared" and one of the two scripts never ran at all. The values
+    ride on the element instead, which cannot collide. */}
+<script is:inline>
   (() => {
     const dlg = document.querySelector('[data-support]');
     if (!dlg || typeof dlg.showModal !== 'function') return;
 
     const form = dlg.querySelector('[data-support-form]');
+    const wa = dlg.dataset.wa;
+    const mail = dlg.dataset.mail;
 
     const open = () => {
       // The phone menu is one of the places this opens from. Closing it
@@ -157,14 +165,14 @@ const WA = site.phone.whatsapp;
     form.addEventListener('submit', (e) => {
       e.preventDefault();
       if (!form.reportValidity()) return;
-      window.open('https://wa.me/' + WA + '?text=' + encodeURIComponent(compose()),
+      window.open('https://wa.me/' + wa + '?text=' + encodeURIComponent(compose()),
         '_blank', 'noopener');
     });
 
     dlg.querySelector('[data-support-mail]')?.addEventListener('click', () => {
       if (!form.reportValidity()) return;
       window.location.href =
-        'mailto:' + MAIL + '?subject=' + encodeURIComponent('Support request')
+        'mailto:' + mail + '?subject=' + encodeURIComponent('Support request')
         + '&body=' + encodeURIComponent(compose());
     });
   })();

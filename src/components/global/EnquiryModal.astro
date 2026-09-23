@@ -1,0 +1,471 @@
+---
+import Icon from '@components/ui/Icon.astro';
+import Logo from '@components/global/Logo.astro';
+import { site } from '@data/site';
+
+/**
+ * CONSULTATION and QUOTE — two dialogs, one shell.
+ *
+ * Every call to action had been opening the same support drawer, so
+ * "Request a quote" and "Talk to our experts" asked the same generic
+ * questions. They want different things, so they ask different things:
+ * consultation asks what kind of business and what the problem is;
+ * quote asks which product or service and how many.
+ *
+ * The support drawer stays for "Get Support" — that one IS the generic
+ * route, and it is the only one that still opens it.
+ *
+ * As everywhere else on this site, there is no server: the form
+ * composes a message and hands it to WhatsApp, with email as the
+ * alternative. Nothing is posted and nothing is stored.
+ *
+ * ⚠ The mockup's footnote read "we'll get back to you within 1 business
+ * day". That is a response-time commitment nobody has confirmed, and
+ * the same claim was stripped from this page once already. The note
+ * says what is actually policy instead.
+ */
+
+/** From the ledger: the sectors Danat already serves, not invented. */
+const sectors = [
+  'Retail or trade',
+  'Healthcare or clinic',
+  'School or college',
+  'Office or SME',
+  'Hospitality',
+  'Other',
+];
+
+/** The same seven the services deck carries. */
+const products = [
+  'Computers and laptops',
+  'Printers and consumables',
+  'Networking equipment',
+  'CCTV and security',
+  'Data recovery',
+  'Software support',
+  'Hardware support',
+];
+
+const forms = [
+  {
+    key: 'consult',
+    eb: "Let's talk",
+    h: ['Get a Free', 'Consultation'],
+    p: 'Talk to our experts and find the right technology solutions for your business.',
+    icon: 'chat',
+    pick: { name: 'sector', label: 'Business type', icon: 'building', ph: 'Select business type', opts: sectors, required: false },
+    note: { label: 'How can we help you?', ph: 'Tell us about your requirements…', required: true },
+    cta: 'Request free consultation',
+    foot: 'No obligation. Diagnosis is free, and nothing is touched until you agree the quote.',
+  },
+  {
+    key: 'quote',
+    eb: 'Get pricing',
+    h: ['Request a', 'Quote'],
+    p: "Tell us what you need and we'll come back with a price.",
+    icon: 'box',
+    pick: { name: 'product', label: 'Product or service', icon: 'box', ph: 'Select product or service', opts: products, required: true },
+    note: { label: 'Additional details', ph: 'E.g. model, quantity, specifications…', required: false },
+    cta: 'Request quote',
+    foot: 'No obligation. Nothing is stored on this site.',
+  },
+];
+---
+
+{forms.map((f) => (
+  <dialog class="em" data-enquiry-modal={f.key}
+    data-wa={site.phone.whatsapp} data-mail={site.email}
+    aria-label={f.h.join(' ')}>
+    <div class="em__card">
+      <button class="em__x" type="button" data-enquiry-close aria-label="Close">
+        <Icon name="plus" size={18} />
+      </button>
+
+      {/* A soft mark rather than a stock illustration. */}
+      <span class="em__art" aria-hidden="true">
+        <i class="em__blob"></i>
+        <i class="em__bubble"><Icon name={f.icon} size={22} /></i>
+        <i class="em__dot"></i>
+      </span>
+
+      <div class="em__brand"><Logo /></div>
+
+      <p class="em__eb">{f.eb}</p>
+      <h2 class="em__h">{f.h[0]}<br /><em>{f.h[1]}</em></h2>
+      <p class="em__p">{f.p}</p>
+
+      <form class="em__form" data-enquiry-form novalidate>
+        <div class="em__row">
+          <label class="ef">
+            <Icon name="person" size={16} />
+            <input type="text" name="name" required autocomplete="name" placeholder="Full name *" />
+          </label>
+          <label class="ef">
+            <Icon name="building" size={16} />
+            <input type="text" name="company" autocomplete="organization" placeholder="Company name" />
+          </label>
+        </div>
+
+        <div class="em__row">
+          <label class="ef ef--tel">
+            <Icon name="headset" size={16} />
+            <span class="ef__pre">+968</span>
+            <input type="tel" name="phone" required autocomplete="tel" placeholder="Phone number *" />
+          </label>
+          <label class="ef">
+            <Icon name="mail" size={16} />
+            <input type="email" name="email" autocomplete="email" placeholder="Email address" />
+          </label>
+        </div>
+
+        <label class="ef ef--sel">
+          <Icon name={f.pick.icon} size={16} />
+          <select name={f.pick.name} required={f.pick.required}>
+            <option value="">{f.pick.ph}{f.pick.required ? ' *' : ''}</option>
+            {f.pick.opts.map((o) => <option value={o}>{o}</option>)}
+          </select>
+        </label>
+
+        <label class="ef ef--area">
+          <Icon name="chat" size={16} />
+          <textarea name="message" rows="3" required={f.note.required}
+            placeholder={f.note.ph + (f.note.required ? ' *' : '')}></textarea>
+        </label>
+
+        <button class="em__send" type="submit">
+          {f.cta}
+          <span aria-hidden="true"><Icon name="arrow" size={15} /></span>
+        </button>
+
+        <p class="em__foot">
+          <Icon name="shield" size={14} />
+          {f.foot}
+        </p>
+        <button class="em__alt" type="button" data-enquiry-mail>Send by email instead</button>
+      </form>
+    </div>
+  </dialog>
+))}
+
+{/* See the note in SupportDrawer — define:vars on an inline script
+    puts its names in the page's global scope, and two components using
+    the same names is a SyntaxError that kills one of the scripts. */}
+<script is:inline>
+  (() => {
+    const modals = {};
+    document.querySelectorAll('[data-enquiry-modal]').forEach((d) => {
+      modals[d.dataset.enquiryModal] = d;
+    });
+    if (!Object.keys(modals).length) return;
+
+    const close = (d) => {
+      d.removeAttribute('data-in');
+      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) d.close();
+      else setTimeout(() => d.close(), 220);
+    };
+
+    const open = (key) => {
+      const d = modals[key];
+      if (!d || typeof d.showModal !== 'function') return false;
+      const mnav = document.querySelector('[data-mnav]');
+      if (mnav && !mnav.hidden) document.querySelector('[aria-controls="mnav"]')?.click();
+      d.showModal();
+      // display:none -> block leaves the transition no previous state to
+      // run from unless layout is flushed first.
+      void d.offsetWidth;
+      d.setAttribute('data-in', '');
+      return true;
+    };
+
+    document.querySelectorAll('[data-enquiry]').forEach((el) =>
+      el.addEventListener('click', (e) => {
+        // Only swallow the click if the dialog actually opened; the
+        // trigger's href is a working fallback otherwise.
+        if (open(el.dataset.enquiry)) e.preventDefault();
+      })
+    );
+
+    Object.values(modals).forEach((d) => {
+      d.querySelector('[data-enquiry-close]')?.addEventListener('click', () => close(d));
+      d.addEventListener('click', (e) => { if (e.target === d) close(d); });
+      d.addEventListener('cancel', (e) => { e.preventDefault(); close(d); });
+
+      const form = d.querySelector('[data-enquiry-form]');
+      const wa = d.dataset.wa;
+      const mail = d.dataset.mail;
+      if (!form) return;
+
+      const compose = () => {
+        const fd = new FormData(form);
+        const v = (k) => String(fd.get(k) || '').trim();
+        const opt = (k, label) => (v(k) ? [label + ': ' + v(k)] : []);
+        const kind = d.dataset.enquiryModal === 'quote'
+          ? 'I would like a quote.'
+          : 'I would like a free consultation.';
+        return [
+          'Hello Danat — this is ' + v('name') + '. ' + kind,
+          '',
+          ...opt('company', 'Company'),
+          ...opt('phone', 'Phone'),
+          ...opt('email', 'Email'),
+          ...opt('sector', 'Business type'),
+          ...opt('product', 'Product / service'),
+          '',
+          v('message'),
+        ].join(String.fromCharCode(10));
+      };
+
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        if (!form.reportValidity()) return;
+        window.open('https://wa.me/' + wa + '?text=' + encodeURIComponent(compose()),
+          '_blank', 'noopener');
+      });
+
+      d.querySelector('[data-enquiry-mail]')?.addEventListener('click', () => {
+        if (!form.reportValidity()) return;
+        const subj = d.dataset.enquiryModal === 'quote' ? 'Quote request' : 'Consultation request';
+        window.location.href = 'mailto:' + mail + '?subject=' + encodeURIComponent(subj)
+          + '&body=' + encodeURIComponent(compose());
+      });
+    });
+  })();
+</script>
+
+<style>
+  .em {
+    width: min(37rem, 100%);
+    max-width: none;
+    max-height: 100dvh;
+    margin: auto;
+    padding: 0;
+    border: 0;
+    background: none;
+    overflow: visible;
+  }
+  .em::backdrop {
+    background: rgb(12 18 13 / 0);
+    backdrop-filter: blur(0px);
+    transition: background-color 300ms var(--ease), backdrop-filter 300ms var(--ease);
+  }
+  .em[data-in]::backdrop {
+    background: rgb(12 18 13 / 0.52);
+    backdrop-filter: blur(5px);
+  }
+
+  .em__card {
+    position: relative;
+    max-height: 92dvh;
+    padding: clamp(1.4rem, 3.2vw, 2.1rem);
+    border-radius: 22px;
+    background: var(--white);
+    box-shadow: 0 40px 90px -40px rgb(12 18 13 / 0.6);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    opacity: 0;
+    transform: translate3d(0, 18px, 0) scale(0.97);
+    transition:
+      opacity 260ms var(--ease),
+      transform 380ms cubic-bezier(0.22, 1.1, 0.36, 1);
+  }
+  .em[data-in] .em__card { opacity: 1; transform: none; }
+
+  .em__x {
+    position: absolute;
+    top: clamp(1.4rem, 3.2vw, 2.1rem);
+    right: clamp(1.4rem, 3.2vw, 2.1rem);
+    z-index: 3;
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border: 1px solid var(--line-light);
+    border-radius: 50%;
+    background: var(--white);
+    color: var(--text-2);
+    cursor: pointer;
+    transition: background-color var(--t2) var(--ease), transform var(--t2) var(--ease);
+  }
+  /* No close glyph in the set, so the plus becomes one. */
+  .em__x :global(svg) { transform: rotate(45deg); }
+  .em__x:hover { background: var(--off); transform: rotate(90deg); }
+  .em__x:focus-visible { outline: 2px solid var(--green-deep); outline-offset: 3px; }
+
+  /* The mark, in place of a stock illustration. */
+  .em__art {
+    position: absolute;
+    top: 3.4rem;
+    right: clamp(1.4rem, 3.2vw, 2.1rem);
+    width: 9rem;
+    height: 6.5rem;
+    pointer-events: none;
+  }
+  .em__blob {
+    position: absolute;
+    inset: 0;
+    border-radius: 48% 52% 44% 56% / 56% 44% 56% 44%;
+    background: radial-gradient(circle at 34% 32%, #e6f2e6, #f3f9f3 70%);
+  }
+  .em__bubble {
+    position: absolute;
+    top: 0.7rem;
+    right: 1rem;
+    display: grid;
+    place-items: center;
+    width: 3.2rem;
+    height: 3.2rem;
+    border-radius: 50% 50% 50% 12%;
+    background: var(--green-deep);
+    color: #fff;
+  }
+  .em__dot {
+    position: absolute;
+    bottom: 1.1rem;
+    left: 0.9rem;
+    width: 1.8rem;
+    height: 1.8rem;
+    border-radius: 50% 50% 12% 50%;
+    background: var(--white);
+    box-shadow: 0 6px 16px -8px rgb(12 18 13 / 0.4);
+  }
+
+  .em__brand { position: relative; z-index: 1; margin-bottom: var(--s5); }
+  .em__brand :global(svg), .em__brand :global(img) { max-height: 2rem; width: auto; }
+
+  .em__eb {
+    position: relative;
+    z-index: 1;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--green-deep);
+  }
+  .em__h {
+    position: relative;
+    z-index: 1;
+    margin-top: 0.5rem;
+    font-size: clamp(1.5rem, 4vw, 2.05rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1.08;
+  }
+  .em__h em { font-style: normal; color: var(--green-deep); }
+  .em__p {
+    position: relative;
+    z-index: 1;
+    max-width: 30ch;
+    margin-top: 0.7rem;
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--text-2);
+  }
+
+  .em__form { display: grid; gap: 0.7rem; margin-top: var(--s5); }
+  .em__row { display: grid; gap: 0.7rem; }
+
+  .ef {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0 0.9rem;
+    border: 1px solid var(--line-light);
+    border-radius: 12px;
+    background: var(--off);
+    color: var(--green-deep);
+    transition: border-color var(--t2) var(--ease), box-shadow var(--t2) var(--ease),
+      background-color var(--t2) var(--ease);
+  }
+  .ef--tel { grid-template-columns: auto auto 1fr; }
+  .ef--area { align-items: start; padding-block: 0.8rem; }
+  .ef__pre {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    color: var(--text-2);
+    padding-right: 0.6rem;
+    border-right: 1px solid var(--line-light);
+  }
+  .ef :is(input, select, textarea) {
+    width: 100%;
+    padding: 0.8rem 0;
+    border: 0;
+    background: none;
+    color: var(--text);
+    font: inherit;
+    font-size: 0.9375rem;
+  }
+  .ef--area textarea { padding: 0; resize: vertical; min-height: 3.4rem; line-height: 1.55; }
+  .ef :is(input, select, textarea):focus { outline: none; }
+  .ef ::placeholder { color: var(--text-3); }
+  .ef select:invalid { color: var(--text-3); }
+  /* The ring goes on the wrapper, so the icon and prefix are inside it. */
+  .ef:focus-within {
+    background: var(--white);
+    border-color: var(--green-deep);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--green) 24%, transparent);
+  }
+
+  .em__send {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    margin-top: 0.3rem;
+    padding: 0.95rem 1.4rem;
+    border: 0;
+    border-radius: 999px;
+    background: var(--green-deep);
+    color: #fff;
+    font: inherit;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color var(--t2) var(--ease);
+  }
+  .em__send:hover { background: #26551f; }
+  .em__send:focus-visible { outline: 2px solid var(--green-deep); outline-offset: 3px; }
+  .em__send :global(svg) { transition: transform var(--t2) var(--ease); }
+  .em__send:hover :global(svg) { transform: translateX(3px); }
+
+  .em__foot {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: start;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    line-height: 1.55;
+    color: var(--text-3);
+  }
+  .em__foot :global(svg) { color: var(--green-deep); margin-top: 0.1rem; }
+
+  .em__alt {
+    justify-self: center;
+    padding: 0.2rem;
+    border: 0;
+    background: none;
+    color: var(--text-2);
+    font: inherit;
+    font-size: 0.8125rem;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+  .em__alt:hover { color: var(--green-deep); }
+  .em__alt:focus-visible { outline: 2px solid var(--green-deep); outline-offset: 2px; border-radius: 4px; }
+
+  @media (min-width: 34rem) {
+    .em__row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  /* The mark would sit under the heading on a narrow card. */
+  @media (max-width: 30rem) {
+    .em__art { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .em__card, .em::backdrop { transition: none; }
+    .em__card { opacity: 1; transform: none; }
+    .em__x:hover, .em__send:hover :global(svg) { transform: none; }
+    .em__x :global(svg) { transform: rotate(45deg); }
+  }
+</style>
