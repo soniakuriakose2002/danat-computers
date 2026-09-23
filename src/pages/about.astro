@@ -7,6 +7,7 @@ import VideoModal from '@components/global/VideoModal.astro';
 import { site, branches } from '@data/site';
 import { OMAN_PATH, OMAN_VIEWBOX, OMAN_PINS } from '@data/omanMap';
 import imgTech from '@assets/photos/repair-solder.jpg';
+import imgFilm from '@assets/photos/film-poster.jpg';
 import r01 from '@assets/renders/01.png';
 import r03 from '@assets/renders/03.png';
 import r04 from '@assets/renders/04.png';
@@ -83,24 +84,21 @@ const layers = [r01, r03, r04, r05];
             Our story
             <span class="btn__i" aria-hidden="true"><Icon name="arrow" size={15} /></span>
           </a>
-          {/* The label rides a circular textPath around the play mark and
-              turns continuously, so it reads as a device rather than a
-              line of text parked beside a button. */}
+          {/* The actual opening frame of the company's film, cropped clear
+              of the thumbnail's overlay bars. A real frame says what the
+              film is; a ring of text only says that one exists. */}
           <button class="film" type="button" data-video-open
             aria-label="Watch the film: inside Danat Computers">
-            <svg class="film__ring" viewBox="0 0 100 100" aria-hidden="true">
-              <defs>
-                <path id="filmArc"
-                  d="M50,50 m-37,0 a37,37 0 1,1 74,0 a37,37 0 1,1 -74,0" />
-              </defs>
-              <text>
-                <textPath href="#filmArc" startOffset="0">
-                  WATCH THE FILM · INSIDE DANAT COMPUTERS ·&nbsp;
-                </textPath>
-              </text>
-            </svg>
-            <span class="film__play" aria-hidden="true">
-              <Icon name="play" size={15} />
+            <span class="film__shot">
+              <Image src={imgFilm} alt="" widths={[220, 360]} sizes="180px"
+                quality={78} format="webp" loading="lazy" />
+              <span class="film__play" aria-hidden="true">
+                <Icon name="play" size={13} />
+              </span>
+            </span>
+            <span class="film__t">
+              <b>Watch the film</b>
+              <em>Inside Danat Computers</em>
             </span>
           </button>
         </div>
@@ -397,51 +395,81 @@ const layers = [r01, r03, r04, r05];
     gap: var(--s4) var(--s5); margin-top: var(--s5);
   }
   .film {
-    position: relative;
-    display: grid;
-    place-items: center;
-    width: clamp(6.5rem, 9vw, 7.5rem);
-    aspect-ratio: 1;
-    padding: 0;
-    border: 0;
-    background: none;
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 0.4rem 1rem 0.4rem 0.4rem;
+    border: 1px solid var(--line-light);
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.8);
+    backdrop-filter: blur(8px);
     cursor: pointer;
+    text-align: left;
+    box-shadow: 0 1px 2px rgb(10 30 12 / 0.04), 0 12px 28px -20px rgb(10 30 12 / 0.4);
+    transition:
+      transform var(--t2) var(--ease),
+      border-color var(--t2) var(--ease),
+      box-shadow var(--t2) var(--ease);
   }
+  .film:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in oklab, var(--green) 34%, var(--line-light));
+    box-shadow: 0 1px 2px rgb(10 30 12 / 0.04), 0 22px 40px -22px rgb(10 30 12 / 0.42);
+  }
+  .film:focus-visible { outline: 2px solid var(--green-deep); outline-offset: 3px; }
 
-  .film__ring {
-    position: absolute;
-    inset: 0;
+  .film__shot {
+    position: relative;
+    display: block;
+    width: 74px;
+    aspect-ratio: 16 / 10;
+    flex: none;
+    border-radius: 999px;
+    overflow: hidden;
+    background: var(--off);
+  }
+  .film__shot :global(img) {
     width: 100%;
     height: 100%;
-    fill: var(--green-deep);
-    font-family: var(--font-mono);
-    font-size: 7.4px;
-    letter-spacing: 0.22em;
-    transform-origin: 50% 50%;
+    object-fit: cover;
+    object-position: 50% 32%;
+    transition: scale var(--t3) var(--ease);
   }
-  @media (prefers-reduced-motion: no-preference) {
-    .film__ring { animation: film-turn 18s linear infinite; }
-    .film:hover .film__ring { animation-duration: 7s; }
-  }
-  @keyframes film-turn { to { transform: rotate(360deg); } }
+  .film:hover .film__shot :global(img) { scale: 1.08; }
 
   .film__play {
-    position: relative;
+    position: absolute;
+    inset: 0;
     display: grid;
     place-items: center;
-    width: 46%;
-    aspect-ratio: 1;
-    border-radius: 50%;
-    background: var(--white);
-    color: var(--green-deep);
-    box-shadow: 0 1px 2px rgb(10 30 12 / 0.06), 0 10px 24px -14px rgb(10 30 12 / 0.45);
-    transition:
-      background-color var(--t2) var(--ease),
-      color var(--t2) var(--ease),
-      scale var(--t2) var(--ease);
+    /* Measured against the real frame, not guessed: at 0.42 the white
+       play mark was 2.90:1 over the photo's brightest pixels, under the
+       3:1 a non-text graphic needs. 0.52 gives 4.01:1. */
+    background: rgb(7 9 10 / 0.52);
+    color: #fff;
+    transition: background-color var(--t2) var(--ease);
   }
-  .film:hover .film__play { scale: 1.08; background: var(--green-deep); color: #fff; }
-  .film:focus-visible .film__play { outline: 2px solid var(--green-deep); outline-offset: 4px; }
+  .film:hover .film__play { background: rgb(47 100 41 / 0.72); }
+  /* The play mark breathes, so the control reads as live at rest. */
+  @media (prefers-reduced-motion: no-preference) {
+    .film__play :global(svg) { animation: film-beat 2.6s var(--ease) infinite; }
+  }
+  @keyframes film-beat {
+    0%, 70%, 100% { transform: scale(1); }
+    12% { transform: scale(1.22); }
+    24% { transform: scale(1); }
+  }
+
+  .film__t { display: grid; }
+  .film__t b { font-size: 0.875rem; font-weight: 700; letter-spacing: -0.02em; }
+  .film__t em {
+    font-style: normal;
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
 
   .hero__mantra {
     display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem;
@@ -782,8 +810,9 @@ const layers = [r01, r03, r04, r05];
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .film__ring { animation: none; }
-    .film__play, .film:hover .film__play { scale: 1; transition: none; }
+    .film, .film:hover { transform: none; transition: none; }
+    .film__play :global(svg) { animation: none; }
+    .film:hover .film__shot :global(img) { scale: 1; }
     .pr__map :is(.pr__land, .pr__pin, .pr__chip) { opacity: 1; scale: 1; transition: none; }
     .btn, .btn:hover, .fc, .fc:hover, .fc__i, .br, .br:hover, .cta__b, .cta__b:hover {
       transform: none; transition: none;
