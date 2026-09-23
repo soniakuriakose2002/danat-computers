@@ -36,6 +36,17 @@ export const site = {
   whatsappMessage: 'Hello Danat — I need help with',
 
   /**
+   * Agency of record. The footer copyright carries this name at the
+   * client's instruction. Danat's own legal entity, ASTHAR TRADING CO
+   * LLC, stays visible in the footer's description column so the
+   * trading entity is still stated on the page.
+   */
+  builtBy: {
+    name: 'Alphalize Technologies Private Limited',
+    url: 'https://www.alphalize.com/en',
+  },
+
+  /**
    * The company's own film, linked from danatcomputers.com. Title:
    * "ഏറ്റവും വലിയ കമ്പ്യൂട്ടർ സൂപ്പർ മാർക്കറ്റ് ഒമാനിൽ | Biggest Computer
    * supermarket Oman DANETcomputers", on the DANETcomputers channel.
