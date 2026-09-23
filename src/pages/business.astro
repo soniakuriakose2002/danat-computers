@@ -46,14 +46,20 @@ const trust = [
  * Same seven the ecosystem ring carried — the wording is unchanged,
  * only the way they are presented.
  */
+/**
+ * Each card deep-links to its own service page. The four-card section
+ * that used to sit below this one listed the same services with the
+ * same photographs and sent all four to /services; it has been removed
+ * rather than repeated.
+ */
 const deck = [
-  { icon: 'laptop', img: imgOffice, t: 'Computer support', p: 'Sales, repair and technical support for business.' },
-  { icon: 'printer', img: imgPrinter, t: 'Printer services', p: 'Servicing and repair for all brands.' },
-  { icon: 'drive', img: imgDrive, t: 'Data recovery', p: 'Recover lost or inaccessible data.' },
-  { icon: 'gear', img: imgAgent, t: 'Software support', p: 'Troubleshoot software and keep you working.' },
-  { icon: 'network', img: imgPatch, t: 'Networking', p: 'Setup and troubleshooting for connectivity.' },
-  { icon: 'camera', img: imgCctv, t: 'CCTV solutions', p: 'Installation and maintenance for safer premises.' },
-  { icon: 'chip', img: imgBoard, t: 'Hardware support', p: 'Diagnose and fix hardware problems.' },
+  { icon: 'laptop', img: imgOffice, href: '/services/computer-repair', t: 'Computer support', p: 'Sales, repair and technical support for business.' },
+  { icon: 'printer', img: imgPrinter, href: '/services/printer-services', t: 'Printer services', p: 'Servicing and repair for all brands.' },
+  { icon: 'drive', img: imgDrive, href: '/services/data-recovery', t: 'Data recovery', p: 'Recover lost or inaccessible data.' },
+  { icon: 'gear', img: imgAgent, href: '/services/software-troubleshooting', t: 'Software support', p: 'Troubleshoot software and keep you working.' },
+  { icon: 'network', img: imgPatch, href: '/services/networking', t: 'Networking', p: 'Setup and troubleshooting for connectivity.' },
+  { icon: 'camera', img: imgCctv, href: '/services/cctv-services', t: 'CCTV solutions', p: 'Installation and maintenance for safer premises.' },
+  { icon: 'chip', img: imgBoard, href: '/services/hardware-troubleshooting', t: 'Hardware support', p: 'Diagnose and fix hardware problems.' },
 ];
 
 /** Only what the rest of the site already states as policy. */
@@ -62,13 +68,6 @@ const steps = [
   { n: '02', icon: 'chat', t: 'Diagnose', p: 'We identify the right solution for your issue or upgrade.' },
   { n: '03', icon: 'gear', t: 'Solve', p: 'Diagnosis is free, and nothing is touched until you agree the quote.' },
   { n: '04', icon: 'check', t: 'Support', p: 'The same counter afterwards, at any of the four branches.' },
-];
-
-const cards = [
-  { img: imgOffice, t: 'Computer sales & support', p: 'Desktops, laptops and technical support for your office.' },
-  { img: imgPrinter, t: 'Printer services', p: 'Servicing and repair for Canon, Epson, HP and Brother.' },
-  { img: imgCctv, t: 'CCTV solutions', p: 'Hikvision, Dahua and Uniview — supplied and installed.' },
-  { img: imgPatch, t: 'Networking solutions', p: 'Cabling, switching and Wi-Fi, set up or troubleshot.' },
 ];
 
 const figures = [
@@ -132,7 +131,36 @@ const figures = [
     </div>
   </section>
 
-  {/* ══════ 02 · the stage ══════ */}
+  {/* ══════ 02 · process ══════ */}
+  <section class="pr section">
+    <div class="shell pr__head">
+      <div>
+        <p class="eb" data-rise>How we support your business</p>
+        <h2 class="pr__h" data-rise style="--d:70ms">
+          A Simple Process. <em>Real Results.</em>
+        </h2>
+      </div>
+      <p class="pr__aside" data-rise style="--d:130ms">
+        We make technology support easy, so you can focus on what matters —
+        your business.
+      </p>
+    </div>
+
+    <ol class="shell pr__steps">
+      {steps.map((s, i) => (
+        <li data-rise style={`--d:${i * 80}ms`}>
+          <span class="pr__marks" aria-hidden="true">
+            <b>{s.n}</b>
+            <i><Icon name={s.icon} size={18} /></i>
+          </span>
+          <h3>{s.t}</h3>
+          <p>{s.p}</p>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  {/* ══════ 03 · the stage ══════ */}
   <section class="bs">
     <span class="bs__sky" aria-hidden="true"></span>
 
@@ -184,7 +212,9 @@ const figures = [
               <div class="bc__body">
                 <h2 class="bc__t">{d.t}</h2>
                 <p class="bc__p">{d.p}</p>
-                <span class="bc__go">Learn more<Icon name="arrow" size={14} /></span>
+                <a class="bc__go" href={d.href} tabindex={i === 0 ? undefined : '-1'}>
+                  Learn more<Icon name="arrow" size={14} />
+                </a>
               </div>
             </article>
           ))}
@@ -225,72 +255,7 @@ const figures = [
 
   </section>
 
-  {/* ══════ 03 · process ══════ */}
-  <section class="pr section">
-    <div class="shell pr__head">
-      <div>
-        <p class="eb" data-rise>How we support your business</p>
-        <h2 class="pr__h" data-rise style="--d:70ms">
-          A Simple Process. <em>Real Results.</em>
-        </h2>
-      </div>
-      <p class="pr__aside" data-rise style="--d:130ms">
-        We make technology support easy, so you can focus on what matters —
-        your business.
-      </p>
-    </div>
-
-    <ol class="shell pr__steps">
-      {steps.map((s, i) => (
-        <li data-rise style={`--d:${i * 80}ms`}>
-          <span class="pr__marks" aria-hidden="true">
-            <b>{s.n}</b>
-            <i><Icon name={s.icon} size={18} /></i>
-          </span>
-          <h3>{s.t}</h3>
-          <p>{s.p}</p>
-        </li>
-      ))}
-    </ol>
-  </section>
-
-  {/* ══════ 04 · service cards ══════ */}
-  <section class="sv section">
-    <div class="shell sv__head">
-      <div>
-        <p class="eb" data-rise>Our business services</p>
-        <h2 class="sv__h" data-rise style="--d:70ms">
-          Practical Solutions<br />for Everyday <em>Business Needs.</em>
-        </h2>
-      </div>
-      <p class="sv__aside" data-rise style="--d:130ms">
-        Proven technology services that help businesses stay secure,
-        productive and worry-free.
-      </p>
-    </div>
-
-    <div class="sv__rail">
-      <ul class="shell-wide sv__track">
-        {cards.map((c, i) => (
-          <li data-rise style={`--d:${i * 60}ms`}>
-            <a href="/services">
-              <span class="sc__shot">
-                <Image src={c.img} alt="" widths={[360, 560]} sizes="280px"
-                  quality={74} format="webp" loading="lazy" />
-              </span>
-              <span class="sc__body">
-                <b>{c.t}</b>
-                <em>{c.p}</em>
-                <i class="sc__go" aria-hidden="true"><Icon name="arrow" size={15} /></i>
-              </span>
-            </a>
-          </li>
-        ))}
-      </ul>
-    </div>
-  </section>
-
-  {/* ══════ 05 · stat band ══════ */}
+  {/* ══════ 04 · stat band ══════ */}
   <section class="st" data-tone="ink">
     <div class="st__bg" aria-hidden="true">
       <Image src={imgRack} alt="" widths={[1000, 1600]} sizes="100vw"
@@ -315,7 +280,7 @@ const figures = [
     </div>
   </section>
 
-  {/* ══════ 06 · what customers say ══════ */}
+  {/* ══════ 05 · what customers say ══════ */}
   <section class="tm section">
     <div class="shell tm__grid">
       <div class="tm__copy" data-rise>
@@ -341,7 +306,7 @@ const figures = [
     </div>
   </section>
 
-  {/* ══════ 07 · cta ══════ */}
+  {/* ══════ 06 · cta ══════ */}
   <section class="ct" id="quote">
     <div class="shell ct__in">
       <div>
@@ -409,6 +374,12 @@ const figures = [
       });
       dots.forEach((d, i) => d.toggleAttribute('data-on', i === at));
       idx.forEach((b, i) => b.toggleAttribute('data-on', i === at));
+      // Only the front card's link is in the tab order; the others are
+      // reached by selecting the card first, same as with a pointer.
+      cards.forEach((c, i) => {
+        const go = c.querySelector('.bc__go');
+        if (go) go.tabIndex = i === at ? 0 : -1;
+      });
     };
 
     const stop = () => { if (timer) clearInterval(timer); timer = null; };
@@ -558,7 +529,7 @@ const figures = [
     aspect-ratio: auto;
   }
 
-  /* ═════ 02 · the stage ═════
+  /* ═════ 03 · the stage ═════
      A fanned deck on a real perspective. Card centres are spaced about
      10.5rem apart while each card is 19rem wide, and z-index falls away
      from the active one — so every neighbour reveals a fixed strip of
@@ -725,7 +696,9 @@ const figures = [
     background: none;
     cursor: pointer;
   }
-  .bc[data-on] .bc__hit { cursor: default; }
+  /* The active card's link has to be reachable, so its select
+     layer stands down. */
+  .bc[data-on] .bc__hit { pointer-events: none; }
   .bc__hit:focus-visible { outline: 2px solid var(--green-deep); outline-offset: -4px; }
 
   .bc__shot { position: relative; aspect-ratio: 4 / 3; }
@@ -786,7 +759,8 @@ const figures = [
     color: var(--green-deep);
   }
   .bc__go :global(svg) { transition: transform var(--t2) var(--ease); }
-  .bc__hit:hover ~ .bc__body .bc__go :global(svg) { transform: translateX(4px); }
+  .bc__go:hover :global(svg) { transform: translateX(4px); }
+  .bc__go:focus-visible { outline: 2px solid var(--green-deep); outline-offset: 3px; border-radius: 4px; }
 
   /* The fan mirrors: see the note in the script. */
   .bc[data-side='r'] .bc__body { text-align: right; }
@@ -902,7 +876,7 @@ const figures = [
     60% { transform: translateY(7px); opacity: 0.2; }
   }
 
-  /* ───── 03 process ───── */
+  /* ───── 02 process ───── */
   .pr { background: var(--white); }
   .pr__head { display: grid; gap: var(--s5); align-items: end; }
   .pr__h {
@@ -955,93 +929,7 @@ const figures = [
     color: var(--text-3);
   }
 
-  /* ───── 04 service cards ───── */
-  .sv { background: linear-gradient(180deg, #fafcfa, #f3f8f3); }
-  .sv__head { display: grid; gap: var(--s5); align-items: end; }
-  .sv__h {
-    margin-top: var(--s4);
-    font-size: clamp(1.6rem, 3vw, 2.2rem);
-    font-weight: 700;
-    letter-spacing: -0.04em;
-    line-height: 1.12;
-  }
-  .sv__h em { font-style: normal; color: var(--green-deep); }
-  .sv__aside { font-size: 0.8125rem; line-height: 1.7; color: var(--text-2); }
-
-  .sv__rail { margin-top: clamp(1.75rem, 4vw, 2.75rem); }
-  .sv__track {
-    display: grid;
-    grid-auto-flow: column;
-    grid-auto-columns: minmax(15rem, 1fr);
-    gap: clamp(0.75rem, 1.6vw, 1.1rem);
-    overflow-x: auto;
-    scroll-snap-type: x proximity;
-    scrollbar-width: none;
-    padding-bottom: 0.5rem;
-  }
-  .sv__track::-webkit-scrollbar { display: none; }
-  .sv__track li { scroll-snap-align: start; }
-  .sv__track a {
-    display: grid;
-    height: 100%;
-    border-radius: 18px;
-    background: var(--white);
-    overflow: hidden;
-    box-shadow: 0 1px 2px rgb(10 30 12 / 0.05), 0 14px 32px -22px rgb(10 30 12 / 0.34);
-    transition: transform var(--t2) var(--ease), box-shadow var(--t2) var(--ease);
-  }
-  .sv__track a:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 1px 2px rgb(10 30 12 / 0.05), 0 26px 46px -22px rgb(10 30 12 / 0.4);
-  }
-  .sc__shot { display: block; aspect-ratio: 16 / 10; overflow: hidden; }
-  .sc__shot :global(img) {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: scale var(--t3) var(--ease);
-  }
-  .sv__track a:hover .sc__shot :global(img) { scale: 1.06; }
-  .sc__body {
-    position: relative;
-    display: grid;
-    align-content: start;
-    padding: 1.1rem 1.2rem 1.3rem;
-  }
-  .sc__body b { font-size: 0.9375rem; font-weight: 700; letter-spacing: -0.02em; }
-  .sc__body em {
-    margin-top: 0.35rem;
-    font-style: normal;
-    max-width: 24ch;
-    font-size: 0.75rem;
-    line-height: 1.5;
-    color: var(--text-3);
-  }
-  .sc__go {
-    position: absolute;
-    right: 1.1rem;
-    bottom: 1.2rem;
-    display: grid;
-    place-items: center;
-    width: 34px;
-    height: 34px;
-    border-radius: 50%;
-    border: 1px solid var(--line-light);
-    color: var(--green-deep);
-    transition:
-      transform var(--t2) var(--ease),
-      background-color var(--t2) var(--ease),
-      border-color var(--t2) var(--ease),
-      color var(--t2) var(--ease);
-  }
-  .sv__track a:hover .sc__go {
-    transform: translateX(3px);
-    background: var(--green-deep);
-    border-color: var(--green-deep);
-    color: #fff;
-  }
-
-  /* ───── 05 stat band ───── */
+  /* ───── 04 stat band ───── */
   .st {
     position: relative;
     color: #fff;
@@ -1083,7 +971,7 @@ const figures = [
   }
   .st__figs dd { margin-top: 0.3rem; font-size: 0.75rem; color: rgb(255 255 255 / 0.76); }
 
-  /* ───── 06 testimonial ───── */
+  /* ───── 05 testimonial ───── */
   .tm { background: var(--white); }
   .tm__grid { display: grid; gap: clamp(1.75rem, 4vw, 3rem); align-items: center; }
   .tm__copy { position: relative; }
@@ -1137,7 +1025,7 @@ const figures = [
     color: var(--green-deep);
   }
 
-  /* ───── 07 cta ───── */
+  /* ───── 06 cta ───── */
   .ct {
     background: linear-gradient(180deg, #f8fbf8, #eef6ee);
     padding-block: clamp(2.5rem, 5vw, 4rem);
@@ -1185,7 +1073,6 @@ const figures = [
     .hero__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr); }
     .pr__head { grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr); }
     .pr__steps { grid-template-columns: repeat(4, 1fr); }
-    .sv__head { grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr); }
     .st__in { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.3fr); }
     .tm__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); }
     .ct__in { grid-template-columns: minmax(0, 1fr) auto; }
@@ -1198,7 +1085,6 @@ const figures = [
 
   @media (prefers-reduced-motion: reduce) {
     .btn, .btn:hover, .film i,
-    .sv__track a, .sv__track a:hover, .sc__go,
     .bc__go :global(svg) {
       transform: none;
       transition: none;
