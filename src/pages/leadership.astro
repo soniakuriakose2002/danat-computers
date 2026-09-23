@@ -1,4 +1,6 @@
 ---
+import fs from 'node:fs';
+import path from 'node:path';
 import { Image } from 'astro:assets';
 import PageLayout from '@layouts/PageLayout.astro';
 import Icon from '@components/ui/Icon.astro';
@@ -38,6 +40,14 @@ import imgPoster from '@assets/photos/film-poster.jpg';
  * the file there is all that is needed — nothing else to change.
  */
 const since = site.stats.since;
+
+/**
+ * Frontmatter runs at build time, so the page can simply look. Without
+ * this the <img> rendered its alt text as a broken image until the file
+ * was supplied, which is worse than an honest empty frame.
+ */
+const PORTRAIT = '/people/shan-sahib.jpg';
+const hasPortrait = fs.existsSync(path.join(process.cwd(), 'public', 'people', 'shan-sahib.jpg'));
 
 /** The mockup's four. Wording is the client's. */
 const values = [
@@ -88,17 +98,23 @@ const values = [
         <p class="lh__script" aria-hidden="true">
           Technology<br />for a stronger<br />Oman
         </p>
-        {/* Save the photograph to public/people/shan-sahib.jpg. Until it
-            is there the frame holds its shape rather than collapsing. */}
-        <img
-          class="lh__img"
-          src="/people/shan-sahib.jpg"
-          alt="Shan Sahib, Managing Director of Danat Computers"
-          width="660"
-          height="830"
-          loading="eager"
-          fetchpriority="high"
-        />
+        {hasPortrait ? (
+          <img
+            class="lh__img"
+            src={PORTRAIT}
+            alt="Shan Sahib, Managing Director of Danat Computers"
+            width="660"
+            height="830"
+            loading="eager"
+            fetchpriority="high"
+          />
+        ) : (
+          <div class="lh__img lh__img--slot">
+            <span class="lh__mark" aria-hidden="true"><Icon name="person" size={30} /></span>
+            <p class="lh__cap">Portrait to follow</p>
+            <p class="lh__hint">Save it to <code>public/people/shan-sahib.jpg</code></p>
+          </div>
+        )}
       </figure>
 
       {/* ── right rail ── */}
@@ -367,6 +383,40 @@ const values = [
       radial-gradient(circle at 50% 36%, #ffffff, #eaf3ea 78%);
     box-shadow: 0 30px 60px -34px rgb(10 30 12 / 0.45);
   }
+  .lh__img--slot {
+    display: grid;
+    place-items: center;
+    align-content: center;
+    gap: 0.7rem;
+    border: 1px dashed color-mix(in oklab, var(--green) 30%, var(--line-light));
+    box-shadow: none;
+    text-align: center;
+    padding: 1.5rem;
+  }
+  .lh__mark {
+    display: grid;
+    place-items: center;
+    width: 4.4rem;
+    height: 4.4rem;
+    border-radius: 50%;
+    background: var(--white);
+    color: var(--green-deep);
+    box-shadow: 0 14px 30px -18px rgb(10 30 12 / 0.45);
+  }
+  .lh__cap {
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+  .lh__hint { font-size: 0.75rem; line-height: 1.5; color: var(--text-3); }
+  .lh__hint code {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    color: var(--green-deep);
+  }
+
   .lh__script {
     position: absolute;
     top: 14%;
