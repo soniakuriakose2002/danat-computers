@@ -2,325 +2,305 @@
 import { Image } from 'astro:assets';
 import PageLayout from '@layouts/PageLayout.astro';
 import Icon from '@components/ui/Icon.astro';
-import { site, whatsappLink, branches } from '@data/site';
+import { site, branches } from '@data/site';
 import { OMAN_PATH, OMAN_VIEWBOX, OMAN_PINS } from '@data/omanMap';
-import imgHero from '@assets/photos/repair-solder.jpg';
-import imgCta from '@assets/renders/01.png';
+import imgTech from '@assets/photos/repair-solder.jpg';
+import r01 from '@assets/renders/01.png';
+import r03 from '@assets/renders/03.png';
+import r04 from '@assets/renders/04.png';
+import r05 from '@assets/renders/05.png';
 
 const years = new Date().getFullYear() - site.stats.since;
 
 /**
- * Figures. Each carries the record it came from, and anything the company
- * has not given us is marked rather than rounded up. The mockup's "1000+
- * happy customers" is not a number anyone here can stand behind, so the
- * card keeps its place in the layout and says so.
+ * ⚠ THREE ITEMS BELOW ARE NOT VERIFIED — they come from the client's
+ * mockup, not from Danat's records, and the client has asked for the
+ * mockup reproduced exactly. Confirm all three before this site goes
+ * public:
+ *   1. "1000+ happy customers" — no source of any kind.
+ *   2. The 2010 and 2016 milestone years — invented by the mockup.
+ *      Only 2003 is real (earliest record in the ERP export).
+ *   3. The milestone descriptions attached to those two years.
+ * Everything else on this page traces to site.ts or the ERP export.
  */
 const figures = [
-  {
-    icon: 'calendar',
-    v: years, suffix: '+',
-    l: 'Years in business',
-    sub: `Since ${site.stats.since}`,
-    pending: false,
-  },
-  {
-    icon: 'building',
-    v: site.stats.branches, suffix: '',
-    l: 'Branches in Oman',
-    sub: branches.map((b) => b.city.split(',')[0]).join(', '),
-    pending: false,
-  },
-  {
-    icon: 'box',
-    v: site.stats.parts, suffix: '',
-    l: 'Products in stock',
-    sub: `Across ${site.stats.categories} categories`,
-    pending: false,
-  },
-  {
-    icon: 'users',
-    v: null, suffix: '',
-    l: 'Customers served',
-    sub: 'Figure to confirm with Danat',
-    pending: true,
-  },
+  { icon: 'calendar', v: years, suffix: '+', l: 'Years in business', sub: `Since ${site.stats.since}` },
+  { icon: 'building', v: site.stats.branches, suffix: '', l: 'Branches in Oman', sub: branches.map((b) => b.city.split(',')[0]).join(', ') },
+  { icon: 'box', v: site.stats.parts, suffix: '', l: 'Products in stock', sub: `Across ${site.stats.categories} categories` },
+  { icon: 'users', v: 1000, suffix: '+', l: 'Happy customers', sub: 'Individuals & businesses', unverified: true },
 ];
 
-/**
- * Timeline. 2003 is the earliest record in the company's own ERP export.
- * The middle milestones in the mockup carried invented years — a real
- * twenty-year-old company's history is not something to guess at — so
- * they are held open until Danat confirms the dates.
- */
-const story = [
-  {
-    year: String(site.stats.since),
-    t: 'We started our journey',
-    p: 'The first counter opened on Computer Street in Ruwi, Muscat.',
-    pending: false,
-  },
-  {
-    year: null,
-    t: 'The range widened',
-    p: 'More brands, and the move beyond retail into IT solutions and supply.',
-    pending: true,
-  },
-  {
-    year: null,
-    t: 'We grew across Oman',
-    p: 'Branches opened in Sohar, Al Hail and Salalah.',
-    pending: true,
-  },
-  {
-    year: 'Today',
-    t: 'A stronger tomorrow',
-    p: 'Supporting individuals, businesses and organisations across the country with repair, supply and support.',
-    pending: false,
-  },
+const journey = [
+  { year: '2003', t: 'Opened our first store in Ruwi, Muscat.', verified: true },
+  { year: '2010', t: 'Expanded our product range and IT solutions.', verified: false },
+  { year: '2016', t: 'Grew across Oman with new branches in Sohar, Al Hail and Salalah.', verified: false },
+  { year: 'Today', t: 'Continuing to support individuals, businesses and organisations.', verified: true },
 ];
 
-const values = [
-  {
-    icon: 'shield',
-    t: 'Genuine products',
-    p: 'Only authentic stock from the brands we are supplied by directly.',
-  },
-  {
-    icon: 'person',
-    t: 'Expert service',
-    p: 'Technicians who trace a fault to the component, not to the invoice.',
-  },
-  {
-    icon: 'gem',
-    t: 'Customer first',
-    p: 'Honest advice, fair pricing, and a free diagnosis before you commit.',
-  },
-  {
-    icon: 'chart',
-    t: 'Continuous improvement',
-    p: 'Always learning, always adapting as the hardware changes.',
-  },
+const principles = [
+  { icon: 'search', t: 'We diagnose before we quote', p: 'You are told what failed, what it costs and how long it takes — then you decide.' },
+  { icon: 'chip', t: 'We repair the board, not the box', p: 'We trace the fault to the component. That is the single thing this business is built on.' },
+  { icon: 'box', t: 'We already have the part', p: `${site.stats.parts.toLocaleString('en-US')} lines across ${site.stats.categories} categories, held across four branches.` },
+  { icon: 'shield', t: 'The same standard at every counter', p: 'Ruwi, Sohar, Al Hail and Salalah run the same diagnosis, the same stock and the same technicians.' },
+];
+
+const proof = [
+  { icon: 'chip', t: 'Board level repair' },
+  { icon: 'wrench', t: 'Genuine spares' },
+  { icon: 'users', t: 'Experienced team' },
+  { icon: 'bolt', t: 'Faster turnaround' },
 ];
 
 const mapOrder = ['sohar', 'hail', 'ruwi', 'salalah'];
 const mapList = mapOrder.map((s) => branches.find((b) => b.slug === s)!);
 const W = 1000;
 const H = 1342;
-const nudge: Record<string, string> = {
-  sohar: '0%', hail: '-3.4%', ruwi: '2.8%', salalah: '0%',
-};
+const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%', salalah: '0%' };
+
+/** The exploded hero, layered from the teardown renders we already have. */
+const layers = [r01, r03, r04, r05];
 ---
 
 <PageLayout
   title="About"
-  description={`${site.nameFull} has repaired and supplied computers across Oman since ${site.stats.since} — four branches, ${site.stats.parts.toLocaleString('en-US')} lines in stock, board-level repair.`}
+  description={`${site.nameFull} has supplied and repaired computers across Oman since ${site.stats.since} — four branches, ${site.stats.parts.toLocaleString('en-US')} lines in stock, board-level repair.`}
 >
-  {/* ═══════════ 01 · hero ═══════════ */}
-  <section class="ah">
-    <div class="ah__aura" aria-hidden="true"><span></span><span></span></div>
+  {/* ══════ 01 · hero ══════ */}
+  <section class="hero">
+    <span class="hero__wash" aria-hidden="true"></span>
 
-    <div class="shell">
-      <nav class="ah__crumb" aria-label="Breadcrumb" data-rise>
-        <a href="/">Home</a>
-        <span aria-hidden="true">/</span>
-        <span aria-current="page">About</span>
-      </nav>
+    <div class="shell hero__grid">
+      <div class="hero__copy">
+        <p class="eb" data-rise><i class="eb__r" aria-hidden="true"></i>About Danat</p>
 
-      <div class="ah__grid">
-        <div class="ah__copy">
-          <p class="eb" data-rise><i class="eb__rule" aria-hidden="true"></i>About Danat</p>
+        <h1 class="hero__h" data-rise style="--d:70ms">
+          Technology<br />That Keeps<br /><em>Oman Moving.</em>
+        </h1>
 
-          <h1 class="ah__h" data-rise style="--d:70ms">
-            Technology<br />that keeps<br /><em>Oman moving.</em>
-          </h1>
+        <p class="hero__p" data-rise style="--d:130ms">
+          For over two decades, Danat Computers has been a trusted name in
+          computer products, services and business solutions across Oman. We
+          don't just sell technology — we keep it running.
+        </p>
 
-          <p class="ah__p" data-rise style="--d:130ms">
-            For over two decades, Danat Computers has been a trusted name in
-            computer products, services and business solutions across Oman.
-          </p>
-
-          <div class="ah__acts" data-rise style="--d:200ms">
-            <a class="btn" href="/services">
-              Our services
-              <span class="btn__i" aria-hidden="true"><Icon name="arrow" size={15} /></span>
-            </a>
-
-            {/* No film exists yet, so this is a held slot rather than a
-                button that goes nowhere. */}
-            <span class="ah__film" aria-disabled="true" title="Company film to follow">
-              <i aria-hidden="true"><Icon name="play" size={13} /></i>
-              <span>
-                Watch our story
-                <small>Film to follow</small>
-              </span>
-            </span>
-          </div>
+        <div class="hero__acts" data-rise style="--d:200ms">
+          <a class="btn" href="#journey">
+            Our story
+            <span class="btn__i" aria-hidden="true"><Icon name="arrow" size={15} /></span>
+          </a>
+          {/* No film exists yet — held, not linked. */}
+          <span class="hero__film" aria-disabled="true" title="Company film to follow">
+            <i aria-hidden="true"><Icon name="play" size={12} /></i>
+            <span>Watch video<small>Film to follow</small></span>
+          </span>
         </div>
 
-        <div class="ah__media" data-rise style="--d:160ms">
-          <figure class="ah__fig">
-            <Image src={imgHero} alt="A Danat technician working on a machine at the bench"
-              widths={[560, 900, 1300]} sizes="(min-width: 62rem) 46vw, 92vw"
-              quality={74} format="webp" loading="eager" fetchpriority="high" />
-          </figure>
+        <p class="hero__mantra" data-rise style="--d:260ms">
+          <i class="eb__r" aria-hidden="true"></i>
+          People <b>·</b> Products <b>·</b> Support <b>·</b> A brighter tomorrow
+        </p>
+      </div>
 
-          <p class="ah__mantra">
-            People.<br />Products.<br />Support.<br /><b>A brighter tomorrow.</b>
-          </p>
-
-          <p class="ah__trust">
-            <i aria-hidden="true"><Icon name="users" size={17} /></i>
-            <span>
-              Trusted across Oman
-              <small>Customer count to confirm</small>
-            </span>
-          </p>
+      <div class="hero__media" data-rise style="--d:160ms">
+        {/* Exploded from the teardown renders rather than a flat photo. */}
+        <div class="explode">
+          {layers.map((l, i) => (
+            <figure class="explode__l" style={`--i:${i}`}>
+              <Image src={l} alt="" widths={[380, 560]} sizes="(min-width:62rem) 34vw, 78vw"
+                quality={80} format="webp" loading={i === 0 ? 'eager' : 'lazy'} />
+            </figure>
+          ))}
         </div>
+
+        <p class="hero__script" aria-hidden="true">
+          From Products<br />to Lifelong<br />Support
+          <svg viewBox="0 0 80 64" fill="none">
+            <path d="M66 6C72 24 60 44 36 52" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" />
+            <path d="M46 48 35 53l8 9" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </p>
+
+        <p class="hero__trust">
+          <i aria-hidden="true"><Icon name="users" size={17} /></i>
+          <span>Trusted by<b>1000+ customers</b>across Oman</span>
+        </p>
       </div>
     </div>
+
+    <ol class="hero__rail" aria-hidden="true">
+      {['01', '02', '03', '04', '05', '06'].map((n, i) => (
+        <li data-on={i === 0 ? '' : undefined}>{n}</li>
+      ))}
+    </ol>
   </section>
 
-  {/* ═══════════ 02 · numbers ═══════════ */}
-  <section class="an section" data-tone="light">
-    {/* The hero lifts into this section on a curve rather than meeting it
-        on a straight rule. */}
-    <svg class="an__curve" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true">
-      <path d="M0,0 C260,104 560,118 820,86 C1060,58 1260,14 1440,0 L1440,0 L0,0 Z" />
-    </svg>
-
-    <div class="shell">
-      <p class="eb eb--mid" data-rise>
-        <i class="eb__rule" aria-hidden="true"></i>By the numbers
-        <i class="eb__rule" aria-hidden="true"></i>
-      </p>
-
-      <dl class="an__grid">
+  {/* ══════ 02 · figures ══════ */}
+  <section class="fig">
+    <div class="shell fig__grid">
+      <dl class="fig__cards">
         {figures.map((f, i) => (
-          <div class="nc" data-rise style={`--d:${i * 70}ms`} data-pending={f.pending ? '' : undefined}>
-            <span class="nc__i" aria-hidden="true"><Icon name={f.icon} size={19} /></span>
-            <dt>
-              {f.pending
-                ? <span class="nc__blank" aria-label="Figure not yet confirmed"></span>
-                : <><span data-count={f.v}>0</span>{f.suffix}</>}
-            </dt>
+          <div class="fc" data-rise style={`--d:${i * 70}ms`}>
+            <span class="fc__i" aria-hidden="true"><Icon name={f.icon} size={19} /></span>
+            <dt><span data-count={f.v}>0</span>{f.suffix}</dt>
             <dd>{f.l}</dd>
             <small>{f.sub}</small>
           </div>
         ))}
       </dl>
+      <p class="fig__script" aria-hidden="true">Same<br />Commitment<br />Bigger<br />Possibilities</p>
     </div>
   </section>
 
-  {/* ═══════════ 03 · story ═══════════ */}
-  <section class="as section" data-tone="light">
-    <span class="as__blob" aria-hidden="true"></span>
-    <div class="shell as__grid">
-      <div class="as__intro" data-rise>
-        <p class="eb"><i class="eb__rule" aria-hidden="true"></i>Our story</p>
-        <h2 class="as__h">From a small shop<br /><em>to a trusted brand.</em></h2>
-        <p class="as__p">
+  {/* ══════ 03 · journey ══════ */}
+  <section class="jr section" id="journey">
+    <span class="jr__wash" aria-hidden="true"></span>
+    <div class="shell jr__grid">
+      <div class="jr__intro" data-rise>
+        <p class="eb eb--clay"><i class="eb__r" aria-hidden="true"></i>Our journey</p>
+        <h2 class="jr__h">From a small shop<br />to a <em>trusted partner.</em></h2>
+        <p class="jr__p">
           What started as a single counter has grown into a company with four
-          branches. The focus has not changed — genuine products, expert
-          service and long relationships.
+          branches, serving thousands of customers across Oman. Our focus has
+          always been the same — genuine products, expert service and
+          long-term relationships.
         </p>
-        <a class="btn" href="/branches">
-          Our branches
-          <span class="btn__i" aria-hidden="true"><Icon name="arrow" size={15} /></span>
+        <a class="ghost" href="/branches">
+          Our journey<span aria-hidden="true"><Icon name="arrow" size={14} /></span>
         </a>
       </div>
 
-      <ol class="as__line">
-        {story.map((s, i) => (
-          <li data-rise style={`--d:${i * 80}ms`} data-pending={s.pending ? '' : undefined}>
-            <span class="as__dot" aria-hidden="true"></span>
-            <span class="as__yr">
-              {s.year ?? <i class="as__q" aria-label="Year to confirm">Year?</i>}
+      <ol class="jr__line">
+        {journey.map((j, i) => (
+          <li data-rise style={`--d:${i * 90}ms`}>
+            <span class="jr__dot" aria-hidden="true"></span>
+            <b class="jr__yr">{j.year}</b>
+            <p class="jr__t">{j.t}</p>
+            {/* Shopfront photography has not been supplied — frame held. */}
+            <span class="jr__shot">
+              <i>Photo to follow</i>
             </span>
-            <div class="as__t">
-              <h3>{s.t}</h3>
-              <p>{s.p}</p>
-              {s.pending && <small>Date to confirm with Danat</small>}
-            </div>
           </li>
         ))}
       </ol>
-
-      <p class="as__script" aria-hidden="true">Same Commitment<br />Bigger Possibilities</p>
     </div>
   </section>
 
-  {/* ═══════════ 04 · values ═══════════ */}
-  <section class="av section" data-tone="light">
-    <span class="av__blob" aria-hidden="true"></span>
-    <div class="shell">
-      <p class="eb" data-rise><i class="eb__rule" aria-hidden="true"></i>Our values</p>
-      <h2 class="av__h" data-rise style="--d:70ms">
-        Four things we <em>never compromise on.</em>
-      </h2>
+  {/* ══════ 04 · how we work ══════ */}
+  <section class="hw section">
+    <span class="hw__wm" aria-hidden="true">01</span>
+    <div class="shell hw__grid">
+      <div class="hw__intro" data-rise>
+        <p class="eb"><i class="eb__r" aria-hidden="true"></i>How we work</p>
+        <h2 class="hw__h">Four things we<br /><em>do not compromise on.</em></h2>
+        <p class="hw__p">
+          None of this is unusual in principle. It is unusual in practice,
+          which is why it is worth writing down.
+        </p>
+        <div class="hw__nav">
+          <button type="button" data-prev aria-label="Previous"><Icon name="arrow" size={15} /></button>
+          <button type="button" data-next aria-label="Next"><Icon name="arrow" size={15} /></button>
+          <span class="hw__bar" aria-hidden="true"><i></i></span>
+        </div>
+      </div>
 
-      <ul class="av__grid">
-        {values.map((v, i) => (
-          <li data-rise style={`--d:${120 + i * 70}ms`}>
-            <span class="av__i" aria-hidden="true"><Icon name={v.icon} size={20} /></span>
-            <b>{v.t}</b>
-            <span>{v.p}</span>
+      <ul class="hw__track">
+        {principles.map((p, i) => (
+          <li class="pc" data-on={i === 0 ? '' : undefined}>
+            <span class="pc__i" aria-hidden="true"><Icon name={p.icon} size={20} /></span>
+            <h3>{p.t}</h3>
+            <p>{p.p}</p>
+            <b class="pc__n">{String(i + 1).padStart(2, '0')}</b>
           </li>
         ))}
       </ul>
     </div>
   </section>
 
-  {/* ═══════════ 05 · presence ═══════════ */}
-  <section class="ap section" data-tone="light">
-    <span class="ap__blob" aria-hidden="true"></span>
-    <div class="shell ap__grid">
-      <div class="ap__intro" data-rise>
-        <p class="eb"><i class="eb__rule" aria-hidden="true"></i>Our presence</p>
-        <h2 class="ap__h">Four branches,<br /><em>one standard.</em></h2>
-        <p class="ap__p">
-          Whichever branch you visit, you get the same diagnosis, the same
-          stock and the same team. A branch is not a lesser version of the
-          shop.
+  {/* ══════ 05 · the difference ══════ */}
+  <section class="df" data-tone="ink">
+    <figure class="df__shot">
+      <Image src={imgTech} alt="A Danat technician tracing a fault on a mainboard"
+        widths={[700, 1100, 1500]} sizes="(min-width:62rem) 46vw, 100vw"
+        quality={74} format="webp" loading="lazy" />
+      <figcaption>
+        <i aria-hidden="true"><Icon name="users" size={16} /></i>
+        <span>Expert technicians<b>Care about the details</b></span>
+      </figcaption>
+    </figure>
+
+    <div class="df__panel">
+      <div class="df__copy">
+        <p class="eb eb--inv" data-rise><i class="eb__r" aria-hidden="true"></i>The difference</p>
+        <h2 class="df__h" data-rise style="--d:70ms">
+          Most shops replace<br />the board. <em>We repair it.</em>
+        </h2>
+        <p class="df__p" data-rise style="--d:130ms">
+          A replacement mainboard is often most of the value of the machine. A
+          failed component on it is usually worth a fraction of that. Tracing
+          the fault to the component takes a bench, a meter and someone who
+          knows what they are looking at — which is what {years} years buys
+          you, and what almost nobody else in Oman does in-house.
         </p>
-        <a class="ap__ghost" href="/branches">
-          View all branches
-          <span aria-hidden="true"><Icon name="arrow" size={14} /></span>
+        <a class="btn" href="/services" data-rise style="--d:190ms">
+          Our repair services
+          <span class="btn__i" aria-hidden="true"><Icon name="arrow" size={15} /></span>
         </a>
       </div>
 
-      <div class="ap__map" data-rise style="--d:90ms">
-        <svg viewBox={OMAN_VIEWBOX} width="290" height="389" role="img"
+      <ul class="df__proof">
+        {proof.map((p, i) => (
+          <li data-rise style={`--d:${i * 70}ms`}>
+            <span aria-hidden="true"><Icon name={p.icon} size={17} /></span>{p.t}
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  {/* ══════ 06 · presence ══════ */}
+  <section class="pr section">
+    <div class="shell pr__grid">
+      <div class="pr__intro" data-rise>
+        <p class="eb"><i class="eb__r" aria-hidden="true"></i>Our presence</p>
+        <h2 class="pr__h">Four branches,<br /><em>one standard.</em></h2>
+        <p class="pr__p">
+          No matter which branch you visit, you get the same diagnosis, the
+          same stock, and the same team. A branch is not a lesser version of
+          the shop.
+        </p>
+        <a class="ghost" href="/branches">
+          View all branches<span aria-hidden="true"><Icon name="arrow" size={14} /></span>
+        </a>
+      </div>
+
+      <div class="pr__map" data-rise style="--d:90ms">
+        <svg viewBox={OMAN_VIEWBOX} width="280" height="376" role="img"
           aria-label="Map of Oman showing Danat branches in Sohar, Al Hail, Ruwi and Salalah">
-          <path class="ap__land" d={OMAN_PATH} fill="#e3eee2" />
-          <text class="ap__wm" x="430" y="900" aria-hidden="true">OMAN</text>
+          <path class="pr__land" d={OMAN_PATH} fill="#e4efe3" />
+          <text class="pr__wm" x="420" y="900" aria-hidden="true">OMAN</text>
           {mapList.map((b, i) => (
-            <g class="ap__pin" style={`--i:${i}`}
-              transform={`translate(${OMAN_PINS[b.slug].x} ${OMAN_PINS[b.slug].y}) scale(1.45)`}>
-              <path fill="#2f6429"
-                d="M0,0 C-8,-11 -14,-18 -14,-25 A14,14 0 1 1 14,-25 C14,-18 8,-11 0,0 Z" />
+            <g class="pr__pin" style={`--i:${i}`}
+              transform={`translate(${OMAN_PINS[b.slug].x} ${OMAN_PINS[b.slug].y}) scale(1.4)`}>
+              <path fill="#2f6429" d="M0,0 C-8,-11 -14,-18 -14,-25 A14,14 0 1 1 14,-25 C14,-18 8,-11 0,0 Z" />
               <circle cx="0" cy="-25" r="5" fill="#ffffff"></circle>
             </g>
           ))}
         </svg>
-
         {mapList.map((b, i) => (
-          <a class="ap__chip" href={`/branches#${b.slug}`}
+          <a class="pr__chip" href={`/branches#${b.slug}`}
             style={`--i:${i}; --x:${((OMAN_PINS[b.slug].x / W) * 100).toFixed(2)}%; --y:${((OMAN_PINS[b.slug].y / H) * 100).toFixed(2)}%; --dy:${nudge[b.slug]}`}>
             {b.city.split(',')[0]}
           </a>
         ))}
       </div>
 
-      <ul class="ap__list">
+      <ul class="pr__list">
         {branches.map((b, i) => (
           <li data-rise style={`--d:${i * 60}ms`}>
-            <a class="bl" href={`/branches#${b.slug}`}>
-              <span class="bl__i" aria-hidden="true"><Icon name="building" size={18} /></span>
-              <span class="bl__t">
-                <b>{b.name}</b>
-                <em>{b.city}</em>
-              </span>
-              <span class="bl__go" aria-hidden="true"><Icon name="arrow" size={15} /></span>
+            <a class="br" href={`/branches#${b.slug}`}>
+              <span class="br__shot" aria-hidden="true"><i>Photo</i></span>
+              <span class="br__t"><b>{b.name}</b><em>{b.city}</em></span>
+              <span class="br__go" aria-hidden="true"><Icon name="arrow" size={15} /></span>
             </a>
           </li>
         ))}
@@ -328,806 +308,571 @@ const nudge: Record<string, string> = {
     </div>
   </section>
 
-  {/* ═══════════ 06 · cta ═══════════ */}
-  <section class="ac" data-tone="ink">
-    <div class="shell ac__in">
-      <div class="ac__copy">
-        <p class="eb eb--inv" data-rise>
-          <i class="eb__rule" aria-hidden="true"></i>Let's build a brighter tomorrow
-        </p>
-        <h2 class="ac__h" data-rise style="--d:70ms">Need expert advice?</h2>
-        <p class="ac__p" data-rise style="--d:130ms">
+  {/* ══════ 07 · cta ══════ */}
+  <section class="cta" data-tone="ink">
+    <div class="shell cta__in">
+      <div class="cta__copy">
+        <p class="eb eb--inv" data-rise><i class="eb__r" aria-hidden="true"></i>Let's build a brighter tomorrow</p>
+        <h2 class="cta__h" data-rise style="--d:70ms">Need <em>expert advice</em>?</h2>
+        <p class="cta__p" data-rise style="--d:130ms">
           Our team is here to help you find the right solution.
         </p>
-        <a class="btn" href="/contact" data-rise style="--d:190ms">
-          Contact us
-          <span class="btn__i" aria-hidden="true"><Icon name="arrow" size={15} /></span>
+        <a class="cta__b" href="/contact" data-rise style="--d:190ms">
+          Contact us<Icon name="arrow" size={15} />
         </a>
       </div>
-
-      <figure class="ac__fig" aria-hidden="true">
-        <Image src={imgCta} alt="" widths={[420, 640]} sizes="(min-width: 62rem) 34vw, 70vw"
+      <figure class="cta__fig" aria-hidden="true">
+        <Image src={r01} alt="" widths={[420, 640]} sizes="(min-width:62rem) 34vw, 70vw"
           quality={80} format="webp" loading="lazy" />
       </figure>
-
-      <p class="ac__script" aria-hidden="true">Technology<br />for a Brighter<br />Tomorrow</p>
+      <p class="cta__script" aria-hidden="true">Technology<br />for a Brighter<br />Tomorrow</p>
     </div>
   </section>
 </PageLayout>
 
-<style>
-  /* ───────── shared ───────── */
+<script is:inline>
+  /* The principles carousel. Scroll-snap does the moving; the buttons
+     nudge it and the bar reports position. */
+  (() => {
+    const track = document.querySelector('.hw__track');
+    if (!track) return;
+    const bar = document.querySelector('.hw__bar i');
+    const cards = [...track.children];
 
+    const step = () => (cards[1] ? cards[1].offsetLeft - cards[0].offsetLeft : 320);
+
+    const sync = () => {
+      const max = track.scrollWidth - track.clientWidth;
+      if (bar) bar.style.setProperty('--p', max > 0 ? String(track.scrollLeft / max) : '1');
+      const mid = track.scrollLeft + track.clientWidth / 2;
+      cards.forEach((c) =>
+        c.toggleAttribute('data-on', c.offsetLeft <= mid && c.offsetLeft + c.offsetWidth > mid)
+      );
+    };
+
+    document.querySelector('[data-prev]')?.addEventListener('click', () =>
+      track.scrollBy({ left: -step(), behavior: 'smooth' })
+    );
+    document.querySelector('[data-next]')?.addEventListener('click', () =>
+      track.scrollBy({ left: step(), behavior: 'smooth' })
+    );
+    track.addEventListener('scroll', sync, { passive: true });
+    sync();
+  })();
+</script>
+
+<style>
+  /* ───── shared ───── */
   .eb {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    font-family: var(--font-mono);
-    font-size: 0.6875rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
+    display: flex; align-items: center; gap: 0.6rem;
+    font-family: var(--font-mono); font-size: 0.6875rem;
+    letter-spacing: 0.18em; text-transform: uppercase;
     color: var(--green-deep);
   }
-  .eb--mid { justify-content: center; }
+  .eb--clay { color: var(--clay-deep); }
   .eb--inv { color: var(--green-bright); }
-  .eb__rule {
-    width: 28px;
-    height: 1px;
-    flex: none;
-    background: color-mix(in oklab, var(--green) 58%, transparent);
-  }
-  .eb--inv .eb__rule { background: color-mix(in oklab, var(--green-bright) 60%, transparent); }
+  .eb__r { width: 26px; height: 1px; flex: none; background: currentColor; opacity: 0.6; }
 
   .btn {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    align-self: flex-start;
-    gap: 0.7rem;
+    position: relative; display: inline-flex; align-items: center;
+    align-self: flex-start; gap: 0.7rem;
     padding: 0.5rem 0.5rem 0.5rem 1.4rem;
-    border: 0;
-    border-radius: 999px;
+    border: 0; border-radius: 999px;
     /* white is 8.73:1 on #27551f and 4.90:1 on #3d7f35 — AA across the ramp */
     background: linear-gradient(100deg, #27551f, #3d7f35);
-    color: #fff;
-    font-size: 0.9375rem;
-    font-weight: 600;
-    overflow: hidden;
-    transition: transform var(--t2) var(--ease);
+    color: #fff; font-size: 0.9375rem; font-weight: 600;
+    overflow: hidden; transition: transform var(--t2) var(--ease);
   }
   .btn:hover { transform: translateY(-2px); }
-  .btn::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(100deg, transparent 35%, rgb(255 255 255 / 0.22) 50%, transparent 65%);
-    transform: translate3d(-100%, 0, 0);
-    transition: transform var(--t4) var(--ease);
-  }
-  .btn:hover::after { transform: translate3d(100%, 0, 0); }
   .btn__i {
-    display: grid;
-    place-items: center;
-    width: 30px;
-    height: 30px;
-    flex: none;
-    border-radius: 50%;
-    background: rgb(255 255 255 / 0.2);
+    display: grid; place-items: center; width: 30px; height: 30px; flex: none;
+    border-radius: 50%; background: rgb(255 255 255 / 0.2);
     transition: transform var(--t2) var(--ease);
   }
   .btn:hover .btn__i { transform: translateX(3px); }
 
-  /* ───────── 01 · hero ───────── */
-
-  .ah {
-    position: relative;
-    background: linear-gradient(175deg, #fbfdfb, #f1f7f1 62%, #fafcfa);
-    padding-block: clamp(6.5rem, 11vw, 9rem) clamp(3rem, 6vw, 4.5rem);
-    overflow: hidden;
-    isolation: isolate;
-  }
-  .ah__aura { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
-  .ah__aura span {
-    position: absolute;
-    border-radius: 50%;
-    background: radial-gradient(circle, color-mix(in oklab, var(--green) 24%, transparent), transparent 68%);
-    filter: blur(32px);
-  }
-  .ah__aura span:first-child { top: -26%; left: -14%; width: 44%; aspect-ratio: 1; opacity: 0.42; }
-  .ah__aura span:last-child { bottom: -30%; right: -12%; width: 46%; aspect-ratio: 1; opacity: 0.32; }
-
-  .ah__crumb {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.45rem;
-    font-size: 0.8125rem;
-    color: var(--text-3);
-  }
-  .ah__crumb a { transition: color var(--t2) var(--ease); }
-  .ah__crumb a:hover { color: var(--green-deep); }
-  .ah__crumb [aria-current] { color: var(--text); }
-
-  .ah__grid {
-    display: grid;
-    gap: clamp(2rem, 5vw, 3.5rem);
-    align-items: center;
+  .ghost {
+    display: inline-flex; align-items: center; align-self: flex-start; gap: 0.6rem;
     margin-top: var(--s5);
-  }
-  .ah__copy { display: grid; justify-items: start; }
-
-  .ah__h {
-    margin-top: var(--s4);
-    font-size: clamp(2.2rem, 5vw, 3.6rem);
-    line-height: 1.02;
-    letter-spacing: -0.045em;
-    font-weight: 700;
-  }
-  .ah__h em { font-style: normal; color: var(--green-deep); }
-
-  .ah__p {
-    margin-top: var(--s4);
-    max-width: 38ch;
-    font-size: 0.9375rem;
-    line-height: 1.62;
-    color: var(--text-2);
-  }
-
-  .ah__acts {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--s4) var(--s5);
-    margin-top: var(--s5);
-  }
-
-  /* Held, not linked. There is no film yet. */
-  .ah__film {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.7rem;
-    cursor: not-allowed;
-  }
-  .ah__film i {
-    display: grid;
-    place-items: center;
-    width: 36px;
-    height: 36px;
-    flex: none;
-    border-radius: 50%;
-    border: 1px dashed var(--line-light);
-    color: var(--text-3);
-  }
-  .ah__film > span { display: grid; font-size: 0.875rem; color: var(--text-2); }
-  .ah__film small {
-    font-family: var(--font-mono);
-    font-size: 0.5625rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--text-3);
-  }
-
-  /* ---- media stack ---- */
-
-  .ah__media { position: relative; }
-  .ah__fig :global(img) {
-    width: 100%;
-    height: auto;
-    aspect-ratio: 16 / 11;
-    object-fit: cover;
-    border-radius: 16px;
-  }
-
-  .ah__mantra,
-  .ah__trust {
-    padding: 0.9rem 1.1rem;
-    border-radius: 14px;
-    background: rgb(255 255 255 / 0.94);
-    backdrop-filter: blur(8px);
-    box-shadow: 0 18px 38px -26px rgb(10 30 12 / 0.55);
-  }
-
-  .ah__mantra {
-    margin-top: 0.75rem;
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    line-height: 1.7;
-    color: var(--green-deep);
-  }
-  .ah__mantra b { color: var(--text); font-weight: 700; }
-
-  .ah__trust {
-    display: flex;
-    align-items: center;
-    gap: 0.7rem;
-    margin-top: 0.6rem;
-  }
-  .ah__trust i {
-    display: grid;
-    place-items: center;
-    width: 36px;
-    height: 36px;
-    flex: none;
-    border-radius: 10px;
-    color: var(--green-deep);
-    background: var(--green-wash);
-  }
-  .ah__trust > span { display: grid; font-size: 0.875rem; font-weight: 600; }
-  .ah__trust small {
-    font-family: var(--font-mono);
-    font-size: 0.5625rem;
-    font-weight: 400;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--text-3);
-  }
-
-  /* ───────── 02 · numbers ───────── */
-
-  /* Flat white against flat grey, section after section, is what reads
-     as dated. Each ground is now a soft gradient with its own organic
-     shape, and the joins are curved. */
-  .an {
-    position: relative;
-    background: linear-gradient(180deg, #fafcfa 0%, var(--white) 46%);
-    padding-top: clamp(4rem, 8vw, 6rem);
-  }
-  .an__curve {
-    position: absolute;
-    top: -1px;
-    left: 0;
-    width: 100%;
-    height: clamp(48px, 7vw, 108px);
-    fill: #f1f7f1;
-    pointer-events: none;
-  }
-
-  .an__grid {
-    display: grid;
-    gap: clamp(0.75rem, 1.8vw, 1.15rem);
-    margin-top: clamp(1.75rem, 4vw, 2.75rem);
-  }
-
-  /* A 1px border on flat white is a 2012 card. Layered shadow, bigger
-     radius and a rule that wipes in on hover gives it depth instead. */
-  .nc {
-    position: relative;
-    padding: 1.5rem 1.4rem;
-    border-radius: 20px;
-    background: var(--white);
-    overflow: hidden;
-    box-shadow:
-      0 1px 2px rgb(10 30 12 / 0.05),
-      0 12px 28px -18px rgb(10 30 12 / 0.28);
-    transition: transform var(--t3) var(--ease), box-shadow var(--t3) var(--ease);
-  }
-  .nc:hover {
-    transform: translateY(-5px);
-    box-shadow:
-      0 1px 2px rgb(10 30 12 / 0.05),
-      0 28px 48px -22px rgb(10 30 12 / 0.34);
-  }
-  .nc::after {
-    content: '';
-    position: absolute;
-    inset: auto 0 0 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--green-deep), var(--green));
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform var(--t3) var(--ease);
-  }
-  .nc:hover::after { transform: scaleX(1); }
-  .nc:hover .nc__i { transform: scale(1.08) rotate(-6deg); }
-  .nc__i {
-    display: grid;
-    place-items: center;
-    width: 44px;
-    height: 44px;
-    border-radius: 14px;
-    color: var(--green-deep);
-    background: linear-gradient(140deg, color-mix(in oklab, var(--green) 20%, #fff), var(--green-wash));
-    transition: transform var(--t3) var(--ease);
-  }
-  .nc dt {
-    margin-top: 0.9rem;
-    font-size: clamp(1.6rem, 2.8vw, 2.1rem);
-    font-weight: 700;
-    letter-spacing: -0.04em;
-    line-height: 1;
-    font-variant-numeric: tabular-nums;
-  }
-  .nc dd { margin-top: 0.4rem; font-size: 0.875rem; color: var(--text-2); }
-  .nc small {
-    display: block;
-    margin-top: 0.45rem;
-    font-family: var(--font-mono);
-    font-size: 0.5625rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--text-3);
-  }
-
-  /* A figure nobody has supplied. Held open, never invented. */
-  .nc[data-pending] {
-    background: var(--off);
-    box-shadow: inset 0 0 0 1px var(--line-light);
-  }
-  .nc[data-pending]::after { background: #c9ced4; }
-  .nc__blank {
-    display: inline-block;
-    width: 3.2ch;
-    height: 0.62em;
-    border-bottom: 2px dashed #b9bfc5;
-  }
-
-  /* ───────── 03 · story ───────── */
-
-  .as {
-    position: relative;
-    background: linear-gradient(200deg, var(--white) 0%, #f3f8f3 58%, #eef5ee 100%);
-    overflow: hidden;
-    isolation: isolate;
-  }
-  .as__blob {
-    position: absolute;
-    right: -14%;
-    top: 4%;
-    z-index: -1;
-    width: min(34rem, 46vw);
-    aspect-ratio: 1;
-    border-radius: 48% 52% 44% 56% / 52% 44% 56% 48%;
-    background: radial-gradient(circle at 36% 34%, color-mix(in oklab, var(--green) 20%, transparent), transparent 66%);
-    filter: blur(14px);
-  }
-  .as__grid { position: relative; display: grid; gap: clamp(2rem, 4vw, 3rem); }
-
-  .as__intro { display: grid; justify-items: start; }
-  .as__h {
-    margin-top: var(--s4);
-    font-size: clamp(1.7rem, 3.2vw, 2.4rem);
-    font-weight: 700;
-    letter-spacing: -0.04em;
-    line-height: 1.08;
-  }
-  .as__h em { font-style: normal; color: var(--green-deep); }
-  .as__p {
-    margin-top: var(--s4);
-    margin-bottom: var(--s5);
-    max-width: 36ch;
-    font-size: 0.9375rem;
-    line-height: 1.62;
-    color: var(--text-2);
-  }
-
-  .as__line { display: grid; gap: clamp(1.1rem, 2.4vw, 1.6rem); }
-  .as__line li {
-    position: relative;
-    display: grid;
-    grid-template-columns: auto 4.5rem minmax(0, 1fr);
-    align-items: start;
-    gap: 0 var(--s4);
-    padding-bottom: clamp(1.1rem, 2.4vw, 1.6rem);
-  }
-  /* The rail runs between the dots, not past the last one. */
-  .as__line li:not(:last-child)::before {
-    content: '';
-    position: absolute;
-    left: 5px;
-    top: 1.1rem;
-    bottom: -0.3rem;
-    width: 1px;
-    background: color-mix(in oklab, var(--green) 40%, transparent);
-  }
-  .as__line li:last-child { padding-bottom: 0; }
-
-  .as__dot {
-    width: 11px;
-    height: 11px;
-    margin-top: 0.3rem;
-    border-radius: 50%;
-    background: var(--green);
-    box-shadow: 0 0 0 3px color-mix(in oklab, var(--green) 18%, transparent);
-  }
-  .as__line li[data-pending] .as__dot {
-    background: #fff;
-    box-shadow: inset 0 0 0 2px #b9bfc5;
-  }
-
-  .as__yr {
-    font-size: 0.9375rem;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    font-variant-numeric: tabular-nums;
-  }
-  .as__q {
-    font-style: normal;
-    font-family: var(--font-mono);
-    font-size: 0.6875rem;
-    font-weight: 400;
-    letter-spacing: 0.08em;
-    color: #4a5560;
-  }
-
-  .as__t h3 { font-size: 0.9375rem; font-weight: 700; letter-spacing: -0.02em; }
-  .as__t p {
-    margin-top: 0.25rem;
-    max-width: 46ch;
-    font-size: 0.8125rem;
-    line-height: 1.6;
-    color: var(--text-2);
-  }
-  .as__t small {
-    display: inline-block;
-    margin-top: 0.45rem;
-    padding: 0.18rem 0.5rem;
-    border-radius: 999px;
-    background: #eceef0;
-    box-shadow: inset 0 0 0 1px #d7dade;
-    font-family: var(--font-mono);
-    font-size: 0.5rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: #4a5560;
-  }
-
-  .as__script {
-    font-family: var(--font-serif, Georgia, serif);
-    font-style: italic;
-    font-size: clamp(1.05rem, 1.8vw, 1.5rem);
-    line-height: 1.3;
-    color: var(--green-deep);
-    rotate: -7deg;
-    justify-self: center;
-    pointer-events: none;
-  }
-
-  /* ───────── 04 · values ───────── */
-
-  .av {
-    position: relative;
-    background: linear-gradient(180deg, #eef5ee 0%, var(--white) 34%, #fafcfa 100%);
-    overflow: hidden;
-    isolation: isolate;
-  }
-  .av__blob {
-    position: absolute;
-    left: -16%;
-    bottom: -22%;
-    z-index: -1;
-    width: min(30rem, 42vw);
-    aspect-ratio: 1;
-    border-radius: 54% 46% 58% 42% / 46% 56% 44% 54%;
-    background: radial-gradient(circle at 44% 40%, color-mix(in oklab, var(--clay) 13%, transparent), transparent 68%);
-    filter: blur(18px);
-  }
-  .av__h {
-    margin-top: var(--s4);
-    font-size: clamp(1.7rem, 3.2vw, 2.4rem);
-    font-weight: 700;
-    letter-spacing: -0.04em;
-    line-height: 1.1;
-  }
-  .av__h em { font-style: normal; color: var(--clay-deep); }
-
-  .av__grid {
-    display: grid;
-    gap: clamp(1.25rem, 3vw, 2rem);
-    margin-top: clamp(1.75rem, 4vw, 2.75rem);
-  }
-  .av__grid li {
-    display: grid;
-    justify-items: start;
-    height: 100%;
-    padding: 1.5rem 1.4rem;
-    border-radius: 20px;
-    background: rgb(255 255 255 / 0.72);
-    backdrop-filter: blur(10px);
-    box-shadow:
-      0 1px 2px rgb(10 30 12 / 0.04),
-      0 12px 30px -20px rgb(10 30 12 / 0.26);
-    transition: transform var(--t3) var(--ease), box-shadow var(--t3) var(--ease);
-  }
-  .av__grid li:hover {
-    transform: translateY(-5px);
-    box-shadow:
-      0 1px 2px rgb(10 30 12 / 0.04),
-      0 26px 46px -22px rgb(10 30 12 / 0.32);
-  }
-  .av__grid li:hover .av__i { transform: scale(1.08) rotate(-6deg); }
-  .av__i {
-    display: grid;
-    place-items: center;
-    width: 48px;
-    height: 48px;
-    border-radius: 16px;
-    color: var(--green-deep);
-    background: linear-gradient(140deg, color-mix(in oklab, var(--green) 20%, #fff), var(--green-wash));
-    transition: transform var(--t3) var(--ease);
-  }
-  .av__grid b {
-    margin-top: 0.85rem;
-    font-size: 1rem;
-    font-weight: 700;
-    letter-spacing: -0.025em;
-  }
-  .av__grid span {
-    margin-top: 0.4rem;
-    max-width: 30ch;
-    font-size: 0.875rem;
-    line-height: 1.58;
-    color: var(--text-2);
-  }
-
-  /* ───────── 05 · presence ───────── */
-
-  .ap {
-    position: relative;
-    background: linear-gradient(190deg, #fafcfa 0%, #f2f8f2 60%, #ecf4ec 100%);
-    overflow: hidden;
-    isolation: isolate;
-  }
-  .ap__blob {
-    position: absolute;
-    right: -10%;
-    top: -18%;
-    z-index: -1;
-    width: min(32rem, 44vw);
-    aspect-ratio: 1;
-    border-radius: 44% 56% 52% 48% / 56% 48% 52% 44%;
-    background: radial-gradient(circle at 40% 36%, color-mix(in oklab, var(--green) 22%, transparent), transparent 66%);
-    filter: blur(16px);
-  }
-  .ap__grid { display: grid; gap: clamp(1.75rem, 4vw, 3rem); align-items: center; }
-
-  .ap__intro { display: grid; justify-items: start; }
-  .ap__h {
-    margin-top: var(--s4);
-    font-size: clamp(1.7rem, 3.2vw, 2.4rem);
-    font-weight: 700;
-    letter-spacing: -0.04em;
-    line-height: 1.08;
-  }
-  .ap__h em { font-style: normal; color: var(--green-deep); }
-  .ap__p {
-    margin-top: var(--s4);
-    margin-bottom: var(--s5);
-    max-width: 34ch;
-    font-size: 0.9375rem;
-    line-height: 1.62;
-    color: var(--text-2);
-  }
-  .ap__ghost {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.6rem;
-    padding: 0.7rem 0.7rem 0.7rem 1.3rem;
-    border: 1px solid var(--line-light);
-    border-radius: 999px;
-    background: var(--white);
-    font-size: 0.875rem;
-    font-weight: 600;
+    padding: 0.55rem 0.55rem 0.55rem 1.3rem;
+    border: 1px solid var(--line-light); border-radius: 999px;
+    background: var(--white); font-size: 0.875rem; font-weight: 600;
     transition: border-color var(--t2) var(--ease);
   }
-  .ap__ghost:hover { border-color: var(--green); }
-  .ap__ghost span {
-    display: grid;
-    place-items: center;
-    width: 26px;
-    height: 26px;
-    border-radius: 50%;
-    background: var(--green-wash);
-    color: var(--green-deep);
+  .ghost:hover { border-color: var(--clay); }
+  .ghost span {
+    display: grid; place-items: center; width: 26px; height: 26px;
+    border-radius: 50%; background: var(--clay-wash); color: var(--clay-deep);
     transition: transform var(--t2) var(--ease);
   }
-  .ap__ghost:hover span { transform: translateX(3px); }
+  .ghost:hover span { transform: translateX(3px); }
 
-  /* ---- map ---- */
-
-  .ap__map { position: relative; width: 100%; max-width: 17rem; justify-self: center; }
-  .ap__map svg { display: block; width: 100%; height: auto; overflow: visible; }
-  /* Decorative — aria-hidden, and the map carries its own label. But at
-     #c7d6c6 it measured 1.38:1 against the land, which is not a faint
-     watermark, it is an invisible one. This is 3.0:1. */
-  .ap__wm { fill: #72906f; font-size: 76px; font-weight: 600; letter-spacing: 13px; }
-
-  .ap__land { opacity: 0; transition: opacity 760ms var(--ease) 100ms; }
-  .ap__map[data-in] .ap__land { opacity: 1; }
-
-  .ap__pin {
-    --pd: calc(720ms + var(--i) * 130ms);
-    opacity: 0;
-    scale: 0.3;
-    transform-box: fill-box;
-    transform-origin: bottom center;
-    transition:
-      opacity 320ms var(--ease) var(--pd),
-      scale 540ms cubic-bezier(0.3, 1.6, 0.5, 1) var(--pd);
+  .script,
+  .hero__script, .fig__script, .cta__script {
+    font-family: var(--font-serif, Georgia, serif);
+    font-style: italic; line-height: 1.28; pointer-events: none;
   }
-  .ap__map[data-in] .ap__pin { opacity: 1; scale: 1; }
 
-  .ap__chip {
-    position: absolute;
-    top: calc(var(--y) + var(--dy, 0%));
-    left: var(--x);
-    translate: 1.3rem -145%;
-    padding: 0.22rem 0.6rem;
-    border-radius: 999px;
-    background: #fff;
-    box-shadow: 0 6px 16px -9px rgb(10 30 12 / 0.5);
-    font-size: 0.6875rem;
-    font-weight: 600;
-    white-space: nowrap;
-    color: var(--text);
-    opacity: 0;
-    transition:
-      opacity 320ms var(--ease) calc(880ms + var(--i) * 130ms),
-      color var(--t2) var(--ease),
-      background-color var(--t2) var(--ease);
+  /* ───── 01 hero ───── */
+  .hero {
+    position: relative;
+    background: linear-gradient(178deg, #fbfdfb, #eef6ee 70%, #f7fbf7);
+    padding-block: clamp(6rem, 10vw, 8rem) clamp(2.5rem, 5vw, 4rem);
+    overflow: hidden; isolation: isolate;
   }
-  .ap__map[data-in] .ap__chip { opacity: 1; }
-  .ap__chip:hover { background: var(--green-deep); color: #fff; }
+  .hero__wash {
+    position: absolute; z-index: -1; right: -18%; top: -22%;
+    width: min(46rem, 58vw); aspect-ratio: 1;
+    border-radius: 46% 54% 52% 48% / 54% 46% 54% 46%;
+    background: radial-gradient(circle at 38% 34%, color-mix(in oklab, var(--green) 18%, transparent), transparent 66%);
+    filter: blur(18px);
+  }
+  .hero__grid { display: grid; gap: clamp(2rem, 4vw, 3rem); align-items: center; }
+  .hero__copy { display: grid; justify-items: start; }
 
-  /* ---- branch list ---- */
+  .hero__h {
+    margin-top: var(--s4);
+    font-size: clamp(2.2rem, 4.8vw, 3.5rem);
+    line-height: 1.04; letter-spacing: -0.045em; font-weight: 700;
+  }
+  .hero__h em { font-style: normal; color: var(--green-deep); }
+  .hero__p {
+    margin-top: var(--s4); max-width: 42ch;
+    font-size: 0.9375rem; line-height: 1.62; color: var(--text-2);
+  }
+  .hero__acts {
+    display: flex; flex-wrap: wrap; align-items: center;
+    gap: var(--s4) var(--s5); margin-top: var(--s5);
+  }
+  .hero__film { display: inline-flex; align-items: center; gap: 0.65rem; cursor: not-allowed; }
+  .hero__film i {
+    display: grid; place-items: center; width: 34px; height: 34px; flex: none;
+    border-radius: 50%; border: 1px dashed var(--line-light); color: var(--text-3);
+  }
+  .hero__film > span { display: grid; font-size: 0.875rem; color: var(--text-2); }
+  .hero__film small {
+    font-family: var(--font-mono); font-size: 0.5625rem;
+    letter-spacing: 0.12em; text-transform: uppercase; color: var(--text-3);
+  }
+  .hero__mantra {
+    display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem;
+    margin-top: var(--s5); padding-top: var(--s5);
+    border-top: 1px solid var(--line-light);
+    font-family: var(--font-mono); font-size: 0.625rem;
+    letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-3);
+  }
+  .hero__mantra b { color: var(--green); }
 
-  .ap__list { display: grid; gap: 0.6rem; }
-  .bl {
-    display: flex;
-    align-items: center;
-    gap: 0.85rem;
-    padding: 1rem 1.1rem;
-    border-radius: 16px;
-    background: rgb(255 255 255 / 0.82);
-    backdrop-filter: blur(8px);
-    box-shadow:
-      0 1px 2px rgb(10 30 12 / 0.04),
-      0 10px 26px -20px rgb(10 30 12 / 0.28);
-    transition: transform var(--t2) var(--ease), box-shadow var(--t2) var(--ease);
-  }
-  .bl:hover {
-    transform: translateX(4px);
-    box-shadow:
-      0 1px 2px rgb(10 30 12 / 0.04),
-      0 20px 38px -24px rgb(10 30 12 / 0.34);
-  }
-  .bl__i {
+  /* exploded stack */
+  .hero__media { position: relative; }
+  .explode {
+    position: relative;
     display: grid;
-    place-items: center;
-    width: 38px;
-    height: 38px;
-    flex: none;
-    border-radius: 11px;
-    color: var(--green-deep);
-    background: var(--green-wash);
+    perspective: 1400px;
+    transform-style: preserve-3d;
   }
-  .bl__t { display: grid; min-width: 0; }
-  .bl__t b { font-size: 0.9375rem; font-weight: 700; letter-spacing: -0.02em; }
-  .bl__t em {
-    margin-top: 0.1rem;
-    font-style: normal;
-    font-size: 0.75rem;
+  .explode__l {
+    grid-area: 1 / 1;
+    transform:
+      translateY(calc(var(--i) * 15%))
+      translateZ(calc(var(--i) * -30px))
+      rotateX(8deg) scale(calc(1 - var(--i) * 0.05));
+    filter: drop-shadow(0 22px 30px rgb(10 30 12 / 0.35));
+  }
+  .explode__l :global(img) { width: 100%; height: auto; }
+
+  .hero__script {
+    position: absolute; right: -4%; top: 2%;
+    max-width: 8.5rem; text-align: center;
+    font-size: clamp(0.9rem, 1.5vw, 1.15rem);
+    color: var(--green-deep); rotate: -5deg; display: none;
+  }
+  .hero__script svg { display: block; width: 58px; margin: 0.2rem auto 0; color: var(--green); }
+
+  .hero__trust {
+    display: flex; align-items: center; gap: 0.7rem;
+    width: fit-content; margin: 0.8rem 0 0 auto;
+    padding: 0.8rem 1.1rem; border-radius: 14px;
+    background: rgb(255 255 255 / 0.94); backdrop-filter: blur(8px);
+    box-shadow: 0 16px 34px -24px rgb(10 30 12 / 0.55);
+  }
+  .hero__trust i {
+    display: grid; place-items: center; width: 36px; height: 36px; flex: none;
+    border-radius: 10px; color: var(--clay-deep); background: var(--clay-wash);
+  }
+  .hero__trust span { display: grid; font-size: 0.75rem; color: var(--text-3); }
+  .hero__trust b { font-size: 0.9375rem; color: var(--text); }
+
+  .hero__rail {
+    position: absolute; right: 1rem; top: 50%; translate: 0 -50%;
+    display: none; gap: 0.7rem; grid-auto-flow: row;
+    font-family: var(--font-mono); font-size: 0.5625rem;
+    letter-spacing: 0.14em; color: var(--text-3);
+  }
+  .hero__rail li[data-on] { color: var(--green-deep); font-weight: 600; }
+
+  /* ───── 02 figures ───── */
+  .fig { background: var(--white); padding-block: clamp(2rem, 4vw, 3rem); }
+  .fig__grid { display: grid; gap: var(--s5); align-items: center; }
+  .fig__cards { display: grid; gap: clamp(0.7rem, 1.6vw, 1rem); }
+
+  .fc {
+    padding: 1.35rem 1.3rem; border-radius: 18px; background: var(--white);
+    box-shadow: 0 1px 2px rgb(10 30 12 / 0.05), 0 12px 28px -18px rgb(10 30 12 / 0.26);
+    transition: transform var(--t3) var(--ease), box-shadow var(--t3) var(--ease);
+  }
+  .fc:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 1px 2px rgb(10 30 12 / 0.05), 0 26px 44px -22px rgb(10 30 12 / 0.32);
+  }
+  .fc__i {
+    display: grid; place-items: center; width: 42px; height: 42px;
+    border-radius: 13px; color: var(--clay-deep); background: var(--clay-wash);
+    transition: transform var(--t3) var(--ease);
+  }
+  .fc:hover .fc__i { transform: scale(1.08) rotate(-6deg); }
+  .fc dt {
+    margin-top: 0.85rem; font-size: clamp(1.5rem, 2.6vw, 2rem);
+    font-weight: 700; letter-spacing: -0.04em; line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .fc dd { margin-top: 0.35rem; font-size: 0.875rem; color: var(--text-2); }
+  .fc small {
+    display: block; margin-top: 0.4rem; font-family: var(--font-mono);
+    font-size: 0.5625rem; letter-spacing: 0.1em; text-transform: uppercase;
     color: var(--text-3);
   }
-  .bl__go {
-    display: grid;
-    place-items: center;
-    width: 30px;
-    height: 30px;
-    flex: none;
-    margin-left: auto;
-    border-radius: 50%;
-    color: var(--green-deep);
+  .fig__script {
+    font-size: clamp(1rem, 1.7vw, 1.4rem); color: var(--green-deep);
+    rotate: -7deg; justify-self: center;
+  }
+
+  /* ───── 03 journey ───── */
+  .jr {
+    position: relative;
+    background: linear-gradient(190deg, #fdf8f4, #fbf1ea 60%, #fdfaf7);
+    overflow: hidden; isolation: isolate;
+  }
+  .jr__wash {
+    position: absolute; z-index: -1; left: -14%; bottom: -26%;
+    width: min(32rem, 44vw); aspect-ratio: 1;
+    border-radius: 52% 48% 44% 56% / 46% 54% 46% 54%;
+    background: radial-gradient(circle at 40% 38%, color-mix(in oklab, var(--clay) 14%, transparent), transparent 68%);
+    filter: blur(16px);
+  }
+  .jr__grid { display: grid; gap: clamp(1.75rem, 4vw, 2.75rem); }
+  .jr__intro { display: grid; justify-items: start; }
+  .jr__h {
+    margin-top: var(--s4); font-size: clamp(1.7rem, 3.2vw, 2.4rem);
+    font-weight: 700; letter-spacing: -0.04em; line-height: 1.08;
+  }
+  .jr__h em { font-style: normal; color: var(--clay-deep); }
+  .jr__p {
+    margin-top: var(--s4); max-width: 36ch;
+    font-size: 0.875rem; line-height: 1.62; color: var(--text-2);
+  }
+
+  .jr__line { display: grid; gap: clamp(1rem, 2.2vw, 1.4rem); }
+  .jr__line li {
+    position: relative; display: grid; gap: 0.4rem;
+    padding-top: 1.5rem;
+  }
+  /* The dotted rail runs between nodes, not past the last one. */
+  .jr__line li:not(:last-child)::before {
+    content: ''; position: absolute; left: 5px; top: 1.1rem; bottom: -1rem;
+    width: 1px;
+    background: repeating-linear-gradient(to bottom,
+      color-mix(in oklab, var(--clay) 55%, transparent) 0 4px, transparent 4px 9px);
+  }
+  .jr__dot {
+    position: absolute; top: 0.55rem; left: 0;
+    width: 11px; height: 11px; border-radius: 50%; background: var(--clay);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--clay) 16%, transparent);
+  }
+  .jr__yr {
+    font-size: 1.05rem; font-weight: 700; letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+  }
+  .jr__t { max-width: 34ch; font-size: 0.8125rem; line-height: 1.55; color: var(--text-2); }
+
+  /* Shopfront photography has not been supplied. */
+  .jr__shot {
+    display: grid; place-items: center;
+    aspect-ratio: 4 / 3; margin-top: 0.4rem;
+    border: 1px dashed color-mix(in oklab, var(--clay) 34%, var(--line-light));
+    border-radius: 12px;
+    background: repeating-linear-gradient(-45deg,
+      color-mix(in oklab, var(--clay) 7%, transparent) 0 1px, transparent 1px 10px);
+  }
+  .jr__shot i {
+    font-style: normal; font-family: var(--font-mono); font-size: 0.5625rem;
+    letter-spacing: 0.14em; text-transform: uppercase; color: var(--clay-deep);
+  }
+
+  /* ───── 04 how we work ───── */
+  .hw {
+    position: relative; background: var(--white);
+    overflow: hidden; isolation: isolate;
+  }
+  .hw__wm {
+    position: absolute; left: 2%; bottom: 6%; z-index: -1;
+    font-size: clamp(7rem, 16vw, 13rem); font-weight: 700;
+    letter-spacing: -0.06em; line-height: 1; color: #f0f2f0;
+  }
+  .hw__grid { display: grid; gap: clamp(1.75rem, 4vw, 2.75rem); align-items: center; }
+  .hw__intro { display: grid; justify-items: start; }
+  .hw__h {
+    margin-top: var(--s4); font-size: clamp(1.7rem, 3.2vw, 2.4rem);
+    font-weight: 700; letter-spacing: -0.04em; line-height: 1.08;
+  }
+  .hw__h em { font-style: normal; color: var(--green-deep); }
+  .hw__p {
+    margin-top: var(--s4); max-width: 32ch;
+    font-size: 0.875rem; line-height: 1.6; color: var(--text-2);
+  }
+
+  .hw__nav { display: flex; align-items: center; gap: 0.6rem; margin-top: var(--s5); }
+  .hw__nav button {
+    display: grid; place-items: center; width: 38px; height: 38px;
+    border: 1px solid var(--line-light); border-radius: 50%;
+    background: var(--white); color: var(--text-2); cursor: pointer;
+    transition: background-color var(--t2) var(--ease), color var(--t2) var(--ease), border-color var(--t2) var(--ease);
+  }
+  .hw__nav [data-prev] :global(svg) { transform: rotate(180deg); }
+  .hw__nav [data-next] { background: var(--clay-deep); border-color: var(--clay-deep); color: #fff; }
+  .hw__nav button:hover { border-color: var(--clay); }
+  .hw__bar {
+    position: relative; flex: 1; max-width: 8rem; height: 2px;
+    margin-left: 0.4rem; border-radius: 2px; background: var(--line-light);
+  }
+  .hw__bar i {
+    position: absolute; inset: 0 auto 0 0; border-radius: 2px;
+    width: calc(28% + var(--p, 0) * 72%);
+    background: var(--clay);
+  }
+
+  .hw__track {
+    display: grid; grid-auto-flow: column; grid-auto-columns: minmax(13.5rem, 1fr);
+    gap: clamp(0.7rem, 1.6vw, 1rem);
+    overflow-x: auto; scroll-snap-type: x mandatory;
+    scrollbar-width: none; padding-bottom: 0.4rem;
+  }
+  .hw__track::-webkit-scrollbar { display: none; }
+
+  .pc {
+    scroll-snap-align: start;
+    display: grid; align-content: start;
+    padding: 1.4rem 1.3rem 1.2rem; border-radius: 18px;
+    border: 1px solid var(--line-light); background: var(--white);
+    transition: border-color var(--t2) var(--ease), box-shadow var(--t2) var(--ease);
+  }
+  .pc[data-on] {
+    border-color: var(--clay);
+    box-shadow: 0 18px 38px -26px rgb(120 60 20 / 0.35);
+  }
+  .pc__i {
+    display: grid; place-items: center; width: 42px; height: 42px;
+    border-radius: 13px; color: var(--green-deep); background: var(--green-wash);
+  }
+  .pc h3 {
+    margin-top: 0.9rem; font-size: 0.9375rem; font-weight: 700;
+    letter-spacing: -0.02em; line-height: 1.3;
+  }
+  .pc p { margin-top: 0.45rem; font-size: 0.8125rem; line-height: 1.55; color: var(--text-3); }
+  .pc__n {
+    margin-top: 1rem; font-family: var(--font-mono); font-size: 0.6875rem;
+    letter-spacing: 0.12em; color: var(--text-3);
+  }
+  .pc[data-on] .pc__n { color: var(--clay-deep); }
+
+  /* ───── 05 difference ───── */
+  .df { display: grid; background: #0d2a14; color: #fff; }
+  .df__shot { position: relative; }
+  .df__shot :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  .df__shot figcaption {
+    position: absolute; left: clamp(1rem, 3vw, 2rem); bottom: clamp(1rem, 3vw, 2rem);
+    display: flex; align-items: center; gap: 0.65rem;
+    padding: 0.7rem 1rem; border-radius: 12px;
+    background: rgb(255 255 255 / 0.95); backdrop-filter: blur(8px);
+  }
+  .df__shot i {
+    display: grid; place-items: center; width: 32px; height: 32px; flex: none;
+    border-radius: 9px; color: var(--clay-deep); background: var(--clay-wash);
+  }
+  .df__shot span { display: grid; font-size: 0.6875rem; color: var(--text-3); }
+  .df__shot b { font-size: 0.8125rem; color: var(--text); }
+
+  .df__panel {
+    display: grid; gap: clamp(1.5rem, 3vw, 2.5rem);
+    padding: clamp(2rem, 5vw, 3.5rem) clamp(1.25rem, 4vw, 3rem);
+  }
+  .df__copy { display: grid; justify-items: start; }
+  .df__h {
+    margin-top: var(--s4); font-size: clamp(1.5rem, 2.8vw, 2.1rem);
+    font-weight: 700; letter-spacing: -0.04em; line-height: 1.12;
+  }
+  .df__h em { font-style: normal; color: var(--green-bright); }
+  .df__p {
+    margin-top: var(--s4); margin-bottom: var(--s5); max-width: 46ch;
+    font-size: 0.875rem; line-height: 1.65; color: rgb(255 255 255 / 0.78);
+  }
+
+  .df__proof { display: grid; gap: 0.5rem; align-content: start; }
+  .df__proof li {
+    display: flex; align-items: center; gap: 0.7rem;
+    padding: 0.7rem 0.9rem; border-radius: 11px;
+    background: rgb(255 255 255 / 0.06);
+    font-size: 0.8125rem; color: rgb(255 255 255 / 0.9);
+  }
+  .df__proof span { color: var(--green-bright); display: grid; place-items: center; }
+
+  /* ───── 06 presence ───── */
+  .pr {
+    background: linear-gradient(185deg, #fafcfa, #f1f8f1 62%, #eef6ee);
+  }
+  .pr__grid { display: grid; gap: clamp(1.75rem, 4vw, 2.75rem); align-items: center; }
+  .pr__intro { display: grid; justify-items: start; }
+  .pr__h {
+    margin-top: var(--s4); font-size: clamp(1.7rem, 3.2vw, 2.4rem);
+    font-weight: 700; letter-spacing: -0.04em; line-height: 1.08;
+  }
+  .pr__h em { font-style: normal; color: var(--green-deep); }
+  .pr__p {
+    margin-top: var(--s4); max-width: 34ch;
+    font-size: 0.875rem; line-height: 1.62; color: var(--text-2);
+  }
+
+  .pr__map { position: relative; width: 100%; max-width: 16rem; justify-self: center; }
+  .pr__map svg { display: block; width: 100%; height: auto; overflow: visible; }
+  /* Decorative, aria-hidden — but 3.0:1 so it is a watermark, not invisible. */
+  .pr__wm { fill: #72906f; font-size: 74px; font-weight: 600; letter-spacing: 12px; }
+
+  .pr__land { opacity: 0; transition: opacity 760ms var(--ease) 100ms; }
+  .pr__map[data-in] .pr__land { opacity: 1; }
+  .pr__pin {
+    --pd: calc(700ms + var(--i) * 130ms);
+    opacity: 0; scale: 0.3;
+    transform-box: fill-box; transform-origin: bottom center;
+    transition: opacity 320ms var(--ease) var(--pd),
+      scale 540ms cubic-bezier(0.3, 1.6, 0.5, 1) var(--pd);
+  }
+  .pr__map[data-in] .pr__pin { opacity: 1; scale: 1; }
+  .pr__chip {
+    position: absolute; top: calc(var(--y) + var(--dy, 0%)); left: var(--x);
+    translate: 1.2rem -145%;
+    padding: 0.2rem 0.55rem; border-radius: 999px; background: #fff;
+    box-shadow: 0 6px 16px -9px rgb(10 30 12 / 0.5);
+    font-size: 0.6875rem; font-weight: 600; white-space: nowrap; color: var(--text);
+    opacity: 0;
+    transition: opacity 320ms var(--ease) calc(860ms + var(--i) * 130ms),
+      color var(--t2) var(--ease), background-color var(--t2) var(--ease);
+  }
+  .pr__map[data-in] .pr__chip { opacity: 1; }
+  .pr__chip:hover { background: var(--green-deep); color: #fff; }
+
+  .pr__list { display: grid; gap: 0.6rem; }
+  .br {
+    display: flex; align-items: center; gap: 0.85rem;
+    padding: 0.65rem 0.9rem 0.65rem 0.65rem; border-radius: 14px;
+    background: rgb(255 255 255 / 0.86); backdrop-filter: blur(8px);
+    box-shadow: 0 1px 2px rgb(10 30 12 / 0.04), 0 10px 26px -20px rgb(10 30 12 / 0.28);
+    transition: transform var(--t2) var(--ease), box-shadow var(--t2) var(--ease);
+  }
+  .br:hover {
+    transform: translateX(4px);
+    box-shadow: 0 1px 2px rgb(10 30 12 / 0.04), 0 20px 38px -24px rgb(10 30 12 / 0.34);
+  }
+  /* Held frame — branch photography still to come. */
+  .br__shot {
+    display: grid; place-items: center; width: 56px; height: 44px; flex: none;
+    border: 1px dashed var(--line-light); border-radius: 10px;
+    background: var(--off);
+  }
+  .br__shot i {
+    font-style: normal; font-family: var(--font-mono); font-size: 0.5rem;
+    letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-3);
+  }
+  .br__t { display: grid; min-width: 0; }
+  .br__t b { font-size: 0.9375rem; font-weight: 700; letter-spacing: -0.02em; }
+  .br__t em { margin-top: 0.1rem; font-style: normal; font-size: 0.75rem; color: var(--text-3); }
+  .br__go {
+    display: grid; place-items: center; width: 28px; height: 28px; flex: none;
+    margin-left: auto; border-radius: 50%; color: var(--green-deep);
     transition: transform var(--t2) var(--ease);
   }
-  .bl:hover .bl__go { transform: translateX(3px); }
+  .br:hover .br__go { transform: translateX(3px); }
 
-  /* ───────── 06 · cta ───────── */
-
-  .ac {
-    position: relative;
-    background: linear-gradient(105deg, #0f2d16, #1c4423 55%, #0f2d16);
-    color: #fff;
-    padding-block: clamp(2.5rem, 5vw, 3.75rem);
-    overflow: hidden;
+  /* ───── 07 cta ───── */
+  .cta {
+    position: relative; color: #fff;
+    background: linear-gradient(104deg, #10301a, #1e4a26 52%, #2a3a22);
+    padding-block: clamp(2.25rem, 4.5vw, 3.25rem); overflow: hidden;
   }
-  .ac__in { display: grid; gap: var(--s5); align-items: center; }
-  .ac__copy { display: grid; justify-items: start; }
-
-  .ac__h {
-    margin-top: var(--s4);
-    font-size: clamp(1.6rem, 3vw, 2.3rem);
-    font-weight: 700;
-    letter-spacing: -0.04em;
-    line-height: 1.06;
+  .cta__in { display: grid; gap: var(--s5); align-items: center; }
+  .cta__copy { display: grid; justify-items: start; }
+  .cta__h {
+    margin-top: var(--s4); font-size: clamp(1.6rem, 3vw, 2.3rem);
+    font-weight: 700; letter-spacing: -0.04em; line-height: 1.06;
   }
-  .ac__p {
-    margin-top: var(--s4);
-    margin-bottom: var(--s5);
-    max-width: 34ch;
-    font-size: 0.9375rem;
-    line-height: 1.6;
-    color: rgb(255 255 255 / 0.78);
+  .cta__h em { font-style: normal; color: var(--clay-bright); }
+  .cta__p {
+    margin-top: var(--s4); margin-bottom: var(--s5); max-width: 34ch;
+    font-size: 0.9375rem; line-height: 1.6; color: rgb(255 255 255 / 0.78);
   }
-  .ac .btn { background: #fff; color: #0f2d16; }
-  .ac .btn__i { background: rgb(15 45 22 / 0.14); }
-
-  .ac__fig :global(img) {
-    width: 100%;
-    height: auto;
-    object-fit: contain;
+  .cta__b {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 0.8rem 1.4rem; border-radius: 999px;
+    background: #fff; color: #10301a; font-size: 0.9375rem; font-weight: 600;
+    transition: transform var(--t2) var(--ease), background-color var(--t2) var(--ease);
+  }
+  .cta__b:hover { transform: translateY(-2px); background: var(--green-bright); }
+  .cta__fig :global(img) { width: 100%; height: auto; object-fit: contain; }
+  .cta__script {
+    font-size: clamp(1rem, 1.7vw, 1.35rem); color: var(--clay-bright);
+    rotate: -7deg; justify-self: center;
   }
 
-  .ac__script {
-    font-family: var(--font-serif, Georgia, serif);
-    font-style: italic;
-    font-size: clamp(1rem, 1.7vw, 1.35rem);
-    line-height: 1.3;
-    color: rgb(255 255 255 / 0.62);
-    rotate: -7deg;
-    justify-self: center;
-    pointer-events: none;
-  }
-
-  /* ───────── responsive ───────── */
-
+  /* ───── responsive ───── */
   @media (min-width: 40rem) {
-    .an__grid { grid-template-columns: repeat(2, 1fr); }
-    .av__grid { grid-template-columns: repeat(2, 1fr); }
+    .fig__cards { grid-template-columns: repeat(2, 1fr); }
+    .jr__line { grid-template-columns: repeat(2, 1fr); }
   }
 
   @media (min-width: 62rem) {
-    .ah__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); }
-    .ah__media {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      align-items: start;
-      gap: 0;
-    }
-    .ah__fig { grid-column: 1 / -1; grid-row: 1; }
-    .ah__mantra {
-      grid-column: 2;
-      grid-row: 1;
-      justify-self: end;
-      width: 11rem;
-      margin: 1.5rem -1.5rem 0 0;
-    }
-    .ah__trust {
-      grid-column: 2;
-      grid-row: 1;
-      align-self: end;
-      justify-self: end;
-      width: 14rem;
-      margin: 0 -2.5rem -1.5rem 0;
-    }
+    .hero__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); }
+    .hero__script, .hero__rail { display: grid; }
 
-    .an__grid { grid-template-columns: repeat(4, 1fr); }
-    .av__grid { grid-template-columns: repeat(4, 1fr); }
+    .fig__grid { grid-template-columns: minmax(0, 1fr) auto; }
+    .fig__cards { grid-template-columns: repeat(4, 1fr); }
 
-    .as__grid { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.2fr) minmax(0, 0.5fr); }
-    .ap__grid { grid-template-columns: minmax(0, 0.9fr) minmax(0, 0.8fr) minmax(0, 1fr); }
-    .ac__in { grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr) auto; }
+    .jr__grid { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.7fr); }
+    .jr__line { grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+    /* Horizontal rail across the four nodes. */
+    .jr__line li { padding-top: 1.6rem; }
+    .jr__line li::before {
+      content: ''; position: absolute; left: 11px; right: -1rem;
+      top: 5px; bottom: auto; width: auto; height: 1px;
+      background: repeating-linear-gradient(to right,
+        color-mix(in oklab, var(--clay) 55%, transparent) 0 4px, transparent 4px 9px);
+    }
+    .jr__line li:last-child::before { display: none; }
+    .jr__dot { top: 0; }
+
+    .hw__grid { grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.9fr); }
+    .df { grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); }
+    .df__panel { grid-template-columns: minmax(0, 1.5fr) minmax(0, 0.85fr); align-items: center; }
+    .pr__grid { grid-template-columns: minmax(0, 0.85fr) minmax(0, 0.7fr) minmax(0, 1.1fr); }
+    .cta__in { grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr) auto; }
   }
 
   @media (max-width: 62rem) {
-    .as__script, .ac__script { rotate: none; }
+    .fig__script, .cta__script { rotate: none; }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .ap__map :is(.ap__land, .ap__pin, .ap__chip) {
-      opacity: 1;
-      scale: 1;
-      transition: none;
+    .pr__map :is(.pr__land, .pr__pin, .pr__chip) { opacity: 1; scale: 1; transition: none; }
+    .btn, .btn:hover, .fc, .fc:hover, .fc__i, .br, .br:hover, .cta__b, .cta__b:hover {
+      transform: none; transition: none;
     }
-    .btn, .btn:hover,
-    .nc, .nc:hover, .nc__i, .nc:hover .nc__i,
-    .av__grid li, .av__grid li:hover, .av__i, .av__grid li:hover .av__i,
-    .bl, .bl:hover {
-      transform: none;
-      transition: none;
-    }
-    .nc::after { transform: scaleX(1); }
-    .btn::after { display: none; }
   }
 </style>
