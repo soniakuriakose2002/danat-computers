@@ -377,10 +377,16 @@ const closing = 'Four counters, one standard — and a bench that opens the mach
     /* The seam is an arc, not a straight rule: the green panel's right
        edge bows into the white, and the story is padded clear of it. */
     .sc__badge {
-      border-radius: 0 34% 34% 0 / 0 52% 48% 0;
-      margin-right: -2.5rem;
+      border-radius: 0 30% 30% 0 / 0 50% 50% 0;
+      z-index: 1;
     }
-    .sc__body { padding-left: clamp(3rem, 6vw, 4.5rem); }
+    /* The white runs 9rem back under the green so the curve reveals
+       white rather than the backdrop. Its padding has to clear both the
+       overlap and the deepest point of the arc. */
+    .sc__body {
+      margin-left: -9rem;
+      padding-left: clamp(10.5rem, 16vw, 13rem);
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
