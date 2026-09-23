@@ -379,7 +379,18 @@ const layers = [r01, r03, r04, r05];
     background: radial-gradient(circle at 38% 34%, color-mix(in oklab, var(--green) 18%, transparent), transparent 66%);
     filter: blur(18px);
   }
-  .hero__grid { display: grid; gap: clamp(2rem, 4vw, 3rem); align-items: center; }
+  .hero__grid { display: grid; gap: clamp(2rem, 4vw, 3rem); align-items: center;
+    /* Single column at mobile, but an auto column's minimum is its
+       content size — the film card refused to shrink and burst the
+       hero out of the viewport, taking the whole page's width with
+       it. minmax(0, 1fr) is what lets it shrink. */
+    grid-template-columns: minmax(0, 1fr);
+  }
+  /* A minmax(0,1fr) TRACK is only half of it: the grid item itself keeps
+     min-width:auto and will still overflow the track it sits in. Both
+     children need an explicit zero minimum before the hero can actually
+     fit a phone. */
+  .hero__copy, .hero__media { min-width: 0; }
   .hero__copy { display: grid; justify-items: start; }
 
   .hero__h {
@@ -399,6 +410,8 @@ const layers = [r01, r03, r04, r05];
   .film {
     display: flex;
     align-items: center;
+    min-width: 0;
+    max-width: 100%;
     gap: 0.85rem;
     padding: 0.4rem 1rem 0.4rem 0.4rem;
     border: 1px solid var(--line-light);
@@ -462,7 +475,7 @@ const layers = [r01, r03, r04, r05];
     24% { transform: scale(1); }
   }
 
-  .film__t { display: grid; }
+  .film__t { display: grid; min-width: 0; overflow-wrap: anywhere; }
   .film__t b { font-size: 0.875rem; font-weight: 700; letter-spacing: -0.02em; }
   .film__t em {
     font-style: normal;

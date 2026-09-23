@@ -129,6 +129,11 @@ const promises = [
           <article class="pane" data-pos={i === 0 ? 'c' : i === 1 ? 'r' : 'l'} data-i={i}>
             <button class="pane__hit" type="button" aria-label={`Show ${f.key}`}></button>
 
+            <span class="pane__face" aria-hidden="true">
+              <b>{f.no}</b>
+              <i>{f.key}</i>
+            </span>
+
             <p class="pane__no">{f.no}</p>
             <p class="pane__k">{f.kicker}</p>
 
@@ -262,7 +267,18 @@ const promises = [
   }
   .eb__r { width: 26px; height: 1px; flex: none; background: currentColor; opacity: 0.6; }
 
-  .po__grid { display: grid; gap: clamp(1.5rem, 3vw, 2.5rem); align-items: center; }
+  /* minmax(0, 1fr), not the default 1fr: a grid item's automatic
+     minimum is its content size, so without this the stage refused to
+     shrink below its intrinsic width and burst out of the column —
+     which on a phone pushed the pane past the right edge and dragged
+     every centred element on the page with it. */
+  .po__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+    align-items: center;
+  }
+  .po__stage { max-width: 100%; }
 
   /* ───── left ───── */
   .po__h {
@@ -341,8 +357,8 @@ const promises = [
   .po__stage {
     position: relative;
     width: 100%;
-    aspect-ratio: 1 / 0.92;
-    perspective: 1700px;
+    aspect-ratio: 1 / 0.74;
+    perspective: 1500px;
     perspective-origin: 50% 42%;
   }
 
@@ -381,8 +397,9 @@ const promises = [
   /* ---- photo cards riding the orbit ---- */
   .po__shot {
     position: absolute;
-    top: 6%;
-    width: clamp(7rem, 15vw, 10rem);
+    top: 5%;
+    z-index: 4;
+    width: clamp(6rem, 11vw, 8.5rem);
     border-radius: 16px;
     overflow: hidden;
     box-shadow: 0 20px 44px -22px rgb(10 30 12 / 0.5);
@@ -395,16 +412,34 @@ const promises = [
     font-size: 0.6875rem;
     font-weight: 600;
     line-height: 1.25;
+    z-index: 1;
     color: #fff;
-    text-shadow: 0 1px 6px rgb(0 0 0 / 0.8);
   }
-  .po__shot--l { left: 2%; rotate: -5deg; }
-  .po__shot--r { right: 2%; rotate: 5deg; }
+  /* A text-shadow is not a contrast mechanism — it cannot be composited
+     and measured, and over the pale corner of the bench photo the white
+     caption was effectively unreadable. A real scrim can be checked
+     against the actual pixels, which is the standard on this site. */
+  .po__shot::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to top,
+      rgb(8 13 9 / 0.88) 0%,
+      rgb(8 13 9 / 0.7) 40%,
+      rgb(8 13 9 / 0.18) 74%,
+      rgb(8 13 9 / 0) 100%
+    );
+  }
+  .po__shot--l { left: -2%; rotate: -6deg; }
+  .po__shot--r { right: -2%; rotate: 6deg; }
 
   /* ---- the three panes ---- */
   .deck {
     position: absolute;
-    inset: 14% 6% 18%;
+    /* 21% side inset makes the deck 58% of the stage; the offsets below
+       are a percentage of THAT, so the side panes stay in the column. */
+    inset: 13% 21% 17%;
     transform-style: preserve-3d;
   }
 
@@ -414,13 +449,18 @@ const promises = [
     display: grid;
     align-content: center;
     justify-items: center;
-    padding: clamp(1rem, 2.6vw, 2rem);
-    border-radius: 24px;
-    /* Frosted glass, so the rings and orbs read through it. */
-    background: rgb(255 255 255 / 0.72);
-    backdrop-filter: blur(16px) saturate(1.1);
-    border: 1px solid rgb(255 255 255 / 0.8);
-    box-shadow: 0 30px 70px -34px rgb(10 30 12 / 0.5);
+    padding: clamp(0.9rem, 2vw, 1.5rem);
+    border-radius: 22px;
+    /* OPAQUE, deliberately. An earlier pass made these frosted glass so
+       the rings read through them — but on a deck the panes overlap, and
+       translucency meant the back pane's text showed through the front
+       one. A card in space occludes what is behind it; that occlusion is
+       most of what sells the depth. */
+    background: #fff;
+    border: 1px solid var(--line-light);
+    box-shadow:
+      0 2px 4px rgb(10 30 12 / 0.05),
+      0 34px 70px -30px rgb(10 30 12 / 0.42);
     text-align: center;
     transition:
       transform 760ms cubic-bezier(0.55, 0, 0.2, 1),
@@ -430,28 +470,67 @@ const promises = [
 
   /* Centre: square to the camera and forward. */
   .pane[data-pos='c'] {
+    box-shadow:
+      0 2px 4px rgb(10 30 12 / 0.06),
+      0 50px 90px -34px rgb(10 30 12 / 0.5);
     transform: translate3d(0, 0, 60px);
     opacity: 1;
     z-index: 3;
   }
   /* Sides: pushed out, back, and turned inward. */
   .pane[data-pos='l'] {
-    transform: translate3d(-62%, 4%, -150px) rotateY(34deg) scale(0.82);
-    opacity: 0.94;
+    transform: translate3d(-58%, 3%, -170px) rotateY(36deg) scale(0.84);
+    background: #f4f8f5;
     z-index: 1;
   }
   .pane[data-pos='r'] {
-    transform: translate3d(62%, 4%, -150px) rotateY(-34deg) scale(0.82);
-    opacity: 0.94;
+    transform: translate3d(58%, 3%, -170px) rotateY(-36deg) scale(0.84);
+    background: #f4f8f5;
     z-index: 1;
   }
-  /* A side pane shows only its heading — the body would be unreadable
-     at that angle anyway, and hiding it keeps the centre the subject. */
-  .pane[data-pos='l'] :is(.pane__p, .pane__cta, .pane__bar),
-  .pane[data-pos='r'] :is(.pane__p, .pane__cta, .pane__bar) {
+  /* A side pane is roughly half covered by the centre one. Its own text
+     is centred, which is exactly the part that gets covered — so it was
+     rendering as sliced half-words ("Diagno…", "Repair…"). A side pane
+     therefore shows none of its real content and puts .pane__face in the
+     strip that IS visible instead. The text stays in the DOM at opacity
+     0, so a screen reader still reads all three. */
+  .pane[data-pos='l'] :is(.pane__no, .pane__k, .pane__h, .pane__p, .pane__cta, .pane__bar),
+  .pane[data-pos='r'] :is(.pane__no, .pane__k, .pane__h, .pane__p, .pane__cta, .pane__bar) {
     opacity: 0;
     pointer-events: none;
   }
+
+  /* ── the back of a card ── */
+  .pane__face {
+    position: absolute;
+    top: 50%;
+    translate: 0 -50%;
+    display: grid;
+    gap: 0.45rem;
+    width: 44%;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 400ms var(--ease);
+  }
+  .pane__face b {
+    font-size: clamp(2.1rem, 3.8vw, 3.2rem);
+    font-weight: 700;
+    letter-spacing: -0.05em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    color: #73916f; /* 3.26:1 on the side-pane #f4f8f5 — large text */
+  }
+  .pane__face i {
+    font-family: var(--font-mono);
+    font-style: normal;
+    font-size: 0.5625rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--green-deep);
+  }
+  /* Pinned to whichever edge the centre pane does not cover. */
+  .pane[data-pos='l'] .pane__face { left: 7%; text-align: left; opacity: 1; }
+  .pane[data-pos='r'] .pane__face { right: 7%; text-align: right; opacity: 1; }
 
   .pane__hit {
     position: absolute;
@@ -480,16 +559,16 @@ const promises = [
   }
   .pane__h {
     margin-top: 0.7rem;
-    font-size: clamp(1rem, 2.1vw, 1.65rem);
+    font-size: clamp(0.95rem, 1.6vw, 1.35rem);
     font-weight: 700;
     letter-spacing: -0.035em;
-    line-height: 1.14;
+    line-height: 1.16;
   }
   .pane__h em { font-style: normal; color: var(--green-deep); }
   .pane__p {
     margin-top: 0.7rem;
-    max-width: 32ch;
-    font-size: clamp(0.6875rem, 1.05vw, 0.8125rem);
+    max-width: 28ch;
+    font-size: clamp(0.6875rem, 0.9vw, 0.78rem);
     line-height: 1.6;
     color: var(--text-2);
     transition: opacity var(--t3) var(--ease);
@@ -592,6 +671,29 @@ const promises = [
     .po__proms { grid-template-columns: repeat(2, 1fr); }
   }
 
+  /* Between the phone stack and the full three-column layout, the left
+     block kept its narrow measure inside a full-width row and left most
+     of the viewport empty. Split it in two so it fills the width, and
+     stop the stage growing to the whole row — at 1180px the 1/0.74 box
+     was over 800px tall on its own. */
+  @media (max-width: 75.99rem) {
+    .po__stage { max-width: 42rem; margin-inline: auto; }
+  }
+
+  @media (min-width: 34rem) and (max-width: 75.99rem) {
+    .po__left {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      column-gap: clamp(1.5rem, 4vw, 3rem);
+      align-content: start;
+    }
+    .po__left > .eb { grid-area: 1 / 1; }
+    .po__h { grid-area: 2 / 1; }
+    .po__p { grid-area: 2 / 2; margin-top: 0.55rem; }
+    .po__idx { grid-area: 3 / 2; }
+    .po__script { grid-area: 3 / 1; }
+  }
+
   @media (min-width: 76rem) {
     .po__grid { grid-template-columns: minmax(0, 0.8fr) minmax(0, 2fr) auto; }
     .po__right { display: grid; }
@@ -613,7 +715,20 @@ const promises = [
     .po__ring, .orb { animation: none; }
     .pane, .pane__cta, .pane__cta:hover { transition: none; transform: none; }
     .pane[data-pos='c'] { transform: translate3d(0, 0, 60px); }
-    .pane[data-pos='l'] { transform: translate3d(-62%, 4%, -150px) rotateY(34deg) scale(0.82); }
-    .pane[data-pos='r'] { transform: translate3d(62%, 4%, -150px) rotateY(-34deg) scale(0.82); }
+    .pane[data-pos='l'] { transform: translate3d(-58%, 3%, -170px) rotateY(36deg) scale(0.84); }
+    .pane[data-pos='r'] { transform: translate3d(58%, 3%, -170px) rotateY(-36deg) scale(0.84); }
+  }
+
+  /* ── mobile corrections ── */
+  @media (max-width: 48rem) {
+    /* The centre pane kept its translateZ, which still scaled it against
+       the stage perspective and pushed it past the right edge. On the
+       flat stack there is no depth to express, so drop it. */
+    .po__stage { overflow: hidden; }
+    .deck { inset: 8% 2% 14%; }
+    .pane, .pane[data-pos='c'] { transform: none; }
+    /* The draft note is mono with wide tracking; on a phone it ran off
+       the side rather than wrapping. */
+    .po__note { letter-spacing: 0.1em; overflow-wrap: anywhere; }
   }
 </style>
