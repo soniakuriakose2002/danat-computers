@@ -99,7 +99,7 @@ const figures = [
         </p>
 
         <div class="hero__acts" data-rise style="--d:190ms">
-          <a class="btn" href="#quote">
+          <a class="btn" href="#quote" data-support-open>
             Talk to our experts
             <span class="btn__i" aria-hidden="true"><Icon name="arrow" size={15} /></span>
           </a>
@@ -318,12 +318,14 @@ const figures = [
       </div>
 
       <div class="ct__acts" data-rise style="--d:130ms">
-        <a class="btn" href={whatsappLink('Hello Danat — I would like to talk about business solutions for')}
+        <a class="btn" data-support-open
+          href={whatsappLink('Hello Danat — I would like to talk about business solutions for')}
           target="_blank" rel="noopener noreferrer">
           Get a free consultation
           <span class="btn__i" aria-hidden="true"><Icon name="arrow" size={15} /></span>
         </a>
-        <a class="ct__ghost" href={whatsappLink('Hello Danat — I would like a trade quote for')}
+        <a class="ct__ghost" data-support-open
+          href={whatsappLink('Hello Danat — I would like a trade quote for')}
           target="_blank" rel="noopener noreferrer">
           <Icon name="mail" size={16} />Request a quote
         </a>

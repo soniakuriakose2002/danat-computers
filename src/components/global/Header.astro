@@ -66,6 +66,10 @@ const { overlay = false } = Astro.props;
     ))}
   </nav>
   <div class="mnav__foot">
+    {/* .hd__cta is desktop-only, so without this the drawer is
+        unreachable on a phone. */}
+    <a class="mnav__get" href={whatsappLink()} data-support-open
+      target="_blank" rel="noopener noreferrer">Get support</a>
     <a href={`tel:${site.phone.tel}`}>{site.phone.display}</a>
     <a href={whatsappLink()} target="_blank" rel="noopener noreferrer">WhatsApp</a>
   </div>
@@ -312,6 +316,16 @@ const { overlay = false } = Astro.props;
     font-size: 0.6875rem;
     letter-spacing: 0.16em;
     color: var(--green-bright);
+  }
+
+  .mnav__get {
+    flex: 1 0 100%;
+    padding: 0.8rem 1.2rem;
+    border-radius: 999px;
+    background: var(--green-deep);
+    color: #fff;
+    font-weight: 700;
+    text-align: center;
   }
 
   .mnav__foot {
