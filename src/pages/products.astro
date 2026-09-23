@@ -4,6 +4,7 @@ import PageLayout from '@layouts/PageLayout.astro';
 import Icon from '@components/ui/Icon.astro';
 import { site, brands } from '@data/site';
 import pHp from '@assets/products/hp.png';
+const heroShot = pHp;
 import pDell from '@assets/products/dell.png';
 import pAsus from '@assets/products/asus.png';
 import pLenovo from '@assets/products/lenovo.png';
@@ -97,6 +98,24 @@ const cats = [
   },
 ];
 
+/** The chips that float around the scene, in the mockup's order. */
+const chips = [
+  { icon: 'laptop', t: 'Desktops', at: 'a' },
+  { icon: 'laptop', t: 'Laptops', at: 'b' },
+  { icon: 'network', t: 'Networking', at: 'c' },
+  { icon: 'camera', t: 'Security & CCTV', at: 'd' },
+  { icon: 'chip', t: 'Refurbished desktops', at: 'e' },
+  { icon: 'gear', t: 'Spare parts', at: 'f' },
+];
+
+/** The hero's three. Deliberately not the plinth's three below it —
+    the same words twice on one page reads as a mistake. */
+const heroMarks = [
+  { icon: 'gem', t: 'Trusted brands' },
+  { icon: 'laptop', t: 'Latest technology' },
+  { icon: 'shield', t: 'Reliable products' },
+];
+
 /** The mockup's three, on the plinth. */
 const plinth = [
   { icon: 'gem', t: 'Top brands' },
@@ -124,17 +143,60 @@ const helps = [
   title="Products"
   description={`Laptops, desktops, networking, security and accessories from ${brands.flat().length} brands — supplied across Oman from ${site.stats.branches} branches since ${site.stats.since}.`}
 >
+  {/* ══════ 01 · hero ══════ */}
+  <section class="ph">
+    <span class="ph__waves" aria-hidden="true">
+      <svg viewBox="0 0 1440 420" preserveAspectRatio="none" fill="none">
+        <path d="M0,300 C260,190 520,360 760,250 C1000,140 1220,300 1440,210 L1440,420 L0,420 Z" />
+        <path d="M0,360 C300,250 560,400 820,300 C1060,210 1250,340 1440,270 L1440,420 L0,420 Z" />
+        <path d="M980,0 C1120,120 1180,60 1320,170 C1400,230 1420,300 1440,360" />
+        <path d="M1080,0 C1210,130 1270,80 1400,200" />
+      </svg>
+    </span>
+
+    <div class="shell ph__grid">
+      <div class="ph__copy">
+        <p class="eb" data-rise>Our product range</p>
+        <h1 class="ph__h" data-rise style="--d:70ms">
+          Technology for <em>Every Need</em>
+        </h1>
+        <p class="ph__p" data-rise style="--d:130ms">
+          Explore trusted devices built for work, business, and everyday life.
+        </p>
+        <ul class="ph__marks" data-rise style="--d:190ms">
+          {heroMarks.map((m) => (
+            <li><i aria-hidden="true"><Icon name={m.icon} size={16} /></i>{m.t}</li>
+          ))}
+        </ul>
+      </div>
+
+      {/* The scene: a lit dais with the range standing on it and the
+          categories floating around, as drawn. The chips are siblings of
+          the picture — inside it they would be clipped by its own box. */}
+      <div class="ph__scene" data-rise style="--d:160ms">
+        <span class="ph__dais" aria-hidden="true"><i></i></span>
+        <img class="ph__hero" src={heroShot.src} width={heroShot.width}
+          height={heroShot.height} alt="" loading="eager" fetchpriority="high" />
+
+        {chips.map((c, i) => (
+          <span class="ph__chip" data-at={c.at} style={`--d:${300 + i * 90}ms`}>
+            <i aria-hidden="true"><Icon name={c.icon} size={15} /></i>{c.t}
+          </span>
+        ))}
+      </div>
+    </div>
+  </section>
+
   {/* ══════ 02 · featured ══════ */}
   <section class="pf section" data-pick
     data-cats={JSON.stringify(cats.map((x) => ({ n: x.items.length, t: x.t, s: x.sub })))}>
     <div class="shell pf__head">
       <p class="eb" data-rise>Explore our products</p>
-      {/* The page's h1 — the hero that used to carry one is gone. */}
-      <h1 class="pf__h" data-rise style="--d:70ms">
+      <h2 class="pf__h" data-rise style="--d:70ms">
         <span data-cat-a>{cats[0].t.split(' ').slice(0, -1).join(' ')}</span>
         {' '}
         <em data-cat-b>{cats[0].t.split(' ').slice(-1)[0]}</em>
-      </h1>
+      </h2>
       <p class="pf__sub" data-cat-s data-rise style="--d:110ms">{cats[0].sub}</p>
     </div>
 
@@ -519,6 +581,132 @@ const helps = [
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--text-3);
+  }
+
+  /* ───────── 01 hero ───────── */
+  .ph {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    padding-block: clamp(5.5rem, 10vw, 8rem) clamp(2rem, 4vw, 3.5rem);
+    background:
+      radial-gradient(900px 520px at 78% 40%, #e9f5eb 0%, rgb(233 245 235 / 0) 66%),
+      linear-gradient(170deg, #f4faf5 0%, #ffffff 58%, #f1f8f3 100%);
+  }
+  .ph__waves { position: absolute; inset: 0; z-index: -1; }
+  .ph__waves svg { width: 100%; height: 100%; }
+  .ph__waves path { fill: rgb(47 100 41 / 0.045); }
+  .ph__waves path:nth-child(2) { fill: rgb(47 100 41 / 0.03); }
+  .ph__waves path:nth-child(n+3) {
+    fill: none;
+    stroke: rgb(47 100 41 / 0.12);
+    stroke-width: 1.5;
+  }
+
+  .ph__grid { display: grid; gap: clamp(1.75rem, 4vw, 3rem); align-items: center; }
+  .ph__copy, .ph__scene { min-width: 0; }
+
+  .ph__h {
+    margin-top: var(--s4);
+    font-size: clamp(2.1rem, 4.6vw, 3.6rem);
+    font-weight: 700;
+    letter-spacing: -0.045em;
+    line-height: 1.04;
+  }
+  .ph__h em { font-style: normal; color: var(--green-deep); }
+  .ph__p {
+    max-width: 44ch;
+    margin-top: var(--s4);
+    font-size: var(--lead);
+    line-height: 1.6;
+    color: var(--text-2);
+  }
+  .ph__marks {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem clamp(0.9rem, 2.4vw, 2rem);
+    margin-top: var(--s5);
+  }
+  .ph__marks li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--text-2);
+  }
+  .ph__marks li + li {
+    padding-left: clamp(0.9rem, 2.4vw, 2rem);
+    border-left: 1px solid var(--line-light);
+  }
+  .ph__marks i { display: grid; place-items: center; color: var(--green-deep); }
+
+  /* the scene */
+  .ph__scene { position: relative; aspect-ratio: 1 / 0.72; }
+  .ph__hero {
+    position: absolute;
+    left: 50%;
+    bottom: 16%;
+    translate: -50% 0;
+    width: min(23rem, 62%);
+    height: auto;
+    z-index: 2;
+    filter: drop-shadow(0 26px 34px rgb(10 30 12 / 0.22));
+  }
+  .ph__dais {
+    position: absolute;
+    left: 50%;
+    bottom: 6%;
+    translate: -50% 0;
+    z-index: 1;
+    width: 62%;
+    aspect-ratio: 3.4 / 1;
+    border-radius: 50%;
+    background: radial-gradient(ellipse at 50% 30%, #ffffff 0%, #f1f8f3 58%, #e4f0e7 100%);
+    box-shadow:
+      0 8px 0 #fbfefb, 0 18px 0 #f3faf4, 0 30px 0 #ebf5ed,
+      0 44px 34px -22px rgb(47 100 41 / 0.3);
+  }
+  /* the lit ring the range stands in */
+  .ph__dais i {
+    position: absolute;
+    inset: 12% 8% 22%;
+    border-radius: 50%;
+    border: 2px solid color-mix(in oklab, var(--green) 55%, transparent);
+    box-shadow: 0 0 22px 2px rgb(89 170 84 / 0.4);
+  }
+
+  .ph__chip {
+    position: absolute;
+    z-index: 3;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    max-width: 44%;
+    padding: 0.6rem 0.95rem;
+    border-radius: 13px;
+    background: rgb(255 255 255 / 0.96);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 14px 30px -16px rgb(10 30 12 / 0.45);
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    line-height: 1.3;
+    color: var(--text);
+    animation: phBob 7s var(--ease) infinite;
+    animation-delay: var(--d, 0ms);
+  }
+  .ph__chip i { display: grid; place-items: center; flex: none; color: var(--green-deep); }
+  .ph__chip[data-at='a'] { left: 4%; top: 22%; }
+  .ph__chip[data-at='b'] { left: 31%; top: 6%; }
+  .ph__chip[data-at='c'] { right: 4%; top: 17%; }
+  .ph__chip[data-at='d'] { right: 1%; top: 40%; }
+  .ph__chip[data-at='e'] { right: 5%; bottom: 22%; }
+  .ph__chip[data-at='f'] { left: 1%; bottom: 20%; }
+  @keyframes phBob {
+    0%, 100% { translate: 0 0; }
+    50% { translate: 0 -8px; }
   }
 
   /* ───────── 02 featured ───────── */
@@ -1074,6 +1262,7 @@ const helps = [
        dark green, which read as broken rather than decorative. Moved to
        the pale ground under the photograph. */
 
+    .ph__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.06fr); }
     .pf__grid { grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.6fr) minmax(0, 0.88fr); }
     .pb__row { grid-template-columns: minmax(0, 1fr) auto; }
     .pc__head { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; }
@@ -1084,7 +1273,7 @@ const helps = [
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .pb__track { animation: none; }
+    .pb__track, .ph__chip { animation: none; }
     .btn, .btn:hover .btn__i, .film:hover i,
     .pc__grid a, .pc__grid a:hover, .pc__grid a:hover .pc__go {
       transform: none;
