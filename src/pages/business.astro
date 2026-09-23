@@ -370,8 +370,7 @@ const steps = [
         ...opt('phone', 'Phone'),
         ``,
         String(d.get('message') || '').trim(),
-      ].join('
-');
+      ].join(String.fromCharCode(10));
       window.open(`https://wa.me/${WA}?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
     });
   })();
