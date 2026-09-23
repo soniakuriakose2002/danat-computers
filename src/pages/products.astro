@@ -205,10 +205,19 @@ const helps = [
 
         {chips.map((c, i) => (
           <span class="ph__chip" data-at={c.at} style={`--d:${300 + i * 90}ms`}>
-            <i aria-hidden="true"><Icon name={c.icon} size={19} /></i>{c.t}
+            <i aria-hidden="true"><Icon name={c.icon} size={15} /></i>{c.t}
           </span>
         ))}
       </div>
+
+      {/* The same six, for widths where a label cannot float beside the
+          thing it names without landing on top of it. Only one of the two
+          is ever displayed. */}
+      <ul class="ph__cats">
+        {chips.map((c) => (
+          <li><i aria-hidden="true"><Icon name={c.icon} size={14} /></i>{c.t}</li>
+        ))}
+      </ul>
     </div>
   </section>
 
@@ -667,16 +676,16 @@ const helps = [
   .ph__marks i { display: grid; place-items: center; color: var(--green-deep); }
 
   /* the scene */
-  .ph__scene { position: relative; aspect-ratio: 1 / 0.72; }
+  .ph__scene { position: relative; aspect-ratio: 1 / 0.62; }
   .ph__hero {
     position: absolute;
-    left: 42%;
-    bottom: 16%;
+    left: 50%;
+    bottom: 23%;
     translate: -50% 0;
-    width: min(18rem, 44%);
+    width: min(15rem, 32%);
     height: auto;
     z-index: 2;
-    filter: drop-shadow(0 26px 34px rgb(10 30 12 / 0.22));
+    filter: drop-shadow(0 16px 22px rgb(10 30 12 / 0.2));
   }
   /* The rest of the range. Depth is carried by z-index against the dais:
      the desktop and the router stand BEHIND it, the drives in front. */
@@ -704,31 +713,31 @@ const helps = [
     border-radius: 50%;
     background: radial-gradient(ellipse at 50% 30%, #ffffff 0%, #f3f9f4 58%, #e8f3ea 100%);
     box-shadow:
-      0 5px 0 #fcfefc, 0 11px 0 #f4faf5, 0 18px 0 #ecf6ee,
-      0 26px 20px -14px rgb(47 100 41 / 0.26);
+      0 4px 0 #fcfefc, 0 9px 0 #f4faf5, 0 15px 0 #ecf6ee,
+      0 22px 16px -12px rgb(47 100 41 / 0.26);
   }
   /* The drives lie flat and are wide — a podium as broad as the rest would
      swamp them. */
   .ph__prop[data-at='part']::after { width: 84%; bottom: -9%; }
-  .ph__prop[data-at='desk']  { z-index: 0; left: 0%;   bottom: 29%; width: 30%; }
-  .ph__prop[data-at='rout']  { z-index: 0; right: 21%; top: 2%;    width: 18%; }
-  .ph__prop[data-at='cam']   { z-index: 1; right: 24%; top: 30%;   width: 13%; }
-  .ph__prop[data-at='tower'] { z-index: 0; right: 24%; bottom: 28%; width: 9%; }
-  .ph__prop[data-at='part']  { z-index: 2; left: 2%;   bottom: 5%;  width: 22%; }
+  .ph__prop[data-at='desk']  { z-index: 0; left: 15%;  bottom: 40%; width: 19%; }
+  .ph__prop[data-at='rout']  { z-index: 0; right: 27%; bottom: 63%; width: 10%; }
+  .ph__prop[data-at='cam']   { z-index: 1; right: 19%; bottom: 44%; width: 9%; }
+  .ph__prop[data-at='tower'] { z-index: 0; right: 15%; bottom: 27%; width: 6%; }
+  .ph__prop[data-at='part']  { z-index: 2; left: 11%;  bottom: 23%; width: 15%; }
 
   .ph__dais {
     position: absolute;
-    left: 42%;
-    bottom: 6%;
+    left: 51%;
+    bottom: 13%;
     translate: -50% 0;
     z-index: 1;
-    width: 54%;
+    width: 37%;
     aspect-ratio: 3.4 / 1;
     border-radius: 50%;
     background: radial-gradient(ellipse at 50% 30%, #ffffff 0%, #f1f8f3 58%, #e4f0e7 100%);
     box-shadow:
-      0 8px 0 #fbfefb, 0 18px 0 #f3faf4, 0 30px 0 #ebf5ed,
-      0 44px 34px -22px rgb(47 100 41 / 0.3);
+      0 6px 0 #fbfefb, 0 13px 0 #f3faf4, 0 21px 0 #ebf5ed,
+      0 32px 26px -18px rgb(47 100 41 / 0.3);
   }
   /* the lit ring the range stands in */
   .ph__dais i {
@@ -746,16 +755,16 @@ const helps = [
     z-index: 3;
     display: inline-flex;
     align-items: center;
-    gap: 0.6rem;
-    max-width: 44%;
-    padding: 0.7rem 1.05rem;
-    border-radius: 12px;
+    gap: 0.4rem;
+    max-width: 26%;
+    padding: 0.45rem 0.7rem;
+    border-radius: 9px;
     background: rgb(255 255 255 / 0.97);
     backdrop-filter: blur(10px);
     box-shadow:
       0 1px 2px rgb(10 30 12 / 0.06),
-      0 20px 36px -20px rgb(10 30 12 / 0.42);
-    font-size: clamp(0.625rem, 0.82vw, 0.8125rem);
+      0 14px 24px -14px rgb(10 30 12 / 0.4);
+    font-size: clamp(0.5rem, 0.6vw, 0.6875rem);
     font-weight: 700;
     letter-spacing: 0.07em;
     text-transform: uppercase;
@@ -770,20 +779,23 @@ const helps = [
     content: '';
     position: absolute;
     z-index: -1;
-    inset: -0.5rem -0.85rem;
-    border-radius: 16px;
+    inset: -0.32rem -0.55rem;
+    border-radius: 12px;
     background: rgb(233 245 235 / 0.52);
   }
   .ph__chip i { display: grid; place-items: center; flex: none; color: var(--green-deep); }
-  /* Two words, two lines — as drawn. */
-  .ph__chip[data-at='d'], .ph__chip[data-at='e'] { max-width: 23%; }
 
-  .ph__chip[data-at='a'] { left: 3%;  top: 20%; }
-  .ph__chip[data-at='b'] { left: 30%; top: 4%; }
-  .ph__chip[data-at='c'] { right: 0%; top: 12%; }
-  .ph__chip[data-at='d'] { right: 0%; top: 36%; }
-  .ph__chip[data-at='e'] { right: 0%; bottom: 17%; }
-  .ph__chip[data-at='f'] { left: 1%;  bottom: 17%; }
+  /* Shown only in place of the floating labels — see the narrow block. */
+  .ph__cats { display: none; }
+  /* Two words, two lines — as drawn. */
+  .ph__chip[data-at='d'], .ph__chip[data-at='e'] { max-width: 22%; }
+
+  .ph__chip[data-at='a'] { left: 14%; top: 26%; }
+  .ph__chip[data-at='b'] { left: 36%; top: 20%; }
+  .ph__chip[data-at='c'] { right: 6%;  top: 21%; }
+  .ph__chip[data-at='d'] { right: 1%;  top: 42%; }
+  .ph__chip[data-at='e'] { right: 5%;  top: 68%; }
+  .ph__chip[data-at='f'] { left: 11%;  top: 77%; }
   @keyframes phBob {
     0%, 100% { translate: 0 0; }
     50% { translate: 0 -8px; }
@@ -1342,7 +1354,41 @@ const helps = [
      floating around the range and start burying it. Shrink them, pin them
      to the outer edges, and give the scene more height to breathe. */
   @media (max-width: 61.999rem) {
-    .ph__scene { aspect-ratio: 1 / 0.94; }
+    /* A phone's scene is barely wider than one label, so a chip cannot sit
+       beside its product without covering it — the camera, the tower and
+       the drives all disappeared underneath theirs. The labels come out of
+       the scene and become a row beneath it instead. */
+    .ph__chip { display: none; }
+    .ph__cats {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.4rem;
+      margin-top: var(--s4);
+    }
+    .ph__cats li {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.42rem 0.7rem;
+      border-radius: 9px;
+      background: var(--white);
+      box-shadow: 0 1px 2px rgb(10 30 12 / 0.06), 0 10px 20px -14px rgb(10 30 12 / 0.4);
+      font-size: 0.5625rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text);
+    }
+    .ph__cats i { display: grid; place-items: center; color: var(--green-deep); }
+
+    .ph__scene { aspect-ratio: 1 / 0.8; }
+    .ph__hero { left: 45%; bottom: 14%; width: min(18rem, 44%); }
+    .ph__dais { left: 45%; bottom: 5%; width: 50%; }
+    .ph__prop[data-at='desk']  { left: 0%;   bottom: 30%; width: 30%; }
+    .ph__prop[data-at='rout']  { right: 18%; bottom: 66%; width: 19%; }
+    .ph__prop[data-at='cam']   { right: 14%; bottom: 46%; width: 14%; }
+    .ph__prop[data-at='tower'] { right: 12%; bottom: 27%; width: 10%; }
     .ph__chip {
       gap: 0.35rem;
       max-width: 38%;
