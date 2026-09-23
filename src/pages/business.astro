@@ -86,6 +86,16 @@ const sectors = [
   { icon: 'users', t: 'Education', p: 'Labs, admin and AV' },
 ];
 
+/** Why Danat, in a horizontal rail. Every line is defensible. */
+const reasons = [
+  { icon: 'search', t: 'Free diagnosis', p: 'Before a quote, every time — so you find out what it costs before you commit.' },
+  { icon: 'chip', t: 'Board-level repair', p: 'Faults traced to the component, not written off at the mainboard.' },
+  { icon: 'box', t: 'Stock already here', p: 'Thousands of lines held in country, so most jobs do not wait on shipping.' },
+  { icon: 'building', t: 'Four branches', p: 'Ruwi, Sohar, Al Hail and Salalah — the same standard at each counter.' },
+  { icon: 'award', t: 'Twenty years in', p: 'Trading on Computer Street since 2003, under one registered company.' },
+  { icon: 'users', t: 'One team throughout', p: 'The people who quote the job are the people who do it.' },
+];
+
 const steps = [
   { n: '01', t: 'Tell us the scope', p: 'A list, a floor plan or a problem. Whichever you have.' },
   { n: '02', t: 'We survey or quote', p: 'A site visit where the work needs one; a written quote where it does not.' },
@@ -100,56 +110,49 @@ const steps = [
 >
   {/* ══════ 01 · hero ══════ */}
   <section class="bh">
-    <span class="bh__wash" aria-hidden="true"></span>
+    <div class="bh__bg" aria-hidden="true">
+      <Image src={imgRack} alt="" widths={[1100, 1700, 2200]} sizes="100vw"
+        quality={74} format="webp" loading="eager" fetchpriority="high" />
+      {/* Measured against the real crop, not guessed. */}
+      <span class="bh__tint"></span>
+    </div>
 
-    <div class="shell">
-      <nav class="bh__crumb" aria-label="Breadcrumb" data-rise>
+    <div class="shell bh__in">
+      <nav class="bh__crumb" aria-label="Breadcrumb">
         <a href="/">Home</a>
         <span aria-hidden="true">/</span>
         <span aria-current="page">Business Solutions</span>
       </nav>
 
-      <div class="bh__grid">
-        <div class="bh__copy">
-          <p class="eb eb--clay" data-rise>
-            <i class="eb__r" aria-hidden="true"></i>For business
-          </p>
+      <p class="eb eb--inv"><i class="eb__r" aria-hidden="true"></i>For business</p>
 
-          <h1 class="bh__h" data-rise style="--d:70ms">
-            The same counter.<br /><em>Built for volume.</em>
-          </h1>
+      <h1 class="bh__h">
+        The same counter.<br /><em>Built for volume.</em>
+      </h1>
 
-          <p class="bh__p" data-rise style="--d:130ms">
-            Hospitals, retailers and offices across Oman buy from Danat at
-            trade — supply, projects and repair from the same stock and the
-            same technicians that serve the shop floor.
-          </p>
+      <p class="bh__p">
+        Hospitals, retailers and offices across Oman buy from Danat at trade —
+        supply, projects and repair from the same stock and the same
+        technicians that serve the shop floor.
+      </p>
 
-          <div class="bh__acts" data-rise style="--d:190ms">
-            <a class="btn" href={whatsappLink('Hello Danat — I would like to discuss a business account for')}
-              target="_blank" rel="noopener noreferrer">
-              Talk to us
-              <span class="btn__i" aria-hidden="true"><Icon name="arrow" size={15} /></span>
-            </a>
-            <a class="bh__mail" href={`mailto:${site.email}`}>{site.email}</a>
-          </div>
-        </div>
-
-        <figure class="bh__fig" data-rise style="--d:160ms">
-          <Image src={imgRack} alt="Engineer working on network equipment in a rack"
-            widths={[560, 900, 1300]} sizes="(min-width:62rem) 46vw, 92vw"
-            quality={76} format="webp" loading="eager" fetchpriority="high" />
-          <figcaption>Work · Connect · Grow</figcaption>
-        </figure>
+      <div class="bh__acts">
+        <a class="btn" href="#quote">
+          Get a trade quote
+          <span class="btn__i" aria-hidden="true"><Icon name="arrow" size={15} /></span>
+        </a>
+        <a class="bh__mail" href={`mailto:${site.email}`}>{site.email}</a>
       </div>
+    </div>
 
-      <dl class="bh__figs" data-rise style="--d:250ms">
+    <dl class="bh__figs">
+      <div class="shell bh__figsin">
         <div><dt><span data-count={site.stats.parts}>0</span></dt><dd>Lines held</dd></div>
         <div><dt><span data-count={brandCount}>0</span></dt><dd>Brands carried</dd></div>
         <div><dt><span data-count={site.stats.branches}>0</span></dt><dd>Branches</dd></div>
         <div><dt><span data-count={years}>0</span>+</dt><dd>Years trading</dd></div>
-      </dl>
-    </div>
+      </div>
+    </dl>
   </section>
 
   {/* ══════ 02 · what we do ══════ */}
@@ -220,6 +223,28 @@ const steps = [
     </div>
   </section>
 
+  {/* ══════ 03b · why ══════ */}
+  <section class="wy section">
+    <div class="shell wy__head" data-rise>
+      <p class="eb eb--clay"><i class="eb__r" aria-hidden="true"></i>Why Danat</p>
+      <h2 class="wy__h">Six reasons, all of them<br /><em>checkable.</em></h2>
+    </div>
+
+    {/* A rail rather than a grid: it signals there is more than fits, and
+        it scrolls with a thumb as readily as a trackpad. */}
+    <div class="wy__rail">
+      <ul class="shell-wide wy__track">
+        {reasons.map((r, i) => (
+          <li data-rise style={`--d:${i * 50}ms`}>
+            <span aria-hidden="true"><Icon name={r.icon} size={22} /></span>
+            <b>{r.t}</b>
+            <em>{r.p}</em>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
   {/* ══════ 04 · how ══════ */}
   <section class="hw" data-tone="ink">
     <div class="hw__bg" aria-hidden="true">
@@ -251,34 +276,106 @@ const steps = [
     </div>
   </section>
 
-  {/* ══════ 05 · cta ══════ */}
-  <section class="ct">
-    <div class="shell ct__in">
-      <div>
-        <p class="eb eb--clay" data-rise><i class="eb__r" aria-hidden="true"></i>Open an account</p>
-        <h2 class="ct__h" data-rise style="--d:70ms">
-          Send us the list.<br /><em>We will price it.</em>
-        </h2>
-        <p class="ct__p" data-rise style="--d:130ms">
-          A spreadsheet, a photo of a shelf, or a floor plan. Whatever you
-          have is enough to start.
-        </p>
+  {/* ══════ 05 · quote ══════ */}
+  <section class="qt section" id="quote">
+    <span class="qt__wash" aria-hidden="true"></span>
+
+    <div class="shell qt__head" data-rise>
+      <p class="eb eb--clay eb--mid"><i class="eb__r" aria-hidden="true"></i>Open an account</p>
+      <h2 class="qt__h">Send us the list.<br /><em>We will price it.</em></h2>
+      <p class="qt__p">
+        A spreadsheet, a photo of a shelf, or a floor plan. Whatever you have
+        is enough to start.
+      </p>
+    </div>
+
+    <form class="shell qt__form" id="trade" data-rise style="--d:90ms">
+      <div class="qf__row">
+        <div class="qf">
+          <label for="q-name">Your name</label>
+          <input id="q-name" name="name" type="text" autocomplete="name" required
+            placeholder="Who we are quoting for" />
+        </div>
+        <div class="qf">
+          <label for="q-co">Company</label>
+          <input id="q-co" name="company" type="text" autocomplete="organization"
+            placeholder="Business or trade name" />
+        </div>
       </div>
 
-      <div class="ct__acts" data-rise style="--d:190ms">
-        <a class="btn" href={whatsappLink('Hello Danat — I would like a trade quote for')}
-          target="_blank" rel="noopener noreferrer">
-          Get a trade quote
-          <span class="btn__i" aria-hidden="true"><Icon name="arrow" size={15} /></span>
-        </a>
-        <a class="ct__call" href={`tel:${site.phone.tel}`}>{site.phone.display}</a>
-        <p class="ct__note">
-          {branches.map((b) => b.city.split(',')[0]).join(' · ')}
-        </p>
+      <div class="qf__row">
+        <div class="qf">
+          <label for="q-phone">Phone <span>optional</span></label>
+          <input id="q-phone" name="phone" type="tel" autocomplete="tel"
+            placeholder="If you would rather we called" />
+        </div>
+        <div class="qf">
+          <label for="q-need">What do you need?</label>
+          <select id="q-need" name="need">
+            {services.map((sv) => <option value={sv.t}>{sv.t}</option>)}
+            <option value="A mix of the above">A mix of the above</option>
+          </select>
+        </div>
       </div>
-    </div>
+
+      <div class="qf">
+        <label for="q-msg">Scope, quantities, or the problem</label>
+        <textarea id="q-msg" name="message" rows="5" required
+          placeholder="40 laptops for a clinic refit, or 12 cameras across two floors — rough is fine."></textarea>
+      </div>
+
+      <div class="qt__acts">
+        <button class="btn" type="submit">
+          Send to Danat
+          <span class="btn__i" aria-hidden="true"><Icon name="whatsapp" size={15} /></span>
+        </button>
+        <a class="qt__call" href={`tel:${site.phone.tel}`}>{site.phone.display}</a>
+      </div>
+
+      <p class="qt__note">
+        Opens WhatsApp with your enquiry ready — nothing is stored on this
+        site and nothing sends until you press send.
+      </p>
+
+      <noscript>
+        <p class="qt__nojs">
+          This form needs JavaScript. Reach us on
+          {' '}<a href={whatsappLink()}>WhatsApp</a>, call
+          {' '}<a href={`tel:${site.phone.tel}`}>{site.phone.display}</a>, or email
+          {' '}<a href={`mailto:${site.email}`}>{site.email}</a>.
+        </p>
+      </noscript>
+    </form>
   </section>
+
 </PageLayout>
+
+<script is:inline define:vars={{ WA: site.phone.whatsapp }}>
+  (() => {
+    const form = document.getElementById('trade');
+    if (!form) return;
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      if (!form.reportValidity()) return;
+      const d = new FormData(form);
+      const opt = (k, label) => {
+        const v = String(d.get(k) || '').trim();
+        return v ? [`${label}: ${v}`] : [];
+      };
+      const text = [
+        `Hello Danat — trade enquiry from ${String(d.get('name') || '').trim()}.`,
+        ``,
+        ...opt('company', 'Company'),
+        ...opt('need', 'Needs'),
+        ...opt('phone', 'Phone'),
+        ``,
+        String(d.get('message') || '').trim(),
+      ].join('
+');
+      window.open(`https://wa.me/${WA}?text=${encodeURIComponent(text)}`, '_blank', 'noopener');
+    });
+  })();
+</script>
 
 <style>
   /* ───── shared ───── */
@@ -328,110 +425,83 @@ const steps = [
   /* ───── 01 hero ───── */
   .bh {
     position: relative;
-    background: linear-gradient(180deg, #fdfbf9, #f8f2ec 58%, #fdfcfa);
-    padding-block: clamp(6.5rem, 11vw, 9rem) clamp(2.5rem, 5vw, 4rem);
+    color: #fff;
+    padding-block: clamp(7rem, 12vw, 10rem) 0;
     overflow: hidden;
     isolation: isolate;
   }
-  .bh__wash {
-    position: absolute;
-    z-index: -1;
-    right: -14%;
-    top: -20%;
-    width: min(40rem, 52vw);
-    aspect-ratio: 1;
-    border-radius: 48% 52% 44% 56% / 52% 46% 54% 48%;
-    background: radial-gradient(circle at 38% 34%, color-mix(in oklab, var(--clay) 16%, transparent), transparent 68%);
-    filter: blur(20px);
+  .bh__bg { position: absolute; inset: 0; z-index: 0; }
+  .bh__bg :global(img) {
+    width: 100%; height: 100%; object-fit: cover; object-position: 56% 42%;
   }
+  .bh__tint {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(100deg, rgb(8 10 12 / 0.93) 0%, rgb(8 10 12 / 0.84) 44%,
+        rgb(8 10 12 / 0.55) 78%, rgb(8 10 12 / 0.4) 100%),
+      linear-gradient(to top, rgb(8 10 12 / 0.7), transparent 40%);
+  }
+  .bh__in { position: relative; z-index: 1; padding-bottom: clamp(3rem, 7vw, 5.5rem); }
 
   .bh__crumb {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.45rem;
-    font-size: 0.8125rem;
-    color: var(--text-3);
+    display: flex; flex-wrap: wrap; align-items: center; gap: 0.45rem;
+    margin-bottom: var(--s5);
+    font-size: 0.8125rem; color: rgb(255 255 255 / 0.66);
   }
   .bh__crumb a { transition: color var(--t2) var(--ease); }
-  .bh__crumb a:hover { color: var(--clay-deep); }
-  .bh__crumb [aria-current] { color: var(--text); }
-
-  .bh__grid { display: grid; gap: clamp(2rem, 4vw, 3rem); align-items: center; margin-top: var(--s5); }
-  .bh__copy { display: grid; justify-items: start; }
+  .bh__crumb a:hover { color: #fff; }
+  .bh__crumb [aria-current] { color: #fff; }
 
   .bh__h {
     margin-top: var(--s4);
-    font-size: clamp(2.1rem, 4.6vw, 3.4rem);
-    line-height: 1.04;
-    letter-spacing: -0.044em;
+    font-size: clamp(2.3rem, 6vw, 4.2rem);
+    line-height: 1.02;
+    letter-spacing: -0.046em;
     font-weight: 700;
   }
-  .bh__h em { font-style: normal; color: var(--clay-deep); }
+  .bh__h em { font-style: normal; color: var(--clay-bright); }
   .bh__p {
     margin-top: var(--s4);
-    max-width: 42ch;
+    max-width: 46ch;
     font-size: var(--lead);
     line-height: 1.62;
-    color: var(--text-2);
+    color: rgb(255 255 255 / 0.84);
   }
   .bh__acts {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--s4) var(--s5);
-    margin-top: var(--s5);
+    display: flex; flex-wrap: wrap; align-items: center;
+    gap: var(--s4) var(--s5); margin-top: var(--s5);
   }
   .bh__mail {
-    font-family: var(--font-mono);
-    font-size: 0.875rem;
-    color: var(--text);
-    border-bottom: 1px solid var(--line-light);
-    padding-bottom: 2px;
+    font-family: var(--font-mono); font-size: 0.875rem; color: #fff;
+    border-bottom: 1px solid rgb(255 255 255 / 0.45); padding-bottom: 2px;
     overflow-wrap: anywhere;
     transition: border-color var(--t2) var(--ease);
   }
-  .bh__mail:hover { border-color: var(--clay); }
+  .bh__mail:hover { border-color: var(--clay-bright); }
 
-  .bh__fig { position: relative; }
-  .bh__fig :global(img) {
-    width: 100%;
-    height: auto;
-    aspect-ratio: 4 / 3;
-    object-fit: cover;
-    border-radius: 18px;
-  }
-  .bh__fig figcaption {
-    position: absolute;
-    left: 1rem;
-    bottom: 1rem;
-    padding: 0.4rem 0.9rem;
-    border-radius: 999px;
-    background: rgb(255 255 255 / 0.94);
-    backdrop-filter: blur(6px);
-    font-family: var(--font-mono);
-    font-size: 0.5625rem;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--clay-deep);
-  }
-
+  /* The figures sit on a band at the base of the photograph. */
   .bh__figs {
+    position: relative;
+    z-index: 1;
+    background: rgb(8 10 12 / 0.55);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgb(255 255 255 / 0.14);
+  }
+  .bh__figsin {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: var(--s5) var(--s4);
-    margin-top: clamp(2rem, 4vw, 3rem);
-    padding-top: var(--s5);
-    border-top: 1px solid var(--line-light);
+    padding-block: clamp(1.25rem, 3vw, 2rem);
   }
   .bh__figs dt {
     font-size: clamp(1.5rem, 2.6vw, 2.1rem);
-    font-weight: 700;
-    letter-spacing: -0.04em;
-    line-height: 1;
+    font-weight: 700; letter-spacing: -0.04em; line-height: 1;
     font-variant-numeric: tabular-nums;
   }
-  .bh__figs dd { margin-top: 0.3rem; font-size: 0.8125rem; color: var(--text-3); }
+  .bh__figs dd {
+    margin-top: 0.3rem; font-size: 0.8125rem; color: rgb(255 255 255 / 0.7);
+  }
 
   /* ───── 02 cards ───── */
   .sv { background: var(--white); }
@@ -763,44 +833,135 @@ const steps = [
     color: rgb(255 255 255 / 0.82);
   }
 
-  /* ───── 05 cta ───── */
-  .ct { background: var(--white); padding-block: clamp(3rem, 6vw, 5rem); }
-  .ct__in { display: grid; gap: clamp(1.75rem, 4vw, 3rem); align-items: center; }
-  .ct__h {
+  /* ───── 03b why rail ───── */
+  .wy { background: var(--white); }
+  .wy__head { display: grid; justify-items: center; text-align: center; }
+  .wy__h {
     margin-top: var(--s4);
     font-size: clamp(1.7rem, 3.2vw, 2.5rem);
-    font-weight: 700;
-    letter-spacing: -0.04em;
-    line-height: 1.08;
+    font-weight: 700; letter-spacing: -0.04em; line-height: 1.08;
   }
-  .ct__h em { font-style: normal; color: var(--clay-deep); }
-  .ct__p {
+  .wy__h em { font-style: normal; color: var(--clay-deep); }
+
+  .wy__rail { margin-top: clamp(1.75rem, 4vw, 2.75rem); }
+  .wy__track {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(15rem, 1fr);
+    gap: clamp(0.75rem, 1.6vw, 1.1rem);
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    padding-bottom: 0.5rem;
+  }
+  .wy__track::-webkit-scrollbar { display: none; }
+  .wy__track li {
+    scroll-snap-align: start;
+    display: grid;
+    align-content: start;
+    padding: 1.5rem 1.4rem;
+    border-radius: 20px;
+    background: var(--off);
+    transition: background-color var(--t2) var(--ease), transform var(--t2) var(--ease);
+  }
+  .wy__track li:hover { transform: translateY(-4px); background: var(--clay-wash); }
+  .wy__track span {
+    display: grid; place-items: center; width: 46px; height: 46px;
+    border-radius: 15px; color: var(--clay-deep); background: #fff;
+  }
+  .wy__track b {
+    margin-top: 0.9rem; font-size: 1rem; font-weight: 700; letter-spacing: -0.025em;
+  }
+  .wy__track em {
+    margin-top: 0.4rem; font-style: normal;
+    font-size: 0.8125rem; line-height: 1.55; color: var(--text-2);
+  }
+
+  /* ───── 05 quote ───── */
+  .qt {
+    position: relative;
+    background: linear-gradient(180deg, #fdfbf9, #f7f1ea 56%, #fdfcfa);
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .qt__wash {
+    position: absolute; z-index: -1; left: 50%; top: 40%;
+    translate: -50% -50%;
+    width: min(52rem, 94vw); aspect-ratio: 1; border-radius: 50%;
+    background: radial-gradient(circle, color-mix(in oklab, var(--clay) 13%, transparent), transparent 70%);
+    filter: blur(30px);
+  }
+  .qt__head { display: grid; justify-items: center; text-align: center; }
+  .eb--mid { justify-content: center; }
+  .qt__h {
     margin-top: var(--s4);
-    max-width: 38ch;
-    font-size: 0.9375rem;
-    line-height: 1.62;
-    color: var(--text-2);
+    font-size: clamp(1.8rem, 3.6vw, 2.7rem);
+    font-weight: 700; letter-spacing: -0.042em; line-height: 1.06;
   }
-  .ct__acts { display: grid; justify-items: start; gap: var(--s4); }
-  .ct__call {
-    font-family: var(--font-mono);
-    font-size: 0.9375rem;
+  .qt__h em { font-style: normal; color: var(--clay-deep); }
+  .qt__p {
+    max-width: 44ch; margin-top: var(--s4);
+    font-size: 0.9375rem; line-height: 1.62; color: var(--text-2);
+  }
+
+  .qt__form {
+    display: grid;
+    gap: var(--s4);
+    max-width: 46rem;
+    margin: clamp(2rem, 4vw, 3rem) auto 0;
+    padding: clamp(1.4rem, 3vw, 2.25rem);
+    border-radius: 22px;
+    background: var(--white);
+    box-shadow: 0 1px 2px rgb(30 20 10 / 0.05), 0 30px 60px -44px rgb(30 20 10 / 0.5);
+  }
+  .qf__row { display: grid; gap: var(--s4); }
+  .qf { display: grid; gap: 0.45rem; }
+  .qf label {
+    font-family: var(--font-mono); font-size: 0.5625rem;
+    letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-3);
+  }
+  .qf label span { opacity: 0.7; }
+  .qf input, .qf select, .qf textarea {
+    width: 100%;
+    padding: 0.85rem 0.95rem;
+    border: 1px solid var(--line-light);
+    border-radius: 11px;
+    background: var(--off);
     color: var(--text);
-    border-bottom: 1px solid var(--line-light);
-    padding-bottom: 2px;
+    font: inherit; font-size: 0.9375rem;
+    transition: border-color var(--t2) var(--ease), box-shadow var(--t2) var(--ease);
+  }
+  .qf textarea { resize: vertical; min-height: 7rem; line-height: 1.55; }
+  .qf input::placeholder, .qf textarea::placeholder { color: var(--text-3); }
+  .qf input:focus-visible, .qf select:focus-visible, .qf textarea:focus-visible {
+    outline: none;
+    background: var(--white);
+    border-color: var(--clay-deep);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--clay) 24%, transparent);
+  }
+
+  .qt__acts {
+    display: flex; flex-wrap: wrap; align-items: center;
+    gap: var(--s4) var(--s5); margin-top: var(--s3);
+  }
+  .qt__call {
+    font-family: var(--font-mono); font-size: 0.9375rem; color: var(--text);
+    border-bottom: 1px solid var(--line-light); padding-bottom: 2px;
     transition: border-color var(--t2) var(--ease);
   }
-  .ct__call:hover { border-color: var(--clay); }
-  .ct__note {
-    font-family: var(--font-mono);
-    font-size: 0.5625rem;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--text-3);
+  .qt__call:hover { border-color: var(--clay); }
+  .qt__note { font-size: 0.75rem; line-height: 1.5; color: var(--text-3); }
+  .qt__nojs {
+    padding: 0.85rem 1rem; border-radius: 11px;
+    background: #eceef0; color: #4a5560;
+    font-size: 0.8125rem; line-height: 1.55;
   }
+  .qt__nojs a { text-decoration: underline; }
 
   /* ───── responsive ───── */
   @media (min-width: 40rem) {
+    .qf__row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .bh__figsin { grid-template-columns: repeat(4, 1fr); }
     .sv__grid { grid-template-columns: repeat(2, 1fr); }
     /* Two up: only the lead card takes the full width. */
     .card[style*='--span:2'] { grid-column: span 2; }
@@ -816,13 +977,13 @@ const steps = [
     .card { grid-column: span var(--span, 1); }
     .wh__grid { grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); }
     .hw__steps { grid-template-columns: repeat(4, 1fr); }
-    .ct__in { grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr); }
   }
 
   @media (prefers-reduced-motion: reduce) {
     .btn, .btn:hover, .card, .card:hover, .card__i,
     .tile a, .tile a:hover, .tile__go,
-    .wh__list li, .wh__list li:hover { transform: none; transition: none; }
+    .wh__list li, .wh__list li:hover,
+    .wy__track li, .wy__track li:hover { transform: none; transition: none; }
     .card::after { transform: scaleX(1); }
   }
 </style>
