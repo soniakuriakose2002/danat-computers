@@ -622,18 +622,18 @@ const helps = [
        normalised onto. They are all the same height and stood on the
        same floor in the asset, so the arc comes out even without CSS
        having to reconcile five different shapes. */
-    width: min(21rem, 62%);
+    width: min(24rem, 70%);
     aspect-ratio: 900 / 640;
     /* translateY is NEGATIVE with distance: on an ellipse seen from
        slightly above, whatever sits further back sits HIGHER on screen.
        Pushing the outer ones down was what made the row read as a flat
        fan hanging over the disc rather than a group standing on it. */
     transform:
-      translateX(calc(var(--o, 0) * 5.4rem))
+      translateX(calc(var(--o, 0) * 8.4rem))
       translateY(calc(var(--a, 0) * var(--a, 0) * -0.35rem))
       translateZ(calc(var(--a, 0) * var(--a, 0) * -60px))
       rotateY(calc(var(--o, 0) * -15deg))
-      scale(calc(1 - var(--a, 0) * 0.1));
+      scale(calc(1 - var(--a, 0) * 0.12));
     transition:
       transform 700ms cubic-bezier(0.4, 0, 0.2, 1),
       opacity 420ms var(--ease);
@@ -652,7 +652,12 @@ const helps = [
     box-shadow: 0 2px 4px rgb(10 30 12 / 0.05), 0 26px 50px -28px rgb(10 30 12 / 0.4);
   }
   .pf__slide:not([data-on]) { opacity: calc(1 - var(--a, 0) * 0.16); }
-  .pf__slide[data-off] { opacity: 0; pointer-events: none; }
+  /* data-off: belongs to another category. data-far: outside the
+     symmetric wing. The script had been setting data-far since the
+     symmetry change with no rule to match it, so nothing was hidden and
+     four machines fanned where three should. */
+  .pf__slide[data-off],
+  .pf__slide[data-far] { opacity: 0; pointer-events: none; }
   .pf__slide[data-on] { animation: pfFloat 6s var(--ease) infinite; }
   @keyframes pfFloat {
     0%, 100% { margin-bottom: 0; }
