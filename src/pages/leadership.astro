@@ -53,6 +53,14 @@ const since = site.stats.since;
 const PORTRAIT = '/people/shan-sahib.jpg';
 const hasPortrait = fs.existsSync(path.join(process.cwd(), 'public', 'people', 'shan-sahib.jpg'));
 
+/** Every one of these traces to the ERP export. */
+const figures = [
+  { v: new Date().getFullYear() - since, suffix: '+', l: 'Years trading' },
+  { v: site.stats.parts, suffix: '+', l: 'Lines held in stock' },
+  { v: site.stats.categories, suffix: '', l: 'Product categories' },
+  { v: site.stats.branches, suffix: '', l: 'Branches across Oman' },
+];
+
 /** The mockup's four. Wording is the client's. */
 const values = [
   { icon: 'users', t: 'Customer first', p: 'We listen, understand and deliver.' },
@@ -137,21 +145,48 @@ const values = [
   </section>
 
   {/* ══════ 02 · values ══════ */}
-  <section class="vl" id="values">
-    <div class="shell vl__in">
-      <ul class="vl__list">
-        {values.map((v, i) => (
-          <li data-rise style={`--d:${i * 60}ms`}>
-            <i aria-hidden="true"><Icon name={v.icon} size={20} /></i>
-            <span><b>{v.t}</b><em>{v.p}</em></span>
-          </li>
-        ))}
-      </ul>
-
-      <p class="vl__q" data-rise style="--d:260ms">
+  <section class="vl section" id="values">
+    <div class="shell vl__head">
+      <div>
+        <p class="eb" data-rise>What guides us</p>
+        <h2 class="vl__h" data-rise style="--d:70ms">
+          Four things we<br /><em>lead with.</em>
+        </h2>
+      </div>
+      <p class="vl__q" data-rise style="--d:130ms">
         <span class="vl__mark" aria-hidden="true">&ldquo;</span>
-        A smarter<br />tomorrow together.
+        A smarter tomorrow together.
       </p>
+    </div>
+
+    {/* Four tones rather than four identical tiles. Clay is the accent
+       the token system already carries; it marks emphasis and never a
+       button, which stays green everywhere on this site. */}
+    <ul class="shell vl__list">
+      {values.map((v, i) => (
+        <li data-rise data-tone={['a', 'b', 'c', 'd'][i]} style={`--d:${i * 70}ms`}>
+          <span class="vl__n" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+          <i aria-hidden="true"><Icon name={v.icon} size={20} /></i>
+          <b>{v.t}</b>
+          <em>{v.p}</em>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  {/* ══════ 02b · figures ══════ */}
+  <section class="fg">
+    <span class="fg__wash" aria-hidden="true"></span>
+    <div class="shell fg__in">
+      <p class="fg__k" data-rise>On the record</p>
+      <dl class="fg__figs">
+        {figures.map((f, i) => (
+          <div data-rise style={`--d:${i * 70}ms`}>
+            <dt><span data-count={f.v}>0</span>{f.suffix}</dt>
+            <dd>{f.l}</dd>
+          </div>
+        ))}
+      </dl>
     </div>
   </section>
 
@@ -458,45 +493,136 @@ const values = [
   .lh__chip b { font-size: 0.875rem; font-weight: 700; color: var(--text); }
 
   /* ───────── 02 values ───────── */
-  .vl { background: var(--white); padding-block: clamp(1.75rem, 3.5vw, 2.75rem); }
-  .vl__in { display: grid; gap: clamp(1.25rem, 2.6vw, 2rem); align-items: center; }
-  .vl__list { display: grid; gap: clamp(1rem, 2vw, 1.5rem); }
-  .vl__list li { display: grid; grid-template-columns: auto 1fr; align-items: start; gap: 0.9rem; }
-  .vl__list i {
-    display: grid;
-    place-items: center;
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: #e9f3ea;
-    color: var(--green-deep);
+  .vl { background: var(--white); }
+  .vl__head { display: grid; gap: var(--s5); align-items: end; }
+  .vl__h {
+    margin-top: var(--s4);
+    font-size: clamp(1.7rem, 3.4vw, 2.5rem);
+    font-weight: 700;
+    letter-spacing: -0.042em;
+    line-height: 1.08;
   }
-  .vl__list span { display: grid; min-width: 0; }
-  .vl__list b { font-size: 0.9375rem; font-weight: 700; letter-spacing: -0.02em; }
-  .vl__list em {
-    margin-top: 0.25rem;
-    font-style: normal;
-    font-size: 0.8125rem;
-    line-height: 1.55;
-    color: var(--text-2);
-  }
+  .vl__h em { font-style: normal; color: var(--green-deep); }
 
   .vl__q {
     position: relative;
-    padding: clamp(1.1rem, 2.4vw, 1.6rem) clamp(1.1rem, 2.4vw, 1.5rem);
+    max-width: 34ch;
+    padding: clamp(1.1rem, 2.2vw, 1.5rem) clamp(1.2rem, 2.4vw, 1.6rem);
     border-radius: 18px;
-    background: #eef6ef;
+    /* Clay marks the one emphatic line; the buttons stay green. */
+    background: var(--clay-wash);
+    border-left: 3px solid var(--clay);
     font-size: clamp(1rem, 1.8vw, 1.2rem);
     font-weight: 700;
     letter-spacing: -0.025em;
-    line-height: 1.3;
+    line-height: 1.35;
   }
   .vl__mark {
     display: block;
     font-family: var(--font-serif, Georgia, serif);
     font-size: 2.2rem;
     line-height: 0.7;
-    color: var(--green);
+    color: var(--clay);
+  }
+
+  .vl__list {
+    display: grid;
+    gap: clamp(0.75rem, 1.6vw, 1.1rem);
+    margin-top: clamp(1.75rem, 4vw, 2.75rem);
+  }
+  .vl__list li {
+    position: relative;
+    display: grid;
+    align-content: start;
+    padding: 1.6rem 1.4rem 1.5rem;
+    border-radius: 22px;
+    overflow: hidden;
+    transition: transform var(--t2) var(--ease), box-shadow var(--t2) var(--ease);
+  }
+  .vl__list li:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 26px 46px -30px rgb(10 30 12 / 0.4);
+  }
+  /* The four tones. */
+  .vl__list [data-tone='a'] { background: var(--off); --ink: var(--green-deep); }
+  .vl__list [data-tone='b'] { background: var(--clay-wash); --ink: var(--clay-deep); }
+  .vl__list [data-tone='c'] { background: #eef5ef; --ink: var(--green-deep); }
+  .vl__list [data-tone='d'] { background: #f6f1ec; --ink: var(--clay-deep); }
+
+  .vl__n {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.9rem;
+    font-size: 3.4rem;
+    font-weight: 700;
+    letter-spacing: -0.06em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+    opacity: 0.12;
+  }
+  .vl__list i {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 16px;
+    background: var(--white);
+    color: var(--ink);
+  }
+  .vl__list b {
+    margin-top: 1rem;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+  }
+  .vl__list em {
+    margin-top: 0.4rem;
+    font-style: normal;
+    font-size: 0.8438rem;
+    line-height: 1.6;
+    color: var(--text-2);
+  }
+
+  /* ───────── 02b figures ───────── */
+  .fg {
+    position: relative;
+    padding-block: clamp(2.25rem, 4.5vw, 3.5rem);
+    background: linear-gradient(135deg, #12351a 0%, #0c2411 58%, #143a1d 100%);
+    color: #fff;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .fg__wash {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: radial-gradient(720px 380px at 10% 0%, rgb(143 221 138 / 0.16), transparent 68%);
+  }
+  .fg__k {
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--green-bright);
+  }
+  .fg__figs {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--s5) var(--s4);
+    margin-top: var(--s5);
+  }
+  .fg__figs dt {
+    font-size: clamp(1.8rem, 3.4vw, 2.6rem);
+    font-weight: 700;
+    letter-spacing: -0.045em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .fg__figs dd {
+    margin-top: 0.4rem;
+    font-size: 0.8125rem;
+    color: rgb(255 255 255 / 0.76);
   }
 
   /* ───────── 03 from the stage ───────── */
@@ -649,19 +775,21 @@ const values = [
   /* ───────── responsive ───────── */
   @media (min-width: 40rem) {
     .vl__list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .fg__figs { grid-template-columns: repeat(4, minmax(0, 1fr)); }
     .st__p { margin-bottom: var(--s5); }
   }
 
   @media (min-width: 62rem) {
     .lh__grid { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr) minmax(0, 0.9fr); }
-    .vl__in { grid-template-columns: minmax(0, 1fr) minmax(0, 0.34fr); }
+    .vl__head { grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr); }
     .vl__list { grid-template-columns: repeat(4, minmax(0, 1fr)); }
     .st__head { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.3fr); }
     .lc__in { grid-template-columns: minmax(0, 1fr) auto auto; }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .btn, .btn:hover .btn__i, .film:hover i, .st__card:hover .st__play {
+    .btn, .btn:hover .btn__i, .film:hover i, .st__card:hover .st__play,
+    .vl__list li, .vl__list li:hover {
       transform: none;
       transition: none;
     }
