@@ -255,7 +255,7 @@ const promises = [
     };
 
     const stop = () => { if (timer) clearInterval(timer); timer = null; };
-    const start = () => { if (!reduced && !timer) timer = setInterval(() => show(at + 1), 5200); };
+    const start = () => { if (!reduced && !timer) timer = setInterval(() => show(at + 1), 4000); };
 
     nodes.forEach((el, i) => el.addEventListener('click', () => { stop(); show(i); }));
     idx.forEach((el) =>
@@ -432,6 +432,14 @@ const promises = [
     height: 100%;
     color: color-mix(in oklab, var(--text-3) 34%, transparent);
   }
+  /* The two rings turn against each other, slowly and forever, so the
+     orbit reads as live even between face changes. */
+  @media (prefers-reduced-motion: no-preference) {
+    .orb__arcs circle:first-child { animation: po-spin 64s linear infinite; }
+    .orb__arcs circle:last-child { animation: po-spin 44s linear infinite reverse; }
+    .orb__arcs circle { transform-origin: 50% 50%; }
+  }
+  @keyframes po-spin { to { transform: rotate(360deg); } }
 
   /* 3D-ish spheres, drifting */
   .orb__ball {
@@ -494,6 +502,7 @@ const promises = [
 
   .nd {
     position: absolute;
+    isolation: isolate;
     top: 0;
     left: 50%;
     translate: -50% 0;
@@ -539,6 +548,22 @@ const promises = [
     color: #fff;
   }
   .nd[data-on] i { color: #fff; }
+  .nd[data-on]::after {
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 2px solid color-mix(in oklab, var(--green) 55%, transparent);
+    animation: po-pulse 2.4s var(--ease) infinite;
+    pointer-events: none;
+  }
+  @keyframes po-pulse {
+    0% { transform: scale(0.96); opacity: 0.9; }
+    70%, 100% { transform: scale(1.12); opacity: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .nd[data-on]::after { animation: none; opacity: 0.5; transform: none; }
+  }
   .nd[data-on] em { color: rgb(255 255 255 / 0.82); }
 
   /* ---- centre ---- */
@@ -547,7 +572,13 @@ const promises = [
     position: absolute;
     inset: 22%;
     display: grid;
-    place-items: center;
+    /* Two rows, not absolute positioning: the counter used to be
+       position:absolute inside this circle and sat straight on top of
+       the Learn more button. Panels share row 1 so they can cross-fade;
+       the counter owns row 2 and cannot collide. */
+    grid-template-rows: 1fr auto;
+    justify-items: center;
+    align-content: center;
     border-radius: 50%;
     background: rgb(255 255 255 / 0.96);
     backdrop-filter: blur(10px);
@@ -606,10 +637,8 @@ const promises = [
   .pn__cta:hover { transform: translateY(-2px); }
 
   .orb__count {
-    position: absolute;
-    left: 50%;
-    bottom: clamp(0.6rem, 2.4vw, 1.6rem);
-    translate: -50% 0;
+    grid-row: 2;
+    margin-top: 0.8rem;
     display: flex;
     align-items: center;
     gap: 0.6rem;
