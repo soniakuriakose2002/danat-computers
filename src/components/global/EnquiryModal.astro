@@ -171,7 +171,7 @@ const forms = [
         else setTimeout(() => d.close(), 220);
       };
 
-      const open = (key) => {
+      const open = (key, want) => {
         const d = modals[key];
         if (!d || typeof d.showModal !== 'function') return false;
         const mnav = document.querySelector('[data-mnav]');
@@ -181,6 +181,12 @@ const forms = [
         // run from unless layout is flushed first.
         void d.offsetWidth;
         d.setAttribute('data-in', '');
+
+        // Arrive on the thing that was asked about, not on a blank form.
+        if (want) {
+          const sel = d.querySelector('select[name="product"], select[name="sector"]');
+          if (sel && [...sel.options].some((o) => o.value === want)) sel.value = want;
+        }
         return true;
       };
 
@@ -188,7 +194,7 @@ const forms = [
         el.addEventListener('click', (e) => {
           // Only swallow the click if the dialog actually opened; the
           // trigger's href is a working fallback otherwise.
-          if (open(el.dataset.enquiry)) e.preventDefault();
+          if (open(el.dataset.enquiry, el.dataset.enquiryProduct)) e.preventDefault();
         })
       );
 

@@ -53,7 +53,7 @@ import imgBoard from '@assets/photos/repair-board.jpg';
  */
 const cats = [
   {
-    icon: 'laptop', t: 'Laptops & Desktops', sub: 'Leading brands. Reliable performance.',
+    icon: 'laptop', t: 'Laptops & Desktops', sub: 'Leading brands. Reliable performance.', pre: 'Computers and laptops',
     items: [
       { b: 'HP', t: 'HP Laptops & Desktops', img: pHp, cut: true,
         p: 'Power your ideas with HP. Designed for work, learning and everyday performance.' },
@@ -66,7 +66,7 @@ const cats = [
     ],
   },
   {
-    icon: 'network', t: 'Networking', sub: 'Wired and wireless, planned and fixed.',
+    icon: 'network', t: 'Networking', sub: 'Wired and wireless, planned and fixed.', pre: 'Networking equipment',
     items: [
       { b: 'Wired', t: 'Wired Networking', img: pWired,
         p: 'Structured cabling, patching and switching — set up new or put right.' },
@@ -75,21 +75,21 @@ const cats = [
     ],
   },
   {
-    icon: 'camera', t: 'Security & CCTV', sub: 'Smarter, safer spaces.',
+    icon: 'camera', t: 'Security & CCTV', sub: 'Smarter, safer spaces.', pre: 'CCTV and security',
     items: [
       { b: 'CCTV', t: 'CCTV Installation', img: pCctv,
         p: 'Cameras, recorders and storage, supplied by the people who maintain them.' },
     ],
   },
   {
-    icon: 'gear', t: 'Spare Parts', sub: 'Held here, not ordered in.',
+    icon: 'gear', t: 'Spare Parts', sub: 'Held here, not ordered in.', pre: 'Hardware support',
     items: [
       { b: 'Parts', t: 'Spare Parts', img: pSpare,
         p: 'The parts the bench uses every day, on the shelf rather than on order.' },
     ],
   },
   {
-    icon: 'chip', t: 'Refurbished Desktop', sub: 'Reliable performance, better value.',
+    icon: 'chip', t: 'Refurbished Desktop', sub: 'Reliable performance, better value.', pre: 'Computers and laptops',
     items: [
       { b: 'Refurbished', t: 'Refurbished Desktop', img: pRefurb,
         p: 'Tested at component level by the technicians who repair them.' },
@@ -211,8 +211,13 @@ const helps = [
                   <li><i aria-hidden="true"><Icon name="check" size={12} /></i>{t}</li>
                 ))}
               </ul>
-              <a class="btn" href="/contact" data-enquiry="quote">
-                View {it.b} products
+              {/* It opens a quote, so it says so. There is no catalogue
+                  behind this site to list, and a button promising one
+                  would misdescribe what happens next. The subject rides
+                  along so the form does not arrive blank. */}
+              <a class="btn" href="/contact" data-enquiry="quote"
+                data-enquiry-product={cat.pre}>
+                Ask about {it.b}
                 <span class="btn__i" aria-hidden="true"><Icon name="arrow" size={15} /></span>
               </a>
             </div>
@@ -251,7 +256,7 @@ const helps = [
     <ul class="shell pc__grid">
       {cats.map((c, i) => (
         <li data-rise data-tone={['a', 'b', 'c', 'd', 'a'][i]} style={`--d:${i * 60}ms`}>
-          <a href="/contact" data-enquiry="quote">
+          <a href="/contact" data-enquiry="quote" data-enquiry-product={c.pre}>
             <span class="pc__n">{String(i + 1).padStart(2, '0')}</span>
             <span class="pc__t">{c.t}</span>
             <span class="pc__s">{c.sub}</span>
