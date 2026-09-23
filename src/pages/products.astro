@@ -4,7 +4,20 @@ import PageLayout from '@layouts/PageLayout.astro';
 import Icon from '@components/ui/Icon.astro';
 import { site, brands } from '@data/site';
 import pHp from '@assets/products/hp.png';
+import scDesktop from '@assets/products/scene/desktop.png';
+import scRouter from '@assets/products/scene/router.png';
+import scCamera from '@assets/products/scene/camera.png';
+import scParts from '@assets/products/scene/parts.png';
+
 const heroShot = pHp;
+
+/** The rest of the range standing around the dais, as the mockup places it. */
+const props = [
+  { img: scDesktop, at: 'desk' },
+  { img: scRouter, at: 'rout' },
+  { img: scCamera, at: 'cam' },
+  { img: scParts, at: 'part' },
+];
 import pDell from '@assets/products/dell.png';
 import pAsus from '@assets/products/asus.png';
 import pLenovo from '@assets/products/lenovo.png';
@@ -175,6 +188,11 @@ const helps = [
           the picture — inside it they would be clipped by its own box. */}
       <div class="ph__scene" data-rise style="--d:160ms">
         <span class="ph__dais" aria-hidden="true"><i></i></span>
+
+        {props.map((x) => (
+          <img class="ph__prop" data-at={x.at} src={x.img.src}
+            width={x.img.width} height={x.img.height} alt="" loading="lazy" />
+        ))}
         <img class="ph__hero" src={heroShot.src} width={heroShot.width}
           height={heroShot.height} alt="" loading="eager" fetchpriority="high" />
 
@@ -653,6 +671,18 @@ const helps = [
     z-index: 2;
     filter: drop-shadow(0 26px 34px rgb(10 30 12 / 0.22));
   }
+  /* The rest of the range. Depth is carried by z-index against the dais:
+     the desktop and the router stand BEHIND it, the drives in front. */
+  .ph__prop {
+    position: absolute;
+    height: auto;
+    filter: drop-shadow(0 14px 18px rgb(10 30 12 / 0.14));
+  }
+  .ph__prop[data-at='desk'] { z-index: 0; left: 3%;  bottom: 32%; width: 17%; }
+  .ph__prop[data-at='rout'] { z-index: 0; right: 19%; top: 5%;   width: 19%; }
+  .ph__prop[data-at='cam']  { z-index: 1; right: 8%;  top: 33%;  width: 15%; }
+  .ph__prop[data-at='part'] { z-index: 2; left: 0%;   bottom: 11%; width: 26%; }
+
   .ph__dais {
     position: absolute;
     left: 50%;
