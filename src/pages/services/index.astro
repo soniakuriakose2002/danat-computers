@@ -624,7 +624,7 @@ const promises = [
        full width of the page. */
     .sh__stage {
       position: static;
-      min-height: clamp(30rem, 45vw, 39rem);
+      min-height: clamp(32rem, 46vw, 41rem);
       margin: 0;
     }
 
@@ -632,12 +632,12 @@ const promises = [
     .sh__media {
       position: absolute;
       z-index: 2;
-      inset: 15% 7% 13% auto;
+      inset: 6rem 7% 4.5rem auto;
       width: 47vw;
       aspect-ratio: auto;
       border: clamp(8px, 0.8vw, 13px) solid #fff;
       border-radius: clamp(1.75rem, 3.2vw, 2.75rem);
-      rotate: -2.4deg;
+      rotate: -1.7deg;
       box-shadow: 0 40px 80px -40px rgb(10 30 12 / 0.55);
       clip-path: inset(0 0 100% 0);
       transition: clip-path 1100ms var(--ease-io) 200ms;
@@ -649,11 +649,11 @@ const promises = [
       display: block;
       position: absolute;
       z-index: 1;
-      inset: 11% 3% 17% auto;
+      inset: 4.25rem 3% 6.5rem auto;
       width: 44vw;
       border-radius: clamp(1.75rem, 3.2vw, 2.75rem);
       background: #17431f;
-      rotate: 2.6deg;
+      rotate: 1.9deg;
       opacity: 0;
       transform: translate3d(2.5rem, 0, 0);
       transition: opacity 700ms var(--ease) 320ms, transform 900ms var(--ease) 320ms;
@@ -664,11 +664,11 @@ const promises = [
       display: block;
       position: absolute;
       z-index: 1;
-      inset: 20% 12% 6% auto;
+      inset: 8rem 12% 2rem auto;
       width: 44vw;
       border: 1px solid color-mix(in oklab, var(--green) 42%, transparent);
       border-radius: clamp(1.75rem, 3.2vw, 2.75rem);
-      rotate: -2.4deg;
+      rotate: -1.7deg;
       opacity: 0;
       transform: translate3d(-2rem, 0, 0);
       transition: opacity 700ms var(--ease) 440ms, transform 900ms var(--ease) 440ms;
@@ -680,7 +680,7 @@ const promises = [
       position: absolute;
       z-index: 3;
       left: 46.5vw;
-      top: 32%;
+      top: 11rem;
       width: clamp(14px, 1.4vw, 22px);
       height: clamp(6rem, 12vw, 10rem);
       border-radius: 999px;
@@ -700,7 +700,7 @@ const promises = [
       opacity: 0;
       transition: opacity 700ms var(--ease) 700ms;
     }
-    .sh__dots--a { left: 45vw; top: 15%; }
+    .sh__dots--a { left: 45vw; top: 4.5rem; }
     .sh__dots--b { right: 2.5vw; bottom: 12%; }
 
     .sh__stage[data-in] .sh__slab,
@@ -714,7 +714,7 @@ const promises = [
     /* the two cards that sit over the picture */
     .sh__tag {
       z-index: 4;
-      top: 21%;
+      top: 7.5rem;
       right: 3vw;
       width: min(15rem, 21vw);
       grid-template-columns: auto 1fr;
@@ -728,7 +728,7 @@ const promises = [
       z-index: 4;
       left: 44vw;
       right: auto;
-      bottom: 16%;
+      bottom: 6rem;
       translate: none;
     }
 
