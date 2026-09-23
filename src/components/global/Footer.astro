@@ -105,11 +105,31 @@ const companyLinks = [
 
   <div class="ft__base shell">
     <p>&copy; {year} {site.legalName}. All rights reserved.</p>
-    <p>Ruwi &middot; Sohar &middot; Hail &middot; Salalah</p>
+    <p class="ft__by">
+      Ruwi &middot; Sohar &middot; Hail &middot; Salalah
+      <span aria-hidden="true">&middot;</span>
+      Built by
+      <a href="https://www.alphalize.com/en" target="_blank" rel="noopener noreferrer">
+        Alphalize
+      </a>
+    </p>
   </div>
 </footer>
 
 <style>
+  .ft__by {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .ft__by a {
+    color: var(--green-bright);
+    border-bottom: 1px solid transparent;
+    transition: border-color var(--t2) var(--ease);
+  }
+  .ft__by a:hover { border-color: currentColor; }
+
   .ft {
     position: relative;
     background: var(--ink);

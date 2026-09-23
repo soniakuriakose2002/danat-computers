@@ -1,0 +1,291 @@
+---
+import Icon from '@components/ui/Icon.astro';
+import Logo from '@components/global/Logo.astro';
+import { site, branches } from '@data/site';
+
+/**
+ * OUR STORY — a card that opens over the page.
+ *
+ * Same <dialog> + showModal() foundation as the film: the platform gives
+ * the inert background, the Escape handler, the focus trap and
+ * ::backdrop, which is where hand-rolled overlays usually go wrong.
+ *
+ * The shield and each paragraph carry their own --d, and the reveal is
+ * driven by a data attribute the open handler sets one frame later.
+ * That one-frame delay matters: a transition cannot run from styles that
+ * were applied in the same frame the element became visible, so without
+ * it the card would simply appear.
+ *
+ * Every figure below traces to the company's own records. There is no
+ * review score here because Danat has published none — the reference
+ * layout has one, and inventing it is not an option.
+ */
+const years = new Date().getFullYear() - site.stats.since;
+const cities = branches.map((b) => b.city.split(',')[0]).join(', ');
+
+const paras = [
+  `Danat Computers opened on Computer Street in Ruwi in ${site.stats.since}, and has traded there ever since. ${years} years on it runs four branches across Oman — ${cities} — under the registered name ${site.legalName}.`,
+  `We sell, supply and repair: laptops and desktops, printers, CCTV, networking, and the parts that go inside all of them. ${site.stats.parts.toLocaleString('en-US')} lines across ${site.stats.categories} categories sit on the shelves, which is why most repairs do not wait on an order arriving from outside the country.`,
+  'The part that sets the bench apart is what happens when a board fails. Most shops trace a fault that far, then quote a replacement mainboard — usually most of the value of the machine. We trace it to the component on the board and replace that instead.',
+  'Diagnosis is free and comes before the quote. You are told what failed, what it will cost and how long it takes, and then you decide.',
+];
+
+const closing = 'Four counters, one standard — and a bench that opens the machine rather than replacing it.';
+---
+
+<dialog class="sc" data-story-modal aria-label="Our story">
+  <div class="sc__box">
+    <button class="sc__x" type="button" data-story-close aria-label="Close">
+      <Icon name="plus" size={18} />
+    </button>
+
+    <div class="sc__grid">
+      {/* shield */}
+      <div class="sc__badge" style="--d:60ms">
+        <span class="sc__shield">
+          <Logo />
+          <span class="sc__since">Since {site.stats.since}</span>
+        </span>
+      </div>
+
+      {/* story */}
+      <div class="sc__body">
+        <p class="sc__k" style="--d:120ms">Our story</p>
+        <h2 class="sc__h" style="--d:170ms">
+          It started on<br /><em>Computer Street.</em>
+        </h2>
+
+        {paras.map((t, i) => (
+          <p class="sc__p" style={`--d:${230 + i * 70}ms`}>{t}</p>
+        ))}
+
+        <p class="sc__close" style={`--d:${230 + paras.length * 70}ms`}>{closing}</p>
+
+        <div class="sc__acts" style={`--d:${290 + paras.length * 70}ms`}>
+          <a class="sc__cta" href="/branches">
+            Our branches<Icon name="arrow" size={15} />
+          </a>
+          <button class="sc__alt" type="button" data-video-open>
+            Watch the film
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<script is:inline>
+  (() => {
+    const dlg = document.querySelector('[data-story-modal]');
+    if (!dlg) return;
+
+    const open = () => {
+      if (typeof dlg.showModal === 'function') dlg.showModal();
+      else dlg.setAttribute('open', '');
+      // One frame later, or the transition has no previous state to run
+      // from and every element simply appears.
+      requestAnimationFrame(() => requestAnimationFrame(() => dlg.setAttribute('data-in', '')));
+    };
+    const close = () => {
+      dlg.removeAttribute('data-in');
+      if (typeof dlg.close === 'function') dlg.close();
+      else dlg.removeAttribute('open');
+    };
+
+    document.querySelectorAll('[data-story-open]').forEach((b) =>
+      b.addEventListener('click', (e) => { e.preventDefault(); open(); })
+    );
+    dlg.querySelector('[data-story-close]')?.addEventListener('click', close);
+    dlg.addEventListener('click', (e) => { if (e.target === dlg) close(); });
+    dlg.addEventListener('close', () => dlg.removeAttribute('data-in'));
+
+    // "Watch the film" inside the card hands over to the video dialog.
+    dlg.querySelector('[data-video-open]')?.addEventListener('click', close);
+  })();
+</script>
+
+<style>
+  .sc {
+    width: min(64rem, 94vw);
+    max-width: none;
+    max-height: 92vh;
+    padding: 0;
+    border: 0;
+    background: none;
+    overflow: visible;
+  }
+  .sc::backdrop {
+    background: rgb(7 9 10 / 0.8);
+    backdrop-filter: blur(7px);
+  }
+
+  .sc__box {
+    position: relative;
+    max-height: 92vh;
+    overflow-y: auto;
+    border-radius: 20px;
+    background: var(--white);
+    box-shadow: 0 40px 90px -36px rgb(0 0 0 / 0.65);
+  }
+
+  .sc__x {
+    position: absolute;
+    top: 0.9rem;
+    right: 0.9rem;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border: 1px solid var(--line-light);
+    border-radius: 50%;
+    background: var(--white);
+    color: var(--text-2);
+    cursor: pointer;
+    transition: background-color var(--t2) var(--ease), color var(--t2) var(--ease), transform var(--t2) var(--ease);
+  }
+  /* No dedicated close glyph in the set — the plus is turned into one. */
+  .sc__x :global(svg) { transform: rotate(45deg); }
+  .sc__x:hover { background: var(--ink); color: #fff; transform: rotate(90deg); }
+  .sc__x:focus-visible { outline: 2px solid var(--green-deep); outline-offset: 3px; }
+
+  .sc__grid { display: grid; }
+
+  /* ---- shield ---- */
+
+  .sc__badge {
+    display: grid;
+    place-items: center;
+    padding: clamp(2rem, 5vw, 3rem);
+    background: linear-gradient(160deg, #10301a, #1e4a26 56%, #0e2a17);
+  }
+  .sc__shield {
+    display: grid;
+    justify-items: center;
+    gap: 0.9rem;
+    width: min(15rem, 60%);
+    aspect-ratio: 4 / 5;
+    place-content: center;
+    padding: 1.5rem;
+    border-radius: 44% 44% 46% 46% / 8% 8% 40% 40%;
+    background: rgb(255 255 255 / 0.08);
+    border: 1px solid rgb(255 255 255 / 0.16);
+  }
+  .sc__shield :global(img),
+  .sc__shield :global(svg) { max-width: 100%; height: auto; }
+  .sc__since {
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--green-bright);
+  }
+
+  /* ---- story ---- */
+
+  .sc__body { padding: clamp(1.5rem, 4vw, 2.75rem); }
+
+  .sc__k {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--green-deep);
+  }
+  .sc__h {
+    margin-top: var(--s4);
+    font-size: clamp(1.5rem, 3vw, 2.2rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1.08;
+  }
+  .sc__h em { font-style: normal; color: var(--green-deep); }
+
+  .sc__p {
+    margin-top: var(--s4);
+    max-width: 62ch;
+    font-size: 0.875rem;
+    line-height: 1.68;
+    color: var(--text-2);
+  }
+  .sc__close {
+    margin-top: var(--s5);
+    padding-top: var(--s4);
+    border-top: 1px solid var(--line-light);
+    max-width: 58ch;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    line-height: 1.5;
+    color: var(--text);
+  }
+
+  .sc__acts {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s4) var(--s5);
+    margin-top: var(--s5);
+  }
+  .sc__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.4rem;
+    border-radius: 999px;
+    /* white is 8.73:1 on #27551f and 4.90:1 on #3d7f35 */
+    background: linear-gradient(100deg, #27551f, #3d7f35);
+    color: #fff;
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: transform var(--t2) var(--ease);
+  }
+  .sc__cta:hover { transform: translateY(-2px); }
+  .sc__alt {
+    padding: 0;
+    border: 0;
+    border-bottom: 1px solid var(--line-light);
+    background: none;
+    color: var(--text-2);
+    font: inherit;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: color var(--t2) var(--ease), border-color var(--t2) var(--ease);
+  }
+  .sc__alt:hover { color: var(--green-deep); border-color: var(--green); }
+
+  /* ---- the reveal ---- */
+
+  .sc__badge,
+  .sc__k,
+  .sc__h,
+  .sc__p,
+  .sc__close,
+  .sc__acts {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0);
+    transition:
+      opacity var(--t3) var(--ease) var(--d, 0ms),
+      transform var(--t3) var(--ease) var(--d, 0ms);
+  }
+  .sc__badge { transform: translate3d(0, 0, 0) scale(0.96); }
+
+  .sc[data-in] :is(.sc__k, .sc__h, .sc__p, .sc__close, .sc__acts) {
+    opacity: 1;
+    transform: none;
+  }
+  .sc[data-in] .sc__badge { opacity: 1; transform: none; }
+
+  @media (min-width: 56rem) {
+    .sc__grid { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sc__badge, .sc__k, .sc__h, .sc__p, .sc__close, .sc__acts {
+      opacity: 1;
+      transform: none;
+      transition: none;
+    }
+    .sc__x, .sc__x:hover, .sc__cta, .sc__cta:hover { transform: none; transition: none; }
+    .sc__x :global(svg) { transform: rotate(45deg); }
+  }
+</style>

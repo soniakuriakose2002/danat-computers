@@ -4,6 +4,7 @@ import PageLayout from '@layouts/PageLayout.astro';
 import Icon from '@components/ui/Icon.astro';
 import PurposeOrbit from '@components/sections/PurposeOrbit.astro';
 import VideoModal from '@components/global/VideoModal.astro';
+import StoryCard from '@components/global/StoryCard.astro';
 import { site, branches } from '@data/site';
 import { OMAN_PATH, OMAN_VIEWBOX, OMAN_PINS } from '@data/omanMap';
 import imgTech from '@assets/photos/repair-solder.jpg';
@@ -80,10 +81,10 @@ const layers = [r01, r03, r04, r05];
         </p>
 
         <div class="hero__acts" data-rise style="--d:200ms">
-          <a class="btn" href="#journey">
+          <button class="btn" type="button" data-story-open>
             Our story
             <span class="btn__i" aria-hidden="true"><Icon name="arrow" size={15} /></span>
-          </a>
+          </button>
           {/* The actual opening frame of the company's film, cropped clear
               of the thumbnail's overlay bars. A real frame says what the
               film is; a ring of text only says that one exists. */}
@@ -308,6 +309,7 @@ const layers = [r01, r03, r04, r05];
       <p class="cta__script" aria-hidden="true">Technology<br />for a Brighter<br />Tomorrow</p>
     </div>
   </section>
+  <StoryCard />
   <VideoModal />
 </PageLayout>
 
