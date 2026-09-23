@@ -138,8 +138,7 @@ const closing = 'Four counters, one standard — and a bench that opens the mach
     max-height: 92vh;
     overflow-y: auto;
     border-radius: 26px;
-    background: var(--white);
-    box-shadow: 0 40px 90px -36px rgb(0 0 0 / 0.65);
+    background: transparent;
   }
 
   .sc[data-in] .sc__box { opacity: 1; transform: none; }
@@ -158,8 +157,14 @@ const closing = 'Four counters, one standard — and a bench that opens the mach
     background: var(--white);
     color: var(--text-2);
     cursor: pointer;
-    transition: background-color var(--t2) var(--ease), color var(--t2) var(--ease), transform var(--t2) var(--ease);
+    opacity: 0;
+    transition:
+      opacity 260ms var(--ease) var(--join),
+      background-color var(--t2) var(--ease),
+      color var(--t2) var(--ease),
+      transform var(--t2) var(--ease);
   }
+  .sc[data-in] .sc__x { opacity: 1; }
   /* No dedicated close glyph in the set — the plus is turned into one. */
   .sc__x :global(svg) { transform: rotate(45deg); }
   .sc__x:hover { background: var(--ink); color: #fff; transform: rotate(90deg); }
@@ -176,6 +181,7 @@ const closing = 'Four counters, one standard — and a bench that opens the mach
     place-items: center;
     padding: clamp(2rem, 5vw, 3rem);
     background: linear-gradient(160deg, #10301a, #1e4a26 56%, #0e2a17);
+    box-shadow: 0 40px 90px -36px rgb(0 0 0 / 0.55);
   }
   .sc__mark {
     position: relative;
@@ -226,7 +232,13 @@ const closing = 'Four counters, one standard — and a bench that opens the mach
 
   /* ---- story ---- */
 
-  .sc__body { padding: clamp(1.5rem, 4vw, 2.75rem); }
+  .sc__body {
+    /* Its own surface, so the half is a thing that arrives rather than
+       text sliding over a backdrop that was already there. */
+    background: var(--white);
+    padding: clamp(1.5rem, 4vw, 2.75rem);
+    box-shadow: 0 40px 90px -36px rgb(0 0 0 / 0.55);
+  }
 
   .sc__k {
     font-family: var(--font-mono);
@@ -372,7 +384,7 @@ const closing = 'Four counters, one standard — and a bench that opens the mach
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .sc__box, .sc__badge, .sc__body, .sc__mark,
+    .sc__box, .sc__badge, .sc__body, .sc__mark, .sc__x,
     .sc__k, .sc__h, .sc__p, .sc__close, .sc__acts {
       opacity: 1;
       scale: 1;
