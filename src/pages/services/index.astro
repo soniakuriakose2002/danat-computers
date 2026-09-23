@@ -281,7 +281,7 @@ const promises = [
     position: absolute;
     inset: 0;
     z-index: -1;
-    background: linear-gradient(162deg, #eef5ef 0%, #f6faf6 54%, #ffffff 100%);
+    background: linear-gradient(162deg, #eef5ef 0%, #f3f9f4 58%, #f1f7f2 100%);
   }
   .sh__grid { display: grid; gap: clamp(1.75rem, 3.5vw, 2.75rem); align-items: center; }
   /* The copy carries the header clearance so the photograph can run to
@@ -400,7 +400,9 @@ const promises = [
   .sh__pill i { width: 1px; height: 18px; background: var(--line-light); }
 
   /* ───────── 02 marks ───────── */
-  .sm { background: var(--white); padding-block: clamp(1.4rem, 3vw, 2.2rem); }
+  /* Same panel as the hero — in the mockup the pale ground runs
+     behind both and stops under this strip. */
+  .sm { background: #f1f7f2; padding-block: clamp(1.4rem, 3vw, 2.2rem); }
   .sm__list { display: grid; gap: clamp(1rem, 2.2vw, 1.6rem); }
   .sm__list li { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 0.85rem; }
   .sm__list i {
@@ -584,17 +586,17 @@ const promises = [
       margin: 0;
     }
 
-    /* Measured off the mockup: the slab's left edge runs from 53% of
-       the page at the top to 47% at the bottom. 53vw wide, right
-       anchored, with the lean in the polygon gives exactly that. */
+    /* The slab reads as a thin crescent beside the arc and a wedge
+       under it, not a band: left edge at 48% of the page at the top,
+       46% at the bottom, with the photo's own edge at 50%. */
     .sh__slab {
       display: block;
       position: absolute;
       top: 0;
       bottom: 0;
       right: 0;
-      width: 53vw;
-      clip-path: polygon(11% 0, 100% 0, 100% 100%, 0 100%);
+      width: 54vw;
+      clip-path: polygon(4% 0, 100% 0, 100% 100%, 0 100%);
       background: #89af93;
     }
     .sh__media {
@@ -602,14 +604,17 @@ const promises = [
       top: 0;
       bottom: 8%;
       right: 0;
-      width: 41vw;
+      width: 50vw;
       aspect-ratio: auto;
-      border-radius: clamp(3rem, 9vw, 8.5rem) 0 0 clamp(3rem, 9vw, 8.5rem);
+      /* Measured off the mockup at 4x: the photo's left edge sits at 51%
+         of the page at the top, 50% at mid-height and 56% at the bottom
+         — one long arc, so both left corners take a large radius. */
+      border-radius: clamp(3.5rem, 10vw, 9.5rem) 0 0 clamp(3.5rem, 10vw, 9.5rem);
     }
     .sh__media :global(img) { position: absolute; inset: 0; }
     .sh__pill {
       position: absolute;
-      left: 47vw;
+      left: 57vw;
       right: auto;
       bottom: 3%;
       translate: none;
