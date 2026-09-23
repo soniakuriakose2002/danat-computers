@@ -11,6 +11,10 @@ import imgPoster from '@assets/photos/film-poster.jpg';
 /**
  * LEADERSHIP — built to the client's mockup.
  *
+ * The portrait lives at public/people/shan-sahib.jpg. The frontmatter
+ * checks for it, so the page holds an honest empty frame if it is ever
+ * removed rather than rendering a broken image.
+ *
  * Four things in that mockup are not carried over as drawn, and each is
  * a factual claim rather than a design choice:
  *
@@ -93,18 +97,22 @@ const values = [
         </div>
       </div>
 
+      {/* In the mockup this sits in the gap beside the portrait, not on
+          it — so it gets its own column rather than being positioned
+          over the photograph. */}
+      <p class="lh__script" data-rise style="--d:140ms" aria-hidden="true">
+        Technology<br />for a<br />stronger<br />Oman
+      </p>
+
       {/* ── portrait ── */}
       <figure class="lh__shot" data-rise style="--d:160ms">
-        <p class="lh__script" aria-hidden="true">
-          Technology<br />for a stronger<br />Oman
-        </p>
         {hasPortrait ? (
           <img
             class="lh__img"
             src={PORTRAIT}
             alt="Shan Sahib, Managing Director of Danat Computers"
             width="660"
-            height="830"
+            height="797"
             loading="eager"
             fetchpriority="high"
           />
@@ -343,7 +351,7 @@ const values = [
     gap: clamp(1.5rem, 3vw, 2.5rem);
     align-items: center;
   }
-  .lh__copy, .lh__shot, .lh__who { min-width: 0; }
+  .lh__copy, .lh__shot, .lh__who, .lh__script { min-width: 0; }
 
   .lh__h {
     margin-top: var(--s4);
@@ -374,7 +382,7 @@ const values = [
     width: 100%;
     max-width: 24rem;
     height: auto;
-    aspect-ratio: 660 / 830;
+    aspect-ratio: 660 / 797;
     object-fit: cover;
     object-position: 50% 12%;
     /* Holds its shape, and reads as a frame, before the file lands. */
@@ -418,12 +426,9 @@ const values = [
   }
 
   .lh__script {
-    position: absolute;
-    top: 14%;
-    left: 0;
-    z-index: 1;
-    max-width: 8ch;
-    text-shadow: 0 1px 10px rgb(255 255 255 / 0.9);
+    align-self: center;
+    justify-self: end;
+    text-align: right;
     font-family: var(--font-serif, Georgia, serif);
     font-style: italic;
     font-size: clamp(1rem, 1.8vw, 1.4rem);
@@ -659,13 +664,19 @@ const values = [
   }
 
   /* ───────── responsive ───────── */
+  @media (max-width: 61.99rem) {
+    .lh__script { display: none; }
+  }
+
   @media (min-width: 40rem) {
     .vl__list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .st__p { margin-bottom: var(--s5); }
   }
 
   @media (min-width: 62rem) {
-    .lh__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 0.92fr) minmax(0, 0.72fr); }
+    .lh__grid {
+      grid-template-columns: minmax(0, 1fr) auto minmax(0, 0.88fr) minmax(0, 0.7fr);
+    }
     .vl__in { grid-template-columns: minmax(0, 1fr) minmax(0, 0.34fr); }
     .vl__list { grid-template-columns: repeat(4, minmax(0, 1fr)); }
     .st__head { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.3fr); }
