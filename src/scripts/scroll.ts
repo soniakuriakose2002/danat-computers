@@ -62,28 +62,7 @@ type Linked = {
   travel: boolean;
 };
 
-/** Overall page progress on :root as --scroll, 0..1. */
-function initPageProgress() {
-  if (REDUCED) return;
-  const el = document.documentElement;
-  let ticking = false;
-  const frame = () => {
-    const max = el.scrollHeight - window.innerHeight;
-    el.style.setProperty('--scroll', max > 0 ? (window.scrollY / max).toFixed(4) : '0');
-    ticking = false;
-  };
-  const onScroll = () => {
-    if (ticking) return;
-    ticking = true;
-    requestAnimationFrame(frame);
-  };
-  window.addEventListener('scroll', onScroll, { passive: true });
-  window.addEventListener('resize', onScroll, { passive: true });
-  frame();
-}
-
 export function initScrollLink(root: ParentNode = document) {
-  initPageProgress();
   if (REDUCED) return;
 
   const items: Linked[] = [

@@ -3,7 +3,6 @@ import BaseLayout from './BaseLayout.astro';
 import Header from '@components/global/Header.astro';
 import Footer from '@components/global/Footer.astro';
 import SupportBot from '@components/global/SupportBot.astro';
-import CircuitRail from '@components/global/CircuitRail.astro';
 
 interface Props {
   title?: string;
@@ -20,7 +19,6 @@ const { title, description, overlayHeader = false } = Astro.props;
   <main><slot /></main>
   <Footer />
   <SupportBot />
-  <CircuitRail />
 </BaseLayout>
 
 <script>
