@@ -6,7 +6,6 @@ import { site, brands } from '@data/site';
 import pHp from '@assets/products/hp.png';
 import pDell from '@assets/products/dell.png';
 import pAsus from '@assets/products/asus.png';
-import pApple from '@assets/products/apple.png';
 import pLenovo from '@assets/products/lenovo.png';
 import pWired from '@assets/products/wired.jpg';
 import pWireless from '@assets/products/wireless.jpg';
@@ -37,6 +36,13 @@ import imgBoard from '@assets/photos/repair-board.jpg';
  * redraw; the sixteen names come from the catalogue export.
  */
 /**
+ * ⚠ Apple is in the brand row and the category's brand line but NOT on
+ * the stage. The old site's Apple picture is a dark studio composite of
+ * a dozen products, and the iMac's screen sits within tolerance of the
+ * ground behind it — every automatic cut takes the screen away with the
+ * background, leaving an outline. It needs a product shot on white, like
+ * the other four have. Four machines turn on the stage until then.
+ *
  * The five categories and their items are the old product page's own,
  * names and all — pulled from danatcomputers.com/page/product together
  * with its photographs, which now live in src/assets/products.
@@ -55,8 +61,6 @@ const cats = [
         p: 'Precision and innovation with Dell, for the desk and the site office alike.' },
       { b: 'Asus', t: 'Asus Laptops & Desktops', img: pAsus, cut: true,
         p: 'Elevate your experience with Asus — everyday machines that keep up.' },
-      { b: 'Apple', t: 'Apple Laptops & Desktops', img: pApple, cut: true,
-        p: 'Seamless integration with Apple, supported by the same counter.' },
       { b: 'Lenovo', t: 'Lenovo Laptops & Desktops', img: pLenovo, cut: true,
         p: 'Innovation redefined with Lenovo, built to be worked rather than admired.' },
     ],
