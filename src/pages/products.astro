@@ -2,9 +2,7 @@
 import { Image } from 'astro:assets';
 import PageLayout from '@layouts/PageLayout.astro';
 import Icon from '@components/ui/Icon.astro';
-import VideoModal from '@components/global/VideoModal.astro';
 import { site, brands } from '@data/site';
-import imgRetail from '@assets/photos/retail-display.jpg';
 import pHp from '@assets/products/hp.jpg';
 import pDell from '@assets/products/dell.jpg';
 import pAsus from '@assets/products/asus.jpg';
@@ -19,7 +17,6 @@ import imgPatch from '@assets/photos/network-patch.jpg';
 import imgCctv from '@assets/photos/cctv-white.jpg';
 import imgDrive from '@assets/photos/drive-macro.jpg';
 import imgBoard from '@assets/photos/repair-board.jpg';
-import imgDesk from '@assets/photos/support-desk.jpg';
 
 /**
  * PRODUCTS — built to the client's mockup.
@@ -123,68 +120,6 @@ const helps = [
   title="Products"
   description={`Laptops, desktops, networking, security and accessories from ${brands.flat().length} brands — supplied across Oman from ${site.stats.branches} branches since ${site.stats.since}.`}
 >
-  {/* ══════ 01 · hero ══════ */}
-  <section class="ph">
-    <span class="ph__sky" aria-hidden="true"></span>
-
-    <div class="shell ph__grid">
-      <div class="ph__copy">
-        <p class="eb" data-rise>Explore products</p>
-        <h1 class="ph__h" data-mask>
-          <span class="mask"><span class="mask__i" style="--d:90ms">Technology,</span></span>
-          <span class="mask"><span class="mask__i" style="--d:170ms">chosen for the way</span></span>
-          <span class="mask"><span class="mask__i" style="--d:250ms"><em>you work.</em></span></span>
-        </h1>
-        <p class="ph__p" data-rise style="--d:260ms">
-          Laptops, desktops, networking, security and more — genuine products
-          and trusted technology solutions for businesses and individuals
-          across Oman.
-        </p>
-
-        <div class="ph__acts" data-rise style="--d:320ms">
-          <a class="btn" href="#categories">
-            Browse all products
-            <span class="btn__i" aria-hidden="true"><Icon name="arrow" size={15} /></span>
-          </a>
-          <button class="film" type="button" data-video-open>
-            <i aria-hidden="true"><Icon name="play" size={12} /></i>
-            <span>Watch video<small>Explore our range</small></span>
-          </button>
-        </div>
-
-        <ul class="ph__marks" data-rise style="--d:380ms">
-          {marks.map((m) => (
-            <li>
-              <i aria-hidden="true"><Icon name={m.icon} size={17} /></i>
-              <span><b>{m.t}</b>{m.p}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      {/* Same layered treatment as the services hero. Every decoration is
-          a sibling of the figure — inside it they would be clipped to the
-          picture's own frame. */}
-      <div class="ph__stage" data-mask>
-        <span class="ph__slab" aria-hidden="true"></span>
-        <span class="ph__dots" aria-hidden="true"></span>
-
-        <figure class="ph__media">
-          <Image src={imgDesk} alt="Danat staff at the support desk"
-            widths={[700, 1100, 1500]} sizes="(min-width:62rem) 48vw, 100vw"
-            quality={78} format="webp" loading="eager" fetchpriority="high" />
-        </figure>
-
-        <p class="ph__chip" data-rise style="--d:560ms">
-          <i aria-hidden="true"><Icon name="bolt" size={15} /></i>
-          <span><b>Reliable tech</b>Brighter tomorrow</span>
-        </p>
-
-        <p class="ph__script" aria-hidden="true">Better Technology.<br />A Smarter Oman.</p>
-      </div>
-    </div>
-  </section>
-
   {/* ══════ 02 · featured ══════ */}
   <section class="pf section" data-pick
     data-cats={JSON.stringify(cats.map((x) => ({ n: x.items.length, t: x.t, s: x.sub })))}>
@@ -364,7 +299,6 @@ const helps = [
     </div>
   </section>
 
-  <VideoModal />
 </PageLayout>
 
 <script is:inline>
@@ -519,91 +453,13 @@ const helps = [
     color: var(--text-3);
   }
 
-  /* ───────── 01 hero ───────── */
-  .ph { position: relative; overflow: hidden; isolation: isolate; }
-  .ph__sky {
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background:
-      radial-gradient(880px 520px at 12% 16%, #e6f1e8 0%, rgb(230 241 232 / 0) 62%),
-      linear-gradient(162deg, #eff6f0 0%, #f5faf5 58%, #f1f7f2 100%);
-  }
-  .ph__grid { display: grid; gap: clamp(1.75rem, 3.5vw, 2.75rem); align-items: center; }
-  .ph__copy, .ph__stage { min-width: 0; }
-  .ph__copy { padding-block: clamp(5.5rem, 10vw, 8rem) clamp(2rem, 4vw, 3rem); }
-
-  .ph__h {
-    margin-top: var(--s4);
-    font-size: clamp(2.1rem, 4.2vw, 3.1rem);
-    font-weight: 700;
-    letter-spacing: -0.045em;
-    line-height: 1.05;
-  }
-  .ph__h em { font-style: normal; color: var(--green-deep); }
-  .ph__p {
-    max-width: 44ch;
-    margin-top: var(--s4);
-    font-size: 0.9375rem;
-    line-height: 1.68;
-    color: var(--text-2);
-  }
-  .ph__acts {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: var(--s4) var(--s5);
-    margin-top: var(--s5);
-  }
-  .ph__marks {
-    display: grid;
-    gap: var(--s4);
-    margin-top: var(--s5);
-    padding-top: var(--s5);
-    border-top: 1px solid var(--line-light);
-  }
-  .ph__marks li { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 0.7rem; }
-  .ph__marks i {
-    display: grid;
-    place-items: center;
-    width: 38px;
-    height: 38px;
-    border-radius: 12px;
-    background: #e9f3ea;
-    color: var(--green-deep);
-  }
-  .ph__marks span { display: grid; font-size: 0.75rem; color: var(--text-3); }
-  .ph__marks b { font-size: 0.8125rem; font-weight: 700; color: var(--text); }
-
-  .ph__stage { position: relative; margin-bottom: clamp(1.5rem, 3vw, 2.5rem); }
-  .ph__slab, .ph__dots, .ph__script { display: none; }
-  .ph__media {
-    position: relative;
-    aspect-ratio: 16 / 11;
-    border-radius: 18px;
-    overflow: hidden;
-  }
-  .ph__media :global(img) { width: 100%; height: 100%; object-fit: cover; }
-  .ph__chip {
-    position: absolute;
-    top: clamp(0.7rem, 2vw, 1.2rem);
-    left: clamp(0.7rem, 2vw, 1.2rem);
-    display: grid;
-    grid-template-columns: auto 1fr;
-    align-items: center;
-    gap: 0.6rem;
-    padding: 0.6rem 0.9rem;
-    border-radius: 14px;
-    background: rgb(255 255 255 / 0.95);
-    backdrop-filter: blur(8px);
-    box-shadow: 0 16px 34px -18px rgb(8 22 10 / 0.5);
-  }
-  .ph__chip i { display: grid; place-items: center; color: var(--green-deep); }
-  .ph__chip span { display: grid; font-size: 0.6875rem; color: var(--text-3); }
-  .ph__chip b { font-size: 0.8125rem; font-weight: 700; color: var(--text); }
-
   /* ───────── 02 featured ───────── */
-  .pf { background: var(--white); }
+  /* First section on the page now, so it carries the header
+     clearance the hero used to. */
+  .pf {
+    background: var(--white);
+    padding-block: clamp(6rem, 11vw, 9rem) clamp(2.5rem, 5vw, 4rem);
+  }
   .pf__eb {
     display: flex;
     align-items: center;
@@ -677,8 +533,8 @@ const helps = [
   .pf__nav button:focus-visible { outline: 2px solid var(--green-deep); outline-offset: -2px; }
 
   /* the fan */
-  .pf__stage { position: relative; aspect-ratio: 1 / 0.86; perspective: 1500px; }
-  .pf__deck { position: absolute; inset: 4% 0 30% 0; transform-style: preserve-3d; }
+  .pf__stage { position: relative; aspect-ratio: 1 / 0.9; perspective: 1400px; }
+  .pf__deck { position: absolute; inset: 4% 0 14% 0; transform-style: preserve-3d; }
   .pf__slide {
     position: absolute;
     top: 50%;
@@ -686,15 +542,19 @@ const helps = [
     /* translate resolves before transform, so the card centres first and
        every fan offset is measured from the middle. */
     translate: -50% -50%;
-    width: min(15rem, 54%);
+    width: min(17rem, 58%);
     aspect-ratio: 4 / 3;
     border-radius: 14px;
     overflow: hidden;
+    /* a*a, not a: a linear falloff gives a flat fan, a squared one
+       bends the row back into an arc, which is what standing them on a
+       round stage looks like. */
     transform:
-      translateX(calc(var(--o, 0) * 6.4rem))
-      translateZ(calc(var(--a, 0) * -120px))
-      rotateY(calc(var(--o, 0) * -15deg))
-      scale(calc(1 - var(--a, 0) * 0.06));
+      translateX(calc(var(--o, 0) * 7.6rem))
+      translateY(calc(var(--a, 0) * var(--a, 0) * 0.42rem))
+      translateZ(calc(var(--a, 0) * var(--a, 0) * -55px))
+      rotateY(calc(var(--o, 0) * -13deg))
+      scale(calc(1 - var(--a, 0) * var(--a, 0) * 0.028));
     transition:
       transform 700ms cubic-bezier(0.4, 0, 0.2, 1),
       opacity 420ms var(--ease);
@@ -708,10 +568,10 @@ const helps = [
   .pf__podium {
     position: absolute;
     left: 50%;
-    bottom: 16%;
+    bottom: 13%;
     translate: -50% 0;
-    width: 76%;
-    aspect-ratio: 4 / 1;
+    width: 82%;
+    aspect-ratio: 4.4 / 1;
     border-radius: 50%;
     background: radial-gradient(ellipse at 50% 36%, #ffffff 0%, #f0f7f1 54%, #e2eee4 100%);
     box-shadow: 0 26px 44px -28px rgb(10 30 12 / 0.42);
@@ -776,8 +636,8 @@ const helps = [
   }
   .pf__arrow:hover { background: #e9f3ea; }
   .pf__arrow:focus-visible { outline: 2px solid var(--green-deep); outline-offset: 2px; }
-  .pf__arrow--l { left: 0; rotate: 180deg; }
-  .pf__arrow--r { right: 0; }
+  .pf__arrow--l { left: -1.1rem; rotate: 180deg; }
+  .pf__arrow--r { right: -1.1rem; }
 
   /* the card */
   .pf__card {
@@ -1032,66 +892,14 @@ const helps = [
 
   /* ───────── responsive ───────── */
   @media (min-width: 40rem) {
-    .ph__marks { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .pc__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .pt__list { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   }
 
   @media (min-width: 62rem) {
-    .ph__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.04fr); align-items: stretch; }
-    .ph__stage { position: static; min-height: clamp(30rem, 42vw, 36rem); margin: 0; }
-    .ph__media {
-      position: absolute;
-      z-index: 2;
-      inset: 5.5rem 6% 4.5rem auto;
-      width: 46vw;
-      aspect-ratio: auto;
-      border: clamp(8px, 0.7vw, 12px) solid #fff;
-      border-radius: clamp(1.5rem, 3vw, 2.5rem);
-      rotate: -1.6deg;
-      box-shadow: 0 40px 80px -40px rgb(10 30 12 / 0.5);
-    }
-    .ph__media :global(img) { position: absolute; inset: 0; }
-    .ph__slab {
-      display: block;
-      position: absolute;
-      z-index: 1;
-      inset: 4rem 2.5% 6.25rem auto;
-      width: 43vw;
-      border-radius: clamp(1.5rem, 3vw, 2.5rem);
-      background: #17431f;
-      rotate: 1.8deg;
-    }
-    .ph__dots {
-      display: block;
-      position: absolute;
-      z-index: 1;
-      left: auto;
-      right: 31%;
-      bottom: 0.9rem;
-      width: clamp(3.5rem, 5vw, 4.5rem);
-      height: clamp(3.5rem, 5vw, 4.5rem);
-      background-image: radial-gradient(circle, color-mix(in oklab, var(--green) 55%, transparent) 1.6px, transparent 1.6px);
-      background-size: 14px 14px;
-    }
-    .ph__chip { z-index: 4; top: 8rem; left: 45vw; }
     /* It was pinned top-right, where the dark slab sits — green type on
        dark green, which read as broken rather than decorative. Moved to
        the pale ground under the photograph. */
-    .ph__script {
-      display: block;
-      position: absolute;
-      z-index: 4;
-      right: 7%;
-      bottom: 0.6rem;
-      max-width: 22ch;
-      font-family: var(--font-serif, Georgia, serif);
-      font-style: italic;
-      font-size: clamp(0.9375rem, 1.5vw, 1.2rem);
-      line-height: 1.3;
-      text-align: right;
-      color: var(--green-deep);
-    }
 
     .pf__grid { grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.6fr) minmax(0, 0.88fr); }
     .pb__row { grid-template-columns: minmax(0, 1fr) auto; }
