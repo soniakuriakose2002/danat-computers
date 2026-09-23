@@ -182,6 +182,12 @@ const nudge: Record<string, string> = {
 
   {/* ═══════════ 02 · numbers ═══════════ */}
   <section class="an section" data-tone="light">
+    {/* The hero lifts into this section on a curve rather than meeting it
+        on a straight rule. */}
+    <svg class="an__curve" viewBox="0 0 1440 120" preserveAspectRatio="none" aria-hidden="true">
+      <path d="M0,0 C260,104 560,118 820,86 C1060,58 1260,14 1440,0 L1440,0 L0,0 Z" />
+    </svg>
+
     <div class="shell">
       <p class="eb eb--mid" data-rise>
         <i class="eb__rule" aria-hidden="true"></i>By the numbers
@@ -207,6 +213,7 @@ const nudge: Record<string, string> = {
 
   {/* ═══════════ 03 · story ═══════════ */}
   <section class="as section" data-tone="light">
+    <span class="as__blob" aria-hidden="true"></span>
     <div class="shell as__grid">
       <div class="as__intro" data-rise>
         <p class="eb"><i class="eb__rule" aria-hidden="true"></i>Our story</p>
@@ -244,6 +251,7 @@ const nudge: Record<string, string> = {
 
   {/* ═══════════ 04 · values ═══════════ */}
   <section class="av section" data-tone="light">
+    <span class="av__blob" aria-hidden="true"></span>
     <div class="shell">
       <p class="eb" data-rise><i class="eb__rule" aria-hidden="true"></i>Our values</p>
       <h2 class="av__h" data-rise style="--d:70ms">
@@ -264,6 +272,7 @@ const nudge: Record<string, string> = {
 
   {/* ═══════════ 05 · presence ═══════════ */}
   <section class="ap section" data-tone="light">
+    <span class="ap__blob" aria-hidden="true"></span>
     <div class="shell ap__grid">
       <div class="ap__intro" data-rise>
         <p class="eb"><i class="eb__rule" aria-hidden="true"></i>Our presence</p>
@@ -557,7 +566,23 @@ const nudge: Record<string, string> = {
 
   /* ───────── 02 · numbers ───────── */
 
-  .an { background: var(--white); }
+  /* Flat white against flat grey, section after section, is what reads
+     as dated. Each ground is now a soft gradient with its own organic
+     shape, and the joins are curved. */
+  .an {
+    position: relative;
+    background: linear-gradient(180deg, #fafcfa 0%, var(--white) 46%);
+    padding-top: clamp(4rem, 8vw, 6rem);
+  }
+  .an__curve {
+    position: absolute;
+    top: -1px;
+    left: 0;
+    width: 100%;
+    height: clamp(48px, 7vw, 108px);
+    fill: #f1f7f1;
+    pointer-events: none;
+  }
 
   .an__grid {
     display: grid;
@@ -565,25 +590,46 @@ const nudge: Record<string, string> = {
     margin-top: clamp(1.75rem, 4vw, 2.75rem);
   }
 
+  /* A 1px border on flat white is a 2012 card. Layered shadow, bigger
+     radius and a rule that wipes in on hover gives it depth instead. */
   .nc {
-    padding: 1.3rem 1.35rem;
-    border: 1px solid var(--line-light);
-    border-radius: 16px;
+    position: relative;
+    padding: 1.5rem 1.4rem;
+    border-radius: 20px;
     background: var(--white);
-    transition: transform var(--t2) var(--ease), box-shadow var(--t2) var(--ease);
+    overflow: hidden;
+    box-shadow:
+      0 1px 2px rgb(10 30 12 / 0.05),
+      0 12px 28px -18px rgb(10 30 12 / 0.28);
+    transition: transform var(--t3) var(--ease), box-shadow var(--t3) var(--ease);
   }
   .nc:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 22px 40px -30px rgb(10 30 12 / 0.5);
+    transform: translateY(-5px);
+    box-shadow:
+      0 1px 2px rgb(10 30 12 / 0.05),
+      0 28px 48px -22px rgb(10 30 12 / 0.34);
   }
+  .nc::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--green-deep), var(--green));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--t3) var(--ease);
+  }
+  .nc:hover::after { transform: scaleX(1); }
+  .nc:hover .nc__i { transform: scale(1.08) rotate(-6deg); }
   .nc__i {
     display: grid;
     place-items: center;
-    width: 42px;
-    height: 42px;
-    border-radius: 12px;
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
     color: var(--green-deep);
-    background: var(--green-wash);
+    background: linear-gradient(140deg, color-mix(in oklab, var(--green) 20%, #fff), var(--green-wash));
+    transition: transform var(--t3) var(--ease);
   }
   .nc dt {
     margin-top: 0.9rem;
@@ -605,7 +651,11 @@ const nudge: Record<string, string> = {
   }
 
   /* A figure nobody has supplied. Held open, never invented. */
-  .nc[data-pending] { background: var(--off); }
+  .nc[data-pending] {
+    background: var(--off);
+    box-shadow: inset 0 0 0 1px var(--line-light);
+  }
+  .nc[data-pending]::after { background: #c9ced4; }
   .nc__blank {
     display: inline-block;
     width: 3.2ch;
@@ -615,7 +665,23 @@ const nudge: Record<string, string> = {
 
   /* ───────── 03 · story ───────── */
 
-  .as { background: var(--off); }
+  .as {
+    position: relative;
+    background: linear-gradient(200deg, var(--white) 0%, #f3f8f3 58%, #eef5ee 100%);
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .as__blob {
+    position: absolute;
+    right: -14%;
+    top: 4%;
+    z-index: -1;
+    width: min(34rem, 46vw);
+    aspect-ratio: 1;
+    border-radius: 48% 52% 44% 56% / 52% 44% 56% 48%;
+    background: radial-gradient(circle at 36% 34%, color-mix(in oklab, var(--green) 20%, transparent), transparent 66%);
+    filter: blur(14px);
+  }
   .as__grid { position: relative; display: grid; gap: clamp(2rem, 4vw, 3rem); }
 
   .as__intro { display: grid; justify-items: start; }
@@ -720,7 +786,23 @@ const nudge: Record<string, string> = {
 
   /* ───────── 04 · values ───────── */
 
-  .av { background: var(--white); }
+  .av {
+    position: relative;
+    background: linear-gradient(180deg, #eef5ee 0%, var(--white) 34%, #fafcfa 100%);
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .av__blob {
+    position: absolute;
+    left: -16%;
+    bottom: -22%;
+    z-index: -1;
+    width: min(30rem, 42vw);
+    aspect-ratio: 1;
+    border-radius: 54% 46% 58% 42% / 46% 56% 44% 54%;
+    background: radial-gradient(circle at 44% 40%, color-mix(in oklab, var(--clay) 13%, transparent), transparent 68%);
+    filter: blur(18px);
+  }
   .av__h {
     margin-top: var(--s4);
     font-size: clamp(1.7rem, 3.2vw, 2.4rem);
@@ -735,15 +817,35 @@ const nudge: Record<string, string> = {
     gap: clamp(1.25rem, 3vw, 2rem);
     margin-top: clamp(1.75rem, 4vw, 2.75rem);
   }
-  .av__grid li { display: grid; justify-items: start; }
+  .av__grid li {
+    display: grid;
+    justify-items: start;
+    height: 100%;
+    padding: 1.5rem 1.4rem;
+    border-radius: 20px;
+    background: rgb(255 255 255 / 0.72);
+    backdrop-filter: blur(10px);
+    box-shadow:
+      0 1px 2px rgb(10 30 12 / 0.04),
+      0 12px 30px -20px rgb(10 30 12 / 0.26);
+    transition: transform var(--t3) var(--ease), box-shadow var(--t3) var(--ease);
+  }
+  .av__grid li:hover {
+    transform: translateY(-5px);
+    box-shadow:
+      0 1px 2px rgb(10 30 12 / 0.04),
+      0 26px 46px -22px rgb(10 30 12 / 0.32);
+  }
+  .av__grid li:hover .av__i { transform: scale(1.08) rotate(-6deg); }
   .av__i {
     display: grid;
     place-items: center;
-    width: 46px;
-    height: 46px;
-    border-radius: 14px;
+    width: 48px;
+    height: 48px;
+    border-radius: 16px;
     color: var(--green-deep);
-    background: var(--green-wash);
+    background: linear-gradient(140deg, color-mix(in oklab, var(--green) 20%, #fff), var(--green-wash));
+    transition: transform var(--t3) var(--ease);
   }
   .av__grid b {
     margin-top: 0.85rem;
@@ -761,7 +863,23 @@ const nudge: Record<string, string> = {
 
   /* ───────── 05 · presence ───────── */
 
-  .ap { background: var(--off); }
+  .ap {
+    position: relative;
+    background: linear-gradient(190deg, #fafcfa 0%, #f2f8f2 60%, #ecf4ec 100%);
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .ap__blob {
+    position: absolute;
+    right: -10%;
+    top: -18%;
+    z-index: -1;
+    width: min(32rem, 44vw);
+    aspect-ratio: 1;
+    border-radius: 44% 56% 52% 48% / 56% 48% 52% 44%;
+    background: radial-gradient(circle at 40% 36%, color-mix(in oklab, var(--green) 22%, transparent), transparent 66%);
+    filter: blur(16px);
+  }
   .ap__grid { display: grid; gap: clamp(1.75rem, 4vw, 3rem); align-items: center; }
 
   .ap__intro { display: grid; justify-items: start; }
@@ -859,19 +977,20 @@ const nudge: Record<string, string> = {
     display: flex;
     align-items: center;
     gap: 0.85rem;
-    padding: 0.9rem 1rem;
-    border: 1px solid var(--line-light);
-    border-radius: 14px;
-    background: var(--white);
-    transition:
-      transform var(--t2) var(--ease),
-      border-color var(--t2) var(--ease),
-      box-shadow var(--t2) var(--ease);
+    padding: 1rem 1.1rem;
+    border-radius: 16px;
+    background: rgb(255 255 255 / 0.82);
+    backdrop-filter: blur(8px);
+    box-shadow:
+      0 1px 2px rgb(10 30 12 / 0.04),
+      0 10px 26px -20px rgb(10 30 12 / 0.28);
+    transition: transform var(--t2) var(--ease), box-shadow var(--t2) var(--ease);
   }
   .bl:hover {
-    transform: translateY(-3px);
-    border-color: color-mix(in oklab, var(--green) 32%, var(--line-light));
-    box-shadow: 0 20px 38px -30px rgb(10 30 12 / 0.5);
+    transform: translateX(4px);
+    box-shadow:
+      0 1px 2px rgb(10 30 12 / 0.04),
+      0 20px 38px -24px rgb(10 30 12 / 0.34);
   }
   .bl__i {
     display: grid;
@@ -1001,7 +1120,14 @@ const nudge: Record<string, string> = {
       scale: 1;
       transition: none;
     }
-    .btn, .btn:hover, .nc, .nc:hover, .bl, .bl:hover { transform: none; transition: none; }
+    .btn, .btn:hover,
+    .nc, .nc:hover, .nc__i, .nc:hover .nc__i,
+    .av__grid li, .av__grid li:hover, .av__i, .av__grid li:hover .av__i,
+    .bl, .bl:hover {
+      transform: none;
+      transition: none;
+    }
+    .nc::after { transform: scaleX(1); }
     .btn::after { display: none; }
   }
 </style>
