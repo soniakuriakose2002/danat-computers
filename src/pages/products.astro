@@ -599,18 +599,18 @@ const helps = [
     bottom: 0;
     translate: -50% 0;
     transform-origin: bottom center;
-    /* Sized by HEIGHT, width auto. A fixed 4:3 box letterboxed every
-       product that is not 4:3 — that padding inside each slide is what
-       read as space between the machines, and no amount of tightening
-       the spacing could close it. */
-    height: clamp(9rem, 22vw, 15rem);
-    width: auto;
+    /* One box for every slide, matching the canvas the machines were
+       normalised onto. They are all the same height and stood on the
+       same floor in the asset, so the arc comes out even without CSS
+       having to reconcile five different shapes. */
+    width: min(21rem, 62%);
+    aspect-ratio: 900 / 640;
     /* translateY is NEGATIVE with distance: on an ellipse seen from
        slightly above, whatever sits further back sits HIGHER on screen.
        Pushing the outer ones down was what made the row read as a flat
        fan hanging over the disc rather than a group standing on it. */
     transform:
-      translateX(calc(var(--o, 0) * 5.9rem))
+      translateX(calc(var(--o, 0) * 5.4rem))
       translateY(calc(var(--a, 0) * var(--a, 0) * -0.35rem))
       translateZ(calc(var(--a, 0) * var(--a, 0) * -60px))
       rotateY(calc(var(--o, 0) * -15deg))
@@ -621,10 +621,9 @@ const helps = [
   }
   .pf__slide :global(img) {
     display: block;
+    width: 100%;
     height: 100%;
-    width: auto;
     object-fit: contain;
-    object-position: 50% 100%;
   }
   /* A photograph with a real background still needs a frame; a cut-out
      must not have one, or it reads as a box sitting on the stage. */
