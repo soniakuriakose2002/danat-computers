@@ -91,8 +91,6 @@ const promises = [
           — inside the figure the photo's own radius would clip it to
           exactly the same outline. */}
       <div class="sh__stage" data-mask>
-        <span class="sh__mount" aria-hidden="true"></span>
-
         {/* Not data-curtain. That utility starts the element at
             clip-path: inset(0 0 100%), and an element clipped to zero
             never reports as intersecting — so it can never trigger its
@@ -341,7 +339,6 @@ const promises = [
   }
 
   .sh__stage { position: relative; margin-bottom: clamp(1.5rem, 3vw, 2.5rem); }
-  .sh__mount { display: none; }
   .sh__media {
     position: relative;
     aspect-ratio: 16 / 11;
@@ -612,34 +609,21 @@ const promises = [
     .sh__stage[data-in] .sh__media { clip-path: inset(0 0 0% 0); }
     .sh__media :global(img) { transform: scale(1.18); transition: transform 1600ms var(--ease-io) 220ms; }
     .sh__stage[data-in] .sh__media :global(img) { transform: none; }
-    /* A mount rather than a slab: the picture sits in a soft-cornered
-       frame and a hairline rule traces the same shape, offset up and
-       left, the way a print sits on a mat. The rule is a sibling — put
-       inside the figure it would be clipped to the same outline and
-       never show, which is what happened to the first attempt. */
+    /* Same family as the business hero the client approved, which uses
+       border-radius: 44% 18px 18px 44% / 30% 18px 18px 30% — an elliptical
+       left edge rather than a frame. This is a variation on it: a deeper
+       sweep at the top than the bottom, so the two pages rhyme without
+       repeating. */
     .sh__media {
       position: absolute;
-      inset: 4% 0 4% auto;
-      width: 50vw;
+      inset: 3% 0 3% auto;
+      width: 51vw;
       aspect-ratio: auto;
-      border-radius: clamp(1.5rem, 3.5vw, 3rem) 0 0 clamp(1.5rem, 3.5vw, 3rem);
+      border-radius: 54% 20px 20px 34% / 44% 20px 20px 26%;
       clip-path: inset(0 0 100% 0);
       transition: clip-path 1100ms var(--ease-io);
       transition-delay: 200ms;
     }
-    .sh__mount {
-      display: block;
-      position: absolute;
-      inset: calc(4% - 1.1rem) 0 calc(4% + 1.1rem) auto;
-      width: calc(50vw + 1.1rem);
-      border: 1px solid color-mix(in oklab, var(--green) 48%, transparent);
-      border-right: 0;
-      border-radius: clamp(1.5rem, 3.5vw, 3rem) 0 0 clamp(1.5rem, 3.5vw, 3rem);
-      opacity: 0;
-      transform: translate3d(1.4rem, 0, 0);
-      transition: opacity 700ms var(--ease) 420ms, transform 900ms var(--ease) 420ms;
-    }
-    .sh__stage[data-in] .sh__mount { opacity: 1; transform: none; }
     .sh__media :global(img) { position: absolute; inset: 0; }
     .sh__pill {
       position: absolute;
@@ -661,7 +645,6 @@ const promises = [
       transition: none;
     }
     .sh__media :global(img) { animation: none; transform: none; transition: none; }
-    .sh__mount { opacity: 1; transform: none; transition: none; }
     .sh__media { clip-path: none; transition: none; }
   }
 </style>
