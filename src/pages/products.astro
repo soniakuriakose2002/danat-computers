@@ -348,6 +348,11 @@ const helps = [
         const n = CATS[c] ? CATS[c].n : 1;
         i = ((i % n) + n) % n;
 
+        // An even count cannot fan symmetrically — four items put two on
+        // one side and one on the other, which is what read as untidy.
+        // Show the active one plus the same number each side, always.
+        const wing = Math.floor((n - 1) / 2);
+
         slides.forEach((el) => {
           const mine = Number(el.dataset.c) === c;
           if (!mine) { el.toggleAttribute('data-off', true); return; }
@@ -362,6 +367,7 @@ const helps = [
           el.style.setProperty('--a', String(abs));
           el.style.zIndex = String(9 - abs);
           el.toggleAttribute('data-on', o === 0);
+          el.toggleAttribute('data-far', abs > wing);
         });
 
         panes.forEach((el) =>
