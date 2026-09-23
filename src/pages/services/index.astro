@@ -464,7 +464,7 @@ const promises = [
 
   /* ───────── 03 the grid ───────── */
   .sl { background: var(--white); padding-top: clamp(1.5rem, 3vw, 2.5rem); }
-  .sl__grid { display: grid; gap: clamp(0.85rem, 1.8vw, 1.25rem); }
+  .sl__grid { display: grid; gap: clamp(0.75rem, 1.6vw, 1.1rem); }
 
   /* The numbered tinted card from the products page: words at the top,
      the photograph filling the lower half, the arrow in the corner. */
@@ -749,7 +749,10 @@ const promises = [
       border-left: 1px solid var(--line-light);
       padding-left: clamp(1rem, 2.4vw, 2rem);
     }
-    .sl__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .sl__grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+    /* Eight services fill the first row and three of the second; the
+       closing cell takes the two that are left so the row ends square. */
+    .sl__talk { grid-column: span 2; }
     .sc__in { grid-template-columns: minmax(0, 1fr) auto; }
   }
 
