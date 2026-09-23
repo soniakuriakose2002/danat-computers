@@ -127,6 +127,12 @@ const helps = [
     <h2 class="pf__h" data-cat-t data-rise style="--d:70ms">{cats[0].t}</h2>
     <p class="pf__sub" data-cat-s data-rise style="--d:110ms">{cats[0].sub}</p>
 
+    <ul class="pf__over" data-rise style="--d:150ms">
+      {plinth.map((m) => (
+        <li><i aria-hidden="true"><Icon name={m.icon} size={16} /></i>{m.t}</li>
+      ))}
+    </ul>
+
     <div class="shell pf__grid">
       <ul class="pf__nav" data-rise>
         {cats.map((c, i) => (
@@ -160,17 +166,21 @@ const helps = [
           )}
         </div>
 
-        <span class="pf__podium" aria-hidden="true"></span>
+        <span class="pf__halo" aria-hidden="true"></span>
+
+        {/* The stage the range stands on: an ellipse for the top face and
+            a stack of offset shadows for the side, which reads as a
+            cylinder without a second element. */}
+        <span class="pf__podium" aria-hidden="true">
+          <i class="pf__top"></i>
+          <i class="pf__brands">
+            {cats[0].items.map((it) => <b>{it.b}</b>)}
+          </i>
+        </span>
 
         <span class="pf__dots" data-fan-dots aria-hidden="true">
           {cats[0].items.map((_, i) => <i data-on={i === 0 ? '' : undefined}></i>)}
         </span>
-
-        <ul class="pf__plinth" aria-hidden="true">
-          {plinth.map((m) => (
-            <li><Icon name={m.icon} size={15} />{m.t}</li>
-          ))}
-        </ul>
 
         <button class="pf__arrow pf__arrow--r" type="button" data-step="1" aria-label="Next">
           <Icon name="arrow" size={16} />
@@ -457,8 +467,12 @@ const helps = [
   /* First section on the page now, so it carries the header
      clearance the hero used to. */
   .pf {
-    background: var(--white);
-    padding-block: clamp(6rem, 11vw, 9rem) clamp(2.5rem, 5vw, 4rem);
+    position: relative;
+    isolation: isolate;
+    background:
+      radial-gradient(1100px 620px at 52% 62%, #e9f4ea 0%, rgb(233 244 234 / 0) 68%),
+      linear-gradient(180deg, #f6fbf7 0%, #ffffff 62%);
+    padding-block: clamp(5rem, 9vw, 7rem) clamp(2rem, 4vw, 3.25rem);
   }
   .pf__eb {
     display: flex;
@@ -492,6 +506,27 @@ const helps = [
     color: var(--text-2);
     text-align: center;
   }
+  .pf__over {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem clamp(0.9rem, 2.4vw, 2rem);
+    margin-top: var(--s5);
+  }
+  .pf__over li {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--text-2);
+  }
+  .pf__over li + li {
+    padding-left: clamp(0.9rem, 2.4vw, 2rem);
+    border-left: 1px solid var(--line-light);
+  }
+  .pf__over i { display: grid; place-items: center; color: var(--green-deep); }
+
   .pf__grid {
     display: grid;
     gap: clamp(1.25rem, 2.6vw, 2rem);
@@ -533,53 +568,119 @@ const helps = [
   .pf__nav button:focus-visible { outline: 2px solid var(--green-deep); outline-offset: -2px; }
 
   /* the fan */
-  .pf__stage { position: relative; aspect-ratio: 1 / 0.9; perspective: 1400px; }
-  .pf__deck { position: absolute; inset: 4% 0 14% 0; transform-style: preserve-3d; }
+  .pf__stage { position: relative; aspect-ratio: 1 / 0.8; perspective: 1400px; }
+  .pf__deck {
+    position: absolute;
+    z-index: 2;
+    inset: 6% 0 17% 0;
+    transform-style: preserve-3d;
+  }
   .pf__slide {
     position: absolute;
-    top: 50%;
     left: 50%;
-    /* translate resolves before transform, so the card centres first and
-       every fan offset is measured from the middle. */
-    translate: -50% -50%;
-    width: min(17rem, 58%);
+    /* Anchored to the FLOOR of the deck, not its middle, so every item
+       stands on the stage instead of hanging in the middle of its own
+       box. transform-origin follows, or scaling lifts the feet off. */
+    bottom: 0;
+    translate: -50% 0;
+    transform-origin: bottom center;
+    width: min(19rem, 62%);
     aspect-ratio: 4 / 3;
     border-radius: 14px;
     overflow: hidden;
-    /* a*a, not a: a linear falloff gives a flat fan, a squared one
-       bends the row back into an arc, which is what standing them on a
-       round stage looks like. */
+    /* translateY is NEGATIVE with distance: on an ellipse seen from
+       slightly above, whatever sits further back sits HIGHER on screen.
+       Pushing the outer ones down was what made the row read as a flat
+       fan hanging over the disc rather than a group standing on it. */
     transform:
-      translateX(calc(var(--o, 0) * 7.6rem))
-      translateY(calc(var(--a, 0) * var(--a, 0) * 0.42rem))
-      translateZ(calc(var(--a, 0) * var(--a, 0) * -55px))
-      rotateY(calc(var(--o, 0) * -13deg))
-      scale(calc(1 - var(--a, 0) * var(--a, 0) * 0.028));
+      translateX(calc(var(--o, 0) * 8.2rem))
+      translateY(calc(var(--a, 0) * var(--a, 0) * -0.7rem))
+      translateZ(calc(var(--a, 0) * var(--a, 0) * -70px))
+      rotateY(calc(var(--o, 0) * -12deg))
+      scale(calc(1 - var(--a, 0) * var(--a, 0) * 0.05));
     transition:
       transform 700ms cubic-bezier(0.4, 0, 0.2, 1),
       opacity 420ms var(--ease);
   }
-  .pf__slide :global(img) { width: 100%; height: 100%; object-fit: contain; }
-  .pf__slide:not([data-on]) { opacity: calc(1 - var(--a, 0) * 0.12); }
-  /* Items belonging to a category that is not live. */
+  .pf__slide :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    object-position: 50% 100%;
+  }
+  .pf__slide:not([data-on]) { opacity: calc(1 - var(--a, 0) * 0.1); }
   .pf__slide[data-off] { opacity: 0; pointer-events: none; }
+  .pf__slide[data-on] { animation: pfFloat 6s var(--ease) infinite; }
+  @keyframes pfFloat {
+    0%, 100% { margin-bottom: 0; }
+    50% { margin-bottom: 6px; }
+  }
 
-  /* the disc the fan stands on */
+  .pf__halo {
+    position: absolute;
+    z-index: 0;
+    left: 50%;
+    top: 4%;
+    translate: -50% 0;
+    width: min(32rem, 66%);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgb(255 255 255 / 0.55) 38%, rgb(233 244 234 / 0) 72%);
+  }
+
+  /* the stage */
   .pf__podium {
     position: absolute;
+    z-index: 1;
     left: 50%;
-    bottom: 13%;
+    bottom: 12%;
     translate: -50% 0;
-    width: 82%;
-    aspect-ratio: 4.4 / 1;
-    border-radius: 50%;
-    background: radial-gradient(ellipse at 50% 36%, #ffffff 0%, #f0f7f1 54%, #e2eee4 100%);
-    box-shadow: 0 26px 44px -28px rgb(10 30 12 / 0.42);
+    display: block;
+    width: 74%;
   }
+  .pf__top {
+    display: block;
+    width: 100%;
+    aspect-ratio: 3.6 / 1;
+    border-radius: 50%;
+    background: radial-gradient(ellipse at 50% 26%, #ffffff 0%, #f1f8f3 62%, #e7f2ea 100%);
+    /* Stacked offsets read as the side of a cylinder. */
+    box-shadow:
+      0 8px 0 #fbfefb,
+      0 18px 0 #f3faf4,
+      0 30px 0 #ebf5ed,
+      0 42px 0 #dfeee3,
+      0 56px 40px -26px rgb(47 100 41 / 0.3);
+  }
+  .pf__brands {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(100% + 0.55rem);
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: clamp(0.5rem, 1.6vw, 1.2rem);
+    font-style: normal;
+    font-family: var(--font-mono);
+    font-size: clamp(0.5rem, 0.75vw, 0.6875rem);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    white-space: nowrap;
+  }
+  .pf__brands b { font-weight: 500; }
+  .pf__brands b + b {
+    padding-left: clamp(0.5rem, 1.6vw, 1.2rem);
+    border-left: 1px solid var(--line-light);
+  }
+
   .pf__dots {
     position: absolute;
+    z-index: 3;
     left: 50%;
-    bottom: 22%;
+    bottom: 1%;
     translate: -50% 0;
     display: flex;
     gap: 0.35rem;
@@ -588,35 +689,10 @@ const helps = [
     width: 1.3rem;
     height: 4px;
     border-radius: 2px;
-    background: #d3e0d2;
+    background: #cfe0d2;
     transition: background-color var(--t2) var(--ease), width var(--t2) var(--ease);
   }
   .pf__dots i[data-on] { width: 2rem; background: var(--green-deep); }
-
-  .pf__plinth {
-    position: absolute;
-    left: 50%;
-    bottom: 7%;
-    translate: -50% 0;
-    display: flex;
-    flex-wrap: nowrap;
-    white-space: nowrap;
-    justify-content: center;
-    align-items: center;
-    gap: clamp(0.5rem, 1.4vw, 1.1rem);
-  }
-  .pf__plinth li {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    font-size: clamp(0.625rem, 0.85vw, 0.75rem);
-    color: var(--text-2);
-  }
-  .pf__plinth li + li {
-    padding-left: clamp(0.5rem, 1.4vw, 1.1rem);
-    border-left: 1px solid var(--line-light);
-  }
-  .pf__plinth :global(svg) { color: var(--green-deep); }
 
   .pf__arrow {
     position: absolute;
@@ -918,5 +994,6 @@ const helps = [
       transition: none;
     }
     .pf__slide { transition: none; }
+    .pf__slide[data-on] { animation: none; }
   }
 </style>
