@@ -584,31 +584,39 @@ const helps = [
     bottom: 0;
     translate: -50% 0;
     transform-origin: bottom center;
-    width: min(19rem, 62%);
-    aspect-ratio: 4 / 3;
-    border-radius: 14px;
-    overflow: hidden;
+    /* Sized by HEIGHT, width auto. A fixed 4:3 box letterboxed every
+       product that is not 4:3 — that padding inside each slide is what
+       read as space between the machines, and no amount of tightening
+       the spacing could close it. */
+    height: clamp(9rem, 22vw, 15rem);
+    width: auto;
     /* translateY is NEGATIVE with distance: on an ellipse seen from
        slightly above, whatever sits further back sits HIGHER on screen.
        Pushing the outer ones down was what made the row read as a flat
        fan hanging over the disc rather than a group standing on it. */
     transform:
-      translateX(calc(var(--o, 0) * 8.2rem))
-      translateY(calc(var(--a, 0) * var(--a, 0) * -0.7rem))
-      translateZ(calc(var(--a, 0) * var(--a, 0) * -70px))
-      rotateY(calc(var(--o, 0) * -12deg))
-      scale(calc(1 - var(--a, 0) * var(--a, 0) * 0.05));
+      translateX(calc(var(--o, 0) * 5.9rem))
+      translateY(calc(var(--a, 0) * var(--a, 0) * -0.35rem))
+      translateZ(calc(var(--a, 0) * var(--a, 0) * -60px))
+      rotateY(calc(var(--o, 0) * -15deg))
+      scale(calc(1 - var(--a, 0) * 0.1));
     transition:
       transform 700ms cubic-bezier(0.4, 0, 0.2, 1),
       opacity 420ms var(--ease);
   }
   .pf__slide :global(img) {
-    width: 100%;
+    display: block;
     height: 100%;
+    width: auto;
     object-fit: contain;
     object-position: 50% 100%;
+    /* The shots are products on white. Multiplying them against the pale
+       stage drops that white out, so they read as machines standing
+       there rather than as photographs in boxes — which is what made the
+       row look like cards butted together. */
+    mix-blend-mode: multiply;
   }
-  .pf__slide:not([data-on]) { opacity: calc(1 - var(--a, 0) * 0.1); }
+  .pf__slide:not([data-on]) { opacity: calc(1 - var(--a, 0) * 0.16); }
   .pf__slide[data-off] { opacity: 0; pointer-events: none; }
   .pf__slide[data-on] { animation: pfFloat 6s var(--ease) infinite; }
   @keyframes pfFloat {
