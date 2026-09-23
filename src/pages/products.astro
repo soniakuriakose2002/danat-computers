@@ -30,49 +30,53 @@ import imgDesk from '@assets/photos/support-desk.jpg';
  * redraw; the sixteen names come from the catalogue export.
  */
 /**
- * The five titles the old product page carries, verbatim apart from
- * sentence case — "HP Laptops and Desktops: Unleash Power and
- * Performance with HP" and so on. The mockup's featured rail is a brand
- * rail, not a category one: five dots, and the card reads "HP Laptops".
+ * Five items, one per category — which is what the mockup draws: five
+ * rows on the left, five dots on the right.
  *
- * ⚠ No brand product photography is in the project, so each brand shows
- * a Danat photograph for now. Send the product shots and they drop in.
- */
-const makes = [
-  { k: 'hp', b: 'HP', t: 'HP laptops and desktops', p: 'Unleash power and performance with HP.',
-    img: imgRetail, alt: 'Retail display of computers and accessories' },
-  { k: 'dell', b: 'Dell', t: 'Dell laptops and desktops', p: 'Precision and innovation with Dell.',
-    img: imgDesk, alt: 'Danat staff working at the support desk' },
-  { k: 'asus', b: 'ASUS', t: 'Asus laptops and desktops', p: 'Elevate your experience with Asus.',
-    img: imgBoard, alt: 'A technician working on a mainboard' },
-  { k: 'apple', b: 'Apple', t: 'Apple laptops and desktops', p: 'Seamless integration with Apple.',
-    img: imgRetail, alt: 'Retail display of computers and accessories' },
-  { k: 'lenovo', b: 'Lenovo', t: 'Lenovo laptops and desktops', p: 'Innovation redefined with Lenovo.',
-    img: imgDesk, alt: 'Danat staff working at the support desk' },
-];
-
-/**
- * The grid groups the rest of the old page's items rather than dropping
- * them: wired and wireless networking together, CCTV installation under
- * security, spare parts under accessories, and refurbished desktop on
- * its own.
+ * Their product lines are the old page's own names. Its ten entries map
+ * onto these five: the brand titles under laptops, wired and wireless
+ * networking together, CCTV installation under security, spare parts
+ * under accessories, refurbished desktop on its own.
+ *
+ * ⚠ No brand product photography is in the project, so each card shows
+ * a Danat photograph. Send the product shots and they drop in.
  */
 const cats = [
-  { n: '01', icon: 'laptop', t: 'Laptops & desktops', sub: 'Work. Learn. Create.',
-    p: 'HP, Dell, Asus, Apple and Lenovo.', img: imgRetail,
-    alt: 'Retail display of computers and accessories' },
-  { n: '02', icon: 'network', t: 'Networking', sub: 'Stay connected.',
-    p: 'Wired and wireless networking.', img: imgPatch,
-    alt: 'Network patch panel with structured cabling' },
-  { n: '03', icon: 'camera', t: 'Security & CCTV', sub: 'Safer environments.',
-    p: 'CCTV installation and maintenance.', img: imgCctv,
-    alt: 'Security cameras mounted on a white wall' },
-  { n: '04', icon: 'drive', t: 'Accessories & parts', sub: 'Enhance your setup.',
-    p: 'Spare parts and consumables.', img: imgDrive,
-    alt: 'Close detail of a storage drive' },
-  { n: '05', icon: 'chip', t: 'Refurbished desktops', sub: 'Smart value.',
-    p: 'Reliable performance, better value.', img: imgBoard,
-    alt: 'A technician working on a desktop mainboard' },
+  {
+    n: '01', icon: 'laptop', t: 'Laptops & desktops', sub: 'Work. Learn. Create.',
+    line: 'HP · Dell · Asus · Apple · Lenovo',
+    p: 'Unleash power and performance.',
+    blurb: 'Reliable, versatile machines built for business and everyday use, from the brands the workshop already services.',
+    img: imgRetail, alt: 'Retail display of computers and accessories',
+  },
+  {
+    n: '02', icon: 'network', t: 'Networking', sub: 'Stay connected.',
+    line: 'Wired · Wireless',
+    p: 'Wired and wireless networking.',
+    blurb: 'Routers, switches, access points and structured cabling — for a new setup or to fix one that already exists.',
+    img: imgPatch, alt: 'Network patch panel with structured cabling',
+  },
+  {
+    n: '03', icon: 'camera', t: 'Security & CCTV', sub: 'Safer environments.',
+    line: 'Hikvision · Dahua · Uniview · EZVIZ',
+    p: 'CCTV installation.',
+    blurb: 'Cameras, recorders and storage supplied by the people who also maintain them.',
+    img: imgCctv, alt: 'Security cameras mounted on a white wall',
+  },
+  {
+    n: '04', icon: 'drive', t: 'Accessories & parts', sub: 'Enhance your setup.',
+    line: 'Canon · Epson · Zebra · AOC',
+    p: 'Spare parts and consumables.',
+    blurb: 'Drives, peripherals and the spare parts the bench uses — held in country rather than ordered in.',
+    img: imgDrive, alt: 'Close detail of a storage drive',
+  },
+  {
+    n: '05', icon: 'chip', t: 'Refurbished desktops', sub: 'Smart value.',
+    line: 'HP · Dell · Lenovo',
+    p: 'Refurbished desktop.',
+    blurb: 'Tested at component level by the same technicians who repair them, for a fit-out that does not need the newest thing.',
+    img: imgBoard, alt: 'A technician working on a desktop mainboard',
+  },
 ];
 
 const marks = [
@@ -161,58 +165,60 @@ const helps = [
 
     <div class="shell pf__grid">
       <ul class="pf__nav" data-rise>
-        {makes.map((m, i) => (
+        {cats.map((c, i) => (
           <li>
             <button type="button" data-go={i} data-on={i === 0 ? '' : undefined}>
-              <i aria-hidden="true"><Icon name="laptop" size={18} /></i>
-              <span><b>{m.b}</b>Laptops &amp; desktops</span>
+              <i aria-hidden="true"><Icon name={c.icon} size={18} /></i>
+              <span><b>{c.t}</b>{c.sub}</span>
             </button>
           </li>
         ))}
       </ul>
 
+      {/* A real fan on a perspective stage, not a cross-fade: the active
+          card stands square and forward, the rest sit back and turn
+          inward. Offsets come from --o (signed) and --a (absolute), both
+          set in script — CSS has no portable abs(). */}
       <div class="pf__stage" data-rise style="--d:120ms">
-        <button class="pf__arrow pf__arrow--l" type="button" data-step="-1" aria-label="Previous brand">
+        <button class="pf__arrow pf__arrow--l" type="button" data-step="-1" aria-label="Previous">
           <Icon name="arrow" size={16} />
         </button>
 
-        <div class="pf__shots">
-          {makes.map((m, i) => (
-            <figure data-i={i} data-on={i === 0 ? '' : undefined}>
-              <Image src={m.img} alt={m.alt} widths={[420, 700]} sizes="420px"
+        <div class="pf__deck">
+          {cats.map((c, i) => (
+            <figure class="pf__slide" data-i={i}>
+              <Image src={c.img} alt={c.alt} widths={[380, 620]} sizes="300px"
                 quality={78} format="webp" loading={i === 0 ? 'eager' : 'lazy'} />
             </figure>
           ))}
-          <span class="pf__plinth" aria-hidden="true"></span>
         </div>
 
-        <button class="pf__arrow pf__arrow--r" type="button" data-step="1" aria-label="Next brand">
+        <span class="pf__podium" aria-hidden="true">
+          <i class="pf__ring">
+            {cats.map((c) => <b>{c.t}</b>)}
+          </i>
+        </span>
+
+        <button class="pf__arrow pf__arrow--r" type="button" data-step="1" aria-label="Next">
           <Icon name="arrow" size={16} />
         </button>
-
-        <p class="pf__ring" aria-hidden="true">
-          {makes.map((m) => <span>{m.b}</span>)}
-        </p>
       </div>
 
       <div class="pf__card" data-rise style="--d:180ms">
-        {makes.map((m, i) => (
+        {cats.map((c, i) => (
           <div class="pf__pane" data-i={i} data-on={i === 0 ? '' : undefined}>
-            <p class="pf__makes">{m.b}</p>
-            <h3 class="pf__t">{m.t}</h3>
-            <p class="pf__sub">{m.p}</p>
-            <p class="pf__blurb">
-              Supplied and supported by the same team that runs the workshop,
-              from {site.stats.branches} branches across Oman.
-            </p>
+            <p class="pf__makes">{c.line}</p>
+            <h3 class="pf__t">{c.t}</h3>
+            <p class="pf__sub">{c.p}</p>
+            <p class="pf__blurb">{c.blurb}</p>
             <a class="btn" href="/contact" data-enquiry="quote">
-              View {m.b} products
+              View {c.t.toLowerCase()}
               <span class="btn__i" aria-hidden="true"><Icon name="arrow" size={15} /></span>
             </a>
           </div>
         ))}
         <span class="pf__dots" aria-hidden="true">
-          {makes.map((_, i) => <i data-on={i === 0 ? '' : undefined}></i>)}
+          {cats.map((_, i) => <i data-on={i === 0 ? '' : undefined}></i>)}
         </span>
       </div>
     </div>
@@ -320,19 +326,32 @@ const helps = [
       if (!root) return;
 
       const navs = [...root.querySelectorAll('[data-go]')];
-      const shots = [...root.querySelectorAll('.pf__shots figure')];
+      const slides = [...root.querySelectorAll('.pf__slide')];
       const panes = [...root.querySelectorAll('.pf__pane')];
       const dots = [...root.querySelectorAll('.pf__dots i')];
-      const n = shots.length;
+      const n = slides.length;
       if (!n) return;
 
       let at = 0;
       const show = (next) => {
         at = ((next % n) + n) % n;
+        slides.forEach((el, i) => {
+          // Signed distance wrapped the short way, so the fan turns
+          // through the nearer edge rather than unwinding the whole deck.
+          let o = i - at;
+          if (o > n / 2) o -= n;
+          if (o < -n / 2) o += n;
+          const abs = Math.abs(o);
+          el.style.setProperty('--o', String(o));
+          el.style.setProperty('--a', String(abs));
+          // Falling z-index is what makes each neighbour reveal a strip
+          // of itself instead of being buried by the one outside it.
+          el.style.zIndex = String(n - abs);
+          el.toggleAttribute('data-on', o === 0);
+        });
         const mark = (els) =>
           els.forEach((e, i) => e.toggleAttribute('data-on', i === at));
         mark(navs);
-        mark(shots);
         mark(panes);
         mark(dots);
       };
@@ -554,33 +573,82 @@ const helps = [
   .pf__nav [data-on] b { color: #fff; }
   .pf__nav button:focus-visible { outline: 2px solid var(--green-deep); outline-offset: 2px; }
 
-  .pf__stage { position: relative; display: grid; place-items: center; }
-  .pf__shots { position: relative; width: 100%; aspect-ratio: 4 / 3; }
-  .pf__shots figure {
-    position: absolute;
-    inset: 0 0 12% 0;
-    border-radius: 20px;
-    overflow: hidden;
-    opacity: 0;
-    scale: 0.94;
-    transition: opacity 420ms var(--ease), scale 620ms var(--ease);
+  .pf__stage {
+    position: relative;
+    aspect-ratio: 1 / 0.72;
+    perspective: 1500px;
   }
-  .pf__shots figure[data-on] { opacity: 1; scale: 1; }
-  .pf__shots :global(img) { width: 100%; height: 100%; object-fit: cover; }
-  .pf__plinth {
+  .pf__deck { position: absolute; inset: 0 0 16% 0; transform-style: preserve-3d; }
+
+  .pf__slide {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    /* The individual translate resolves before transform, so the card is
+       centred first and every fan offset is measured from the middle. */
+    translate: -50% -50%;
+    width: min(13.5rem, 52%);
+    aspect-ratio: 4 / 3;
+    padding: 0.4rem;
+    border-radius: 18px;
+    background: var(--white);
+    box-shadow: 0 2px 4px rgb(10 30 12 / 0.05), 0 30px 58px -30px rgb(10 30 12 / 0.42);
+    transform:
+      translateX(calc(var(--o, 0) * 6.9rem))
+      translateY(calc(var(--a, 0) * 0.5rem))
+      translateZ(calc(var(--a, 0) * -110px))
+      rotateY(calc(var(--o, 0) * -14deg))
+      scale(calc(1 - var(--a, 0) * 0.05));
+    transition:
+      transform 700ms cubic-bezier(0.4, 0, 0.2, 1),
+      opacity 460ms var(--ease),
+      box-shadow 460ms var(--ease);
+  }
+  .pf__slide:not([data-on]) { opacity: calc(1 - var(--a, 0) * 0.08); }
+  .pf__slide[data-on] {
+    box-shadow: 0 2px 4px rgb(10 30 12 / 0.06), 0 46px 80px -32px rgb(10 30 12 / 0.5);
+  }
+  .pf__slide :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 13px;
+  }
+
+  /* the plinth the fan stands on */
+  .pf__podium {
     position: absolute;
     left: 50%;
-    bottom: 2%;
+    bottom: 4%;
     translate: -50% 0;
-    width: 74%;
-    height: 8%;
+    display: grid;
+    place-items: center;
+    width: 82%;
+    aspect-ratio: 5 / 1;
     border-radius: 50%;
-    background: radial-gradient(ellipse at 50% 50%, #dfeee1, rgb(223 238 225 / 0) 72%);
+    background:
+      radial-gradient(ellipse at 50% 42%, #ffffff 0%, #eef6ef 52%, #e2eee4 100%);
+    box-shadow: 0 22px 40px -26px rgb(10 30 12 / 0.4);
   }
+  .pf__ring {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.2rem 0.9rem;
+    max-width: 88%;
+    font-style: normal;
+    font-family: var(--font-mono);
+    font-size: 0.5rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+  .pf__ring b { font-weight: 500; }
+
   .pf__arrow {
     position: absolute;
-    top: 42%;
-    z-index: 2;
+    top: 40%;
+    z-index: 5;
     display: grid;
     place-items: center;
     width: 40px;
@@ -595,20 +663,8 @@ const helps = [
   }
   .pf__arrow:hover { background: #e9f3ea; }
   .pf__arrow:focus-visible { outline: 2px solid var(--green-deep); outline-offset: 2px; }
-  .pf__arrow--l { left: -6px; rotate: 180deg; }
-  .pf__arrow--r { right: -6px; }
-  .pf__ring {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.4rem 1rem;
-    margin-top: 0.4rem;
-    font-family: var(--font-mono);
-    font-size: 0.5625rem;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--text-3);
-  }
+  .pf__arrow--l { left: -4px; rotate: 180deg; }
+  .pf__arrow--r { right: -4px; }
 
   .pf__card {
     position: relative;
@@ -894,6 +950,6 @@ const helps = [
       transform: none;
       transition: none;
     }
-    .pf__shots figure { transition: none; }
+    .pf__slide { transition: none; }
   }
 </style>
