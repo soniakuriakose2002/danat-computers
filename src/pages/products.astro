@@ -5,6 +5,16 @@ import Icon from '@components/ui/Icon.astro';
 import VideoModal from '@components/global/VideoModal.astro';
 import { site, brands } from '@data/site';
 import imgRetail from '@assets/photos/retail-display.jpg';
+import pHp from '@assets/products/hp.jpg';
+import pDell from '@assets/products/dell.jpg';
+import pAsus from '@assets/products/asus.jpg';
+import pApple from '@assets/products/apple.jpg';
+import pLenovo from '@assets/products/lenovo.jpg';
+import pWired from '@assets/products/wired.jpg';
+import pWireless from '@assets/products/wireless.jpg';
+import pCctv from '@assets/products/cctv.jpg';
+import pSpare from '@assets/products/spare.jpg';
+import pRefurb from '@assets/products/refurb.jpg';
 import imgPatch from '@assets/photos/network-patch.jpg';
 import imgCctv from '@assets/photos/cctv-white.jpg';
 import imgDrive from '@assets/photos/drive-macro.jpg';
@@ -30,54 +40,71 @@ import imgDesk from '@assets/photos/support-desk.jpg';
  * redraw; the sixteen names come from the catalogue export.
  */
 /**
- * Five items, one per category — which is what the mockup draws: five
- * rows on the left, five dots on the right.
+ * The five categories and their items are the old product page's own,
+ * names and all — pulled from danatcomputers.com/page/product together
+ * with its photographs, which now live in src/assets/products.
  *
- * Their product lines are the old page's own names. Its ten entries map
- * onto these five: the brand titles under laptops, wired and wireless
- * networking together, CCTV installation under security, spare parts
- * under accessories, refurbished desktop on its own.
- *
- * ⚠ No brand product photography is in the project, so each card shows
- * a Danat photograph. Send the product shots and they drop in.
+ * Each category holds its items; the fan turns them and the card on the
+ * right follows. Laptops has the five brands, networking has wired and
+ * wireless, the rest have one each.
  */
 const cats = [
   {
-    n: '01', icon: 'laptop', t: 'Laptops & desktops', sub: 'Work. Learn. Create.',
-    line: 'HP · Dell · Asus · Apple · Lenovo',
-    p: 'Unleash power and performance.',
-    blurb: 'Reliable, versatile machines built for business and everyday use, from the brands the workshop already services.',
-    img: imgRetail, alt: 'Retail display of computers and accessories',
+    icon: 'laptop', t: 'Laptops & Desktops', sub: 'Leading brands. Reliable performance.',
+    items: [
+      { b: 'HP', t: 'HP Laptops & Desktops', img: pHp,
+        p: 'Power your ideas with HP. Designed for work, learning and everyday performance.' },
+      { b: 'Dell', t: 'Dell Laptops & Desktops', img: pDell,
+        p: 'Precision and innovation with Dell, for the desk and the site office alike.' },
+      { b: 'Asus', t: 'Asus Laptops & Desktops', img: pAsus,
+        p: 'Elevate your experience with Asus — everyday machines that keep up.' },
+      { b: 'Apple', t: 'Apple Laptops & Desktops', img: pApple,
+        p: 'Seamless integration with Apple, supported by the same counter.' },
+      { b: 'Lenovo', t: 'Lenovo Laptops & Desktops', img: pLenovo,
+        p: 'Innovation redefined with Lenovo, built to be worked rather than admired.' },
+    ],
   },
   {
-    n: '02', icon: 'network', t: 'Networking', sub: 'Stay connected.',
-    line: 'Wired · Wireless',
-    p: 'Wired and wireless networking.',
-    blurb: 'Routers, switches, access points and structured cabling — for a new setup or to fix one that already exists.',
-    img: imgPatch, alt: 'Network patch panel with structured cabling',
+    icon: 'network', t: 'Networking', sub: 'Wired and wireless, planned and fixed.',
+    items: [
+      { b: 'Wired', t: 'Wired Networking', img: pWired,
+        p: 'Structured cabling, patching and switching — set up new or put right.' },
+      { b: 'Wireless', t: 'Wireless Networking', img: pWireless,
+        p: 'Access points and coverage planned around how the space is actually used.' },
+    ],
   },
   {
-    n: '03', icon: 'camera', t: 'Security & CCTV', sub: 'Safer environments.',
-    line: 'Hikvision · Dahua · Uniview · EZVIZ',
-    p: 'CCTV installation.',
-    blurb: 'Cameras, recorders and storage supplied by the people who also maintain them.',
-    img: imgCctv, alt: 'Security cameras mounted on a white wall',
+    icon: 'camera', t: 'Security & CCTV', sub: 'Smarter, safer spaces.',
+    items: [
+      { b: 'CCTV', t: 'CCTV Installation', img: pCctv,
+        p: 'Cameras, recorders and storage, supplied by the people who maintain them.' },
+    ],
   },
   {
-    n: '04', icon: 'drive', t: 'Accessories & parts', sub: 'Enhance your setup.',
-    line: 'Canon · Epson · Zebra · AOC',
-    p: 'Spare parts and consumables.',
-    blurb: 'Drives, peripherals and the spare parts the bench uses — held in country rather than ordered in.',
-    img: imgDrive, alt: 'Close detail of a storage drive',
+    icon: 'gear', t: 'Spare Parts', sub: 'Held here, not ordered in.',
+    items: [
+      { b: 'Parts', t: 'Spare Parts', img: pSpare,
+        p: 'The parts the bench uses every day, on the shelf rather than on order.' },
+    ],
   },
   {
-    n: '05', icon: 'chip', t: 'Refurbished desktops', sub: 'Smart value.',
-    line: 'HP · Dell · Lenovo',
-    p: 'Refurbished desktop.',
-    blurb: 'Tested at component level by the same technicians who repair them, for a fit-out that does not need the newest thing.',
-    img: imgBoard, alt: 'A technician working on a desktop mainboard',
+    icon: 'chip', t: 'Refurbished Desktop', sub: 'Reliable performance, better value.',
+    items: [
+      { b: 'Refurbished', t: 'Refurbished Desktop', img: pRefurb,
+        p: 'Tested at component level by the technicians who repair them.' },
+    ],
   },
 ];
+
+/** The mockup's three, on the plinth. */
+const plinth = [
+  { icon: 'gem', t: 'Top brands' },
+  { icon: 'laptop', t: 'Latest models' },
+  { icon: 'shield', t: 'Genuine products' },
+];
+
+/** The mockup's three ticks on the right-hand card. */
+const ticks = ['Wide range of models', 'Reliable performance', 'Ideal for business & home'];
 
 const marks = [
   { icon: 'shield', t: 'Genuine products', p: 'Trusted brands' },
@@ -159,9 +186,11 @@ const helps = [
   </section>
 
   {/* ══════ 02 · featured ══════ */}
-  <section class="pf section" data-pick>
-    <p class="eb eb--mid" data-rise>Featured products</p>
-    <h2 class="pf__h" data-rise style="--d:70ms">Premium brands. Wider choices.</h2>
+  <section class="pf section" data-pick
+    data-cats={JSON.stringify(cats.map((x) => ({ n: x.items.length, t: x.t, s: x.sub })))}>
+    <p class="pf__eb" data-rise>Explore our products</p>
+    <h2 class="pf__h" data-cat-t data-rise style="--d:70ms">{cats[0].t}</h2>
+    <p class="pf__sub" data-cat-s data-rise style="--d:110ms">{cats[0].sub}</p>
 
     <div class="shell pf__grid">
       <ul class="pf__nav" data-rise>
@@ -169,35 +198,44 @@ const helps = [
           <li>
             <button type="button" data-go={i} data-on={i === 0 ? '' : undefined}>
               <i aria-hidden="true"><Icon name={c.icon} size={18} /></i>
-              <span><b>{c.t}</b>{c.sub}</span>
+              <b>{c.t}</b>
+              <em aria-hidden="true"><Icon name="arrow" size={14} /></em>
             </button>
           </li>
         ))}
       </ul>
 
-      {/* A real fan on a perspective stage, not a cross-fade: the active
-          card stands square and forward, the rest sit back and turn
-          inward. Offsets come from --o (signed) and --a (absolute), both
-          set in script — CSS has no portable abs(). */}
+      {/* A real fan on a perspective stage. Offsets come from --o (signed)
+          and --a (absolute), both set in script — CSS has no portable
+          abs() — and z-index falls away from the active card so each
+          neighbour reveals a strip of itself. */}
       <div class="pf__stage" data-rise style="--d:120ms">
         <button class="pf__arrow pf__arrow--l" type="button" data-step="-1" aria-label="Previous">
           <Icon name="arrow" size={16} />
         </button>
 
         <div class="pf__deck">
-          {cats.map((c, i) => (
-            <figure class="pf__slide" data-i={i}>
-              <Image src={c.img} alt={c.alt} widths={[380, 620]} sizes="300px"
-                quality={78} format="webp" loading={i === 0 ? 'eager' : 'lazy'} />
-            </figure>
-          ))}
+          {cats.map((cat, ci) =>
+            cat.items.map((it, ii) => (
+              <figure class="pf__slide" data-c={ci} data-i={ii}>
+                <Image src={it.img} alt={it.t} widths={[360, 620]} sizes="320px"
+                  quality={82} format="webp" loading={ci === 0 && ii === 0 ? 'eager' : 'lazy'} />
+              </figure>
+            ))
+          )}
         </div>
 
-        <span class="pf__podium" aria-hidden="true">
-          <i class="pf__ring">
-            {cats.map((c) => <b>{c.t}</b>)}
-          </i>
+        <span class="pf__podium" aria-hidden="true"></span>
+
+        <span class="pf__dots" data-fan-dots aria-hidden="true">
+          {cats[0].items.map((_, i) => <i data-on={i === 0 ? '' : undefined}></i>)}
         </span>
+
+        <ul class="pf__plinth" aria-hidden="true">
+          {plinth.map((m) => (
+            <li><Icon name={m.icon} size={15} />{m.t}</li>
+          ))}
+        </ul>
 
         <button class="pf__arrow pf__arrow--r" type="button" data-step="1" aria-label="Next">
           <Icon name="arrow" size={16} />
@@ -205,22 +243,35 @@ const helps = [
       </div>
 
       <div class="pf__card" data-rise style="--d:180ms">
-        {cats.map((c, i) => (
-          <div class="pf__pane" data-i={i} data-on={i === 0 ? '' : undefined}>
-            <p class="pf__makes">{c.line}</p>
-            <h3 class="pf__t">{c.t}</h3>
-            <p class="pf__sub">{c.p}</p>
-            <p class="pf__blurb">{c.blurb}</p>
-            <a class="btn" href="/contact" data-enquiry="quote">
-              View {c.t.toLowerCase()}
-              <span class="btn__i" aria-hidden="true"><Icon name="arrow" size={15} /></span>
-            </a>
-          </div>
-        ))}
-        <span class="pf__dots" aria-hidden="true">
-          {cats.map((_, i) => <i data-on={i === 0 ? '' : undefined}></i>)}
-        </span>
+        {cats.map((cat, ci) =>
+          cat.items.map((it, ii) => (
+            <div class="pf__pane" data-c={ci} data-i={ii}
+              data-on={ci === 0 && ii === 0 ? '' : undefined}>
+              <p class="pf__mark">{it.b}</p>
+              <h3 class="pf__t">{it.t}</h3>
+              <p class="pf__blurb">{it.p}</p>
+              <ul class="pf__ticks">
+                {ticks.map((t) => (
+                  <li><i aria-hidden="true"><Icon name="check" size={12} /></i>{t}</li>
+                ))}
+              </ul>
+              <a class="btn" href="/contact" data-enquiry="quote">
+                View {it.b} products
+                <span class="btn__i" aria-hidden="true"><Icon name="arrow" size={15} /></span>
+              </a>
+            </div>
+          ))
+        )}
       </div>
+    </div>
+
+    {/* ── shop by brand ── */}
+    <p class="pf__eb pf__eb--low" data-rise>Shop by brand</p>
+    <div class="shell pb__row" data-rise style="--d:70ms">
+      <ul>
+        {['HP', 'Dell', 'Asus', 'Apple', 'Lenovo'].map((b) => <li>{b}</li>)}
+      </ul>
+      <p>Trusted brands<br />for a smarter Oman.</p>
     </div>
   </section>
 
@@ -245,11 +296,11 @@ const helps = [
       {cats.map((c, i) => (
         <li data-rise data-tone={['a', 'b', 'c', 'd', 'a'][i]} style={`--d:${i * 60}ms`}>
           <a href="/contact" data-enquiry="quote">
-            <span class="pc__n">{c.n}</span>
+            <span class="pc__n">{String(i + 1).padStart(2, '0')}</span>
             <span class="pc__t">{c.t}</span>
-            <span class="pc__s">{c.p}</span>
+            <span class="pc__s">{c.sub}</span>
             <span class="pc__shot">
-              <Image src={c.img} alt="" widths={[320, 520]} sizes="240px"
+              <Image src={c.items[0].img} alt="" widths={[320, 520]} sizes="240px"
                 quality={74} format="webp" loading="lazy" />
             </span>
             <span class="pc__go" aria-hidden="true"><Icon name="arrow" size={15} /></span>
@@ -328,39 +379,60 @@ const helps = [
       const navs = [...root.querySelectorAll('[data-go]')];
       const slides = [...root.querySelectorAll('.pf__slide')];
       const panes = [...root.querySelectorAll('.pf__pane')];
-      const dots = [...root.querySelectorAll('.pf__dots i')];
-      const n = slides.length;
-      if (!n) return;
+      const dotBox = root.querySelector('[data-fan-dots]');
+      const catT = root.querySelector('[data-cat-t]');
+      const catS = root.querySelector('[data-cat-s]');
+      if (!slides.length) return;
 
-      let at = 0;
-      const show = (next) => {
-        at = ((next % n) + n) % n;
-        slides.forEach((el, i) => {
+      const CATS = JSON.parse(root.dataset.cats || '[]');
+      let c = 0;
+      let i = 0;
+
+      const show = () => {
+        const n = CATS[c] ? CATS[c].n : 1;
+        i = ((i % n) + n) % n;
+
+        slides.forEach((el) => {
+          const mine = Number(el.dataset.c) === c;
+          if (!mine) { el.toggleAttribute('data-off', true); return; }
+          el.removeAttribute('data-off');
           // Signed distance wrapped the short way, so the fan turns
-          // through the nearer edge rather than unwinding the whole deck.
-          let o = i - at;
+          // through the nearer edge rather than unwinding the deck.
+          let o = Number(el.dataset.i) - i;
           if (o > n / 2) o -= n;
           if (o < -n / 2) o += n;
           const abs = Math.abs(o);
           el.style.setProperty('--o', String(o));
           el.style.setProperty('--a', String(abs));
-          // Falling z-index is what makes each neighbour reveal a strip
-          // of itself instead of being buried by the one outside it.
-          el.style.zIndex = String(n - abs);
+          el.style.zIndex = String(9 - abs);
           el.toggleAttribute('data-on', o === 0);
         });
-        const mark = (els) =>
-          els.forEach((e, i) => e.toggleAttribute('data-on', i === at));
-        mark(navs);
-        mark(panes);
-        mark(dots);
+
+        panes.forEach((el) =>
+          el.toggleAttribute('data-on',
+            Number(el.dataset.c) === c && Number(el.dataset.i) === i)
+        );
+        navs.forEach((el, k) => el.toggleAttribute('data-on', k === c));
+
+        if (catT && CATS[c]) catT.textContent = CATS[c].t;
+        if (catS && CATS[c]) catS.textContent = CATS[c].s;
+
+        // The dot count follows the category, which does not hold a
+        // fixed number of items.
+        if (dotBox) {
+          if (dotBox.children.length !== n) {
+            dotBox.replaceChildren();
+            for (let k = 0; k < n; k++) dotBox.appendChild(document.createElement('i'));
+          }
+          [...dotBox.children].forEach((d, k) => d.toggleAttribute('data-on', k === i));
+        }
       };
 
-      navs.forEach((b) => b.addEventListener('click', () => show(Number(b.dataset.go))));
+      navs.forEach((b) => b.addEventListener('click', () => { c = Number(b.dataset.go); i = 0; show(); }));
       root.querySelectorAll('[data-step]').forEach((b) =>
-        b.addEventListener('click', () => show(at + Number(b.dataset.step)))
+        b.addEventListener('click', () => { i += Number(b.dataset.step); show(); })
       );
-      show(0);
+      show();
     };
 
     let ran = false;
@@ -532,13 +604,36 @@ const helps = [
 
   /* ───────── 02 featured ───────── */
   .pf { background: var(--white); }
+  .pf__eb {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.8rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--green-deep);
+  }
+  .pf__eb::before, .pf__eb::after {
+    content: '';
+    width: clamp(1.5rem, 4vw, 3rem);
+    height: 1px;
+    background: currentColor;
+  }
+  .pf__eb--low { margin-top: clamp(2rem, 4vw, 3.25rem); }
   .pf__h {
-    max-width: 22ch;
-    margin: var(--s4) auto 0;
-    font-size: clamp(1.5rem, 2.8vw, 2.1rem);
+    margin-top: var(--s4);
+    font-size: clamp(1.7rem, 3.4vw, 2.6rem);
     font-weight: 700;
-    letter-spacing: -0.04em;
-    line-height: 1.12;
+    letter-spacing: -0.042em;
+    line-height: 1.08;
+    text-align: center;
+  }
+  .pf__sub {
+    margin-top: 0.4rem;
+    font-size: 0.9375rem;
+    color: var(--text-2);
     text-align: center;
   }
   .pf__grid {
@@ -548,166 +643,224 @@ const helps = [
     align-items: center;
   }
 
-  .pf__nav { display: grid; gap: 0.4rem; align-content: start; }
+  /* the category column */
+  .pf__nav {
+    display: grid;
+    align-content: start;
+    padding: 0.5rem;
+    border-radius: 22px;
+    background: var(--white);
+    box-shadow: 0 2px 4px rgb(10 30 12 / 0.04), 0 26px 54px -34px rgb(10 30 12 / 0.4);
+  }
+  .pf__nav li + li { border-top: 1px solid var(--line-light); }
   .pf__nav button {
     display: grid;
-    grid-template-columns: auto 1fr;
+    grid-template-columns: auto 1fr auto;
     align-items: center;
-    gap: 0.8rem;
+    gap: 0.85rem;
     width: 100%;
-    padding: 0.85rem 1rem;
+    padding: 0.95rem 1rem;
     border: 0;
     border-radius: 14px;
-    background: var(--off);
+    background: none;
     text-align: left;
     cursor: pointer;
-    transition: background-color var(--t2) var(--ease), color var(--t2) var(--ease);
+    transition: background-color var(--t2) var(--ease);
   }
   .pf__nav i { display: grid; place-items: center; color: var(--green-deep); }
-  .pf__nav span { display: grid; min-width: 0; font-size: 0.6875rem; color: var(--text-3); }
-  .pf__nav b { font-size: 0.875rem; font-weight: 700; color: var(--text); }
-  .pf__nav button:hover { background: #e9f3ea; }
+  .pf__nav b { font-size: 0.9375rem; font-weight: 700; color: var(--text); }
+  .pf__nav em { display: grid; place-items: center; color: var(--text-3); opacity: 0; }
+  .pf__nav button:hover { background: #eef6ef; }
   .pf__nav [data-on] { background: var(--green-deep); }
-  .pf__nav [data-on] i { color: var(--green-bright); }
-  .pf__nav [data-on] span { color: rgb(255 255 255 / 0.76); }
+  .pf__nav [data-on] i, .pf__nav [data-on] em { color: #fff; opacity: 1; }
   .pf__nav [data-on] b { color: #fff; }
-  .pf__nav button:focus-visible { outline: 2px solid var(--green-deep); outline-offset: 2px; }
+  .pf__nav button:focus-visible { outline: 2px solid var(--green-deep); outline-offset: -2px; }
 
-  .pf__stage {
-    position: relative;
-    aspect-ratio: 1 / 0.72;
-    perspective: 1500px;
-  }
-  .pf__deck { position: absolute; inset: 0 0 16% 0; transform-style: preserve-3d; }
-
+  /* the fan */
+  .pf__stage { position: relative; aspect-ratio: 1 / 0.86; perspective: 1500px; }
+  .pf__deck { position: absolute; inset: 4% 0 30% 0; transform-style: preserve-3d; }
   .pf__slide {
     position: absolute;
     top: 50%;
     left: 50%;
-    /* The individual translate resolves before transform, so the card is
-       centred first and every fan offset is measured from the middle. */
+    /* translate resolves before transform, so the card centres first and
+       every fan offset is measured from the middle. */
     translate: -50% -50%;
-    width: min(13.5rem, 52%);
+    width: min(15rem, 54%);
     aspect-ratio: 4 / 3;
-    padding: 0.4rem;
-    border-radius: 18px;
-    background: var(--white);
-    box-shadow: 0 2px 4px rgb(10 30 12 / 0.05), 0 30px 58px -30px rgb(10 30 12 / 0.42);
+    border-radius: 14px;
+    overflow: hidden;
     transform:
-      translateX(calc(var(--o, 0) * 6.9rem))
-      translateY(calc(var(--a, 0) * 0.5rem))
-      translateZ(calc(var(--a, 0) * -110px))
-      rotateY(calc(var(--o, 0) * -14deg))
-      scale(calc(1 - var(--a, 0) * 0.05));
+      translateX(calc(var(--o, 0) * 6.4rem))
+      translateZ(calc(var(--a, 0) * -120px))
+      rotateY(calc(var(--o, 0) * -15deg))
+      scale(calc(1 - var(--a, 0) * 0.06));
     transition:
       transform 700ms cubic-bezier(0.4, 0, 0.2, 1),
-      opacity 460ms var(--ease),
-      box-shadow 460ms var(--ease);
+      opacity 420ms var(--ease);
   }
-  .pf__slide:not([data-on]) { opacity: calc(1 - var(--a, 0) * 0.08); }
-  .pf__slide[data-on] {
-    box-shadow: 0 2px 4px rgb(10 30 12 / 0.06), 0 46px 80px -32px rgb(10 30 12 / 0.5);
-  }
-  .pf__slide :global(img) {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 13px;
-  }
+  .pf__slide :global(img) { width: 100%; height: 100%; object-fit: contain; }
+  .pf__slide:not([data-on]) { opacity: calc(1 - var(--a, 0) * 0.12); }
+  /* Items belonging to a category that is not live. */
+  .pf__slide[data-off] { opacity: 0; pointer-events: none; }
 
-  /* the plinth the fan stands on */
+  /* the disc the fan stands on */
   .pf__podium {
     position: absolute;
     left: 50%;
-    bottom: 4%;
+    bottom: 16%;
     translate: -50% 0;
-    display: grid;
-    place-items: center;
-    width: 82%;
-    aspect-ratio: 5 / 1;
+    width: 76%;
+    aspect-ratio: 4 / 1;
     border-radius: 50%;
-    background:
-      radial-gradient(ellipse at 50% 42%, #ffffff 0%, #eef6ef 52%, #e2eee4 100%);
-    box-shadow: 0 22px 40px -26px rgb(10 30 12 / 0.4);
+    background: radial-gradient(ellipse at 50% 36%, #ffffff 0%, #f0f7f1 54%, #e2eee4 100%);
+    box-shadow: 0 26px 44px -28px rgb(10 30 12 / 0.42);
   }
-  .pf__ring {
+  .pf__dots {
+    position: absolute;
+    left: 50%;
+    bottom: 22%;
+    translate: -50% 0;
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 0.2rem 0.9rem;
-    max-width: 88%;
-    font-style: normal;
-    font-family: var(--font-mono);
-    font-size: 0.5rem;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--text-3);
+    gap: 0.35rem;
   }
-  .pf__ring b { font-weight: 500; }
+  .pf__dots i {
+    width: 1.3rem;
+    height: 4px;
+    border-radius: 2px;
+    background: #d3e0d2;
+    transition: background-color var(--t2) var(--ease), width var(--t2) var(--ease);
+  }
+  .pf__dots i[data-on] { width: 2rem; background: var(--green-deep); }
+
+  .pf__plinth {
+    position: absolute;
+    left: 50%;
+    bottom: 7%;
+    translate: -50% 0;
+    display: flex;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: clamp(0.5rem, 1.4vw, 1.1rem);
+  }
+  .pf__plinth li {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: clamp(0.625rem, 0.85vw, 0.75rem);
+    color: var(--text-2);
+  }
+  .pf__plinth li + li {
+    padding-left: clamp(0.5rem, 1.4vw, 1.1rem);
+    border-left: 1px solid var(--line-light);
+  }
+  .pf__plinth :global(svg) { color: var(--green-deep); }
 
   .pf__arrow {
     position: absolute;
-    top: 40%;
+    top: 34%;
     z-index: 5;
     display: grid;
     place-items: center;
-    width: 40px;
-    height: 40px;
-    border: 1px solid var(--line-light);
+    width: 42px;
+    height: 42px;
+    border: 0;
     border-radius: 50%;
     background: var(--white);
     color: var(--green-deep);
     cursor: pointer;
-    box-shadow: 0 10px 24px -14px rgb(10 30 12 / 0.5);
+    box-shadow: 0 12px 26px -14px rgb(10 30 12 / 0.55);
     transition: background-color var(--t2) var(--ease);
   }
   .pf__arrow:hover { background: #e9f3ea; }
   .pf__arrow:focus-visible { outline: 2px solid var(--green-deep); outline-offset: 2px; }
-  .pf__arrow--l { left: -4px; rotate: 180deg; }
-  .pf__arrow--r { right: -4px; }
+  .pf__arrow--l { left: 0; rotate: 180deg; }
+  .pf__arrow--r { right: 0; }
 
+  /* the card */
   .pf__card {
     position: relative;
     display: grid;
     align-content: start;
-    padding: clamp(1.25rem, 2.6vw, 1.75rem);
-    border: 1px solid var(--line-light);
+    padding: clamp(1.25rem, 2.6vw, 1.9rem);
     border-radius: 22px;
     background: var(--white);
-    box-shadow: 0 26px 54px -34px rgb(10 30 12 / 0.4);
+    box-shadow: 0 2px 4px rgb(10 30 12 / 0.04), 0 26px 54px -34px rgb(10 30 12 / 0.4);
   }
   .pf__pane { display: none; }
   .pf__pane[data-on] { display: grid; }
-  .pf__makes {
+  .pf__mark {
     font-family: var(--font-mono);
     font-size: 0.5625rem;
-    letter-spacing: 0.14em;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
     color: var(--green-deep);
   }
   .pf__t {
-    margin-top: 0.7rem;
+    margin-top: 0.6rem;
     font-size: clamp(1.15rem, 2vw, 1.5rem);
     font-weight: 700;
     letter-spacing: -0.035em;
+    line-height: 1.14;
   }
-  .pf__sub { margin-top: 0.2rem; font-size: 0.9375rem; color: var(--text-2); }
   .pf__blurb {
-    margin-top: 0.8rem;
-    font-size: 0.8438rem;
-    line-height: 1.62;
+    margin-top: 0.7rem;
+    font-size: 0.875rem;
+    line-height: 1.6;
     color: var(--text-2);
   }
-  .pf__pane .btn { justify-self: start; margin-top: 1.1rem; }
-  .pf__dots { display: flex; gap: 0.35rem; margin-top: 1.1rem; }
-  .pf__dots i {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: #d3e0d2;
-    transition: background-color var(--t2) var(--ease), width var(--t2) var(--ease);
+  .pf__ticks { display: grid; gap: 0.55rem; margin-top: 1rem; }
+  .pf__ticks li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 0.875rem;
+    color: var(--text);
   }
-  .pf__dots i[data-on] { width: 18px; border-radius: 4px; background: var(--green-deep); }
+  .pf__ticks i {
+    display: grid;
+    place-items: center;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--green-deep);
+    color: #fff;
+  }
+  .pf__pane .btn { justify-self: start; margin-top: 1.2rem; }
+
+  /* shop by brand */
+  .pb__row {
+    display: grid;
+    gap: var(--s4);
+    align-items: center;
+    margin-top: var(--s5);
+  }
+  .pb__row ul {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem clamp(1rem, 3vw, 2.5rem);
+  }
+  .pb__row li {
+    font-size: clamp(1.05rem, 2vw, 1.5rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: var(--text-2);
+  }
+  .pb__row li + li {
+    padding-left: clamp(1rem, 3vw, 2.5rem);
+    border-left: 1px solid var(--line-light);
+  }
+  .pb__row p {
+    font-size: 0.875rem;
+    line-height: 1.6;
+    color: var(--text-3);
+    text-align: center;
+  }
 
   /* ───────── 03 categories ───────── */
   .pc { background: linear-gradient(180deg, #f4faf5, #ffffff); }
@@ -936,7 +1089,9 @@ const helps = [
       color: var(--green-deep);
     }
 
-    .pf__grid { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.5fr) minmax(0, 0.95fr); }
+    .pf__grid { grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.6fr) minmax(0, 0.88fr); }
+    .pb__row { grid-template-columns: minmax(0, 1fr) auto; }
+    .pb__row p { text-align: left; }
     .pc__head { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; }
     .pc__grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
     .pb__in { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.6fr) auto; }
