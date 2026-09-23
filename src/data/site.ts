@@ -54,6 +54,8 @@ export const site = {
    */
   video: {
     youtube: '7VTB6scn-lk',
+    /** Shan Sahib's channel, supplied by the client. */
+    channel: 'https://www.youtube.com/@shanontech4849',
     title: 'Inside Danat Computers',
     verified: true,
   },
@@ -77,7 +79,7 @@ export const site = {
     { label: 'Services', href: '/services' },
     { label: 'Business Solutions', href: '/business' },
     { label: 'Branches', href: '/branches' },
-    { label: 'Support', href: '/support' },
+    { label: 'Leadership', href: '/leadership' },
     { label: 'Contact', href: '/contact' },
   ],
 } as const;

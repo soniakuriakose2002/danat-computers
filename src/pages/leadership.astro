@@ -1,0 +1,631 @@
+---
+import { Image } from 'astro:assets';
+import PageLayout from '@layouts/PageLayout.astro';
+import Icon from '@components/ui/Icon.astro';
+import VideoModal from '@components/global/VideoModal.astro';
+import { site } from '@data/site';
+import imgPoster from '@assets/photos/film-poster.jpg';
+
+/**
+ * LEADERSHIP — built to the client's mockup.
+ *
+ * Four things in that mockup are not carried over as drawn, and each is
+ * a factual claim rather than a design choice:
+ *
+ *  1. "Proudly serving Oman since 2000" — the earliest ERP record is
+ *     2003-10-12, and every other page on this site says 2003.
+ *  2. "+968 7025 05503" — that is Alphalize's Indian number, +91 70252
+ *     05503, with an Omani country code in front of it. It does not
+ *     dial. Danat's verified number is used instead.
+ *  3. The three "From the stage" videos — Mind Management, the
+ *     corporate training session and the BizConnect robotics award —
+ *     are Alphalize's own, from alphalize.com/en/ceo. The client then
+ *     supplied the channel they come from, so the rail leads with the
+ *     real Danat film, links the channel itself, and holds the third
+ *     card. YouTube renders its channel page in script, so the video
+ *     ids and titles cannot be read from it — send the individual
+ *     links and they drop straight in rather than being guessed at.
+ *  4. The Muscat skyline behind the portrait: there is no such
+ *     photograph in the project and none has been supplied, so the
+ *     hero uses a wash rather than a stock substitute.
+ *
+ * ⚠ The name and title are as the client specified. Worth confirming
+ * once: alphalize.com/en/ceo lists Shan Sahib as Managing Director of
+ * Alphalize Technologies, so "Managing Director · Danat Computers"
+ * states a second role at a different company.
+ *
+ * The portrait is served from public/people/shan-sahib.jpg. Dropping
+ * the file there is all that is needed — nothing else to change.
+ */
+const since = site.stats.since;
+
+/** The mockup's four. Wording is the client's. */
+const values = [
+  { icon: 'users', t: 'Customer first', p: 'We listen, understand and deliver.' },
+  { icon: 'bolt', t: 'Innovation', p: 'Adopting new technology for a smarter tomorrow.' },
+  { icon: 'shield', t: 'Trusted partnerships', p: 'Building long-term relationships.' },
+  { icon: 'chart', t: 'Sustainable growth', p: 'Creating value for our customers and community.' },
+];
+---
+
+<PageLayout
+  title="Leadership"
+  description={`The leadership of Danat Computers — serving Oman from ${site.stats.branches} branches since ${since}.`}
+>
+  {/* ══════ 01 · hero ══════ */}
+  <section class="lh">
+    <span class="lh__sky" aria-hidden="true"></span>
+
+    <div class="shell lh__grid">
+      {/* ── left ── */}
+      <div class="lh__copy">
+        <p class="eb" data-rise>Leadership</p>
+
+        <h1 class="lh__h" data-rise style="--d:70ms">
+          People who<br /><em>move technology<br />forward.</em>
+        </h1>
+
+        <p class="lh__p" data-rise style="--d:130ms">
+          Guided by vision, driven by values. Our leadership continues to build
+          Danat with a strong focus on customers, innovation and a better
+          tomorrow for Oman.
+        </p>
+
+        <div class="lh__acts" data-rise style="--d:190ms">
+          <a class="btn" href="#values">
+            Our leadership
+            <span class="btn__i" aria-hidden="true"><Icon name="arrow" size={15} /></span>
+          </a>
+          <button class="film" type="button" data-video-open>
+            <i aria-hidden="true"><Icon name="play" size={12} /></i>
+            <span>Watch our story<small>{site.video.title}</small></span>
+          </button>
+        </div>
+      </div>
+
+      {/* ── portrait ── */}
+      <figure class="lh__shot" data-rise style="--d:160ms">
+        <p class="lh__script" aria-hidden="true">
+          Technology<br />for a stronger<br />Oman
+        </p>
+        {/* Save the photograph to public/people/shan-sahib.jpg. Until it
+            is there the frame holds its shape rather than collapsing. */}
+        <img
+          class="lh__img"
+          src="/people/shan-sahib.jpg"
+          alt="Shan Sahib, Managing Director of Danat Computers"
+          width="660"
+          height="830"
+          loading="eager"
+          fetchpriority="high"
+        />
+      </figure>
+
+      {/* ── right rail ── */}
+      <div class="lh__who" data-rise style="--d:220ms">
+        <p class="lh__name">Shan Sahib</p>
+        <p class="lh__role">Managing Director<br />{site.name} Computers</p>
+        <span class="lh__rule" aria-hidden="true"></span>
+        <blockquote class="lh__quote">
+          &ldquo;Our focus is on people, practical solutions, and long-term
+          partnerships.&rdquo;
+        </blockquote>
+
+        <p class="lh__chip">
+          <Icon name="pin" size={15} />
+          <span>Proudly serving Oman<b>since {since}</b></span>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  {/* ══════ 02 · values ══════ */}
+  <section class="vl" id="values">
+    <div class="shell vl__in">
+      <ul class="vl__list">
+        {values.map((v, i) => (
+          <li data-rise style={`--d:${i * 60}ms`}>
+            <i aria-hidden="true"><Icon name={v.icon} size={20} /></i>
+            <span><b>{v.t}</b><em>{v.p}</em></span>
+          </li>
+        ))}
+      </ul>
+
+      <p class="vl__q" data-rise style="--d:260ms">
+        <span class="vl__mark" aria-hidden="true">&ldquo;</span>
+        A smarter<br />tomorrow together.
+      </p>
+    </div>
+  </section>
+
+  {/* ══════ 03 · from the stage ══════ */}
+  <section class="st section">
+    <div class="shell st__head">
+      <div>
+        <p class="eb" data-rise>From the stage</p>
+        <h2 class="st__h" data-rise style="--d:70ms">
+          Ideas. Insights. <em>Inspiration.</em>
+        </h2>
+        <p class="st__p" data-rise style="--d:130ms">
+          Talks, sessions and the company film — the leadership on the record.
+        </p>
+        <a class="btn" href={site.video.channel} target="_blank"
+          rel="noopener noreferrer" data-rise style="--d:190ms">
+          Watch all videos
+          <span class="btn__i" aria-hidden="true"><Icon name="arrow" size={15} /></span>
+        </a>
+      </div>
+
+      <ul class="st__rail">
+        <li data-rise>
+          <button class="st__card" type="button" data-video-open>
+            <span class="st__shot">
+              <Image src={imgPoster} alt="" widths={[320, 520]} sizes="260px"
+                quality={74} format="webp" loading="lazy" />
+              <span class="st__play" aria-hidden="true"><Icon name="play" size={16} /></span>
+            </span>
+            <b>{site.video.title}</b>
+            <em>The company film</em>
+          </button>
+        </li>
+
+        <li data-rise style="--d:70ms">
+          <a class="st__card" href={site.video.channel} target="_blank" rel="noopener noreferrer">
+            <span class="st__shot st__shot--ch">
+              <Icon name="play" size={22} />
+              <b>@shanontech4849</b>
+            </span>
+            <b>Shan on Tech</b>
+            <em>Talks and sessions, on YouTube</em>
+          </a>
+        </li>
+
+        {/* Held rather than guessed — see the note at the top of this file. */}
+        <li data-rise style="--d:140ms">
+          <div class="st__card st__card--slot">
+            <span class="st__shot st__shot--slot" aria-hidden="true">
+              <Icon name="play" size={18} />
+            </span>
+            <b>Next talk to follow</b>
+            <em>Send the link and it drops in here</em>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </section>
+
+  {/* ══════ 04 · cta ══════ */}
+  <section class="lc">
+    <span class="lc__wash" aria-hidden="true"></span>
+    <div class="shell lc__in">
+      <div>
+        <p class="eb eb--inv" data-rise>Let's build together</p>
+        <h2 class="lc__h" data-rise style="--d:70ms">
+          Stronger people. <em>Smarter solutions.</em>
+        </h2>
+        <p class="lc__p" data-rise style="--d:130ms">
+          Get in touch to explore opportunities, partnerships or business
+          discussions.
+        </p>
+      </div>
+
+      <div class="lc__acts" data-rise style="--d:190ms">
+        <a class="btn btn--light" href="/contact" data-enquiry="consult">
+          Start a conversation
+          <span class="btn__i" aria-hidden="true"><Icon name="arrow" size={15} /></span>
+        </a>
+        <a class="lc__tel" href={`tel:${site.phone.tel}`}>
+          <Icon name="headset" size={16} />{site.phone.display}
+        </a>
+      </div>
+
+      <p class="lc__script" aria-hidden="true">Oman<br />Forward<br />Together</p>
+    </div>
+  </section>
+
+  <VideoModal />
+</PageLayout>
+
+<style>
+  /* ───────── shared ───────── */
+  .eb {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--green-deep);
+  }
+  .eb::before { content: ''; width: 28px; height: 1px; background: currentColor; }
+  .eb--inv { color: var(--green-bright); }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0.85rem 0.85rem 0.85rem 1.4rem;
+    border: 0;
+    border-radius: 999px;
+    background: var(--green-deep);
+    color: #fff;
+    font: inherit;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color var(--t2) var(--ease);
+  }
+  .btn:hover { background: #26551f; }
+  .btn__i {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.2);
+    transition: transform var(--t2) var(--ease);
+  }
+  .btn:hover .btn__i { transform: translateX(3px); }
+  .btn--light { background: #fff; color: #10301a; }
+  .btn--light:hover { background: var(--green-bright); }
+  .btn--light .btn__i { background: rgb(16 48 26 / 0.14); }
+
+  .film {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+    text-align: left;
+  }
+  .film i {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    flex: none;
+    border-radius: 50%;
+    background: var(--green-deep);
+    color: #fff;
+    transition: transform var(--t2) var(--ease);
+  }
+  .film:hover i { transform: scale(1.08); }
+  .film:focus-visible i { outline: 2px solid var(--green-deep); outline-offset: 3px; }
+  .film > span { display: grid; min-width: 0; font-size: 0.9375rem; font-weight: 700; }
+  .film small {
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+
+  /* ───────── 01 hero ───────── */
+  .lh {
+    position: relative;
+    padding-block: clamp(2.25rem, 5vw, 4rem) clamp(2.5rem, 5vw, 4rem);
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .lh__sky {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      radial-gradient(820px 520px at 74% 0%, #ffffff 0%, rgb(255 255 255 / 0) 64%),
+      radial-gradient(640px 420px at 96% 34%, #e4f0e6 0%, rgb(228 240 230 / 0) 70%),
+      linear-gradient(168deg, #eef5ef 0%, #f6faf6 48%, #fbfdfb 100%);
+  }
+
+  .lh__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+    align-items: center;
+  }
+  .lh__copy, .lh__shot, .lh__who { min-width: 0; }
+
+  .lh__h {
+    margin-top: var(--s4);
+    font-size: clamp(2.1rem, 4.6vw, 3.4rem);
+    font-weight: 700;
+    letter-spacing: -0.045em;
+    line-height: 1.03;
+  }
+  .lh__h em { font-style: normal; color: var(--green-deep); }
+  .lh__p {
+    max-width: 38ch;
+    margin-top: var(--s4);
+    font-size: 0.9375rem;
+    line-height: 1.66;
+    color: var(--text-2);
+  }
+  .lh__acts {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s4) var(--s5);
+    margin-top: var(--s5);
+  }
+
+  /* portrait */
+  .lh__shot { position: relative; display: grid; justify-items: center; }
+  .lh__img {
+    width: 100%;
+    max-width: 24rem;
+    height: auto;
+    aspect-ratio: 660 / 830;
+    object-fit: cover;
+    object-position: 50% 12%;
+    /* Holds its shape, and reads as a frame, before the file lands. */
+    border-radius: 18px;
+    background:
+      radial-gradient(circle at 50% 36%, #ffffff, #eaf3ea 78%);
+    box-shadow: 0 30px 60px -34px rgb(10 30 12 / 0.45);
+  }
+  .lh__script {
+    position: absolute;
+    top: 14%;
+    left: 0;
+    z-index: 1;
+    max-width: 8ch;
+    text-shadow: 0 1px 10px rgb(255 255 255 / 0.9);
+    font-family: var(--font-serif, Georgia, serif);
+    font-style: italic;
+    font-size: clamp(1rem, 1.8vw, 1.4rem);
+    line-height: 1.3;
+    color: var(--green-deep);
+    pointer-events: none;
+  }
+
+  /* who */
+  .lh__who { display: grid; align-content: center; }
+  .lh__name {
+    font-size: clamp(1.25rem, 2.2vw, 1.6rem);
+    font-weight: 700;
+    letter-spacing: -0.035em;
+  }
+  .lh__role { margin-top: 0.3rem; font-size: 0.875rem; line-height: 1.5; color: var(--text-2); }
+  .lh__rule {
+    width: 46px;
+    height: 2px;
+    margin-top: var(--s4);
+    border-radius: 2px;
+    background: var(--green);
+  }
+  .lh__quote {
+    max-width: 26ch;
+    margin-top: var(--s4);
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--text-2);
+  }
+  .lh__chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: var(--s5);
+    padding: 0.7rem 1rem;
+    border: 1px solid var(--line-light);
+    border-radius: 14px;
+    background: rgb(255 255 255 / 0.76);
+    backdrop-filter: blur(8px);
+    color: var(--green-deep);
+  }
+  .lh__chip span { display: grid; font-size: 0.8125rem; color: var(--text-2); }
+  .lh__chip b { font-size: 0.875rem; font-weight: 700; color: var(--text); }
+
+  /* ───────── 02 values ───────── */
+  .vl { background: var(--white); padding-block: clamp(1.75rem, 3.5vw, 2.75rem); }
+  .vl__in { display: grid; gap: clamp(1.25rem, 2.6vw, 2rem); align-items: center; }
+  .vl__list { display: grid; gap: clamp(1rem, 2vw, 1.5rem); }
+  .vl__list li { display: grid; grid-template-columns: auto 1fr; align-items: start; gap: 0.9rem; }
+  .vl__list i {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: #e9f3ea;
+    color: var(--green-deep);
+  }
+  .vl__list span { display: grid; min-width: 0; }
+  .vl__list b { font-size: 0.9375rem; font-weight: 700; letter-spacing: -0.02em; }
+  .vl__list em {
+    margin-top: 0.25rem;
+    font-style: normal;
+    font-size: 0.8125rem;
+    line-height: 1.55;
+    color: var(--text-2);
+  }
+
+  .vl__q {
+    position: relative;
+    padding: clamp(1.1rem, 2.4vw, 1.6rem) clamp(1.1rem, 2.4vw, 1.5rem);
+    border-radius: 18px;
+    background: #eef6ef;
+    font-size: clamp(1rem, 1.8vw, 1.2rem);
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1.3;
+  }
+  .vl__mark {
+    display: block;
+    font-family: var(--font-serif, Georgia, serif);
+    font-size: 2.2rem;
+    line-height: 0.7;
+    color: var(--green);
+  }
+
+  /* ───────── 03 from the stage ───────── */
+  .st { background: linear-gradient(180deg, #f4faf4, #fbfdfb); }
+  .st__head { display: grid; gap: clamp(1.5rem, 3vw, 2.5rem); align-items: center; }
+  .st__h {
+    margin-top: var(--s4);
+    font-size: clamp(1.7rem, 3.4vw, 2.5rem);
+    font-weight: 700;
+    letter-spacing: -0.042em;
+    line-height: 1.08;
+  }
+  .st__h em { font-style: normal; color: var(--green-deep); }
+  .st__p {
+    max-width: 40ch;
+    margin-top: var(--s4);
+    margin-bottom: var(--s5);
+    font-size: 0.9375rem;
+    line-height: 1.62;
+    color: var(--text-2);
+  }
+
+  .st__rail {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(13rem, 1fr);
+    gap: clamp(0.75rem, 1.6vw, 1.1rem);
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    padding-bottom: 0.4rem;
+  }
+  .st__rail::-webkit-scrollbar { display: none; }
+  .st__rail li { scroll-snap-align: start; min-width: 0; }
+
+  .st__card {
+    display: grid;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+  }
+  .st__card--slot { cursor: default; }
+  .st__shot {
+    position: relative;
+    display: grid;
+    place-items: center;
+    aspect-ratio: 16 / 10;
+    border-radius: 16px;
+    overflow: hidden;
+    background: #dfe9e0;
+  }
+  .st__shot img { width: 100%; height: 100%; object-fit: cover; }
+  .st__shot--ch {
+    display: grid;
+    place-items: center;
+    align-content: center;
+    gap: 0.5rem;
+    background: linear-gradient(140deg, #16381a, #0d240f);
+    color: var(--green-bright);
+  }
+  .st__shot--ch b {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    color: rgb(255 255 255 / 0.78);
+  }
+  .st__shot--slot {
+    border: 1px dashed color-mix(in oklab, var(--green) 32%, var(--line-light));
+    background: var(--off);
+    color: #6f8a6e;
+  }
+  .st__play {
+    position: absolute;
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.92);
+    color: var(--green-deep);
+    transition: transform var(--t2) var(--ease);
+  }
+  .st__card:hover .st__play { transform: scale(1.1); }
+  .st__card b { margin-top: 0.7rem; font-size: 0.875rem; font-weight: 700; }
+  .st__card em {
+    margin-top: 0.2rem;
+    font-style: normal;
+    font-size: 0.75rem;
+    color: var(--text-3);
+  }
+  .st__card:focus-visible { outline: 2px solid var(--green-deep); outline-offset: 4px; border-radius: 18px; }
+
+  /* ───────── 04 cta ───────── */
+  .lc {
+    position: relative;
+    padding-block: clamp(3rem, 6vw, 5rem);
+    background: linear-gradient(135deg, #12351a 0%, #0c2411 56%, #143a1d 100%);
+    color: #fff;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .lc__wash {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: radial-gradient(760px 420px at 84% 96%, rgb(143 221 138 / 0.22), transparent 70%);
+  }
+  .lc__in { display: grid; gap: var(--s5); align-items: center; }
+  .lc__h {
+    margin-top: var(--s4);
+    font-size: clamp(1.7rem, 3.4vw, 2.5rem);
+    font-weight: 700;
+    letter-spacing: -0.042em;
+    line-height: 1.1;
+  }
+  .lc__h em { font-style: normal; color: var(--green-bright); }
+  .lc__p {
+    max-width: 40ch;
+    margin-top: var(--s4);
+    font-size: 0.9375rem;
+    line-height: 1.62;
+    color: rgb(255 255 255 / 0.8);
+  }
+  .lc__acts { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s4) var(--s5); }
+  .lc__tel {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.85rem 1.3rem;
+    border: 1px solid rgb(255 255 255 / 0.32);
+    border-radius: 999px;
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    transition: background-color var(--t2) var(--ease), border-color var(--t2) var(--ease);
+  }
+  .lc__tel:hover { background: rgb(255 255 255 / 0.12); border-color: rgb(255 255 255 / 0.6); }
+  .lc__script {
+    font-family: var(--font-serif, Georgia, serif);
+    font-style: italic;
+    font-size: clamp(1.05rem, 1.9vw, 1.4rem);
+    line-height: 1.3;
+    color: var(--green-bright);
+  }
+
+  /* ───────── responsive ───────── */
+  @media (min-width: 40rem) {
+    .vl__list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .st__p { margin-bottom: var(--s5); }
+  }
+
+  @media (min-width: 62rem) {
+    .lh__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 0.92fr) minmax(0, 0.72fr); }
+    .vl__in { grid-template-columns: minmax(0, 1fr) minmax(0, 0.34fr); }
+    .vl__list { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .st__head { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.3fr); }
+    .lc__in { grid-template-columns: minmax(0, 1fr) auto auto; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .btn, .btn:hover .btn__i, .film:hover i, .st__card:hover .st__play {
+      transform: none;
+      transition: none;
+    }
+  }
+</style>
