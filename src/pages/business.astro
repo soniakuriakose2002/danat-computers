@@ -215,6 +215,11 @@ const steps = [
           This is not a new line of business. The company's own accounts
           show these sectors buying at trade, some of them for years.
         </p>
+
+        <p class="wh__ask">
+          Named references available on request — ask and we will put you in
+          touch with someone in your sector.
+        </p>
       </div>
 
       <ul class="wh__list">
@@ -732,10 +737,19 @@ const steps = [
   .wh__h em { font-style: normal; color: var(--green-deep); }
   .wh__p {
     margin-top: var(--s4);
-    max-width: 36ch;
-    font-size: 0.875rem;
+    max-width: 40ch;
+    font-size: 0.9375rem;
     line-height: 1.62;
     color: var(--text-2);
+  }
+  .wh__ask {
+    max-width: 38ch;
+    margin-top: var(--s5);
+    padding-top: var(--s4);
+    border-top: 1px solid var(--line-light);
+    font-size: 0.8125rem;
+    line-height: 1.6;
+    color: var(--text-3);
   }
 
   .wh__list { display: grid; gap: 0.7rem; }
@@ -743,7 +757,8 @@ const steps = [
     display: flex;
     align-items: center;
     gap: 0.9rem;
-    padding: 1rem 1.1rem;
+    height: 100%;
+    padding: 1.15rem 1.2rem;
     border-radius: 16px;
     background: rgb(255 255 255 / 0.84);
     backdrop-filter: blur(8px);
@@ -980,7 +995,10 @@ const steps = [
     /* Three up: the uneven grid is what stops it reading as six boxes.
        2+1 / 1+2 / 1+1+1, so no row repeats the one above it. */
     .card { grid-column: span var(--span, 1); }
-    .wh__grid { grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); }
+    .wh__grid { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); }
+    /* Two up, not four stacked: a full-width row in this column left most
+       of each card empty and opened a gap beside the copy. */
+    .wh__list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     .hw__steps { grid-template-columns: repeat(4, 1fr); }
   }
 
