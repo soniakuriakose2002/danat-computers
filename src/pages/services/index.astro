@@ -266,7 +266,6 @@ const promises = [
   /* ───────── 01 hero ───────── */
   .sh {
     position: relative;
-    padding-block: clamp(5.5rem, 10vw, 8rem) 0;
     overflow: hidden;
     isolation: isolate;
   }
@@ -277,6 +276,9 @@ const promises = [
     background: linear-gradient(162deg, #eef5ef 0%, #f6faf6 54%, #ffffff 100%);
   }
   .sh__grid { display: grid; gap: clamp(1.75rem, 3.5vw, 2.75rem); align-items: center; }
+  /* The copy carries the header clearance so the photograph can run to
+     the top of the section rather than starting below it. */
+  .sh__copy { padding-block: clamp(5.5rem, 10vw, 8rem) clamp(2rem, 4vw, 3rem); }
   .sh__copy, .sh__media { min-width: 0; }
 
   .sh__crumb {
@@ -318,6 +320,7 @@ const promises = [
   .sh__media {
     position: relative;
     aspect-ratio: 16 / 11;
+    margin-bottom: clamp(1.5rem, 3vw, 2.5rem);
     border-radius: 0 0 0 clamp(2rem, 6vw, 5rem);
     overflow: hidden;
   }
@@ -549,7 +552,30 @@ const promises = [
   }
 
   @media (min-width: 62rem) {
-    .sh__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.12fr); }
+    .sh__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.06fr); align-items: stretch; }
+
+    /* Full-bleed to the right edge of the window, top of the section to
+       bottom, with a convex left edge — the mockup's shape. An ellipse
+       anchored off the right gives the bulge without an SVG path. */
+    .sh__media {
+      aspect-ratio: auto;
+      min-height: clamp(26rem, 40vw, 34rem);
+      margin: 0 calc(50% - 50vw) 0 0;
+      border-radius: 0;
+      /* A large radius on the two left corners, not an ellipse clip.
+         The ellipse's centre moved with the row height, so the sweep
+         came out lopsided — straight at the top, curved at the bottom.
+         Corner radii are measured from the corners and cannot drift. */
+      border-radius: clamp(3rem, 11vw, 10rem) 0 0 clamp(3rem, 11vw, 10rem);
+    }
+    .sh__media :global(img), .sh__tint { position: relative; z-index: 2; }
+    .sh__media :global(img) { position: absolute; inset: 0; }
+    .sh__over, .sh__pill { z-index: 3; }
+    .sh__pill {
+      left: clamp(1.5rem, 5vw, 4rem);
+      right: auto;
+      translate: none;
+    }
     .sm__list { grid-template-columns: repeat(4, minmax(0, 1fr)); }
     .sl__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .sc__in { grid-template-columns: minmax(0, 1fr) auto; }
