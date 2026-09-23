@@ -152,16 +152,32 @@ const figures = [
 
       <div class="ring" data-rise style="--d:120ms">
         <svg class="ring__guide" viewBox="0 0 100 100" fill="none" aria-hidden="true">
-          <circle cx="50" cy="50" r="38" stroke="currentColor" stroke-width="0.35" stroke-dasharray="1.2 2.4" />
+          {/* A spoke per node, drawn out from the hub on reveal. */}
+          {ring.map((_, i) => {
+            const a = ((i * 360) / ring.length - 90) * (Math.PI / 180);
+            return (
+              <line class="ring__spoke" style={`--i:${i}`}
+                x1={50 + Math.cos(a) * 17} y1={50 + Math.sin(a) * 17}
+                x2={50 + Math.cos(a) * 38} y2={50 + Math.sin(a) * 38}
+                stroke="currentColor" stroke-width="0.4" pathLength="1" />
+            );
+          })}
+          <circle class="ring__orbit" cx="50" cy="50" r="38"
+            stroke="currentColor" stroke-width="0.35" stroke-dasharray="1.2 2.4" />
         </svg>
 
+        {/* A signal running the orbit — the ring is a network, so
+            something should be moving on it. */}
+        <div class="ring__run" aria-hidden="true"><span></span></div>
+
         <div class="ring__hub">
+          <span class="ring__pulse" aria-hidden="true"></span>
           <Logo />
           <span>Business<br />technology<br />solutions</span>
         </div>
 
         {ring.map((r, i) => (
-          <div class="ring__slot" style={`--th:${(i * 360) / ring.length}deg`}>
+          <div class="ring__slot" style={`--th:${(i * 360) / ring.length}deg; --i:${i}`}>
             <div class="node">
               <i aria-hidden="true"><Icon name={r.icon} size={20} /></i>
               <b>{r.t}</b>
@@ -531,8 +547,9 @@ const figures = [
     font-size: clamp(0.85rem, 1.3vw, 1.05rem);
     color: var(--green-deep);
   }
-  .eco__note--l { left: 0; rotate: -6deg; }
-  .eco__note--r { right: 0; text-align: right; rotate: 5deg; }
+  .eco__note { max-width: 9rem; }
+  .eco__note--l { left: 0.5rem; rotate: -6deg; }
+  .eco__note--r { right: 0.5rem; text-align: right; rotate: 5deg; }
 
   /* ---- the ring ---- */
   .ring {
@@ -546,6 +563,48 @@ const figures = [
     width: 100%;
     height: 100%;
     color: color-mix(in oklab, var(--green) 42%, transparent);
+  }
+
+  /* Spokes draw from the hub outward, one after another. */
+  .ring__spoke {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset 560ms var(--ease) calc(320ms + var(--i) * 90ms);
+  }
+  .ring[data-in] .ring__spoke { stroke-dashoffset: 0; }
+
+  /* The dashed orbit turns slowly, so the ring is never quite still. */
+  .ring__orbit { transform-origin: 50% 50%; }
+  @media (prefers-reduced-motion: no-preference) {
+    .ring__orbit { animation: ring-turn 90s linear infinite; }
+  }
+  @keyframes ring-turn { to { transform: rotate(360deg); } }
+
+  /* A lit dot running the orbit. Same trick as the nodes: a full-size
+     box rotating about the centre with the dot pinned to its top edge,
+     so the radius is the ring's. */
+  .ring__run {
+    position: absolute;
+    inset: 12%;
+    pointer-events: none;
+  }
+  .ring__run span {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    translate: -50% -50%;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 0 4px color-mix(in oklab, var(--green) 22%, transparent),
+      0 0 14px 2px color-mix(in oklab, var(--green) 55%, transparent);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .ring__run { animation: ring-turn 14s linear infinite; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ring__run { display: none; }
   }
 
   .ring__hub {
@@ -562,7 +621,23 @@ const figures = [
     text-align: center;
     box-shadow: 0 24px 50px -24px rgb(10 40 14 / 0.6);
   }
-  .ring__hub :global(img) { width: clamp(3.5rem, 7vw, 5rem); height: auto; }
+  .ring__hub :global(img) { position: relative; z-index: 1; width: clamp(3.5rem, 7vw, 5rem); height: auto; }
+
+  /* The hub breathes — a slow ring of light leaving it. */
+  .ring__pulse {
+    position: absolute;
+    inset: -6%;
+    border-radius: 50%;
+    border: 2px solid color-mix(in oklab, var(--green) 45%, transparent);
+    pointer-events: none;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .ring__pulse { animation: hub-pulse 3.6s var(--ease) infinite; }
+  }
+  @keyframes hub-pulse {
+    0% { transform: scale(0.92); opacity: 0.85; }
+    70%, 100% { transform: scale(1.18); opacity: 0; }
+  }
   .ring__hub span {
     font-family: var(--font-mono);
     font-size: 0.5rem;
@@ -599,8 +674,17 @@ const figures = [
     box-shadow: 0 1px 2px rgb(10 30 12 / 0.05), 0 14px 30px -18px rgb(10 30 12 / 0.4);
     /* stays upright whatever angle its slot sits at */
     transform: rotate(calc(var(--th) * -1));
-    transition: box-shadow var(--t2) var(--ease);
+    /* Deployed from the hub: each starts pulled back down the spoke and
+       small, then settles at its station. --th keeps it upright
+       throughout. */
+    opacity: 0;
+    scale: 0.6;
+    transition:
+      opacity 420ms var(--ease) calc(420ms + var(--i) * 90ms),
+      scale 680ms cubic-bezier(0.22, 1.35, 0.36, 1) calc(420ms + var(--i) * 90ms),
+      box-shadow var(--t2) var(--ease);
   }
+  .ring[data-in] .node { opacity: 1; scale: 1; }
   .node:hover {
     box-shadow: 0 1px 2px rgb(10 30 12 / 0.05), 0 22px 40px -18px rgb(10 30 12 / 0.45);
   }
@@ -612,6 +696,13 @@ const figures = [
     border-radius: 50%;
     color: var(--green-deep);
     background: var(--green-wash);
+    transition: background-color var(--t2) var(--ease), color var(--t2) var(--ease),
+      transform var(--t2) var(--ease);
+  }
+  .node:hover i {
+    transform: scale(1.08) rotate(-6deg);
+    background: var(--green-deep);
+    color: #fff;
   }
   .node b { font-size: 0.8125rem; font-weight: 700; letter-spacing: -0.02em; }
   .node em {
@@ -931,6 +1022,14 @@ const figures = [
       transform: none;
       transition: none;
     }
-    .node { transform: rotate(calc(var(--th) * -1)); }
+    /* Nodes are drawn at their stations, still. */
+    .node {
+      opacity: 1;
+      scale: 1;
+      transform: rotate(calc(var(--th) * -1));
+      transition: none;
+    }
+    .ring__spoke { stroke-dashoffset: 0; transition: none; }
+    .ring__orbit, .ring__pulse { animation: none; }
   }
 </style>
