@@ -35,8 +35,8 @@ const services = [
   {
     icon: 'box',
     t: 'Supply at trade',
-    p: 'Laptops, desktops, peripherals and consumables from the same stock that serves the counter — priced for resale and repeat volume.',
-    points: [`${brandCount} brands carried`, 'Held across four branches', 'Priced for repeat volume'],
+    p: 'Laptops, desktops, peripherals and consumables from the same stock that serves the counter.',
+    points: [`${brandCount} brands carried`, `${site.stats.categories} product categories`, 'Held across four branches'],
     span: 2,
     tone: 'ink',
     stat: { v: site.stats.parts, l: 'lines held, ready to go' },
@@ -45,35 +45,35 @@ const services = [
     icon: 'camera',
     t: 'CCTV projects',
     p: 'Surveyed, specified, installed and maintained. Hikvision, Dahua, Uniview and EZVIZ.',
-    points: ['Site survey first', 'Installed and commissioned', 'Maintained after handover'],
+    points: ['Hikvision, Dahua, Uniview', 'Cameras, NVR and DVR', 'Supplied from stock'],
     span: 1, tone: 'light', stat: null,
   },
   {
     icon: 'network',
     t: 'Networking',
-    p: 'Structured cabling, switching and Wi-Fi, planned around how the space is actually used.',
-    points: ['Structured cabling', 'Switching and Wi-Fi', 'Multi-site rollouts'],
+    p: 'Cabling, switching and Wi-Fi — set up new, or troubleshot where it already exists.',
+    points: ['TP-Link routers and switches', 'Cabling and Wi-Fi', 'Home or business'],
     span: 1, tone: 'light', stat: null,
   },
   {
     icon: 'chip',
     t: 'Board-level repair',
-    p: 'The workshop that serves the counter serves you too. A failed board is traced to the component rather than written off — which on a fleet is the difference between a repair bill and a replacement one.',
-    points: ['Free diagnosis, always', 'Quoted before any work', 'Fleet-wide turnaround'],
+    p: 'The workshop that serves the counter serves you too. A failed board is traced to the component rather than written off — which is the difference between a repair bill and a replacement one.',
+    points: ['Free diagnosis, always', 'Quoted before any work', 'Component level, not board swap'],
     span: 2, tone: 'green', stat: null,
   },
   {
     icon: 'printer',
     t: 'Print & consumables',
-    p: 'Printers supplied and serviced, with toner held for you so a cartridge never stops a day.',
-    points: ['Supply and service', 'Stock held for you', 'Canon, Epson, HP'],
+    p: 'Printers supplied and repaired, with toner and ink on the shelf rather than on order.',
+    points: ['Supply and repair', 'Canon, Epson, HP, Brother', 'Toner and ink in stock'],
     span: 1, tone: 'light', stat: null,
   },
   {
     icon: 'drive',
     t: 'Data recovery',
-    p: 'Priority handling for business-critical drives, with an honest read before any work begins.',
-    points: ['Assessed first', 'Priority queue', 'No recovery, no charge'],
+    p: 'Failed drives, dead machines and deleted volumes — assessed, with an honest read on what is recoverable before any work begins.',
+    points: ['Assessed before any work', 'Told what is recoverable', 'Failed drives and deleted volumes'],
     span: 1, tone: 'light', stat: null,
   },
 ];
@@ -90,17 +90,22 @@ const sectors = [
 const reasons = [
   { icon: 'search', t: 'Free diagnosis', p: 'Before a quote, every time — so you find out what it costs before you commit.' },
   { icon: 'chip', t: 'Board-level repair', p: 'Faults traced to the component, not written off at the mainboard.' },
-  { icon: 'box', t: 'Stock already here', p: 'Thousands of lines held in country, so most jobs do not wait on shipping.' },
+  { icon: 'chart', t: '5,430 lines in stock', p: 'Across 249 categories, so most jobs do not start with an order.' },
   { icon: 'building', t: 'Four branches', p: 'Ruwi, Sohar, Al Hail and Salalah — the same standard at each counter.' },
   { icon: 'award', t: 'Twenty years in', p: 'Trading on Computer Street since 2003, under one registered company.' },
-  { icon: 'users', t: 'One team throughout', p: 'The people who quote the job are the people who do it.' },
+  { icon: 'box', t: 'Sixteen brands', p: 'HP, Dell, Lenovo, Canon, Hikvision and others, from the company catalogue.' },
 ];
 
+/**
+ * Only what the rest of the site already states as policy. An earlier
+ * draft had a four-step process describing site surveys and post-handover
+ * support — neither is confirmed, and a process diagram reads as a
+ * commitment.
+ */
 const steps = [
-  { n: '01', t: 'Tell us the scope', p: 'A list, a floor plan or a problem. Whichever you have.' },
-  { n: '02', t: 'We survey or quote', p: 'A site visit where the work needs one; a written quote where it does not.' },
-  { n: '03', t: 'Supply or install', p: 'From stock where we hold it, and on site where the job requires it.' },
-  { n: '04', t: 'We stay on it', p: 'The same team and the same counter afterwards, not a handover to someone else.' },
+  { n: '01', t: 'Tell us what you need', p: 'A list, a floor plan, or just the problem.' },
+  { n: '02', t: 'Diagnosis is free', p: 'You are told what failed and what it costs before anything is agreed.' },
+  { n: '03', t: 'Work starts once you agree', p: 'Nothing is touched until the quote is accepted.' },
 ];
 ---
 
@@ -227,7 +232,7 @@ const steps = [
   <section class="wy section">
     <div class="shell wy__head" data-rise>
       <p class="eb eb--clay"><i class="eb__r" aria-hidden="true"></i>Why Danat</p>
-      <h2 class="wy__h">Six reasons, all of them<br /><em>checkable.</em></h2>
+      <h2 class="wy__h">Reasons you can<br /><em>actually check.</em></h2>
     </div>
 
     {/* A rail rather than a grid: it signals there is more than fits, and
@@ -255,7 +260,7 @@ const steps = [
 
     <div class="shell hw__in">
       <p class="eb eb--inv" data-rise><i class="eb__r" aria-hidden="true"></i>How it works</p>
-      <h2 class="hw__h" data-rise style="--d:70ms">Four steps, no surprises.</h2>
+      <h2 class="hw__h" data-rise style="--d:70ms">No surprises.</h2>
 
       <ol class="hw__steps">
         {steps.map((s, i) => (
@@ -269,9 +274,10 @@ const steps = [
 
       {/* Honest about what has not been settled. */}
       <p class="hw__note" data-rise style="--d:420ms">
-        On-site call-out coverage and response-time commitments are still
-        being confirmed with the company. Ask us and we will tell you what
-        we can actually do for your sites.
+        Annual contracts, on-site call-out coverage, delivery and trade
+        credit terms are still being confirmed with the company. Ask us and
+        we will tell you what we can actually do for your sites rather than
+        guess on a web page.
       </p>
     </div>
   </section>
