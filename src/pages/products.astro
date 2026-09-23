@@ -127,11 +127,18 @@ const helps = [
   {/* ══════ 02 · featured ══════ */}
   <section class="pf section" data-pick
     data-cats={JSON.stringify(cats.map((x) => ({ n: x.items.length, t: x.t, s: x.sub })))}>
-    <p class="pf__eb" data-rise>Explore our products</p>
-    <h2 class="pf__h" data-cat-t data-rise style="--d:70ms">{cats[0].t}</h2>
-    <p class="pf__sub" data-cat-s data-rise style="--d:110ms">{cats[0].sub}</p>
+    <div class="shell pf__head">
+      <p class="eb" data-rise>Explore our products</p>
+      {/* The page's h1 — the hero that used to carry one is gone. */}
+      <h1 class="pf__h" data-rise style="--d:70ms">
+        <span data-cat-a>{cats[0].t.split(' ').slice(0, -1).join(' ')}</span>
+        {' '}
+        <em data-cat-b>{cats[0].t.split(' ').slice(-1)[0]}</em>
+      </h1>
+      <p class="pf__sub" data-cat-s data-rise style="--d:110ms">{cats[0].sub}</p>
+    </div>
 
-    <ul class="pf__over" data-rise style="--d:150ms">
+    <ul class="shell pf__over" data-rise style="--d:150ms">
       {plinth.map((m) => (
         <li><i aria-hidden="true"><Icon name={m.icon} size={16} /></i>{m.t}</li>
       ))}
@@ -215,7 +222,7 @@ const helps = [
     </div>
 
     {/* ── shop by brand ── */}
-    <p class="pf__eb pf__eb--low" data-rise>Shop by brand</p>
+    <p class="eb eb--low shell" data-rise>Shop by brand</p>
     <div class="shell pb__row" data-rise style="--d:70ms">
       <ul>
         {['HP', 'Dell', 'Asus', 'Apple', 'Lenovo'].map((b) => <li>{b}</li>)}
@@ -328,7 +335,8 @@ const helps = [
       const slides = [...root.querySelectorAll('.pf__slide')];
       const panes = [...root.querySelectorAll('.pf__pane')];
       const dotBox = root.querySelector('[data-fan-dots]');
-      const catT = root.querySelector('[data-cat-t]');
+      const catA = root.querySelector('[data-cat-a]');
+      const catB = root.querySelector('[data-cat-b]');
       const catS = root.querySelector('[data-cat-s]');
       if (!slides.length) return;
 
@@ -362,7 +370,12 @@ const helps = [
         );
         navs.forEach((el, k) => el.toggleAttribute('data-on', k === c));
 
-        if (catT && CATS[c]) catT.textContent = CATS[c].t;
+        if (CATS[c]) {
+          const parts = CATS[c].t.split(' ');
+          const last = parts.pop();
+          if (catA) catA.textContent = parts.join(' ');
+          if (catB) catB.textContent = last;
+        }
         if (catS && CATS[c]) catS.textContent = CATS[c].s;
 
         // The dot count follows the category, which does not hold a
@@ -493,42 +506,38 @@ const helps = [
       linear-gradient(180deg, #f6fbf7 0%, #ffffff 62%);
     padding-block: clamp(5rem, 9vw, 7rem) clamp(2rem, 4vw, 3.25rem);
   }
-  .pf__eb {
+  /* Same as every other heading block on the site: a leading rule, left
+     aligned, and the emphasis on its own line in green. */
+  .eb {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 0.8rem;
+    gap: 0.6rem;
     font-family: var(--font-mono);
     font-size: 0.6875rem;
-    letter-spacing: 0.2em;
+    letter-spacing: 0.18em;
     text-transform: uppercase;
     color: var(--green-deep);
   }
-  .pf__eb::before, .pf__eb::after {
-    content: '';
-    width: clamp(1.5rem, 4vw, 3rem);
-    height: 1px;
-    background: currentColor;
-  }
-  .pf__eb--low { margin-top: clamp(2rem, 4vw, 3.25rem); }
+  .eb::before { content: ''; width: 28px; height: 1px; background: currentColor; }
+  .eb--low { margin-top: clamp(2.25rem, 4.5vw, 3.5rem); }
+  .pf__h em { font-style: normal; color: var(--green-deep); }
   .pf__h {
     margin-top: var(--s4);
-    font-size: clamp(1.7rem, 3.4vw, 2.6rem);
+    font-size: clamp(2.1rem, 4.4vw, 3.3rem);
     font-weight: 700;
-    letter-spacing: -0.042em;
-    line-height: 1.08;
-    text-align: center;
+    letter-spacing: -0.045em;
+    line-height: 1.04;
   }
   .pf__sub {
-    margin-top: 0.4rem;
-    font-size: 0.9375rem;
+    max-width: 46ch;
+    margin-top: var(--s4);
+    font-size: var(--lead);
+    line-height: 1.62;
     color: var(--text-2);
-    text-align: center;
   }
   .pf__over {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
     align-items: center;
     gap: 0.5rem clamp(0.9rem, 2.4vw, 2rem);
     margin-top: var(--s5);
@@ -805,7 +814,6 @@ const helps = [
   .pb__row ul {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
     align-items: center;
     gap: 0.5rem clamp(1rem, 3vw, 2.5rem);
   }
@@ -823,7 +831,6 @@ const helps = [
     font-size: 0.875rem;
     line-height: 1.6;
     color: var(--text-3);
-    text-align: center;
   }
 
   /* ───────── 03 categories ───────── */
@@ -1007,7 +1014,6 @@ const helps = [
 
     .pf__grid { grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.6fr) minmax(0, 0.88fr); }
     .pb__row { grid-template-columns: minmax(0, 1fr) auto; }
-    .pb__row p { text-align: left; }
     .pc__head { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto; }
     .pc__grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
     .pb__in { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.6fr) auto; }
