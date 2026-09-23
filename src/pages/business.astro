@@ -1,0 +1,679 @@
+---
+import { Image } from 'astro:assets';
+import PageLayout from '@layouts/PageLayout.astro';
+import Icon from '@components/ui/Icon.astro';
+import { site, whatsappLink, branches, brands } from '@data/site';
+import imgRack from '@assets/photos/network-eng.jpg';
+import imgPatch from '@assets/photos/network-patch.jpg';
+
+/**
+ * BUSINESS SOLUTIONS.
+ *
+ * The B2B side is real and evidenced: the company's AR ledger shows
+ * hospitals, enterprises and other computer retailers buying at trade.
+ * Everything claimed here rests on that, on the catalogue export, or on
+ * the branch list.
+ *
+ * ⚠ Two things are NOT confirmed and are marked on the page rather than
+ * asserted: on-site call-out coverage, and any response-time or SLA
+ * commitment. Danat has published neither. Do not turn the "response
+ * time" card into a number without the company confirming it.
+ *
+ * Clay carries the accent here — the consumer pages lead green, so the
+ * trade side reading warmer gives it its own identity without leaving
+ * the palette.
+ */
+const years = new Date().getFullYear() - site.stats.since;
+const brandCount = brands.flat().length;
+
+const services = [
+  {
+    icon: 'box',
+    t: 'Supply at trade',
+    p: 'Laptops, desktops, peripherals and consumables from the same stock that serves the counter — priced for resale and repeat volume.',
+    points: [`${site.stats.parts.toLocaleString('en-US')} lines held`, `${brandCount} brands`, 'Held across four branches'],
+  },
+  {
+    icon: 'camera',
+    t: 'CCTV projects',
+    p: 'Surveyed, specified, installed and maintained. Hikvision, Dahua, Uniview and EZVIZ, with the recorders and storage to match.',
+    points: ['Site survey first', 'Installed and commissioned', 'Maintained after handover'],
+  },
+  {
+    icon: 'network',
+    t: 'Networking',
+    p: 'Structured cabling, switching and Wi-Fi for offices, clinics and retail floors — planned around how the space is actually used.',
+    points: ['Structured cabling', 'Switching and Wi-Fi', 'Multi-site rollouts'],
+  },
+  {
+    icon: 'printer',
+    t: 'Print and consumables',
+    p: 'Printers supplied and serviced, with toner and ink held for you so a cartridge is never the thing that stops a day.',
+    points: ['Supply and service', 'Stock held for you', 'Canon, Epson, HP'],
+  },
+  {
+    icon: 'chip',
+    t: 'Board-level repair',
+    p: 'The workshop that serves the counter serves you too — a failed board is traced to the component rather than written off.',
+    points: ['Free diagnosis', 'Quoted before work', 'Fleet-wide repairs'],
+  },
+  {
+    icon: 'drive',
+    t: 'Data recovery',
+    p: 'Priority handling for business-critical drives, with an honest read on what is recoverable before any work begins.',
+    points: ['Assessed first', 'Priority queue', 'No recovery, no charge'],
+  },
+];
+
+/** Evidenced by the AR ledger, not aspirational. */
+const sectors = [
+  { icon: 'shield', t: 'Healthcare', p: 'Clinics and hospitals' },
+  { icon: 'box', t: 'Retail', p: 'Including other computer shops buying at trade' },
+  { icon: 'building', t: 'Offices', p: 'Single site and multi-branch' },
+  { icon: 'users', t: 'Education', p: 'Labs, admin and AV' },
+];
+
+const steps = [
+  { n: '01', t: 'Tell us the scope', p: 'A list, a floor plan or a problem. Whichever you have.' },
+  { n: '02', t: 'We survey or quote', p: 'A site visit where the work needs one; a written quote where it does not.' },
+  { n: '03', t: 'Supply or install', p: 'From stock where we hold it, and on site where the job requires it.' },
+  { n: '04', t: 'We stay on it', p: 'The same team and the same counter afterwards, not a handover to someone else.' },
+];
+---
+
+<PageLayout
+  title="Business Solutions"
+  description={`Danat Computers supplies and supports business across Oman — trade supply, CCTV, networking, print and board-level repair from ${site.stats.parts.toLocaleString('en-US')} lines held across four branches.`}
+>
+  {/* ══════ 01 · hero ══════ */}
+  <section class="bh">
+    <span class="bh__wash" aria-hidden="true"></span>
+
+    <div class="shell">
+      <nav class="bh__crumb" aria-label="Breadcrumb" data-rise>
+        <a href="/">Home</a>
+        <span aria-hidden="true">/</span>
+        <span aria-current="page">Business Solutions</span>
+      </nav>
+
+      <div class="bh__grid">
+        <div class="bh__copy">
+          <p class="eb eb--clay" data-rise>
+            <i class="eb__r" aria-hidden="true"></i>For business
+          </p>
+
+          <h1 class="bh__h" data-rise style="--d:70ms">
+            The same counter.<br /><em>Built for volume.</em>
+          </h1>
+
+          <p class="bh__p" data-rise style="--d:130ms">
+            Hospitals, retailers and offices across Oman buy from Danat at
+            trade — supply, projects and repair from the same stock and the
+            same technicians that serve the shop floor.
+          </p>
+
+          <div class="bh__acts" data-rise style="--d:190ms">
+            <a class="btn" href={whatsappLink('Hello Danat — I would like to discuss a business account for')}
+              target="_blank" rel="noopener noreferrer">
+              Talk to us
+              <span class="btn__i" aria-hidden="true"><Icon name="arrow" size={15} /></span>
+            </a>
+            <a class="bh__mail" href={`mailto:${site.email}`}>{site.email}</a>
+          </div>
+        </div>
+
+        <figure class="bh__fig" data-rise style="--d:160ms">
+          <Image src={imgRack} alt="Engineer working on network equipment in a rack"
+            widths={[560, 900, 1300]} sizes="(min-width:62rem) 46vw, 92vw"
+            quality={76} format="webp" loading="eager" fetchpriority="high" />
+          <figcaption>Work · Connect · Grow</figcaption>
+        </figure>
+      </div>
+
+      <dl class="bh__figs" data-rise style="--d:250ms">
+        <div><dt><span data-count={site.stats.parts}>0</span></dt><dd>Lines held</dd></div>
+        <div><dt><span data-count={brandCount}>0</span></dt><dd>Brands carried</dd></div>
+        <div><dt><span data-count={site.stats.branches}>0</span></dt><dd>Branches</dd></div>
+        <div><dt><span data-count={years}>0</span>+</dt><dd>Years trading</dd></div>
+      </dl>
+    </div>
+  </section>
+
+  {/* ══════ 02 · what we do ══════ */}
+  <section class="sv section">
+    <div class="shell">
+      <div class="sv__head" data-rise>
+        <p class="eb eb--clay"><i class="eb__r" aria-hidden="true"></i>What we do</p>
+        <h2 class="sv__h">Six things we take on<br /><em>for business.</em></h2>
+      </div>
+
+      <ul class="sv__grid">
+        {services.map((s, i) => (
+          <li class="card" data-rise style={`--d:${i * 60}ms`}>
+            <span class="card__i" aria-hidden="true"><Icon name={s.icon} size={21} /></span>
+            <h3>{s.t}</h3>
+            <p>{s.p}</p>
+            <ul class="card__pts">
+              {s.points.map((pt) => (
+                <li><Icon name="check" size={13} />{pt}</li>
+              ))}
+            </ul>
+            <span class="card__n" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  {/* ══════ 03 · who ══════ */}
+  <section class="wh section">
+    <div class="shell wh__grid">
+      <div class="wh__intro" data-rise>
+        <p class="eb"><i class="eb__r" aria-hidden="true"></i>Who buys from us</p>
+        <h2 class="wh__h">Already on the<br /><em>ledger.</em></h2>
+        <p class="wh__p">
+          This is not a new line of business. The company's own accounts
+          show these sectors buying at trade, some of them for years.
+        </p>
+      </div>
+
+      <ul class="wh__list">
+        {sectors.map((s, i) => (
+          <li data-rise style={`--d:${i * 70}ms`}>
+            <span aria-hidden="true"><Icon name={s.icon} size={19} /></span>
+            <div><b>{s.t}</b><em>{s.p}</em></div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  {/* ══════ 04 · how ══════ */}
+  <section class="hw" data-tone="ink">
+    <div class="hw__bg" aria-hidden="true">
+      <Image src={imgPatch} alt="" widths={[1000, 1600]} sizes="100vw"
+        quality={70} format="webp" loading="lazy" />
+      <span class="hw__tint"></span>
+    </div>
+
+    <div class="shell hw__in">
+      <p class="eb eb--inv" data-rise><i class="eb__r" aria-hidden="true"></i>How it works</p>
+      <h2 class="hw__h" data-rise style="--d:70ms">Four steps, no surprises.</h2>
+
+      <ol class="hw__steps">
+        {steps.map((s, i) => (
+          <li data-rise style={`--d:${130 + i * 70}ms`}>
+            <b>{s.n}</b>
+            <h3>{s.t}</h3>
+            <p>{s.p}</p>
+          </li>
+        ))}
+      </ol>
+
+      {/* Honest about what has not been settled. */}
+      <p class="hw__note" data-rise style="--d:420ms">
+        On-site call-out coverage and response-time commitments are still
+        being confirmed with the company. Ask us and we will tell you what
+        we can actually do for your sites.
+      </p>
+    </div>
+  </section>
+
+  {/* ══════ 05 · cta ══════ */}
+  <section class="ct">
+    <div class="shell ct__in">
+      <div>
+        <p class="eb eb--clay" data-rise><i class="eb__r" aria-hidden="true"></i>Open an account</p>
+        <h2 class="ct__h" data-rise style="--d:70ms">
+          Send us the list.<br /><em>We will price it.</em>
+        </h2>
+        <p class="ct__p" data-rise style="--d:130ms">
+          A spreadsheet, a photo of a shelf, or a floor plan. Whatever you
+          have is enough to start.
+        </p>
+      </div>
+
+      <div class="ct__acts" data-rise style="--d:190ms">
+        <a class="btn" href={whatsappLink('Hello Danat — I would like a trade quote for')}
+          target="_blank" rel="noopener noreferrer">
+          Get a trade quote
+          <span class="btn__i" aria-hidden="true"><Icon name="arrow" size={15} /></span>
+        </a>
+        <a class="ct__call" href={`tel:${site.phone.tel}`}>{site.phone.display}</a>
+        <p class="ct__note">
+          {branches.map((b) => b.city.split(',')[0]).join(' · ')}
+        </p>
+      </div>
+    </div>
+  </section>
+</PageLayout>
+
+<style>
+  /* ───── shared ───── */
+  .eb {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--green-deep);
+  }
+  .eb--clay { color: var(--clay-deep); }
+  .eb--inv { color: var(--green-bright); }
+  .eb__r { width: 26px; height: 1px; flex: none; background: currentColor; opacity: 0.6; }
+
+  .btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    align-self: flex-start;
+    gap: 0.7rem;
+    padding: 0.5rem 0.5rem 0.5rem 1.4rem;
+    border-radius: 999px;
+    /* white is 8.73:1 on #27551f and 4.90:1 on #3d7f35 — AA across the ramp */
+    background: linear-gradient(100deg, #27551f, #3d7f35);
+    color: #fff;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    overflow: hidden;
+    transition: transform var(--t2) var(--ease);
+  }
+  .btn:hover { transform: translateY(-2px); }
+  .btn__i {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    flex: none;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.2);
+    transition: transform var(--t2) var(--ease);
+  }
+  .btn:hover .btn__i { transform: translateX(3px); }
+
+  /* ───── 01 hero ───── */
+  .bh {
+    position: relative;
+    background: linear-gradient(180deg, #fdfbf9, #f8f2ec 58%, #fdfcfa);
+    padding-block: clamp(6.5rem, 11vw, 9rem) clamp(2.5rem, 5vw, 4rem);
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .bh__wash {
+    position: absolute;
+    z-index: -1;
+    right: -14%;
+    top: -20%;
+    width: min(40rem, 52vw);
+    aspect-ratio: 1;
+    border-radius: 48% 52% 44% 56% / 52% 46% 54% 48%;
+    background: radial-gradient(circle at 38% 34%, color-mix(in oklab, var(--clay) 16%, transparent), transparent 68%);
+    filter: blur(20px);
+  }
+
+  .bh__crumb {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.8125rem;
+    color: var(--text-3);
+  }
+  .bh__crumb a { transition: color var(--t2) var(--ease); }
+  .bh__crumb a:hover { color: var(--clay-deep); }
+  .bh__crumb [aria-current] { color: var(--text); }
+
+  .bh__grid { display: grid; gap: clamp(2rem, 4vw, 3rem); align-items: center; margin-top: var(--s5); }
+  .bh__copy { display: grid; justify-items: start; }
+
+  .bh__h {
+    margin-top: var(--s4);
+    font-size: clamp(2.1rem, 4.6vw, 3.4rem);
+    line-height: 1.04;
+    letter-spacing: -0.044em;
+    font-weight: 700;
+  }
+  .bh__h em { font-style: normal; color: var(--clay-deep); }
+  .bh__p {
+    margin-top: var(--s4);
+    max-width: 42ch;
+    font-size: var(--lead);
+    line-height: 1.62;
+    color: var(--text-2);
+  }
+  .bh__acts {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--s4) var(--s5);
+    margin-top: var(--s5);
+  }
+  .bh__mail {
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    color: var(--text);
+    border-bottom: 1px solid var(--line-light);
+    padding-bottom: 2px;
+    overflow-wrap: anywhere;
+    transition: border-color var(--t2) var(--ease);
+  }
+  .bh__mail:hover { border-color: var(--clay); }
+
+  .bh__fig { position: relative; }
+  .bh__fig :global(img) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: 18px;
+  }
+  .bh__fig figcaption {
+    position: absolute;
+    left: 1rem;
+    bottom: 1rem;
+    padding: 0.4rem 0.9rem;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.94);
+    backdrop-filter: blur(6px);
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--clay-deep);
+  }
+
+  .bh__figs {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--s5) var(--s4);
+    margin-top: clamp(2rem, 4vw, 3rem);
+    padding-top: var(--s5);
+    border-top: 1px solid var(--line-light);
+  }
+  .bh__figs dt {
+    font-size: clamp(1.5rem, 2.6vw, 2.1rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .bh__figs dd { margin-top: 0.3rem; font-size: 0.8125rem; color: var(--text-3); }
+
+  /* ───── 02 cards ───── */
+  .sv { background: var(--white); }
+  .sv__head { text-align: center; display: grid; justify-items: center; }
+  .sv__h {
+    margin-top: var(--s4);
+    font-size: clamp(1.7rem, 3.2vw, 2.5rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1.08;
+  }
+  .sv__h em { font-style: normal; color: var(--clay-deep); }
+
+  .sv__grid {
+    display: grid;
+    gap: clamp(0.9rem, 2vw, 1.4rem);
+    margin-top: clamp(2rem, 4vw, 3rem);
+  }
+
+  .card {
+    position: relative;
+    display: grid;
+    align-content: start;
+    height: 100%;
+    padding: clamp(1.4rem, 2.6vw, 1.9rem);
+    border-radius: 22px;
+    background: var(--white);
+    overflow: hidden;
+    box-shadow: 0 1px 2px rgb(30 20 10 / 0.05), 0 14px 32px -20px rgb(30 20 10 / 0.28);
+    transition: transform var(--t3) var(--ease), box-shadow var(--t3) var(--ease);
+  }
+  .card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 1px 2px rgb(30 20 10 / 0.05), 0 30px 52px -24px rgb(30 20 10 / 0.34);
+  }
+  /* A clay rule wipes across the base on hover — the accent as a mark. */
+  .card::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--clay-deep), var(--clay));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--t3) var(--ease);
+  }
+  .card:hover::after { transform: scaleX(1); }
+
+  .card__i {
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 15px;
+    color: var(--clay-deep);
+    background: linear-gradient(140deg, color-mix(in oklab, var(--clay) 18%, #fff), var(--clay-wash));
+    transition: transform var(--t3) var(--ease);
+  }
+  .card:hover .card__i { transform: scale(1.08) rotate(-6deg); }
+
+  .card h3 {
+    margin-top: 0.9rem;
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+  }
+  .card > p {
+    margin-top: 0.45rem;
+    font-size: 0.8125rem;
+    line-height: 1.6;
+    color: var(--text-2);
+  }
+
+  .card__pts {
+    display: grid;
+    gap: 0.35rem;
+    margin-top: 0.9rem;
+    padding-top: 0.8rem;
+    border-top: 1px solid var(--line-light);
+  }
+  .card__pts li {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.45rem;
+    font-size: 0.75rem;
+    line-height: 1.45;
+    color: var(--text-3);
+  }
+  .card__pts :global(svg) { flex: none; margin-top: 2px; color: var(--clay-deep); }
+
+  .card__n {
+    position: absolute;
+    top: clamp(1.4rem, 2.6vw, 1.9rem);
+    right: clamp(1.4rem, 2.6vw, 1.9rem);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    color: var(--text-3);
+  }
+
+  /* ───── 03 who ───── */
+  .wh { background: linear-gradient(185deg, #fdfcfa, #f7f3ef 60%, #fdfbf9); }
+  .wh__grid { display: grid; gap: clamp(1.75rem, 4vw, 3rem); align-items: center; }
+  .wh__intro { display: grid; justify-items: start; }
+  .wh__h {
+    margin-top: var(--s4);
+    font-size: clamp(1.7rem, 3.2vw, 2.4rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1.08;
+  }
+  .wh__h em { font-style: normal; color: var(--green-deep); }
+  .wh__p {
+    margin-top: var(--s4);
+    max-width: 36ch;
+    font-size: 0.875rem;
+    line-height: 1.62;
+    color: var(--text-2);
+  }
+
+  .wh__list { display: grid; gap: 0.7rem; }
+  .wh__list li {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 1rem 1.1rem;
+    border-radius: 16px;
+    background: rgb(255 255 255 / 0.84);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 1px 2px rgb(30 20 10 / 0.04), 0 10px 26px -20px rgb(30 20 10 / 0.26);
+    transition: transform var(--t2) var(--ease);
+  }
+  .wh__list li:hover { transform: translateX(4px); }
+  .wh__list span {
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    flex: none;
+    border-radius: 13px;
+    color: var(--green-deep);
+    background: var(--green-wash);
+  }
+  .wh__list b { font-size: 0.9375rem; font-weight: 700; letter-spacing: -0.02em; }
+  .wh__list em {
+    display: block;
+    margin-top: 0.15rem;
+    font-style: normal;
+    font-size: 0.75rem;
+    color: var(--text-3);
+  }
+
+  /* ───── 04 how ───── */
+  .hw {
+    position: relative;
+    color: #fff;
+    padding-block: clamp(3rem, 6vw, 5rem);
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .hw__bg { position: absolute; inset: 0; z-index: 0; }
+  .hw__bg :global(img) { width: 100%; height: 100%; object-fit: cover; object-position: 50% 45%; }
+  /* Measured against the real crop — every stop clears AA for white. */
+  .hw__tint {
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(100deg, rgb(8 10 12 / 0.94) 0%, rgb(8 10 12 / 0.88) 48%, rgb(8 10 12 / 0.72) 100%),
+      linear-gradient(to top, rgb(8 10 12 / 0.55), transparent 44%);
+  }
+  .hw__in { position: relative; z-index: 1; }
+
+  .hw__h {
+    margin-top: var(--s4);
+    font-size: clamp(1.6rem, 3vw, 2.3rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+  }
+
+  .hw__steps {
+    display: grid;
+    gap: clamp(1.1rem, 2.4vw, 1.75rem);
+    margin-top: clamp(1.75rem, 4vw, 2.75rem);
+  }
+  .hw__steps li {
+    padding-top: var(--s4);
+    border-top: 1px solid rgb(255 255 255 / 0.2);
+  }
+  .hw__steps b {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.14em;
+    color: var(--clay-bright);
+  }
+  .hw__steps h3 {
+    margin-top: 0.5rem;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .hw__steps p {
+    margin-top: 0.35rem;
+    font-size: 0.8125rem;
+    line-height: 1.55;
+    color: rgb(255 255 255 / 0.76);
+  }
+
+  /* Held open rather than asserted. */
+  .hw__note {
+    max-width: 62ch;
+    margin-top: clamp(1.75rem, 4vw, 2.5rem);
+    padding: 0.9rem 1.1rem;
+    border-radius: 12px;
+    background: rgb(255 255 255 / 0.08);
+    border: 1px dashed rgb(255 255 255 / 0.28);
+    font-size: 0.8125rem;
+    line-height: 1.6;
+    color: rgb(255 255 255 / 0.82);
+  }
+
+  /* ───── 05 cta ───── */
+  .ct { background: var(--white); padding-block: clamp(3rem, 6vw, 5rem); }
+  .ct__in { display: grid; gap: clamp(1.75rem, 4vw, 3rem); align-items: center; }
+  .ct__h {
+    margin-top: var(--s4);
+    font-size: clamp(1.7rem, 3.2vw, 2.5rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1.08;
+  }
+  .ct__h em { font-style: normal; color: var(--clay-deep); }
+  .ct__p {
+    margin-top: var(--s4);
+    max-width: 38ch;
+    font-size: 0.9375rem;
+    line-height: 1.62;
+    color: var(--text-2);
+  }
+  .ct__acts { display: grid; justify-items: start; gap: var(--s4); }
+  .ct__call {
+    font-family: var(--font-mono);
+    font-size: 0.9375rem;
+    color: var(--text);
+    border-bottom: 1px solid var(--line-light);
+    padding-bottom: 2px;
+    transition: border-color var(--t2) var(--ease);
+  }
+  .ct__call:hover { border-color: var(--clay); }
+  .ct__note {
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+
+  /* ───── responsive ───── */
+  @media (min-width: 40rem) {
+    .sv__grid { grid-template-columns: repeat(2, 1fr); }
+    .bh__figs { grid-template-columns: repeat(4, 1fr); }
+    .hw__steps { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (min-width: 62rem) {
+    .bh__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 0.95fr); }
+    .sv__grid { grid-template-columns: repeat(3, 1fr); }
+    .wh__grid { grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr); }
+    .hw__steps { grid-template-columns: repeat(4, 1fr); }
+    .ct__in { grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .btn, .btn:hover, .card, .card:hover, .card__i,
+    .wh__list li, .wh__list li:hover { transform: none; transition: none; }
+    .card::after { transform: scaleX(1); }
+  }
+</style>
