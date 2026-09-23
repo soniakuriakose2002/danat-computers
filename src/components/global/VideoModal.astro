@@ -1,0 +1,145 @@
+---
+import Icon from '@components/ui/Icon.astro';
+import { site } from '@data/site';
+
+/**
+ * The company film, in a dialog.
+ *
+ * Built on <dialog> + showModal() rather than a hand-rolled overlay,
+ * because the platform already gives us the inert background, the
+ * Escape handler, the focus trap and the ::backdrop for free. Rolling
+ * those by hand is where most lightboxes get accessibility wrong.
+ *
+ * The iframe src is EMPTY until the dialog opens, and is cleared again
+ * on close. That matters twice over: nothing from YouTube is fetched on
+ * page load — no embed payload, no cookies set before anyone asked —
+ * and clearing it on close is the only reliable way to stop playback
+ * without the Player API.
+ *
+ * youtube-nocookie.com is the privacy-enhanced host: it does not store
+ * identifying cookies unless the video is actually played.
+ */
+const ID = site.video.youtube;
+---
+
+<dialog class="vm" data-video-modal aria-label={site.video.title}>
+  <div class="vm__box">
+    <button class="vm__x" type="button" data-video-close aria-label="Close video">
+      <Icon name="plus" size={18} />
+    </button>
+    <div class="vm__frame">
+      <iframe
+        data-video-frame
+        data-src={`https://www.youtube-nocookie.com/embed/${ID}?autoplay=1&rel=0&modestbranding=1`}
+        src="about:blank"
+        title={site.video.title}
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen
+        loading="lazy"
+      ></iframe>
+    </div>
+  </div>
+</dialog>
+
+<script is:inline>
+  (() => {
+    const dlg = document.querySelector('[data-video-modal]');
+    if (!dlg) return;
+    const frame = dlg.querySelector('[data-video-frame]');
+
+    const open = () => {
+      if (frame) frame.src = frame.dataset.src ?? 'about:blank';
+      if (typeof dlg.showModal === 'function') dlg.showModal();
+      else dlg.setAttribute('open', '');
+    };
+
+    const close = () => {
+      // Clearing src is what actually stops playback without the
+      // Player API; hiding the dialog alone leaves the audio running.
+      if (frame) frame.src = 'about:blank';
+      if (typeof dlg.close === 'function') dlg.close();
+      else dlg.removeAttribute('open');
+    };
+
+    document.querySelectorAll('[data-video-open]').forEach((b) =>
+      b.addEventListener('click', (e) => {
+        e.preventDefault();
+        open();
+      })
+    );
+    dlg.querySelector('[data-video-close]')?.addEventListener('click', close);
+
+    // Clicking the backdrop: the dialog element itself is the backdrop
+    // area, so a click whose target IS the dialog fell outside the box.
+    dlg.addEventListener('click', (e) => {
+      if (e.target === dlg) close();
+    });
+    // Escape fires `cancel` before `close`; clear the frame either way.
+    dlg.addEventListener('close', () => {
+      if (frame) frame.src = 'about:blank';
+    });
+  })();
+</script>
+
+<style>
+  .vm {
+    width: min(64rem, 92vw);
+    max-width: none;
+    padding: 0;
+    border: 0;
+    background: none;
+    overflow: visible;
+  }
+  .vm::backdrop {
+    background: rgb(7 9 10 / 0.82);
+    backdrop-filter: blur(6px);
+  }
+
+  .vm__box { position: relative; }
+
+  .vm__x {
+    position: absolute;
+    top: -3rem;
+    right: 0;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border: 1px solid rgb(255 255 255 / 0.3);
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.08);
+    color: #fff;
+    cursor: pointer;
+    transition: background-color var(--t2) var(--ease), transform var(--t2) var(--ease);
+  }
+  /* There is no dedicated close glyph in the set, so the plus is turned
+     into one rather than adding a near-duplicate icon. */
+  .vm__x :global(svg) { transform: rotate(45deg); }
+  .vm__x:hover { background: rgb(255 255 255 / 0.2); transform: rotate(90deg); }
+  .vm__x:focus-visible { outline: 2px solid var(--green-bright); outline-offset: 3px; }
+
+  .vm__frame {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #000;
+    box-shadow: 0 40px 80px -30px rgb(0 0 0 / 0.7);
+  }
+  .vm__frame iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  @media (max-width: 48rem) {
+    .vm__x { top: -2.75rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .vm__x, .vm__x:hover { transform: none; transition: none; }
+    .vm__x :global(svg) { transform: rotate(45deg); }
+  }
+</style>

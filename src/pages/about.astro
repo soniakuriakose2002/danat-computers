@@ -3,6 +3,7 @@ import { Image } from 'astro:assets';
 import PageLayout from '@layouts/PageLayout.astro';
 import Icon from '@components/ui/Icon.astro';
 import PurposeOrbit from '@components/sections/PurposeOrbit.astro';
+import VideoModal from '@components/global/VideoModal.astro';
 import { site, branches } from '@data/site';
 import { OMAN_PATH, OMAN_VIEWBOX, OMAN_PINS } from '@data/omanMap';
 import imgTech from '@assets/photos/repair-solder.jpg';
@@ -82,11 +83,10 @@ const layers = [r01, r03, r04, r05];
             Our story
             <span class="btn__i" aria-hidden="true"><Icon name="arrow" size={15} /></span>
           </a>
-          {/* No film exists yet — held, not linked. */}
-          <span class="hero__film" aria-disabled="true" title="Company film to follow">
+          <button class="hero__film" type="button" data-video-open>
             <i aria-hidden="true"><Icon name="play" size={12} /></i>
-            <span>Watch video<small>Film to follow</small></span>
-          </span>
+            <span>Watch video<small>Inside Danat Computers</small></span>
+          </button>
         </div>
 
         <p class="hero__mantra" data-rise style="--d:260ms">
@@ -294,6 +294,7 @@ const layers = [r01, r03, r04, r05];
       <p class="cta__script" aria-hidden="true">Technology<br />for a Brighter<br />Tomorrow</p>
     </div>
   </section>
+  <VideoModal />
 </PageLayout>
 
 <style>
@@ -379,11 +380,19 @@ const layers = [r01, r03, r04, r05];
     display: flex; flex-wrap: wrap; align-items: center;
     gap: var(--s4) var(--s5); margin-top: var(--s5);
   }
-  .hero__film { display: inline-flex; align-items: center; gap: 0.65rem; cursor: not-allowed; }
+  .hero__film {
+    display: inline-flex; align-items: center; gap: 0.65rem;
+    padding: 0; border: 0; background: none; cursor: pointer; text-align: left;
+  }
   .hero__film i {
     display: grid; place-items: center; width: 34px; height: 34px; flex: none;
-    border-radius: 50%; border: 1px dashed var(--line-light); color: var(--text-3);
+    border-radius: 50%; border: 1px solid var(--line-light);
+    background: var(--white); color: var(--green-deep);
+    transition: background-color var(--t2) var(--ease), color var(--t2) var(--ease),
+      transform var(--t2) var(--ease);
   }
+  .hero__film:hover i { transform: scale(1.08); background: var(--green-deep); color: #fff; }
+  .hero__film:focus-visible i { outline: 2px solid var(--green-deep); outline-offset: 3px; }
   .hero__film > span { display: grid; font-size: 0.875rem; color: var(--text-2); }
   .hero__film small {
     font-family: var(--font-mono); font-size: 0.5625rem;

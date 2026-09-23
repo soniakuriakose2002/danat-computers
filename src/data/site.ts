@@ -35,6 +35,18 @@ export const site = {
 
   whatsappMessage: 'Hello Danat — I need help with',
 
+  /**
+   * The company's own film, linked from danatcomputers.com. Title:
+   * "ഏറ്റവും വലിയ കമ്പ്യൂട്ടർ സൂപ്പർ മാർക്കറ്റ് ഒമാനിൽ | Biggest Computer
+   * supermarket Oman DANETcomputers", on the DANETcomputers channel.
+   * Verified: it is the single video URL on the current live site.
+   */
+  video: {
+    youtube: '7VTB6scn-lk',
+    title: 'Inside Danat Computers',
+    verified: true,
+  },
+
   social: {
     facebook: 'https://www.facebook.com/DanatCSOman/',
     instagram: 'https://www.instagram.com/computersupermarketruwi/',
