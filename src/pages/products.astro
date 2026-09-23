@@ -190,10 +190,16 @@ const helps = [
         {/* The page's one emotive line, in the accent face the rest of the
             site keeps for exactly this. The year is the earliest ERP
             record, not a rounded-up claim. */}
-        <p class="ph__line" data-rise style="--d:260ms">
-          Serving Oman since {site.stats.since}
-          <span class="ph__ul" aria-hidden="true"></span>
-        </p>
+        <div class="ph__note" data-rise style="--d:260ms">
+          <p class="ph__line">
+            <span>Supplied.</span>
+            <span>Installed.</span>
+            <span>Repaired.<i class="ph__ul" aria-hidden="true"></i></span>
+          </p>
+          <p class="ph__since">
+            Since {site.stats.since} · {site.stats.branches} branches across Oman
+          </p>
+        </div>
       </div>
 
       {/* The scene: a lit dais with the range standing on it and the
@@ -692,27 +698,43 @@ const helps = [
   /* Instrument Serif is declared @font-face with font-style: italic, so
      font-style has to ASK for italic — leave it normal and the browser
      quietly serves Georgia instead. */
+  .ph__note { margin-top: clamp(1.4rem, 3.2vw, 2.4rem); }
   .ph__line {
     position: relative;
     display: inline-block;
-    margin-top: clamp(1.6rem, 3.6vw, 2.75rem);
     font-family: var(--font-serif);
     font-style: italic;
     font-weight: 400;
-    font-size: clamp(1.5rem, 2.9vw, 2.3rem);
-    line-height: 1.16;
+    font-size: clamp(1.4rem, 2.7vw, 2.15rem);
+    line-height: 1.12;
     letter-spacing: -0.01em;
     color: var(--green-deep);
   }
+  /* max-content so each word's box ends at the word, which is what the
+     drawn stroke measures itself against. */
+  .ph__line span { position: relative; display: block; width: max-content; }
   /* The drawn underline from the reference — one stroke, stretched to
-     whatever width the line ends up. */
+     whatever width the last word ends up. */
+  /* A stroked path of constant width reads as a ruled line, not a drawn
+     one. This is a FILLED lens: two curves that meet exactly at both ends,
+     so it tapers to a point at each tip and swells in the middle, and it
+     overhangs the word on both sides the way a drawn mark does. */
   .ph__ul {
     position: absolute;
-    left: 0.06em;
-    right: -0.05em;
-    bottom: -0.2em;
-    height: 0.17em;
-    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 220 14' preserveAspectRatio='none' fill='none'%3E%3Cpath d='M4 10.4C48 3.6 136 2.2 216 6.8' stroke='%232f6429' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+    left: -0.14em;
+    right: -0.22em;
+    bottom: -0.16em;
+    height: 0.22em;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 240 16' preserveAspectRatio='none'%3E%3Cpath d='M3 12.6C72 3.4 172 2 237 6.4C173 6.6 74 8.6 3 12.6Z' fill='%232f6429'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+  }
+
+  .ph__since {
+    margin-top: clamp(0.9rem, 2vw, 1.3rem);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-2);
   }
 
   /* the scene */
