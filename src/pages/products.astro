@@ -180,7 +180,7 @@ const helps = [
           <span><b>Reliable tech</b>Brighter tomorrow</span>
         </p>
 
-        <p class="ph__script" aria-hidden="true">Better Technology<br />A Smarter Oman</p>
+        <p class="ph__script" aria-hidden="true">Better Technology.<br />A Smarter Oman.</p>
       </div>
     </div>
   </section>
@@ -1066,21 +1066,25 @@ const helps = [
       display: block;
       position: absolute;
       z-index: 1;
-      right: 2vw;
-      bottom: 2.5rem;
-      width: clamp(4rem, 6vw, 5.5rem);
+      left: auto;
+      right: 31%;
+      bottom: 0.9rem;
+      width: clamp(3.5rem, 5vw, 4.5rem);
       height: clamp(3.5rem, 5vw, 4.5rem);
       background-image: radial-gradient(circle, color-mix(in oklab, var(--green) 55%, transparent) 1.6px, transparent 1.6px);
       background-size: 14px 14px;
     }
     .ph__chip { z-index: 4; top: 8rem; left: 45vw; }
+    /* It was pinned top-right, where the dark slab sits — green type on
+       dark green, which read as broken rather than decorative. Moved to
+       the pale ground under the photograph. */
     .ph__script {
       display: block;
       position: absolute;
       z-index: 4;
-      right: 3vw;
-      top: 2rem;
-      max-width: 12ch;
+      right: 7%;
+      bottom: 0.6rem;
+      max-width: 22ch;
       font-family: var(--font-serif, Georgia, serif);
       font-style: italic;
       font-size: clamp(0.9375rem, 1.5vw, 1.2rem);
