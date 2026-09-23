@@ -1,0 +1,718 @@
+---
+import { Image } from 'astro:assets';
+import Icon from '@components/ui/Icon.astro';
+import shotA from '@assets/photos/support-desk.jpg';
+import shotB from '@assets/photos/retail-display.jpg';
+import shotC from '@assets/photos/network-eng.jpg';
+
+/**
+ * OUR PURPOSE — mission, vision and values on an orbit.
+ *
+ * Three nodes sit on a ring; picking one turns the ring until it reaches
+ * the top, and the centre cross-fades under it. Behind the nodes is a
+ * photographic donut cut into three wedges with conic-gradient masks —
+ * a mask rather than clip-path, because a 120° wedge needs arc points a
+ * polygon cannot express without approximating the curve.
+ *
+ * Faces are stored in RING order (clockwise from the top), while the
+ * numbered index on the left shows reading order. The two differ on
+ * purpose: the arrows step around the circle, so "next" has to mean the
+ * node physically to the right.
+ *
+ * ⚠ The mission, vision and values wording is a DRAFT. Danat has never
+ * published any of the three. The mission text comes from the client's
+ * mockup; the other two are written to match its tone. All three need
+ * signing off before launch — the page says so.
+ */
+const faces = [
+  {
+    no: '01',
+    key: 'Mission',
+    sub: 'Creating real value today',
+    icon: 'chip',
+    shot: shotA,
+    h: ['Make technology', 'work better', 'for people.'],
+    accent: [1, 2],
+    p: 'We provide genuine products, expert service and practical technology solutions that help individuals, businesses and communities work smarter and achieve more.',
+  },
+  {
+    no: '03',
+    key: 'Values',
+    sub: 'What guides us always',
+    icon: 'heart',
+    shot: shotB,
+    h: ['Diagnose first.', 'Repair deeper.', 'Stand behind it.'],
+    accent: [1],
+    p: 'Free diagnosis before any quote. Faults traced to the component rather than the board. The same stock and the same standard at all four counters.',
+  },
+  {
+    no: '02',
+    key: 'Vision',
+    sub: 'A more connected tomorrow',
+    icon: 'eye',
+    shot: shotC,
+    h: ['An Oman that', 'repairs, not', 'replaces.'],
+    accent: [1],
+    p: 'Where a failed machine is worth mending, and the skill to mend it lives here rather than being shipped abroad with the hardware.',
+  },
+];
+
+/** Reading order for the index on the left; the ring order differs. */
+const index = [...faces].sort((a, b) => a.no.localeCompare(b.no));
+
+const promises = [
+  { icon: 'users', a: 'People', b: 'at the centre' },
+  { icon: 'shield', a: 'Trusted', b: 'in every solution' },
+  { icon: 'chart', a: 'Committed', b: 'to a better Oman' },
+  { icon: 'heart', a: 'Always here', b: 'to support' },
+];
+---
+
+<section class="po">
+  <span class="po__wash" aria-hidden="true"></span>
+
+  <div class="shell po__grid">
+    {/* ── left ── */}
+    <div class="po__left">
+      <p class="eb" data-rise><i class="eb__r" aria-hidden="true"></i>Our purpose</p>
+      <h2 class="po__h" data-rise style="--d:70ms">
+        Guided by<br /><em>a bigger purpose.</em>
+      </h2>
+      <p class="po__p" data-rise style="--d:130ms">
+        Our mission, vision and values reflect who we are, what we aim for,
+        and how we work — every day, for a brighter Oman.
+      </p>
+
+      <ol class="po__idx" data-rise style="--d:190ms">
+        {index.map((f) => (
+          <li>
+            <button type="button" data-goto={f.key} data-on={f.key === 'Mission' ? '' : undefined}>
+              <b>{f.no}</b><span>{f.key}</span>
+            </button>
+          </li>
+        ))}
+      </ol>
+
+      <p class="po__script" aria-hidden="true">
+        Technology<br />for a Brighter<br />Oman
+        <svg viewBox="0 0 150 14" fill="none">
+          <path d="M4 10C38 3 108 2 146 7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" />
+        </svg>
+      </p>
+    </div>
+
+    {/* ── orbit ── */}
+    <div class="po__mid">
+      <button class="po__side" type="button" data-step="-1" aria-label="Previous">
+        <i aria-hidden="true"><Icon name="arrow" size={16} /></i>
+        <span data-ghost="prev" aria-hidden="true"></span>
+      </button>
+
+      <div class="orb" data-orb>
+        {/* dashed guide arcs */}
+        <svg class="orb__arcs" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+          <circle cx="50" cy="50" r="48" stroke="currentColor" stroke-width="0.3" stroke-dasharray="1.6 3.2" />
+          <circle cx="50" cy="50" r="42" stroke="currentColor" stroke-width="0.3" stroke-dasharray="0.8 5" />
+        </svg>
+
+        {/* floating spheres */}
+        <span class="orb__ball" style="--x:78%; --y:8%;  --s:18px; --c:#c98a6a"></span>
+        <span class="orb__ball" style="--x:95%; --y:30%; --s:14px; --c:#3d8b3a"></span>
+        <span class="orb__ball" style="--x:12%; --y:40%; --s:26px; --c:#e9eeea"></span>
+        <span class="orb__ball" style="--x:6%;  --y:72%; --s:16px; --c:#e9eeea"></span>
+        <span class="orb__ball" style="--x:88%; --y:60%; --s:20px; --c:#e9eeea"></span>
+
+        {/* photographic donut, one wedge per face */}
+        <div class="orb__donut">
+          {faces.map((f, i) => (
+            <figure class="orb__wedge" style={`--from:${i * 120 - 60}deg`}>
+              <Image src={f.shot} alt="" widths={[420, 640]} sizes="34vw"
+                quality={72} format="webp" loading="lazy" />
+            </figure>
+          ))}
+        </div>
+
+        {/* the turning ring of nodes */}
+        <div class="orb__rot">
+          {faces.map((f, i) => (
+            <div class="orb__node" style={`--th:${i * 120}deg`}>
+              <button class="nd" type="button" data-i={i}
+                data-on={i === 0 ? '' : undefined} aria-label={`${f.key} — ${f.sub}`}>
+                <i aria-hidden="true"><Icon name={f.icon} size={20} /></i>
+                <b>{f.key}</b>
+                <em>{f.sub}</em>
+              </button>
+            </div>
+          ))}
+        </div>
+
+        {/* centre */}
+        <div class="orb__core">
+          {faces.map((f, i) => (
+            <article class="pn" data-on={i === 0 ? '' : undefined}
+              aria-hidden={i === 0 ? undefined : 'true'}>
+              <p class="pn__k">{f.key}</p>
+              <h3>
+                {f.h.map((line, li) => (
+                  <>{f.accent.includes(li) ? <em>{line}</em> : line}<br /></>
+                ))}
+              </h3>
+              <p class="pn__p">{f.p}</p>
+              <a class="pn__cta" href="/services">
+                Learn more<Icon name="arrow" size={15} />
+              </a>
+            </article>
+          ))}
+
+          <p class="orb__count" aria-hidden="true">
+            <span data-count-now>01</span> / 0{faces.length}
+            <i class="orb__bar"><b></b></i>
+          </p>
+        </div>
+      </div>
+
+      <button class="po__side po__side--next" type="button" data-step="1" aria-label="Next">
+        <span data-ghost="next" aria-hidden="true"></span>
+        <i aria-hidden="true"><Icon name="arrow" size={16} /></i>
+      </button>
+    </div>
+
+    {/* ── right rail ── */}
+    <div class="po__right" aria-hidden="true">
+      <p class="po__words">People<br />Technology<br />Progress<br />Together</p>
+      <span class="po__rule"></span>
+      <p class="po__scroll">Scroll<br />to explore</p>
+    </div>
+  </div>
+
+  {/* ── foot ── */}
+  <div class="shell po__foot">
+    <ul class="po__proms">
+      {promises.map((p, i) => (
+        <li data-rise style={`--d:${i * 60}ms`}>
+          <i aria-hidden="true"><Icon name={p.icon} size={19} /></i>
+          <span><b>{p.a}</b>{p.b}</span>
+        </li>
+      ))}
+    </ul>
+    <p class="po__tag" aria-hidden="true">Same people.<br />A brighter tomorrow.</p>
+  </div>
+
+  <p class="po__note" data-rise>
+    Mission, vision and values wording is a draft for Danat to approve.
+  </p>
+</section>
+
+<script is:inline>
+  (() => {
+    const orb = document.querySelector('[data-orb]');
+    if (!orb) return;
+
+    const rot = orb.querySelector('.orb__rot');
+    const nodes = [...orb.querySelectorAll('.nd')];
+    const panels = [...orb.querySelectorAll('.pn')];
+    const wedges = [...orb.querySelectorAll('.orb__wedge')];
+    const idx = [...document.querySelectorAll('[data-goto]')];
+    const ghosts = [...document.querySelectorAll('[data-ghost]')];
+    const now = document.querySelector('[data-count-now]');
+    const bar = document.querySelector('.orb__bar b');
+    const n = nodes.length;
+    if (!rot || !n) return;
+
+    const keys = nodes.map((el) => el.querySelector('b')?.textContent ?? '');
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let at = 0;
+    let turns = 0;
+    let timer = null;
+
+    const show = (next) => {
+      let d = (((next - at) % n) + n) % n;
+      if (d > n / 2) d -= n;
+      turns += d;
+      at = ((next % n) + n) % n;
+
+      const deg = -turns * (360 / n);
+      rot.style.setProperty('--a', `${deg}deg`);
+      orb.style.setProperty('--a', `${deg}deg`);
+
+      nodes.forEach((el, i) => el.toggleAttribute('data-on', i === at));
+      wedges.forEach((el, i) => el.toggleAttribute('data-on', i === at));
+      panels.forEach((el, i) => {
+        const on = i === at;
+        el.toggleAttribute('data-on', on);
+        if (on) el.removeAttribute('aria-hidden');
+        else el.setAttribute('aria-hidden', 'true');
+      });
+      idx.forEach((el) =>
+        el.toggleAttribute('data-on', el.getAttribute('data-goto') === keys[at])
+      );
+      ghosts.forEach((el) => {
+        const dir = el.getAttribute('data-ghost') === 'next' ? 1 : -1;
+        el.textContent = keys[(((at + dir) % n) + n) % n];
+      });
+      if (now) now.textContent = String(at + 1).padStart(2, '0');
+      if (bar) bar.style.setProperty('--p', String((at + 1) / n));
+    };
+
+    const stop = () => { if (timer) clearInterval(timer); timer = null; };
+    const start = () => { if (!reduced && !timer) timer = setInterval(() => show(at + 1), 5200); };
+
+    nodes.forEach((el, i) => el.addEventListener('click', () => { stop(); show(i); }));
+    idx.forEach((el) =>
+      el.addEventListener('click', () => {
+        stop();
+        const i = keys.indexOf(el.getAttribute('data-goto') ?? '');
+        if (i >= 0) show(i);
+      })
+    );
+    document.querySelectorAll('[data-step]').forEach((b) =>
+      b.addEventListener('click', () => { stop(); show(at + Number(b.getAttribute('data-step'))); })
+    );
+
+    new IntersectionObserver(([e]) => (e.isIntersecting ? start() : stop()), { threshold: 0.25 })
+      .observe(orb);
+
+    show(0);
+  })();
+</script>
+
+<style>
+  .po {
+    position: relative;
+    background: linear-gradient(180deg, #fcfdfc, #f4f8f4 52%, #fafcfa);
+    padding-block: clamp(3rem, 6vw, 5rem);
+    overflow: hidden;
+    isolation: isolate;
+  }
+  .po__wash {
+    position: absolute;
+    z-index: -1;
+    left: 50%;
+    top: 46%;
+    translate: -50% -50%;
+    width: min(58rem, 96vw);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(
+      circle,
+      color-mix(in oklab, var(--green) 11%, transparent) 0%,
+      color-mix(in oklab, var(--clay) 6%, transparent) 50%,
+      transparent 72%
+    );
+    filter: blur(30px);
+  }
+
+  .eb {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--green-deep);
+  }
+  .eb__r { width: 26px; height: 1px; flex: none; background: currentColor; opacity: 0.6; }
+
+  .po__grid { display: grid; gap: clamp(1.5rem, 3vw, 2.5rem); align-items: center; }
+
+  /* ───── left ───── */
+
+  .po__h {
+    margin-top: var(--s4);
+    font-size: clamp(1.9rem, 3.6vw, 2.9rem);
+    font-weight: 700;
+    letter-spacing: -0.042em;
+    line-height: 1.06;
+  }
+  .po__h em { font-style: normal; color: var(--green-deep); }
+  .po__p {
+    margin-top: var(--s4);
+    max-width: 34ch;
+    font-size: 0.875rem;
+    line-height: 1.65;
+    color: var(--text-2);
+  }
+
+  .po__idx { display: grid; gap: 0.15rem; margin-top: var(--s5); }
+  .po__idx button {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    width: 100%;
+    padding: 0.4rem 0 0.4rem 0.7rem;
+    border: 0;
+    border-left: 2px solid transparent;
+    background: none;
+    cursor: pointer;
+    text-align: left;
+    color: var(--text-3);
+    transition: color var(--t2) var(--ease), border-color var(--t2) var(--ease);
+  }
+  .po__idx b {
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.1em;
+  }
+  .po__idx span { font-size: 0.9375rem; font-weight: 600; letter-spacing: -0.02em; }
+  .po__idx button:hover { color: var(--text-2); }
+  .po__idx button[data-on] { color: var(--text); border-left-color: var(--green-deep); }
+  .po__idx button:focus-visible { outline: 2px solid var(--green-deep); outline-offset: 2px; }
+
+  .po__script {
+    margin-top: clamp(1.5rem, 4vw, 2.75rem);
+    font-family: var(--font-serif, Georgia, serif);
+    font-style: italic;
+    font-size: clamp(1.2rem, 2.2vw, 1.8rem);
+    line-height: 1.24;
+    color: var(--green-deep);
+    rotate: -5deg;
+    transform-origin: left center;
+    pointer-events: none;
+  }
+  .po__script svg { display: block; width: 8.5rem; margin-top: 0.3rem; color: var(--clay); }
+
+  /* ───── orbit ───── */
+
+  .po__mid {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(0.4rem, 1.4vw, 1rem);
+  }
+
+  .po__side {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+  }
+  .po__side i {
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    flex: none;
+    border-radius: 50%;
+    background: var(--white);
+    color: var(--text-2);
+    box-shadow: 0 1px 2px rgb(10 30 12 / 0.06), 0 10px 24px -16px rgb(10 30 12 / 0.4);
+    transition:
+      background-color var(--t2) var(--ease),
+      color var(--t2) var(--ease),
+      transform var(--t2) var(--ease);
+  }
+  .po__side i :global(svg) { transform: rotate(180deg); }
+  .po__side--next i :global(svg) { transform: none; }
+  .po__side:hover i { transform: translateY(-2px); background: var(--green-deep); color: #fff; }
+  .po__side:focus-visible i { outline: 2px solid var(--green-deep); outline-offset: 3px; }
+  .po__side span {
+    display: none;
+    font-size: clamp(1.1rem, 2.2vw, 1.75rem);
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    /* Large bold text: 3:1 is the bar, and this measures 3.16:1. */
+    color: color-mix(in oklab, var(--text-3) 80%, transparent);
+  }
+
+  .orb {
+    position: relative;
+    width: min(34rem, 82vw);
+    aspect-ratio: 1;
+    flex: none;
+  }
+
+  .orb__arcs {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    color: color-mix(in oklab, var(--text-3) 34%, transparent);
+  }
+
+  /* 3D-ish spheres, drifting */
+  .orb__ball {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    width: var(--s);
+    height: var(--s);
+    border-radius: 50%;
+    background: radial-gradient(circle at 32% 28%, #fff, var(--c) 62%, color-mix(in oklab, var(--c) 70%, #000) 100%);
+    box-shadow: 0 6px 14px -6px rgb(10 30 12 / 0.4);
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .orb__ball { animation: po-float 7s ease-in-out infinite alternate; }
+    .orb__ball:nth-child(3) { animation-duration: 9s; }
+    .orb__ball:nth-child(4) { animation-duration: 11s; }
+    .orb__ball:nth-child(5) { animation-duration: 8s; }
+  }
+  @keyframes po-float { to { transform: translate3d(0, -12px, 0); } }
+
+  /* ---- photographic donut ---- */
+
+  .orb__donut {
+    position: absolute;
+    inset: 11%;
+    border-radius: 50%;
+    overflow: hidden;
+  }
+  .orb__wedge {
+    position: absolute;
+    inset: 0;
+    /* A conic mask, not clip-path: a 120-degree wedge needs points along
+       an arc, which a polygon can only approximate. */
+    -webkit-mask-image: conic-gradient(from var(--from), #000 0deg 120deg, transparent 120deg);
+    mask-image: conic-gradient(from var(--from), #000 0deg 120deg, transparent 120deg);
+    filter: saturate(0.85);
+    opacity: 0.55;
+    transition: opacity var(--t3) var(--ease), filter var(--t3) var(--ease);
+  }
+  .orb__wedge[data-on] { opacity: 1; filter: saturate(1); }
+  .orb__wedge :global(img) { width: 100%; height: 100%; object-fit: cover; }
+
+  /* ---- turning ring ---- */
+
+  .orb__rot {
+    position: absolute;
+    inset: 0;
+    transform: rotate(var(--a, 0deg));
+    transition: transform 950ms cubic-bezier(0.65, 0, 0.35, 1);
+  }
+  /* Full-size box rotating about the orbit centre; the chip pins to the
+     top edge. A percentage translate on the chip would resolve against
+     the chip itself and collapse to the middle. */
+  .orb__node {
+    position: absolute;
+    inset: 0;
+    transform: rotate(var(--th));
+    pointer-events: none;
+  }
+
+  .nd {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    translate: -50% 0;
+    display: grid;
+    justify-items: center;
+    gap: 0.1rem;
+    width: clamp(7.5rem, 20vw, 9.5rem);
+    aspect-ratio: 1;
+    padding: 0.6rem;
+    border: 0;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.94);
+    backdrop-filter: blur(6px);
+    color: var(--text);
+    cursor: pointer;
+    pointer-events: auto;
+    align-content: center;
+    box-shadow: 0 1px 2px rgb(10 30 12 / 0.05), 0 18px 38px -22px rgb(10 30 12 / 0.45);
+    transform: rotate(calc((var(--th) + var(--a, 0deg)) * -1));
+    transition:
+      transform 950ms cubic-bezier(0.65, 0, 0.35, 1),
+      background-color var(--t3) var(--ease),
+      color var(--t3) var(--ease),
+      scale var(--t3) var(--ease);
+  }
+  .nd:hover { scale: 1.04; }
+  .nd:focus-visible { outline: 2px solid var(--green-deep); outline-offset: 3px; }
+  .nd i { color: var(--green-deep); display: grid; place-items: center; }
+  .nd b { font-size: 0.9375rem; font-weight: 700; letter-spacing: -0.025em; }
+  .nd em {
+    font-style: normal;
+    max-width: 12ch;
+    font-size: 0.6875rem;
+    line-height: 1.3;
+    color: var(--text-3);
+  }
+  .nd[data-on] {
+    scale: 1.06;
+    /* #3d8b3a measured 4.24:1 for white, and the label is 15px bold —
+       large-text rules do not apply, so 4.5:1 is the bar. #3d7f35 is
+       4.90:1 at the light end, 8.26:1 at the dark. */
+    background: linear-gradient(160deg, #3d7f35, #1f5a22);
+    color: #fff;
+  }
+  .nd[data-on] i { color: #fff; }
+  .nd[data-on] em { color: rgb(255 255 255 / 0.82); }
+
+  /* ---- centre ---- */
+
+  .orb__core {
+    position: absolute;
+    inset: 22%;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.96);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 1px 2px rgb(10 30 12 / 0.05), 0 30px 60px -34px rgb(10 30 12 / 0.5);
+    text-align: center;
+    padding: clamp(0.9rem, 3vw, 2rem);
+  }
+
+  .pn {
+    grid-area: 1 / 1;
+    display: grid;
+    justify-items: center;
+    opacity: 0;
+    scale: 0.95;
+    pointer-events: none;
+    transition: opacity var(--t3) var(--ease), scale var(--t3) var(--ease);
+  }
+  .pn[data-on] { opacity: 1; scale: 1; pointer-events: auto; }
+
+  .pn__k {
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--clay-deep);
+  }
+  .pn h3 {
+    margin-top: 0.5rem;
+    font-size: clamp(0.95rem, 1.8vw, 1.35rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    line-height: 1.16;
+  }
+  .pn h3 em { font-style: normal; color: var(--green-deep); }
+  .pn__p {
+    margin-top: 0.5rem;
+    max-width: 30ch;
+    font-size: clamp(0.6875rem, 1.1vw, 0.8125rem);
+    line-height: 1.55;
+    color: var(--text-2);
+  }
+  .pn__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.85rem;
+    padding: 0.6rem 1.2rem;
+    border-radius: 999px;
+    /* white is 8.73:1 on #27551f and 4.90:1 on #3d7f35 */
+    background: linear-gradient(100deg, #27551f, #3d7f35);
+    color: #fff;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    transition: transform var(--t2) var(--ease);
+  }
+  .pn__cta:hover { transform: translateY(-2px); }
+
+  .orb__count {
+    position: absolute;
+    left: 50%;
+    bottom: clamp(0.6rem, 2.4vw, 1.6rem);
+    translate: -50% 0;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.14em;
+    color: var(--text-3);
+  }
+  .orb__bar {
+    display: block;
+    position: relative;
+    width: 5.5rem;
+    height: 3px;
+    border-radius: 3px;
+    background: var(--line-light);
+    overflow: hidden;
+  }
+  .orb__bar b {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: calc(var(--p, 0.33) * 100%);
+    border-radius: 3px;
+    background: var(--green-deep);
+    transition: width var(--t3) var(--ease);
+  }
+
+  /* ───── right rail ───── */
+
+  .po__right { display: none; justify-items: end; gap: var(--s5); text-align: right; }
+  .po__words,
+  .po__scroll {
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    line-height: 2.1;
+    color: var(--text-3);
+  }
+  .po__rule { width: 1px; height: 4.5rem; background: var(--line-light); justify-self: end; }
+
+  /* ───── foot ───── */
+
+  .po__foot {
+    display: grid;
+    gap: var(--s5);
+    align-items: center;
+    margin-top: clamp(1.75rem, 4vw, 3rem);
+    padding-top: clamp(1.25rem, 3vw, 2rem);
+    border-top: 1px solid var(--line-light);
+  }
+  .po__proms { display: grid; gap: var(--s4); }
+  .po__proms li { display: flex; align-items: center; gap: 0.7rem; }
+  .po__proms i { color: var(--green-deep); display: grid; place-items: center; flex: none; }
+  .po__proms span { display: grid; font-size: 0.8125rem; line-height: 1.3; color: var(--text-3); }
+  .po__proms b { font-weight: 700; color: var(--text); }
+
+  .po__tag {
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    line-height: 2;
+    color: var(--text-3);
+  }
+
+  .po__note {
+    margin-top: var(--s5);
+    text-align: center;
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    color: var(--text-3);
+  }
+
+  /* ───── responsive ───── */
+
+  @media (min-width: 48rem) {
+    .po__proms { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  @media (min-width: 62rem) {
+    .po__side span { display: block; }
+  }
+
+  @media (min-width: 76rem) {
+    .po__grid { grid-template-columns: minmax(0, 0.82fr) minmax(0, 2fr) auto; }
+    .po__right { display: grid; }
+    .po__foot { grid-template-columns: minmax(0, 1fr) auto; }
+    .po__proms { grid-template-columns: repeat(4, 1fr); }
+  }
+
+  @media (max-width: 40rem) {
+    .nd { width: clamp(6rem, 30vw, 7.5rem); padding: 0.4rem; }
+    .nd b { font-size: 0.8125rem; }
+    .nd em { display: none; }
+    .orb__core { inset: 20%; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .orb__rot, .nd, .pn, .orb__wedge, .orb__bar b { transition: none; }
+    .po__side i, .po__side:hover i, .pn__cta, .pn__cta:hover { transform: none; transition: none; }
+    .po__side i :global(svg) { transform: rotate(180deg); }
+    .po__side--next i :global(svg) { transform: none; }
+  }
+</style>

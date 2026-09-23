@@ -2,7 +2,7 @@
 import { Image } from 'astro:assets';
 import PageLayout from '@layouts/PageLayout.astro';
 import Icon from '@components/ui/Icon.astro';
-import VisionDial from '@components/sections/VisionDial.astro';
+import PurposeOrbit from '@components/sections/PurposeOrbit.astro';
 import { site, branches } from '@data/site';
 import { OMAN_PATH, OMAN_VIEWBOX, OMAN_PINS } from '@data/omanMap';
 import imgTech from '@assets/photos/repair-solder.jpg';
@@ -179,8 +179,8 @@ const layers = [r01, r03, r04, r05];
     </div>
   </section>
 
-  {/* ══════ 04 · vision · mission · values ══════ */}
-  <VisionDial />
+  {/* ══════ 04 · our purpose ══════ */}
+  <PurposeOrbit />
 
   {/* ══════ 05 · the difference ══════ */}
   <section class="df" data-tone="ink">
