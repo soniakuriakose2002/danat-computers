@@ -2,6 +2,7 @@
 import { Image } from 'astro:assets';
 import PageLayout from '@layouts/PageLayout.astro';
 import Icon from '@components/ui/Icon.astro';
+import ValueDial from '@components/sections/ValueDial.astro';
 import { site, branches } from '@data/site';
 import { OMAN_PATH, OMAN_VIEWBOX, OMAN_PINS } from '@data/omanMap';
 import imgTech from '@assets/photos/repair-solder.jpg';
@@ -35,13 +36,6 @@ const journey = [
   { year: '2010', t: 'Expanded our product range and IT solutions.', verified: false },
   { year: '2016', t: 'Grew across Oman with new branches in Sohar, Al Hail and Salalah.', verified: false },
   { year: 'Today', t: 'Continuing to support individuals, businesses and organisations.', verified: true },
-];
-
-const principles = [
-  { icon: 'search', t: 'We diagnose before we quote', p: 'You are told what failed, what it costs and how long it takes — then you decide.' },
-  { icon: 'chip', t: 'We repair the board, not the box', p: 'We trace the fault to the component. That is the single thing this business is built on.' },
-  { icon: 'box', t: 'We already have the part', p: `${site.stats.parts.toLocaleString('en-US')} lines across ${site.stats.categories} categories, held across four branches.` },
-  { icon: 'shield', t: 'The same standard at every counter', p: 'Ruwi, Sohar, Al Hail and Salalah run the same diagnosis, the same stock and the same technicians.' },
 ];
 
 const proof = [
@@ -185,36 +179,8 @@ const layers = [r01, r03, r04, r05];
     </div>
   </section>
 
-  {/* ══════ 04 · how we work ══════ */}
-  <section class="hw section">
-    <span class="hw__wm" aria-hidden="true">01</span>
-    <div class="shell hw__grid">
-      <div class="hw__intro" data-rise>
-        <p class="eb"><i class="eb__r" aria-hidden="true"></i>How we work</p>
-        <h2 class="hw__h">Four things we<br /><em>do not compromise on.</em></h2>
-        <p class="hw__p">
-          None of this is unusual in principle. It is unusual in practice,
-          which is why it is worth writing down.
-        </p>
-        <div class="hw__nav">
-          <button type="button" data-prev aria-label="Previous"><Icon name="arrow" size={15} /></button>
-          <button type="button" data-next aria-label="Next"><Icon name="arrow" size={15} /></button>
-          <span class="hw__bar" aria-hidden="true"><i></i></span>
-        </div>
-      </div>
-
-      <ul class="hw__track">
-        {principles.map((p, i) => (
-          <li class="pc" data-on={i === 0 ? '' : undefined}>
-            <span class="pc__i" aria-hidden="true"><Icon name={p.icon} size={20} /></span>
-            <h3>{p.t}</h3>
-            <p>{p.p}</p>
-            <b class="pc__n">{String(i + 1).padStart(2, '0')}</b>
-          </li>
-        ))}
-      </ul>
-    </div>
-  </section>
+  {/* ══════ 04 · values ══════ */}
+  <ValueDial />
 
   {/* ══════ 05 · the difference ══════ */}
   <section class="df" data-tone="ink">
@@ -329,37 +295,6 @@ const layers = [r01, r03, r04, r05];
     </div>
   </section>
 </PageLayout>
-
-<script is:inline>
-  /* The principles carousel. Scroll-snap does the moving; the buttons
-     nudge it and the bar reports position. */
-  (() => {
-    const track = document.querySelector('.hw__track');
-    if (!track) return;
-    const bar = document.querySelector('.hw__bar i');
-    const cards = [...track.children];
-
-    const step = () => (cards[1] ? cards[1].offsetLeft - cards[0].offsetLeft : 320);
-
-    const sync = () => {
-      const max = track.scrollWidth - track.clientWidth;
-      if (bar) bar.style.setProperty('--p', max > 0 ? String(track.scrollLeft / max) : '1');
-      const mid = track.scrollLeft + track.clientWidth / 2;
-      cards.forEach((c) =>
-        c.toggleAttribute('data-on', c.offsetLeft <= mid && c.offsetLeft + c.offsetWidth > mid)
-      );
-    };
-
-    document.querySelector('[data-prev]')?.addEventListener('click', () =>
-      track.scrollBy({ left: -step(), behavior: 'smooth' })
-    );
-    document.querySelector('[data-next]')?.addEventListener('click', () =>
-      track.scrollBy({ left: step(), behavior: 'smooth' })
-    );
-    track.addEventListener('scroll', sync, { passive: true });
-    sync();
-  })();
-</script>
 
 <style>
   /* ───── shared ───── */
@@ -609,82 +544,6 @@ const layers = [r01, r03, r04, r05];
     letter-spacing: 0.14em; text-transform: uppercase; color: var(--clay-deep);
   }
 
-  /* ───── 04 how we work ───── */
-  .hw {
-    position: relative; background: var(--white);
-    overflow: hidden; isolation: isolate;
-  }
-  .hw__wm {
-    position: absolute; left: 2%; bottom: 6%; z-index: -1;
-    font-size: clamp(7rem, 16vw, 13rem); font-weight: 700;
-    letter-spacing: -0.06em; line-height: 1; color: #f0f2f0;
-  }
-  .hw__grid { display: grid; gap: clamp(1.75rem, 4vw, 2.75rem); align-items: center; }
-  .hw__intro { display: grid; justify-items: start; }
-  .hw__h {
-    margin-top: var(--s4); font-size: clamp(1.7rem, 3.2vw, 2.4rem);
-    font-weight: 700; letter-spacing: -0.04em; line-height: 1.08;
-  }
-  .hw__h em { font-style: normal; color: var(--green-deep); }
-  .hw__p {
-    margin-top: var(--s4); max-width: 32ch;
-    font-size: 0.875rem; line-height: 1.6; color: var(--text-2);
-  }
-
-  .hw__nav { display: flex; align-items: center; gap: 0.6rem; margin-top: var(--s5); }
-  .hw__nav button {
-    display: grid; place-items: center; width: 38px; height: 38px;
-    border: 1px solid var(--line-light); border-radius: 50%;
-    background: var(--white); color: var(--text-2); cursor: pointer;
-    transition: background-color var(--t2) var(--ease), color var(--t2) var(--ease), border-color var(--t2) var(--ease);
-  }
-  .hw__nav [data-prev] :global(svg) { transform: rotate(180deg); }
-  .hw__nav [data-next] { background: var(--clay-deep); border-color: var(--clay-deep); color: #fff; }
-  .hw__nav button:hover { border-color: var(--clay); }
-  .hw__bar {
-    position: relative; flex: 1; max-width: 8rem; height: 2px;
-    margin-left: 0.4rem; border-radius: 2px; background: var(--line-light);
-  }
-  .hw__bar i {
-    position: absolute; inset: 0 auto 0 0; border-radius: 2px;
-    width: calc(28% + var(--p, 0) * 72%);
-    background: var(--clay);
-  }
-
-  .hw__track {
-    display: grid; grid-auto-flow: column; grid-auto-columns: minmax(13.5rem, 1fr);
-    gap: clamp(0.7rem, 1.6vw, 1rem);
-    overflow-x: auto; scroll-snap-type: x mandatory;
-    scrollbar-width: none; padding-bottom: 0.4rem;
-  }
-  .hw__track::-webkit-scrollbar { display: none; }
-
-  .pc {
-    scroll-snap-align: start;
-    display: grid; align-content: start;
-    padding: 1.4rem 1.3rem 1.2rem; border-radius: 18px;
-    border: 1px solid var(--line-light); background: var(--white);
-    transition: border-color var(--t2) var(--ease), box-shadow var(--t2) var(--ease);
-  }
-  .pc[data-on] {
-    border-color: var(--clay);
-    box-shadow: 0 18px 38px -26px rgb(120 60 20 / 0.35);
-  }
-  .pc__i {
-    display: grid; place-items: center; width: 42px; height: 42px;
-    border-radius: 13px; color: var(--green-deep); background: var(--green-wash);
-  }
-  .pc h3 {
-    margin-top: 0.9rem; font-size: 0.9375rem; font-weight: 700;
-    letter-spacing: -0.02em; line-height: 1.3;
-  }
-  .pc p { margin-top: 0.45rem; font-size: 0.8125rem; line-height: 1.55; color: var(--text-3); }
-  .pc__n {
-    margin-top: 1rem; font-family: var(--font-mono); font-size: 0.6875rem;
-    letter-spacing: 0.12em; color: var(--text-3);
-  }
-  .pc[data-on] .pc__n { color: var(--clay-deep); }
-
   /* ───── 05 difference ───── */
   .df { display: grid; background: #0d2a14; color: #fff; }
   .df__shot { position: relative; }
@@ -858,7 +717,6 @@ const layers = [r01, r03, r04, r05];
     .jr__line li:last-child::before { display: none; }
     .jr__dot { top: 0; }
 
-    .hw__grid { grid-template-columns: minmax(0, 0.78fr) minmax(0, 1.9fr); }
     .df { grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); }
     .df__panel { grid-template-columns: minmax(0, 1.5fr) minmax(0, 0.85fr); align-items: center; }
     .pr__grid { grid-template-columns: minmax(0, 0.85fr) minmax(0, 0.7fr) minmax(0, 1.1fr); }
