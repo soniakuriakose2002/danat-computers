@@ -177,7 +177,11 @@ import { site } from '@data/site';
     display: block;
     /* The slow zoom below would otherwise spill past the corners. */
     overflow: hidden;
-    border-radius: 22px;
+    /* Not a rectangle, but the arch took a third of the picture with it.
+       This cuts two opposite corners deeply and leaves the other two
+       tight — the shape reads as deliberate while the subject, which
+       sits across the middle, is untouched. */
+    border-radius: 78px 14px 78px 14px;
     /* A framed panel rather than a bare rectangle: a hairline ring on the
        inside so the zoom cannot slide out from under it, a green cast in
        the near shadow, and a deep one to lift it off the section. */
