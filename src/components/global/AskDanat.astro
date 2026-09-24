@@ -125,15 +125,15 @@ const kb = {
         </span>
         <div>
           <p class="ab__msg">
-            Hello. I am a guide on this page, not a person — I answer a few common
-            questions from what this site knows. For anything else, use
-            <b>Chat on WhatsApp</b> below.
+            Hello! I am a guide on this page, not a person — I can help you with
+            common questions about our products and services. For anything else,
+            use <b>Chat on WhatsApp</b>.
           </p>
           <span class="ab__time" data-now></span>
         </div>
       </div>
 
-      <ul class="ab__sugs">
+      <ul class="ab__sugs" hidden>
         {[
           { i: 'pin', q: 'Where are your branches?' },
           { i: 'clock', q: 'What are your opening hours?' },
@@ -337,12 +337,24 @@ const kb = {
       /* Three dots while it "thinks", then the dots become the answer.
          Without it the reply simply materialises and the panel reads as a
          list of canned text rather than an exchange. */
+      /* Held back until the conversation has started, as drawn: the panel
+         opens with the greeting alone, and the prompts arrive with the
+         first answer. */
+      const sugs = dlg.querySelector('.ab__sugs');
+      const showSugs = () => {
+        if (!sugs || !sugs.hasAttribute('hidden')) return;
+        log.appendChild(sugs);
+        sugs.removeAttribute('hidden');
+        scroll.scrollTop = scroll.scrollHeight;
+      };
+
       const reply = (html) => {
         const p = bubble('bot', '<i class="ab__dots"><b></b><b></b><b></b></i>');
         p.setAttribute('data-typing', '');
         window.setTimeout(() => {
           p.removeAttribute('data-typing');
           p.innerHTML = html;
+          showSugs();
           scroll.scrollTop = scroll.scrollHeight;
         }, 620);
       };
