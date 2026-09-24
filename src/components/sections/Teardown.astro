@@ -201,21 +201,21 @@ import { site } from '@data/site';
     animation: tdFilmIn 800ms var(--ease) both;
   }
   @keyframes tdFilmIn { from { opacity: 0; } }
-  /* Arrives, holds, then creeps in — the zoom starts only once it has
-     settled, so the two do not fight. */
-  .td__film video {
-    animation: tdFilmZoom 18s ease-in-out 900ms infinite alternate;
-  }
-  @keyframes tdFilmZoom { to { transform: scale(1.08); } }
+  /* The slow 1.08x creep that used to live here is gone. It was a
+     magnification inside a clipping box, which is another word for a
+     crop — the film lost its edges to it on every cycle. The film has
+     its own camera moves; it does not need ours on top. */
   .td__film video {
     display: block;
     width: 100%;    height: 100%;
-    /* Cover, so the trim comes off the edges rather than leaving bars. */
-    object-fit: cover;
-    /* What shows for the moment before the first frame paints. Black
-       was right under a black section; on a light one it flashes as a
-       hole. */
-    background: var(--off-2);
+    /* CONTAIN, not cover. Cover was cropping the film to fill a 1.91:1
+       box from a 16:9 source. Contain shows every frame whole — and the
+       slivers it leaves above and below are the same colour as the band
+       behind it, so there are no visible bars to letterbox. */
+    object-fit: contain;
+    /* Matches the band exactly, so the contain slivers above and below
+       the film are invisible and the first paint does not flash. */
+    background: #0a0d0e;
     /* Nothing to click, so no context menu, no player chrome, no
        "save video as". It reads as part of the page rather than
        something embedded in it. */
