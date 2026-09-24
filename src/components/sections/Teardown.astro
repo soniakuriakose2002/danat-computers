@@ -2,7 +2,7 @@
 import { Image } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 import Icon from '@components/ui/Icon.astro';
-import { site, brands } from '@data/site';
+import { site } from '@data/site';
 
 /**
  * TEARDOWN — the machine comes apart, part by part, as you scroll.
@@ -93,13 +93,6 @@ const stages = [
   },
 ];
 
-const pillars = [
-  { icon: 'box', a: 'Sales &', b: 'consultation' },
-  { icon: 'gear', a: 'Repair &', b: 'maintenance' },
-  { icon: 'chip', a: 'Upgrades &', b: 'customisation' },
-  { icon: 'shield', a: 'Warranty', b: 'support' },
-  { icon: 'users', a: 'Business', b: 'solutions' },
-];
 ---
 
 <section class="td" data-tone="ink">
@@ -179,59 +172,6 @@ const pillars = [
     );
   })}
 
-  {/* ── closing: it is a service business, not a product page ── */}
-  <div class="td__close">
-    <div class="shell td__cgrid">
-      <div>
-        <p class="td__eb" data-rise>Our service</p>
-        <h2 class="td__ch" data-rise style="--d:70ms">
-          More than products.<br />A complete <em>service experience.</em>
-        </h2>
-        <p class="td__cp" data-rise style="--d:130ms">
-          From purchase to performance, we are with you at every step.
-        </p>
-        <a class="td__cta" href="/services" data-rise style="--d:190ms">
-          Explore our services
-          <span aria-hidden="true"><Icon name="arrow" size={15} /></span>
-        </a>
-      </div>
-
-      {/* The copy says we are with you at every step, so the five read as
-          steps on a line rather than five identical boxes. The line draws
-          itself in, then each stop lights in turn. */}
-      {/* The rule is a sibling of the list, not a child of it: a <span>
-          is not valid inside <ol>, and the list was collapsing around it. */}
-      <div class="td__steps">
-        <span class="td__spine" data-draw style="--d:120ms" aria-hidden="true"></span>
-        <ol class="td__stops">
-        {pillars.map((p, i) => (
-          <li data-rise style={`--d:${200 + i * 90}ms`}>
-            <span class="td__dot" aria-hidden="true"></span>
-            <span class="td__ico" aria-hidden="true"><Icon name={p.icon} size={20} /></span>
-            <b>{p.a}<br />{p.b}</b>
-          </li>
-        ))}
-        </ol>
-      </div>
-
-      <dl class="td__stats" data-rise style="--d:220ms">
-        <div>
-          <dt><span data-count={brands.flat().length}>0</span></dt>
-          <dd>Brands we carry</dd>
-        </div>
-        <div>
-          <dt><span data-count={site.stats.branches}>0</span></dt>
-          <dd>Branches across Oman</dd>
-        </div>
-        {/* Nobody has given us a customer count, so the slot is held open
-            rather than filled with a round number. */}
-        <div class="td__pending">
-          <dt>&nbsp;</dt>
-          <dd>Customers served <s>figure to confirm</s></dd>
-        </div>
-      </dl>
-    </div>
-  </div>
 </section>
 
 <script is:inline>
@@ -582,173 +522,6 @@ const pillars = [
 
   /* ---------- closing ---------- */
 
-  .td__close {
-    padding-block: clamp(2.5rem, 5vw, 3.75rem);
-    /* Must land on --ink at the bottom: the wave at the top of the brand
-       strip is filled --ink, and a boundary shape is only invisible if it
-       matches the section above it. Ending on #07090a would show a seam. */
-    background: linear-gradient(160deg, #0a1b0f, var(--ink) 62%);
-  }
-  /* start, not center: centring left the copy floating with a hole
-     beneath it and the rail floating with one above. */
-  .td__cgrid { display: grid; gap: clamp(1.25rem, 3vw, 2.25rem); align-items: start; }
-
-  .td__ch {
-    margin-top: var(--s4);
-    font-size: clamp(1.6rem, 3.2vw, 2.4rem);
-    line-height: 1.1;
-    letter-spacing: -0.04em;
-    font-weight: 700;
-  }
-  .td__ch em { font-style: normal; color: var(--green-bright); }
-
-  .td__cp {
-    margin-top: var(--s4);
-    max-width: 36ch;
-    font-size: 0.9375rem;
-    line-height: 1.6;
-    color: rgb(255 255 255 / 0.7);
-  }
-
-  .td__cta {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.6rem;
-    margin-top: var(--s5);
-    padding: 0.85rem 1.5rem;
-    border-radius: 999px;
-    background: var(--green);
-    color: #07090a;
-    font-size: 0.9375rem;
-    font-weight: 600;
-    transition: background-color var(--t2) var(--ease), transform var(--t2) var(--ease);
-  }
-  .td__cta:hover { background: var(--green-bright); transform: translateY(-2px); }
-
-  /* Five steps on one line, not five boxes. */
-  /* NOT .td__rail — that is the frame sequence's own index rail, and
-     reusing the name put these rules on all six of those too. */
-  .td__steps { position: relative; padding-top: 1.4rem; }
-  .td__stops {
-    display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 0.4rem;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-  /* The rule the stops sit on. Inset so it starts and ends near the
-     first and last dot rather than running off the edges. */
-  .td__spine {
-    position: absolute;
-    top: 1.4rem;
-    left: 10%;
-    right: 10%;
-    height: 2px;
-    border-radius: 2px;
-    background: linear-gradient(
-      90deg,
-      rgb(111 201 106 / 0.35),
-      rgb(111 201 106 / 0.95) 50%,
-      rgb(111 201 106 / 0.35)
-    );
-    box-shadow: 0 0 12px rgb(111 201 106 / 0.35);
-  }
-  .td__stops li {
-    position: relative;
-    display: grid;
-    justify-items: center;
-    gap: 0.55rem;
-    padding-top: 0.9rem;
-    text-align: center;
-  }
-  .td__dot {
-    position: absolute;
-    top: -3px;
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--green-bright);
-    box-shadow: 0 0 0 4px rgb(111 201 106 / 0.14);
-    transition: box-shadow var(--t2) var(--ease), scale var(--t2) var(--ease);
-  }
-  .td__ico {
-    display: grid;
-    place-items: center;
-    width: 44px;
-    height: 44px;
-    border-radius: 14px;
-    border: 1px solid rgb(255 255 255 / 0.12);
-    background: rgb(255 255 255 / 0.03);
-    color: var(--green-bright);
-    transition:
-      transform var(--t2) var(--ease),
-      border-color var(--t2) var(--ease),
-      background-color var(--t2) var(--ease);
-  }
-  .td__stops li:hover .td__ico {
-    transform: translateY(-4px);
-    border-color: rgb(111 201 106 / 0.5);
-    background: rgb(111 201 106 / 0.1);
-  }
-  .td__stops li:hover .td__dot { scale: 1.35; box-shadow: 0 0 0 6px rgb(111 201 106 / 0.2); }
-  .td__stops b {
-    font-size: 0.75rem;
-    font-weight: 500;
-    line-height: 1.35;
-    color: rgb(255 255 255 / 0.82);
-  }
-
-  /* The figures are the proof on this panel, so they are set at display
-     size and given a column each rather than trailing along one line. */
-  /* Set exactly as the figures on the green band below, so the two count
-     rows on this page read as one device rather than two designs. */
-  /* Three figures stretched across the full panel left huge gaps between
-     them — the green band carries four, which is why the same grid works
-     there and not here. They sit together and the row ends where they do. */
-  .td__stats {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--s5) 0;
-    margin-top: var(--s4);
-    padding-top: clamp(1rem, 1.8vw, 1.4rem);
-    border-top: 1px solid rgb(255 255 255 / 0.26);
-  }
-  .td__stats > div { padding-inline: var(--s5); }
-  .td__stats > div:first-child { padding-left: 0; }
-  .td__stats > div + div { border-left: 1px solid rgb(255 255 255 / 0.26); }
-  .td__stats dt {
-    font-size: clamp(1.4rem, 2.3vw, 2rem);
-    font-weight: 700;
-    letter-spacing: -0.04em;
-    line-height: 1;
-    /* Tabular figures so a counter running up never reflows its label. */
-    font-variant-numeric: tabular-nums;
-    color: #fff;
-  }
-  .td__stats dd {
-    margin-top: 0.35rem;
-    font-size: 0.75rem;
-    letter-spacing: 0.02em;
-    color: rgb(255 255 255 / 0.72);
-  }
-  /* The rule marks the missing figure, so it is the width of a figure —
-     as a grid item it otherwise stretched the whole column. */
-  .td__pending dt {
-    width: 3ch;
-    border-bottom: 1px dashed rgb(255 255 255 / 0.3);
-  }
-  .td__stats s {
-    display: block;
-    margin-top: 0.2rem;
-    text-decoration: none;
-    font-family: var(--font-mono);
-    font-size: 0.5rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: rgb(255 255 255 / 0.42);
-  }
-
   /* ---------- responsive ---------- */
 
   @media (min-width: 62rem) {
@@ -757,16 +530,13 @@ const pillars = [
       gap: clamp(1.5rem, 3vw, 3rem);
     }
     .td__script { display: block; }
-    .td__cgrid { grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.25fr); }
-    .td__stats { grid-column: 1 / -1; }
   }
 
   @media (prefers-reduced-motion: reduce) {
     /* Square to the camera, no motion. --t is never set, so this only
        needs to drop the will-change hint. */
     .td__part { will-change: auto; }
-    .td__cta, .td__cta:hover, .td__cue span { transform: none; transition: none; }
-    .td__stops li:hover .td__ico, .td__stops li:hover .td__dot { transform: none; scale: 1; }
+    .td__cue span { transform: none; transition: none; }
     .td__cue span { transform: rotate(90deg); }
   }
 </style>
