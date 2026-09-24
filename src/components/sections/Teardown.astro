@@ -643,26 +643,33 @@ const pillars = [
 
   /* The figures are the proof on this panel, so they are set at display
      size and given a column each rather than trailing along one line. */
+  /* Set exactly as the figures on the green band below, so the two count
+     rows on this page read as one device rather than two designs. */
   .td__stats {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
-    gap: var(--s5) var(--s6);
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--s5) 0;
     margin-top: var(--s5);
-    padding-top: var(--s5);
-    border-top: 1px solid rgb(255 255 255 / 0.12);
+    padding-top: clamp(1.2rem, 2.2vw, 1.75rem);
+    border-top: 1px solid rgb(255 255 255 / 0.26);
   }
+  .td__stats > div { padding-inline: var(--s5); }
+  .td__stats > div:first-child { padding-left: 0; }
+  .td__stats > div + div { border-left: 1px solid rgb(255 255 255 / 0.26); }
   .td__stats dt {
-    font-size: clamp(2.2rem, 4vw, 3.4rem);
+    font-size: clamp(1.4rem, 2.3vw, 2rem);
     font-weight: 700;
-    letter-spacing: -0.045em;
+    letter-spacing: -0.04em;
     line-height: 1;
     /* Tabular figures so a counter running up never reflows its label. */
     font-variant-numeric: tabular-nums;
+    color: #fff;
   }
   .td__stats dd {
-    margin-top: 0.5rem;
-    font-size: 0.8125rem;
-    color: rgb(255 255 255 / 0.68);
+    margin-top: 0.35rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.02em;
+    color: rgb(255 255 255 / 0.72);
   }
   /* The rule marks the missing figure, so it is the width of a figure —
      as a grid item it otherwise stretched the whole column. */
@@ -690,7 +697,7 @@ const pillars = [
     }
     .td__script { display: block; }
     .td__cgrid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); }
-    .td__stats { grid-column: 1 / -1; }
+    .td__stats { grid-column: 1 / -1; grid-template-columns: repeat(3, 1fr); }
   }
 
   @media (prefers-reduced-motion: reduce) {

@@ -1,0 +1,455 @@
+---
+import { getCollection } from 'astro:content';
+import Icon from '@components/ui/Icon.astro';
+import { site, branches, whatsappLink } from '@data/site';
+
+/**
+ * ASK DANAT — an on-page guide, not a live agent and not an LLM.
+ *
+ * The site is static with no backend, so anything that claimed to be a
+ * real conversation would either be lying or be a third-party script
+ * shipping visitor data off to someone else. This answers a fixed set of
+ * questions from the site's own verified data and hands over to a person
+ * for everything else. It says so in its opening line.
+ *
+ * Every figure, address, number and opening time below comes from
+ * site.ts or the services collection. Where a branch's hours are not
+ * confirmed (hoursVerified: false) the answer says so rather than
+ * presenting them as fact.
+ */
+const services = (await getCollection('services')).sort(
+  (a, b) => a.data.index - b.data.index
+);
+
+const kb = {
+  wa: whatsappLink(),
+  tel: site.phone.tel,
+  telDisplay: site.phone.display,
+  email: site.email,
+  branches: branches.map((b) => ({
+    name: b.name,
+    city: b.city,
+    /* Three of the four street addresses are still internal placeholders.
+       They must not reach a visitor, so they are stripped here and the
+       answer says the address is being confirmed instead. */
+    address: /TODO/i.test(b.address) ? null : b.address.replace(/\n/g, ', '),
+    phone: b.phone,
+    hours: b.hours,
+    hoursVerified: b.hoursVerified,
+  })),
+  services: services.map((s) => ({ t: s.data.title, s: s.data.summary, id: s.id })),
+};
+---
+
+<button class="ab__open" type="button" data-ask-open aria-label="Ask Danat">
+  <Icon name="chat" size={22} />
+  <span>Ask</span>
+</button>
+
+<dialog class="ab" data-ask aria-label="Ask Danat">
+  <div class="ab__panel">
+    <header class="ab__top">
+      <span class="ab__who">
+        <span class="ab__dot" aria-hidden="true"></span>
+        Ask Danat
+      </span>
+      <button class="ab__x" type="button" data-ask-close aria-label="Close">
+        <Icon name="plus" size={16} />
+      </button>
+    </header>
+
+    <div class="ab__log" data-ask-log role="log" aria-live="polite"></div>
+
+    <div class="ab__chips" data-ask-chips></div>
+
+    <form class="ab__ask" data-ask-form>
+      <input type="text" name="q" autocomplete="off"
+        placeholder="Ask about repairs, branches, hours…" aria-label="Ask a question" />
+      <button type="submit" aria-label="Send">
+        <Icon name="arrow" size={16} />
+      </button>
+    </form>
+
+    <footer class="ab__foot">
+      <a class="ab__wa" href={kb.wa} target="_blank" rel="noopener noreferrer">
+        <Icon name="whatsapp" size={15} /> Talk to a person
+      </a>
+      <a class="ab__tel" href={`tel:${kb.tel}`}>{kb.telDisplay}</a>
+    </footer>
+  </div>
+</dialog>
+
+{/* Passed as JSON rather than define:vars — two components declaring the
+    same top-level const in the page's shared inline scope throws, and one
+    of the two scripts then never runs at all. */}
+<script type="application/json" data-ask-kb set:html={JSON.stringify(kb)} />
+
+<script is:inline>
+  (() => {
+    const setup = () => {
+      const dlg = document.querySelector('[data-ask]');
+      const raw = document.querySelector('[data-ask-kb]');
+      if (!dlg || !raw) return;
+
+      const kb = JSON.parse(raw.textContent || '{}');
+      const log = dlg.querySelector('[data-ask-log]');
+      const chipBox = dlg.querySelector('[data-ask-chips]');
+
+      const esc = (t) =>
+        String(t).replace(/[&<>"]/g, (c) =>
+          ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]
+        );
+
+      const branchAnswer = () =>
+        kb.branches
+          .map((b) => {
+            const where = b.address
+              ? esc(b.address)
+              : `<i>${esc(b.city)} — we are confirming the street address.</i>`;
+            const call = b.phone
+              ? `<br><a href="tel:${esc(b.phone.replace(/\s/g, ''))}">${esc(b.phone)}</a>`
+              : '<br><i>Number to confirm — reach us on the Ruwi line below.</i>';
+            return `<b>${esc(b.name)}</b><br>${where}${call}`;
+          })
+          .join('<hr>') + '<hr><a href="/branches">All four branches</a>';
+
+      const hoursAnswer = () =>
+        kb.branches
+          .map((b) => {
+            const note = b.hoursVerified
+              ? ''
+              : '<br><i>These times are on our old site and we are confirming them — please call ahead.</i>';
+            return `<b>${esc(b.name)}</b><br>${b.hours.map(esc).join('<br>')}${note}`;
+          })
+          .join('<hr>');
+
+      const servicesAnswer = () =>
+        kb.services
+          .map((s) => `<b>${esc(s.t)}</b> — ${esc(s.s)} <a href="/services/${esc(s.id)}">Read more</a>`)
+          .join('<br><br>');
+
+      const TOPICS = [
+        { q: 'Where are your branches?', a: branchAnswer },
+        { q: 'What are your opening hours?', a: hoursAnswer },
+        { q: 'What can you repair?', a: servicesAnswer },
+        {
+          q: 'Do you sell laptops?',
+          a: () =>
+            'Yes — laptops and desktops, plus networking, security and spare parts. ' +
+            'We do not publish prices, so the range lives on the ' +
+            '<a href="/products">products page</a> and a quote comes from a conversation.',
+        },
+        {
+          q: 'How much will a repair cost?',
+          a: () =>
+            'Diagnosis is free and comes before any quote. You are told what failed, what it ' +
+            'will cost and how long it takes, and then you decide. Nothing is charged until you agree.',
+        },
+        {
+          q: 'I want a quote',
+          a: () =>
+            'Tell us what you need and we will price it: ' +
+            `<a href="${esc(kb.wa)}" target="_blank" rel="noopener noreferrer">message us on WhatsApp</a>, ` +
+            `call <a href="tel:${esc(kb.tel)}">${esc(kb.telDisplay)}</a>, or ` +
+            `email <a href="mailto:${esc(kb.email)}">${esc(kb.email)}</a>.`,
+        },
+      ];
+
+      /* Typed questions are matched on keywords against the same answers
+         the chips give. This is not a language model and does not claim
+         to be one — anything it cannot place goes to a person. */
+      const KEYS = [
+        ['branch', 'where', 'location', 'address', 'shop', 'ruwi', 'sohar', 'hail', 'salalah', 'near', 'find'],
+        ['hour', 'open', 'close', 'closing', 'time', 'timing', 'friday', 'weekend', 'today'],
+        ['repair', 'fix', 'broken', 'service', 'printer', 'cctv', 'network', 'data', 'recovery', 'virus', 'screen'],
+        ['buy', 'sell', 'laptop', 'desktop', 'product', 'stock', 'brand', 'hp', 'dell', 'lenovo', 'asus'],
+        ['cost', 'charge', 'fee', 'expensive', 'cheap', 'diagnos'],
+        ['quote', 'estimate', 'enquir', 'inquir', 'contact', 'email', 'call', 'price'],
+      ];
+
+      const answerFor = (text) => {
+        const q = text.toLowerCase();
+        let best = -1;
+        let score = 0;
+        KEYS.forEach((words, i) => {
+          const hits = words.reduce((n, w) => n + (q.includes(w) ? 1 : 0), 0);
+          if (hits > score) { score = hits; best = i; }
+        });
+        if (best < 0) return null;
+        return TOPICS[best].a();
+      };
+
+      const bubble = (who, html) => {
+        const p = document.createElement('div');
+        p.className = 'ab__msg';
+        p.setAttribute('data-who', who);
+        p.innerHTML = html;
+        log.appendChild(p);
+        log.scrollTop = log.scrollHeight;
+      };
+
+      const chips = () => {
+        chipBox.replaceChildren();
+        TOPICS.forEach((t) => {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.className = 'ab__chip';
+          b.textContent = t.q;
+          b.addEventListener('click', () => {
+            bubble('you', esc(t.q));
+            /* A beat before the reply, so the log reads as a reply rather
+               than as text that was always there. */
+            window.setTimeout(() => bubble('bot', t.a()), 260);
+          });
+          chipBox.appendChild(b);
+        });
+      };
+
+      let greeted = false;
+      const open = () => {
+        if (!greeted) {
+          greeted = true;
+          bubble(
+            'bot',
+            'Hello. I am a guide on this page, not a person — I answer a few common ' +
+              'questions from what the site knows. For anything else, use ' +
+              '<b>Talk to a person</b> below.'
+          );
+          chips();
+        }
+        if (typeof dlg.showModal === 'function') dlg.showModal();
+        else dlg.setAttribute('open', '');
+        void dlg.offsetWidth;
+        requestAnimationFrame(() => dlg.setAttribute('data-in', ''));
+      };
+      const close = () => {
+        dlg.removeAttribute('data-in');
+        if (typeof dlg.close === 'function') dlg.close();
+        else dlg.removeAttribute('open');
+      };
+
+      const form = dlg.querySelector('[data-ask-form]');
+      form?.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const input = form.querySelector('input');
+        const text = (input.value || '').trim();
+        if (!text) return;
+        bubble('you', esc(text));
+        input.value = '';
+        window.setTimeout(() => {
+          const a = answerFor(text);
+          bubble(
+            'bot',
+            a ||
+              'I do not have an answer for that one — I only cover a few basics. ' +
+                `<a href="${esc(kb.wa)}" target="_blank" rel="noopener noreferrer">Ask a person on WhatsApp</a> ` +
+                `or call <a href="tel:${esc(kb.tel)}">${esc(kb.telDisplay)}</a>.`
+          );
+        }, 280);
+      });
+
+      document
+        .querySelectorAll('[data-ask-open]')
+        .forEach((b) => b.addEventListener('click', open));
+      dlg.querySelector('[data-ask-close]')?.addEventListener('click', close);
+      dlg.addEventListener('click', (e) => { if (e.target === dlg) close(); });
+      dlg.addEventListener('close', () => dlg.removeAttribute('data-in'));
+    };
+
+    /* ClientRouter swaps the body without a page load, so an is:inline
+       script that ran once is bound to elements that no longer exist. */
+    let ran = false;
+    document.addEventListener('astro:page-load', () => { ran = true; setup(); });
+    window.addEventListener('load', () => { if (!ran) { ran = true; setup(); } });
+  })();
+</script>
+
+<style>
+  /* The launcher sits above the WhatsApp button, which keeps its corner. */
+  .ab__open {
+    position: fixed;
+    right: clamp(0.9rem, 2vw, 1.75rem);
+    bottom: calc(clamp(0.9rem, 2vw, 1.75rem) + 4.6rem);
+    z-index: 119;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.7rem 1rem;
+    border: 1px solid var(--line-light);
+    border-radius: 999px;
+    background: var(--white);
+    color: var(--green-deep);
+    font-size: 0.8125rem;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 14px 30px -16px rgb(10 30 12 / 0.45);
+    transition: transform var(--t2) var(--ease), background-color var(--t2) var(--ease);
+  }
+  .ab__open:hover { transform: translateY(-2px); background: #eef6ef; }
+  .ab__open:focus-visible { outline: 2px solid var(--green-deep); outline-offset: 3px; }
+
+  .ab {
+    width: min(24rem, calc(100vw - 1.5rem));
+    max-width: none;
+    /* auto on top and left pins the panel to the bottom-right, beside the
+       launcher that opens it, rather than to the top of the viewport. */
+    margin: auto 0 0 auto;
+    padding: 0;
+    border: 0;
+    background: none;
+    overflow: visible;
+  }
+  .ab::backdrop { background: rgb(7 9 10 / 0.42); }
+
+  .ab__panel {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto auto auto;
+    max-height: min(34rem, 80vh);
+    margin: 0 clamp(0.75rem, 2vw, 1.75rem) calc(clamp(0.9rem, 2vw, 1.75rem) + 4.6rem) 0;
+    border-radius: 18px;
+    overflow: hidden;
+    background: var(--white);
+    box-shadow: 0 40px 80px -32px rgb(10 30 12 / 0.55);
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 200ms var(--ease), transform 280ms var(--ease);
+  }
+  .ab[data-in] .ab__panel { opacity: 1; transform: none; }
+
+  .ab__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.85rem 1rem;
+    background: var(--green-deep);
+    color: #fff;
+  }
+  .ab__who { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; font-weight: 700; }
+  .ab__dot { width: 8px; height: 8px; border-radius: 50%; background: #8fdd8a; }
+  .ab__x {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border: 0;
+    border-radius: 50%;
+    background: rgb(255 255 255 / 0.16);
+    color: #fff;
+    cursor: pointer;
+  }
+  .ab__x :global(svg) { transform: rotate(45deg); }
+  .ab__x:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+
+  .ab__log {
+    display: grid;
+    gap: 0.6rem;
+    align-content: start;
+    padding: 1rem;
+    overflow-y: auto;
+    background: #f7faf8;
+  }
+  .ab__msg {
+    max-width: 92%;
+    padding: 0.65rem 0.8rem;
+    border-radius: 12px;
+    font-size: 0.8125rem;
+    line-height: 1.55;
+  }
+  .ab__msg[data-who='bot'] {
+    justify-self: start;
+    background: var(--white);
+    border: 1px solid var(--line-light);
+    color: var(--text);
+  }
+  .ab__msg[data-who='you'] {
+    justify-self: end;
+    background: var(--green-deep);
+    color: #fff;
+  }
+  .ab__msg :global(a) { color: var(--green-deep); text-decoration: underline; }
+  .ab__msg[data-who='you'] :global(a) { color: #fff; }
+  .ab__msg :global(hr) { border: 0; border-top: 1px solid var(--line-light); margin: 0.6rem 0; }
+  .ab__msg :global(i) { color: var(--text-2); font-style: italic; }
+
+  .ab__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    padding: 0.7rem 1rem;
+    border-top: 1px solid var(--line-light);
+    background: var(--white);
+  }
+  .ab__chip {
+    padding: 0.4rem 0.7rem;
+    border: 1px solid var(--line-light);
+    border-radius: 999px;
+    background: var(--white);
+    color: var(--text);
+    font: inherit;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: background-color var(--t2) var(--ease), border-color var(--t2) var(--ease);
+  }
+  .ab__chip:hover { background: #eef6ef; border-color: var(--green); }
+  .ab__chip:focus-visible { outline: 2px solid var(--green-deep); outline-offset: 2px; }
+
+  .ab__ask {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.5rem;
+    padding: 0 1rem 0.8rem;
+    background: var(--white);
+  }
+  .ab__ask input {
+    min-width: 0;
+    padding: 0.6rem 0.8rem;
+    border: 1px solid var(--line-light);
+    border-radius: 999px;
+    background: var(--white);
+    font: inherit;
+    font-size: 0.8125rem;
+    color: var(--text);
+  }
+  .ab__ask input::placeholder { color: var(--text-3); }
+  .ab__ask input:focus-visible { outline: 2px solid var(--green-deep); outline-offset: 1px; }
+  .ab__ask button {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border: 0;
+    border-radius: 50%;
+    background: var(--green-deep);
+    color: #fff;
+    cursor: pointer;
+  }
+  .ab__ask button:focus-visible { outline: 2px solid var(--green-deep); outline-offset: 2px; }
+
+  .ab__foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+    padding: 0.7rem 1rem;
+    border-top: 1px solid var(--line-light);
+    background: var(--white);
+  }
+  .ab__wa {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: var(--green-deep);
+  }
+  .ab__tel { font-size: 0.75rem; color: var(--text-2); }
+
+  @media (max-width: 30rem) {
+    .ab__open span { display: none; }
+    .ab__open { padding: 0.7rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ab__panel, .ab__open, .ab__open:hover { transition: none; transform: none; }
+  }
+</style>

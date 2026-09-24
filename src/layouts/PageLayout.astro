@@ -6,6 +6,7 @@ import SupportBot from '@components/global/SupportBot.astro';
 import SupportDrawer from '@components/global/SupportDrawer.astro';
 import EnquiryModal from '@components/global/EnquiryModal.astro';
 import ModalHistory from '@components/global/ModalHistory.astro';
+import AskDanat from '@components/global/AskDanat.astro';
 
 interface Props {
   title?: string;
@@ -23,6 +24,7 @@ const { title, description, overlayHeader = false } = Astro.props;
   <Footer />
   <SupportDrawer />
   <EnquiryModal />
+  <AskDanat />
   <ModalHistory />
   <SupportBot />
 </BaseLayout>
