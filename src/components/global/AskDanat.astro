@@ -42,7 +42,21 @@ const kb = {
 ---
 
 <button class="ab__open" type="button" data-ask-open aria-label="Ask Danat">
-  <Icon name="chat" size={22} />
+  {/* The same character as the panel header, cropped to the head so it
+      still reads at button size. A speech bubble said "chat"; this says
+      who you are about to talk to. */}
+  <svg class="ab__face" viewBox="0 0 44 44" fill="none" aria-hidden="true">
+    <path d="M8 22a14 14 0 0 1 28 0" stroke="#2f6429" stroke-width="3" stroke-linecap="round" />
+    <path d="M22 8V4" stroke="#2f6429" stroke-width="2.4" stroke-linecap="round" />
+    <circle cx="22" cy="3" r="2.4" fill="#59aa54" />
+    <rect x="9" y="13" width="26" height="22" rx="9" fill="#fff" stroke="#2f6429" stroke-width="2" />
+    <rect x="13" y="17" width="18" height="13" rx="6" fill="#17311c" />
+    <circle cx="18.6" cy="23" r="1.9" fill="#8fdd8a" />
+    <circle cx="25.4" cy="23" r="1.9" fill="#8fdd8a" />
+    <path d="M19.6 26.6q2.4 2 4.8 0" stroke="#8fdd8a" stroke-width="1.6" stroke-linecap="round" />
+    <rect x="3" y="18" width="7" height="12" rx="3.5" fill="#3d7f35" />
+    <rect x="34" y="18" width="7" height="12" rx="3.5" fill="#3d7f35" />
+  </svg>
   <span>Ask</span>
 </button>
 
@@ -327,7 +341,7 @@ const kb = {
     display: inline-flex;
     align-items: center;
     gap: 0.45rem;
-    padding: 0.7rem 1rem;
+    padding: 0.5rem 1.05rem 0.5rem 0.6rem;
     border: 1px solid var(--line-light);
     border-radius: 999px;
     background: var(--white);
@@ -339,6 +353,15 @@ const kb = {
     transition: transform var(--t2) var(--ease), background-color var(--t2) var(--ease);
   }
   .ab__open:hover { transform: translateY(-2px); background: #eef6ef; }
+  .ab__face { width: 30px; height: 30px; flex: none; }
+  /* A small nod on hover, so the button feels like a character rather
+     than a glyph. */
+  .ab__open:hover .ab__face { animation: abNod 700ms var(--ease); }
+  @keyframes abNod {
+    30% { transform: rotate(-7deg); }
+    65% { transform: rotate(5deg); }
+    100% { transform: rotate(0); }
+  }
   .ab__open:focus-visible { outline: 2px solid var(--green-deep); outline-offset: 3px; }
 
   .ab {
@@ -606,12 +629,13 @@ const kb = {
 
   @media (max-width: 30rem) {
     .ab__open span { display: none; }
-    .ab__open { padding: 0.7rem; }
+    .ab__open { padding: 0.45rem; }
   }
 
   @media (prefers-reduced-motion: reduce) {
     .ab__panel, .ab__open, .ab__open:hover { transition: none; transform: none; }
     .ab__msg { animation: none; }
     .ab__dots b { animation: none; opacity: 0.6; }
+    .ab__open:hover .ab__face { animation: none; }
   }
 </style>
