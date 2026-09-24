@@ -49,10 +49,10 @@ const kb = {
 <dialog class="ab" data-ask aria-label="Ask Danat">
   <div class="ab__panel">
     <header class="ab__top">
-      <span class="ab__who">
-        <span class="ab__dot" aria-hidden="true"></span>
-        Ask Danat
-      </span>
+      <div>
+        <p class="ab__who">Ask Danat</p>
+        <p class="ab__sub">Answers about our products and services</p>
+      </div>
       <button class="ab__x" type="button" data-ask-close aria-label="Close">
         <Icon name="plus" size={16} />
       </button>
@@ -60,21 +60,21 @@ const kb = {
 
     <div class="ab__log" data-ask-log role="log" aria-live="polite"></div>
 
-    <div class="ab__chips" data-ask-chips></div>
-
     <form class="ab__ask" data-ask-form>
       <input type="text" name="q" autocomplete="off"
         placeholder="Ask about repairs, branches, hours…" aria-label="Ask a question" />
       <button type="submit" aria-label="Send">
-        <Icon name="arrow" size={16} />
+        <Icon name="arrow" size={17} />
       </button>
     </form>
 
     <footer class="ab__foot">
       <a class="ab__wa" href={kb.wa} target="_blank" rel="noopener noreferrer">
-        <Icon name="whatsapp" size={15} /> Talk to a person
+        Chat on WhatsApp
       </a>
-      <a class="ab__tel" href={`tel:${kb.tel}`}>{kb.telDisplay}</a>
+      <p class="ab__note">
+        Not a live agent. Confirm anything important with our team.
+      </p>
     </footer>
   </div>
 </dialog>
@@ -89,11 +89,15 @@ const kb = {
     const setup = () => {
       const dlg = document.querySelector('[data-ask]');
       const raw = document.querySelector('[data-ask-kb]');
-      if (!dlg || !raw) return;
+      if (!dlg || !raw || dlg.dataset.wired) return;
+      dlg.dataset.wired = '1';
 
       const kb = JSON.parse(raw.textContent || '{}');
       const log = dlg.querySelector('[data-ask-log]');
-      const chipBox = dlg.querySelector('[data-ask-chips]');
+      /* Suggestions live in the log, under the greeting, so the panel
+         keeps one column of content rather than four bands. */
+      const chipBox = document.createElement('div');
+      chipBox.className = 'ab__chips';
 
       const esc = (t) =>
         String(t).replace(/[&<>"]/g, (c) =>
@@ -212,10 +216,11 @@ const kb = {
           bubble(
             'bot',
             'Hello. I am a guide on this page, not a person — I answer a few common ' +
-              'questions from what the site knows. For anything else, use ' +
-              '<b>Talk to a person</b> below.'
+              'questions from what this site knows. For anything else, use ' +
+              '<b>Chat on WhatsApp</b> below.'
           );
           chips();
+          log.appendChild(chipBox);
         }
         if (typeof dlg.showModal === 'function') dlg.showModal();
         else dlg.setAttribute('open', '');
@@ -258,9 +263,13 @@ const kb = {
 
     /* ClientRouter swaps the body without a page load, so an is:inline
        script that ran once is bound to elements that no longer exist. */
-    let ran = false;
-    document.addEventListener('astro:page-load', () => { ran = true; setup(); });
-    window.addEventListener('load', () => { if (!ran) { ran = true; setup(); } });
+    /* Both of these fire on a first load, and whichever lands second was
+       still calling setup() — two closures, two click handlers on one
+       button, and the greeting printed twice. The dialog itself carries
+       the flag instead: a view transition brings a fresh one, so the next
+       page still wires up. */
+    document.addEventListener('astro:page-load', setup);
+    window.addEventListener('load', setup);
   })();
 </script>
 
@@ -303,13 +312,13 @@ const kb = {
 
   .ab__panel {
     display: grid;
-    grid-template-rows: auto minmax(0, 1fr) auto auto auto;
-    max-height: min(34rem, 80vh);
+    grid-template-rows: auto minmax(0, 1fr) auto auto;
+    max-height: min(36rem, 82vh);
     margin: 0 clamp(0.75rem, 2vw, 1.75rem) calc(clamp(0.9rem, 2vw, 1.75rem) + 4.6rem) 0;
-    border-radius: 18px;
+    border-radius: 20px;
     overflow: hidden;
     background: var(--white);
-    box-shadow: 0 40px 80px -32px rgb(10 30 12 / 0.55);
+    box-shadow: 0 44px 90px -34px rgb(10 30 12 / 0.55);
     opacity: 0;
     transform: translateY(12px);
     transition: opacity 200ms var(--ease), transform 280ms var(--ease);
@@ -318,47 +327,53 @@ const kb = {
 
   .ab__top {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
-    padding: 0.85rem 1rem;
-    background: var(--green-deep);
+    gap: 1rem;
+    padding: 1.15rem 1.25rem;
+    background: linear-gradient(135deg, #2f6429 0%, #3d7f35 100%);
     color: #fff;
   }
-  .ab__who { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; font-weight: 700; }
-  .ab__dot { width: 8px; height: 8px; border-radius: 50%; background: #8fdd8a; }
+  .ab__who { font-size: 1.0625rem; font-weight: 700; letter-spacing: -0.02em; }
+  /* 4.9:1 on the lighter end of the header gradient. */
+  .ab__sub { margin-top: 0.15rem; font-size: 0.8125rem; color: rgb(255 255 255 / 0.82); }
   .ab__x {
     display: grid;
     place-items: center;
-    width: 28px;
-    height: 28px;
+    flex: none;
+    width: 30px;
+    height: 30px;
     border: 0;
     border-radius: 50%;
-    background: rgb(255 255 255 / 0.16);
+    background: rgb(255 255 255 / 0.18);
     color: #fff;
     cursor: pointer;
+    transition: background-color var(--t2) var(--ease);
   }
+  .ab__x:hover { background: rgb(255 255 255 / 0.3); }
   .ab__x :global(svg) { transform: rotate(45deg); }
   .ab__x:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 
   .ab__log {
     display: grid;
-    gap: 0.6rem;
+    gap: 0.7rem;
     align-content: start;
-    padding: 1rem;
+    padding: 1.15rem 1.25rem;
     overflow-y: auto;
-    background: #f7faf8;
+    background: var(--white);
   }
   .ab__msg {
-    max-width: 92%;
-    padding: 0.65rem 0.8rem;
-    border-radius: 12px;
-    font-size: 0.8125rem;
-    line-height: 1.55;
+    max-width: 94%;
+    padding: 0.85rem 1rem;
+    border-radius: 14px;
+    font-size: 0.875rem;
+    line-height: 1.6;
   }
   .ab__msg[data-who='bot'] {
     justify-self: start;
-    background: var(--white);
-    border: 1px solid var(--line-light);
+    /* #f1f6f2 was so close to the panel it did not read as a bubble. */
+    background: #edf4ee;
+    border: 1px solid #e0ebe2;
     color: var(--text);
   }
   .ab__msg[data-who='you'] {
@@ -371,22 +386,18 @@ const kb = {
   .ab__msg :global(hr) { border: 0; border-top: 1px solid var(--line-light); margin: 0.6rem 0; }
   .ab__msg :global(i) { color: var(--text-2); font-style: italic; }
 
-  .ab__chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.35rem;
-    padding: 0.7rem 1rem;
-    border-top: 1px solid var(--line-light);
-    background: var(--white);
-  }
+  /* Suggestions, not chrome: they sit in the conversation and read as
+     things you could say next. */
+  .ab__chips { display: grid; gap: 0.35rem; justify-items: start; }
   .ab__chip {
-    padding: 0.4rem 0.7rem;
-    border: 1px solid var(--line-light);
+    padding: 0.45rem 0.85rem;
+    border: 1px solid #d9e4db;
     border-radius: 999px;
     background: var(--white);
-    color: var(--text);
+    color: var(--green-deep);
     font: inherit;
-    font-size: 0.75rem;
+    font-size: 0.8125rem;
+    text-align: left;
     cursor: pointer;
     transition: background-color var(--t2) var(--ease), border-color var(--t2) var(--ease);
   }
@@ -396,18 +407,20 @@ const kb = {
   .ab__ask {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
-    gap: 0.5rem;
-    padding: 0 1rem 0.8rem;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.85rem 1.25rem;
+    border-top: 1px solid var(--line-light);
     background: var(--white);
   }
   .ab__ask input {
     min-width: 0;
-    padding: 0.6rem 0.8rem;
-    border: 1px solid var(--line-light);
+    padding: 0.8rem 1.05rem;
+    border: 1px solid #d9e4db;
     border-radius: 999px;
     background: var(--white);
     font: inherit;
-    font-size: 0.8125rem;
+    font-size: 0.875rem;
     color: var(--text);
   }
   .ab__ask input::placeholder { color: var(--text-3); }
@@ -415,34 +428,29 @@ const kb = {
   .ab__ask button {
     display: grid;
     place-items: center;
-    width: 38px;
-    height: 38px;
+    width: 44px;
+    height: 44px;
     border: 0;
     border-radius: 50%;
     background: var(--green-deep);
     color: #fff;
     cursor: pointer;
+    transition: transform var(--t2) var(--ease);
   }
+  .ab__ask button:hover { transform: scale(1.06); }
   .ab__ask button:focus-visible { outline: 2px solid var(--green-deep); outline-offset: 2px; }
 
   .ab__foot {
-    display: flex;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
     align-items: center;
-    justify-content: space-between;
-    gap: 0.6rem;
-    padding: 0.7rem 1rem;
-    border-top: 1px solid var(--line-light);
+    gap: 1rem;
+    padding: 0.85rem 1.25rem 1rem;
     background: var(--white);
   }
-  .ab__wa {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    font-size: 0.8125rem;
-    font-weight: 700;
-    color: var(--green-deep);
-  }
-  .ab__tel { font-size: 0.75rem; color: var(--text-2); }
+  .ab__wa { font-size: 0.875rem; font-weight: 700; color: var(--green-deep); }
+  /* --text-3 is AA on white at this size. */
+  .ab__note { font-size: 0.75rem; line-height: 1.45; color: var(--text-3); }
 
   @media (max-width: 30rem) {
     .ab__open span { display: none; }
