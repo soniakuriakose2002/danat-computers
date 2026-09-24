@@ -2,7 +2,10 @@
 import { Image } from 'astro:assets';
 import Icon from '@components/ui/Icon.astro';
 import { site, whatsappLink } from '@data/site';
-import imgBench from '@assets/photos/repair-board.jpg';
+/* NOT repair-board.jpg. That photograph's technician wears a uniform
+   branded ТЕХНОБЫТСЕРВИС — another repair company — and the wordmark is
+   legible. It has no place on Danat's page. */
+import imgBench from '@assets/photos/repair-solder.jpg';
 
 /**
  * 05 — Mid-page CTA.
@@ -48,13 +51,24 @@ const figures = [
         </p>
       </div>
 
-      <div class="mid__acts" data-rise style="--d:190ms">
-        <a class="mid__wa" href={whatsappLink()} target="_blank" rel="noopener noreferrer"
-          title="Chat on WhatsApp" aria-label="Chat with Danat on WhatsApp">
-          <Icon name="whatsapp" size={20} />
-        </a>
-        <a class="mid__call" href={`tel:${site.phone.tel}`}>{site.phone.display}</a>
-        <span class="mid__note">Sat&ndash;Thu &middot; three branches across Oman</span>
+      <div class="mid__side" data-rise style="--d:190ms">
+        {/* What the sentence on the left actually promises, as three
+           steps — the right of this band used to be a phone number and
+           a lot of green. */}
+        <ol class="mid__steps">
+          <li><b>01</b><span>Diagnose<em>Free, before anything is quoted</em></span></li>
+          <li><b>02</b><span>Quote<em>Fixed price, agreed with you first</em></span></li>
+          <li><b>03</b><span>Repair<em>To the component, not the whole board</em></span></li>
+        </ol>
+
+        <div class="mid__acts">
+          <a class="mid__wa" href={whatsappLink()} target="_blank" rel="noopener noreferrer"
+            title="Chat on WhatsApp" aria-label="Chat with Danat on WhatsApp">
+            <Icon name="whatsapp" size={20} />
+          </a>
+          <a class="mid__call" href={`tel:${site.phone.tel}`}>{site.phone.display}</a>
+          <span class="mid__note">Sat&ndash;Thu &middot; three branches across Oman</span>
+        </div>
       </div>
     </div>
 
@@ -104,7 +118,10 @@ const figures = [
       linear-gradient(100deg,
         #27551f 0%,
         rgb(39 85 31 / 0.97) 34%,
-        rgb(47 100 41 / 0.93) 62%,
+        rgb(47 100 41 / 0.9) 62%,
+        /* Measured against the photograph underneath, not judged by eye:
+           at 0.78 the brightest part of the bench put plain white at
+           4.29:1 and the sub-text at 3.29:1. At 0.88 white is 5.36:1. */
         rgb(47 100 41 / 0.88) 100%),
       linear-gradient(to bottom, rgb(39 85 31 / 0.35), transparent 40%);
   }
@@ -152,6 +169,46 @@ const figures = [
     font-size: 0.9375rem;
     line-height: 1.6;
     color: rgb(255 255 255 / 0.84);
+  }
+
+  .mid__side { display: grid; gap: var(--s5); justify-items: start; }
+
+  /* The three steps the headline promises. A number, the step, and what
+     it actually means — the band used to say "free diagnosis" and then
+     leave the right-hand half empty. */
+  .mid__steps {
+    display: grid;
+    gap: 0.9rem;
+    width: 100%;
+    /* The column is right-aligned for the phone number; the steps are
+       sentences and read left. */
+    text-align: left;
+  }
+  .mid__steps li {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+    gap: 0.85rem;
+    padding-bottom: 0.9rem;
+    border-bottom: 1px solid rgb(255 255 255 / 0.18);
+  }
+  .mid__steps li:last-child { border-bottom: 0; padding-bottom: 0; }
+  .mid__steps b {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.16em;
+    color: rgb(255 255 255 / 0.55);
+    padding-top: 0.15rem;
+  }
+  .mid__steps span { display: grid; gap: 0.1rem; font-size: 0.9375rem; font-weight: 700; color: #fff; }
+  .mid__steps em {
+    font-style: normal;
+    font-size: 0.8125rem;
+    font-weight: 400;
+    line-height: 1.45;
+    /* 0.78 measured 3.97:1 over the brightest part of the photograph;
+       0.9 is 4.7:1 and clears AA. */
+    color: rgb(255 255 255 / 0.9);
   }
 
   .mid__acts {
