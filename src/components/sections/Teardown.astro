@@ -177,11 +177,10 @@ import { site } from '@data/site';
     display: block;
     /* The slow zoom below would otherwise spill past the corners. */
     overflow: hidden;
-    /* Not a rectangle, but the arch took a third of the picture with it.
-       This cuts two opposite corners deeply and leaves the other two
-       tight — the shape reads as deliberate while the subject, which
-       sits across the middle, is untouched. */
-    border-radius: 78px 14px 78px 14px;
+    /* Neutral until there is a reference to work from. The arch and the
+       house sweep both ate a third of the picture; three shape guesses
+       have missed, so this is a generous radius and nothing clever. */
+    border-radius: 30px;
     /* A framed panel rather than a bare rectangle: a hairline ring on the
        inside so the zoom cannot slide out from under it, a green cast in
        the near shadow, and a deep one to lift it off the section. */
@@ -316,13 +315,25 @@ import { site } from '@data/site';
 
   /* ---------- spec column ---------- */
 
+  /* Was 11px mono caps, which is a label. This is the company's name, so
+     it is set as one: the display face, title case, and big enough to be
+     read rather than scanned. */
   .td__eb {
-    font-family: var(--font-mono);
-    font-size: 0.6875rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    font-size: clamp(1rem, 1.5vw, 1.25rem);
+    font-weight: 600;
+    letter-spacing: -0.015em;
     /* 6.8:1 on white; --green-bright would be 1.9:1. */
     color: var(--green-deep);
+  }
+  .td__eb::before {
+    content: '';
+    width: 34px;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--green);
   }
 
   .td__h1 {
