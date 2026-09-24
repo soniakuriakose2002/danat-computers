@@ -141,15 +141,19 @@ import { site } from '@data/site';
   /* Two columns now the numbered rail is gone, and centred on each
      other — the film was floating above a headline that started higher
      than it did. */
-  /* Full bleed. No shell, no padding — the film meets the viewport on
-     three sides and the fixed header on the fourth. --hd-h is measured
-     and published by the script below, because the header's height is
-     set by its own contents and a magic number here would drift the
-     first time anything in it changes. */
+  /* A post, not a backdrop. The film is a centred column on a black
+     band that runs the full width — so the page keeps the white theme
+     above and below it, and the film has something dark to sit on.
+
+     --hd-h is measured and published by the script below, because the
+     header's height is set by its own contents and a magic number here
+     would drift the first time anything in it changes. */
   .td__intro {
-    height: calc(100svh - var(--hd-h, 5.4rem));
     margin-top: var(--hd-h, 5.4rem);
-    min-height: 26rem;
+    padding: clamp(1.5rem, 3.5vw, 3rem) var(--gut, 1.25rem);
+    background: #0a0d0e;
+    display: grid;
+    justify-items: center;
   }
 
   /* Present to a screen reader and a crawler, absent to the eye. */
@@ -180,13 +184,20 @@ import { site } from '@data/site';
   .td__film {
     position: relative;
     display: block;
-    height: 100%;
+    width: 100%;
+    /* LinkedIn's landscape post. The source is 16:9, so this trims a
+       little off the top and bottom and leaves the framing — and the
+       captions burned into the bottom-left of each shot — alone. A
+       square or 4:5 crop would take 44-55% off the SIDES of a 16:9
+       film, which is most of every shot. */
+    aspect-ratio: 1.91 / 1;
+    max-width: 62rem;
     /* The slow zoom below would otherwise spill past the corners. */
     overflow: hidden;
-    /* The cut corners and the drop shadow are gone with the box. They
-       were what made this a framed panel sitting ON the page — which is
-       exactly the impression a full-bleed opening has to avoid. Edge to
-       edge, nothing under it, nothing around it. */
+    /* Just enough of a corner to read as a post rather than a hole cut
+       in the band. No shadow: there is nothing lighter behind it for a
+       shadow to fall on. */
+    border-radius: 10px;
     animation: tdFilmIn 800ms var(--ease) both;
   }
   @keyframes tdFilmIn { from { opacity: 0; } }
@@ -199,7 +210,7 @@ import { site } from '@data/site';
   .td__film video {
     display: block;
     width: 100%;    height: 100%;
-    /* Cover, so a 16:9 film still fills a tall phone without bars. */
+    /* Cover, so the trim comes off the edges rather than leaving bars. */
     object-fit: cover;
     /* What shows for the moment before the first frame paints. Black
        was right under a black section; on a light one it flashes as a
