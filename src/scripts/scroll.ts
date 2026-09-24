@@ -160,9 +160,15 @@ export function initCounters(root: ParentNode = document) {
   const io = new IntersectionObserver(
     (entries) => {
       for (const e of entries) {
-        if (!e.isIntersecting) continue;
-        run(e.target as HTMLElement);
-        io.unobserve(e.target);
+        const el = e.target as HTMLElement;
+        if (e.isIntersecting) {
+          run(el);
+        } else {
+          /* Armed again. It used to unobserve after the first run, so
+             scrolling back past a figure showed the finished number and
+             never the count — which read as the animation being gone. */
+          el.textContent = '0';
+        }
       }
     },
     /* Starts when the figure is properly on screen rather than as it
