@@ -113,8 +113,11 @@ const parts = stages.filter((s) => !s.hero);
         {/* Plays on a click, never on its own. */}
         <div class="td__film" data-film>
           <video src="/film/ecosystem.mp4" poster="/film/ecosystem.jpg"
-            muted loop playsinline preload="none"
+            autoplay muted loop playsinline preload="auto"
             aria-label="Danat: printers, laptops, accessories, tools and servers"></video>
+          {/* Only a fallback now. Muted autoplay is allowed everywhere,
+              but a browser or a data-saving setting can still refuse it,
+              and a still frame with no way to start it is a dead end. */}
           <button type="button" data-film-play aria-label="Play the film">
             <Icon name="play" size={18} />
             <span>Watch</span>
@@ -233,7 +236,9 @@ const parts = stages.filter((s) => !s.hero);
       const stop = () => { if (timer) clearInterval(timer); timer = null; };
       const start = () => {
         if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-        if (!timer) timer = setInterval(() => show(at + 1), 3600);
+        /* 3.6s read as a slideshow. At 1.8s with a shorter fade the
+           parts change like cuts in a film. */
+        if (!timer) timer = setInterval(() => show(at + 1), 1800);
       };
 
       dots.forEach((d, i) => d.addEventListener('click', () => { show(i); stop(); start(); }));
@@ -377,8 +382,8 @@ const parts = stages.filter((s) => !s.hero);
     grid-area: 1 / 1;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 520ms var(--ease), transform 640ms var(--ease),
-      visibility 0s linear 520ms;
+    transition: opacity 300ms var(--ease), transform 420ms var(--ease),
+      visibility 0s linear 300ms;
     pointer-events: none;
   }
   /* The active rule has to match the SAME chain length as the one that
@@ -392,7 +397,7 @@ const parts = stages.filter((s) => !s.hero);
     opacity: 1;
     visibility: visible;
     transform: none;
-    transition: opacity 520ms var(--ease), transform 640ms var(--ease);
+    transition: opacity 300ms var(--ease), transform 420ms var(--ease);
     pointer-events: auto;
   }
   /* The part turns in; the words rise. Different motions so the panel
@@ -443,7 +448,21 @@ const parts = stages.filter((s) => !s.hero);
 
   /* The film panel. Sized by its own aspect so nothing jumps when the
      poster swaps for the video. */
-  .td__film { position: relative; display: block; }
+  .td__film {
+    position: relative;
+    display: block;
+    /* The slow zoom below would otherwise spill past the corners. */
+    overflow: hidden;
+    border-radius: 14px;
+    animation: tdFilmIn 800ms var(--ease) both;
+  }
+  @keyframes tdFilmIn { from { opacity: 0; } }
+  /* Arrives, holds, then creeps in — the zoom starts only once it has
+     settled, so the two do not fight. */
+  .td__film video {
+    animation: tdFilmZoom 18s ease-in-out 900ms infinite alternate;
+  }
+  @keyframes tdFilmZoom { to { transform: scale(1.08); } }
   /* The header floats over this frame, and the film's top band carries
      near-white neon: white nav text measured 1.03:1 against it. The
      scrim below takes the worst pixel well clear of AA. */
@@ -499,6 +518,8 @@ const parts = stages.filter((s) => !s.hero);
   .td__film button:hover { transform: translate(-50%, -50%) scale(1.05); }
   .td__film button:focus-visible { outline: 2px solid var(--green-bright); outline-offset: 3px; }
   .td__film[data-playing] button { opacity: 0; pointer-events: none; }
+  /* Hidden the moment playback is under way, however it started. */
+  .td__film[data-auto] button { opacity: 0; pointer-events: none; }
 
   .td__part {
     position: relative;
@@ -680,6 +701,7 @@ const parts = stages.filter((s) => !s.hero);
     /* It only ever plays on a click, so it is already safe here; the
        hover scale is the only thing to drop. */
     .td__film button:hover { transform: translate(-50%, -50%); }
+    .td__film, .td__film video { animation: none; }
     /* Square to the camera, no motion. --t is never set, so this only
        needs to drop the will-change hint. */
     .td__part { will-change: auto; }
@@ -696,6 +718,10 @@ const parts = stages.filter((s) => !s.hero);
       const v = box.querySelector('video');
       const btn = box.querySelector('[data-film-play]');
 
+      /* If autoplay is allowed the button never needs to appear. */
+      if (!v.paused) box.setAttribute('data-auto', '');
+      v.addEventListener('playing', () => box.setAttribute('data-auto', ''));
+
       btn.addEventListener('click', () => {
         box.setAttribute('data-playing', '');
         v.play().catch(() => box.removeAttribute('data-playing'));
@@ -704,7 +730,7 @@ const parts = stages.filter((s) => !s.hero);
       /* Scrolled away mid-play is decode work for nobody. It resumes only
          if it was already playing — it never starts itself. */
       new IntersectionObserver(([e]) => {
-        if (!box.hasAttribute('data-playing')) return;
+        if (!box.hasAttribute('data-playing') && !box.hasAttribute('data-auto')) return;
         if (e.isIntersecting) v.play().catch(() => {});
         else v.pause();
       }, { threshold: 0.2 }).observe(box);
