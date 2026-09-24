@@ -101,11 +101,27 @@ const kb = {
     </header>
 
     <div class="ab__scroll" data-ask-scroll>
-      <p class="ab__msg ab__intro" data-who="bot">
-        Hello. I am a guide on this page, not a person — I answer a few common
-        questions from what this site knows. For anything else, use
-        <b>Chat on WhatsApp</b> below.
-      </p>
+      <div class="ab__row" data-who="bot">
+        <span class="ab__av" aria-hidden="true">
+          <svg viewBox="0 0 44 44" fill="none">
+            <path d="M8 22a14 14 0 0 1 28 0" stroke="#2f6429" stroke-width="3" stroke-linecap="round" />
+            <rect x="9" y="13" width="26" height="22" rx="9" fill="#fff" stroke="#2f6429" stroke-width="2" />
+            <rect x="13" y="17" width="18" height="13" rx="6" fill="#17311c" />
+            <circle cx="18.6" cy="23" r="1.9" fill="#8fdd8a" />
+            <circle cx="25.4" cy="23" r="1.9" fill="#8fdd8a" />
+            <rect x="3" y="18" width="7" height="12" rx="3.5" fill="#3d7f35" />
+            <rect x="34" y="18" width="7" height="12" rx="3.5" fill="#3d7f35" />
+          </svg>
+        </span>
+        <div>
+          <p class="ab__msg">
+            Hello. I am a guide on this page, not a person — I answer a few common
+            questions from what this site knows. For anything else, use
+            <b>Chat on WhatsApp</b> below.
+          </p>
+          <span class="ab__time" data-now></span>
+        </div>
+      </div>
 
       <ul class="ab__sugs">
         {[
@@ -248,14 +264,23 @@ const kb = {
         return TOPICS[best].a();
       };
 
+      const AV = dlg.querySelector('.ab__av')?.innerHTML || '';
+      const clock = () =>
+        new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+      /* One row per message: the bot keeps its face beside what it says,
+         both sides get a tail and a time, which is what makes the log read
+         as a conversation instead of a stack of panels. */
       const bubble = (who, html) => {
-        const p = document.createElement('div');
-        p.className = 'ab__msg';
-        p.setAttribute('data-who', who);
-        p.innerHTML = html;
-        log.appendChild(p);
+        const row = document.createElement('div');
+        row.className = 'ab__row';
+        row.setAttribute('data-who', who);
+        row.innerHTML =
+          (who === 'bot' ? `<span class="ab__av" aria-hidden="true">${AV}</span>` : '') +
+          `<div><p class="ab__msg">${html}</p><span class="ab__time">${clock()}</span></div>`;
+        log.appendChild(row);
         scroll.scrollTop = scroll.scrollHeight;
-        return p;
+        return row.querySelector('.ab__msg');
       };
 
       /* Three dots while it "thinks", then the dots become the answer.
@@ -282,7 +307,15 @@ const kb = {
         });
       });
 
+      /* Stamped when the panel opens, not at build time — a cached page
+         would otherwise show the hour it was generated. */
+      const stampIntro = () => {
+        const n = dlg.querySelector('[data-now]');
+        if (n && !n.textContent) n.textContent = clock();
+      };
+
       const open = () => {
+        stampIntro();
         if (typeof dlg.showModal === 'function') dlg.showModal();
         else dlg.setAttribute('open', '');
         void dlg.offsetWidth;
@@ -461,64 +494,6 @@ const kb = {
     overflow-y: auto;
     background: var(--white);
   }
-  .ab__msg {
-    max-width: 94%;
-    padding: 0.8rem 0.95rem;
-    border-radius: 16px;
-    font-size: 0.9375rem;
-    line-height: 1.55;
-    letter-spacing: -0.005em;
-    animation: abIn 260ms var(--ease) both;
-  }
-  @keyframes abIn { from { opacity: 0; transform: translateY(8px); } }
-  .ab__msg[data-who='bot'] {
-    justify-self: start;
-    background: #f3f7f4;
-    border: 1px solid #e4ece6;
-    color: var(--text);
-  }
-  /* The tail, as drawn — a square rotated behind the bubble's left edge. */
-  .ab__intro { position: relative; }
-  .ab__intro::after {
-    content: '';
-    position: absolute;
-    left: -5px;
-    bottom: 14px;
-    width: 12px;
-    height: 12px;
-    rotate: 45deg;
-    background: #f3f7f4;
-    border-left: 1px solid #e4ece6;
-    border-bottom: 1px solid #e4ece6;
-  }
-  .ab__msg[data-who='you'] {
-    justify-self: end;
-    background: var(--green-deep);
-    color: #fff;
-  }
-  .ab__msg :global(a) { color: var(--green-deep); text-decoration: underline; }
-  .ab__msg[data-who='you'] :global(a) { color: #fff; }
-  .ab__msg :global(b) { color: var(--green-deep); }
-  .ab__msg[data-who='you'] :global(b) { color: #fff; }
-  .ab__msg :global(hr) { border: 0; border-top: 1px solid var(--line-light); margin: 0.6rem 0; }
-  .ab__msg :global(i) { color: var(--text-2); font-style: italic; }
-
-  .ab__msg[data-typing] { padding: 0.95rem 1.1rem; }
-  .ab__dots { display: inline-flex; gap: 0.28rem; }
-  .ab__dots b {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--green-deep);
-    opacity: 0.35;
-    animation: abDot 1.1s ease-in-out infinite;
-  }
-  .ab__dots b:nth-child(2) { animation-delay: 0.16s; }
-  .ab__dots b:nth-child(3) { animation-delay: 0.32s; }
-  @keyframes abDot {
-    0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
-    30% { opacity: 1; transform: translateY(-3px); }
-  }
 
   /* ---- suggestions ---- */
   .ab__sugs { display: grid; gap: 0.4rem; }
@@ -634,8 +609,99 @@ const kb = {
 
   @media (prefers-reduced-motion: reduce) {
     .ab__panel, .ab__open, .ab__open:hover { transition: none; transform: none; }
-    .ab__msg { animation: none; }
+    .ab__row { animation: none; }
     .ab__dots b { animation: none; opacity: 0.6; }
     .ab__open:hover .ab__face { animation: none; }
+  }
+</style>
+
+{/* These rules must be global. Astro scopes styles by stamping a cid
+    attribute on elements at build time, and the reply rows are built by
+    script at runtime — so they carry no cid and every scoped rule missed
+    them. The avatar rendered at its natural size, filling the panel, and
+    the bubbles had no bubble. Everything here is prefixed with .ab so it
+    cannot leak past the dialog. */}
+<style is:global>
+  /* ---- a message row ---- */
+  .ab .ab__row {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    /* Beside the first line of what is said, not floating under it. */
+    align-items: start;
+    gap: 0.5rem;
+    animation: abIn 260ms var(--ease) both;
+  }
+  .ab .ab__row[data-who='you'] { grid-template-columns: minmax(0, 1fr); justify-items: end; }
+  .ab .ab__av {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--white);
+    border: 1px solid #dcebdf;
+  }
+  .ab .ab__av svg { width: 22px; height: 22px; }
+  .ab .ab__time {
+    display: block;
+    margin-top: 0.22rem;
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.1em;
+    color: var(--text-3);
+  }
+  .ab .ab__row[data-who='you'] .ab__time { text-align: right; }
+  .ab .ab__msg {
+    position: relative;
+    max-width: 100%;
+    padding: 0.7rem 0.9rem;
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    letter-spacing: -0.005em;
+  }
+  @keyframes abIn { from { opacity: 0; transform: translateY(8px); } }
+
+  /* Square off the corner the tail comes out of, as a chat bubble does. */
+  .ab .ab__row[data-who='bot'] .ab__msg {
+    border-radius: 16px 16px 16px 4px;
+    background: #f3f7f4;
+    border: 1px solid #e4ece6;
+    color: var(--text);
+  }
+  .ab .ab__row[data-who='you'] .ab__msg {
+    border-radius: 16px 16px 4px 16px;
+    background: var(--green-deep);
+    color: #fff;
+  }
+  .ab .ab__msg :global(a) { color: var(--green-deep); text-decoration: underline; }
+  .ab .ab__row[data-who='you'] .ab__msg :global(a) { color: #fff; }
+  .ab .ab__msg :global(b) { color: var(--green-deep); }
+  .ab .ab__row[data-who='you'] .ab__msg :global(b) { color: #fff; }
+  .ab .ab__msg :global(hr) { border: 0; border-top: 1px solid var(--line-light); margin: 0.6rem 0; }
+  .ab .ab__msg :global(i) { color: var(--text-2); font-style: italic; }
+
+  .ab .ab__msg[data-typing] { padding: 0.8rem 1rem; }
+  .ab .ab__dots { display: inline-flex; gap: 0.28rem; }
+  .ab .ab__dots b {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--green-deep);
+    opacity: 0.35;
+    animation: abDot 1.1s ease-in-out infinite;
+  }
+  .ab .ab__dots b:nth-child(2) { animation-delay: 0.16s; }
+  .ab .ab__dots b:nth-child(3) { animation-delay: 0.32s; }
+  @keyframes abDot {
+    0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+    30% { opacity: 1; transform: translateY(-3px); }
+  }
+
+
+  /* Also global: the scoped copy of these cannot reach a row built at
+     runtime either. */
+  @media (prefers-reduced-motion: reduce) {
+    .ab .ab__row { animation: none; }
+    .ab .ab__dots b { animation: none; opacity: 0.6; }
   }
 </style>
