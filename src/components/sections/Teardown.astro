@@ -196,14 +196,23 @@ const pillars = [
         </a>
       </div>
 
-      <ul class="td__pillars">
+      {/* The copy says we are with you at every step, so the five read as
+          steps on a line rather than five identical boxes. The line draws
+          itself in, then each stop lights in turn. */}
+      {/* The rule is a sibling of the list, not a child of it: a <span>
+          is not valid inside <ol>, and the list was collapsing around it. */}
+      <div class="td__steps">
+        <span class="td__spine" data-draw style="--d:120ms" aria-hidden="true"></span>
+        <ol class="td__stops">
         {pillars.map((p, i) => (
-          <li data-rise style={`--d:${i * 60}ms`}>
-            <span aria-hidden="true"><Icon name={p.icon} size={19} /></span>
+          <li data-rise style={`--d:${200 + i * 90}ms`}>
+            <span class="td__dot" aria-hidden="true"></span>
+            <span class="td__ico" aria-hidden="true"><Icon name={p.icon} size={20} /></span>
             <b>{p.a}<br />{p.b}</b>
           </li>
         ))}
-      </ul>
+        </ol>
+      </div>
 
       <dl class="td__stats" data-rise style="--d:220ms">
         <div>
@@ -574,13 +583,15 @@ const pillars = [
   /* ---------- closing ---------- */
 
   .td__close {
-    padding-block: clamp(3rem, 7vw, 5rem);
+    padding-block: clamp(2.5rem, 5vw, 3.75rem);
     /* Must land on --ink at the bottom: the wave at the top of the brand
        strip is filled --ink, and a boundary shape is only invisible if it
        matches the section above it. Ending on #07090a would show a seam. */
     background: linear-gradient(160deg, #0a1b0f, var(--ink) 62%);
   }
-  .td__cgrid { display: grid; gap: clamp(1.75rem, 4vw, 3rem); align-items: center; }
+  /* start, not center: centring left the copy floating with a hole
+     beneath it and the rail floating with one above. */
+  .td__cgrid { display: grid; gap: clamp(1.25rem, 3vw, 2.25rem); align-items: start; }
 
   .td__ch {
     margin-top: var(--s4);
@@ -614,27 +625,74 @@ const pillars = [
   }
   .td__cta:hover { background: var(--green-bright); transform: translateY(-2px); }
 
-  .td__pillars {
+  /* Five steps on one line, not five boxes. */
+  /* NOT .td__rail — that is the frame sequence's own index rail, and
+     reusing the name put these rules on all six of those too. */
+  .td__steps { position: relative; padding-top: 1.4rem; }
+  .td__stops {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(7rem, 1fr));
-    gap: 0.6rem;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 0.4rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
   }
-  .td__pillars li {
+  /* The rule the stops sit on. Inset so it starts and ends near the
+     first and last dot rather than running off the edges. */
+  .td__spine {
+    position: absolute;
+    top: 1.4rem;
+    left: 10%;
+    right: 10%;
+    height: 2px;
+    border-radius: 2px;
+    background: linear-gradient(
+      90deg,
+      rgb(111 201 106 / 0.35),
+      rgb(111 201 106 / 0.95) 50%,
+      rgb(111 201 106 / 0.35)
+    );
+    box-shadow: 0 0 12px rgb(111 201 106 / 0.35);
+  }
+  .td__stops li {
+    position: relative;
     display: grid;
     justify-items: center;
-    gap: 0.6rem;
-    padding: 1.1rem 0.6rem;
-    border: 1px solid rgb(255 255 255 / 0.1);
-    border-radius: 12px;
+    gap: 0.55rem;
+    padding-top: 0.9rem;
     text-align: center;
-    transition: border-color var(--t2) var(--ease), background-color var(--t2) var(--ease);
   }
-  .td__pillars li:hover {
-    border-color: rgb(111 201 106 / 0.45);
-    background: rgb(111 201 106 / 0.06);
+  .td__dot {
+    position: absolute;
+    top: -3px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--green-bright);
+    box-shadow: 0 0 0 4px rgb(111 201 106 / 0.14);
+    transition: box-shadow var(--t2) var(--ease), scale var(--t2) var(--ease);
   }
-  .td__pillars span { color: var(--green-bright); }
-  .td__pillars b {
+  .td__ico {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+    border: 1px solid rgb(255 255 255 / 0.12);
+    background: rgb(255 255 255 / 0.03);
+    color: var(--green-bright);
+    transition:
+      transform var(--t2) var(--ease),
+      border-color var(--t2) var(--ease),
+      background-color var(--t2) var(--ease);
+  }
+  .td__stops li:hover .td__ico {
+    transform: translateY(-4px);
+    border-color: rgb(111 201 106 / 0.5);
+    background: rgb(111 201 106 / 0.1);
+  }
+  .td__stops li:hover .td__dot { scale: 1.35; box-shadow: 0 0 0 6px rgb(111 201 106 / 0.2); }
+  .td__stops b {
     font-size: 0.75rem;
     font-weight: 500;
     line-height: 1.35;
@@ -652,8 +710,8 @@ const pillars = [
     display: flex;
     flex-wrap: wrap;
     gap: var(--s5) 0;
-    margin-top: var(--s5);
-    padding-top: clamp(1.2rem, 2.2vw, 1.75rem);
+    margin-top: var(--s4);
+    padding-top: clamp(1rem, 1.8vw, 1.4rem);
     border-top: 1px solid rgb(255 255 255 / 0.26);
   }
   .td__stats > div { padding-inline: var(--s5); }
@@ -699,7 +757,7 @@ const pillars = [
       gap: clamp(1.5rem, 3vw, 3rem);
     }
     .td__script { display: block; }
-    .td__cgrid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); }
+    .td__cgrid { grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.25fr); }
     .td__stats { grid-column: 1 / -1; }
   }
 
@@ -708,6 +766,7 @@ const pillars = [
        needs to drop the will-change hint. */
     .td__part { will-change: auto; }
     .td__cta, .td__cta:hover, .td__cue span { transform: none; transition: none; }
+    .td__stops li:hover .td__ico, .td__stops li:hover .td__dot { transform: none; scale: 1; }
     .td__cue span { transform: rotate(90deg); }
   }
 </style>
