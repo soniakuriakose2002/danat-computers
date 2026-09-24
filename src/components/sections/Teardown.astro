@@ -93,166 +93,168 @@ const stages = [
   },
 ];
 
+
+/** The opening block is its own thing; the deck cycles the rest. */
+const parts = stages.filter((s) => !s.hero);
 ---
 
 <section class="td" data-tone="ink">
-  {stages.map((s, i) => {
-    const img = render(s.n);
-    return (
-      <article class="td__stage" data-hero={s.hero ? '' : undefined}>
-        <div class="shell td__grid">
-          {/* rail */}
-          <div class="td__rail" data-rise>
-            <span class="td__n">{s.n}</span>
-            <span class="td__line" aria-hidden="true"></span>
-            <span class="td__k">{s.rail}</span>
-            {s.sub && <span class="td__sub">{s.sub}</span>}
-          </div>
+  {/* ── the opening: this stays a block of its own ── */}
+  <div class="shell td__grid td__intro">
+    <div class="td__rail" data-rise>
+      <span class="td__n">01</span>
+      <span class="td__line" aria-hidden="true"></span>
+      <span class="td__k">The complete system</span>
+    </div>
 
-          {/* the part */}
-          <figure class="td__fig" data-travel style={`--dir:${i % 2 ? -1 : 1}`}>
-            <span class="td__glow" aria-hidden="true"></span>
-            <div class="td__part">
-              {/* The opening frame can play the ecosystem film. It does NOT
-                  start on its own — last time it did, it ambushed the page
-                  on open. The poster paints, and it plays when asked. */}
-              {s.hero ? (
-                <div class="td__film" data-film>
-                  <video src="/film/ecosystem.mp4" poster="/film/ecosystem.jpg"
-                    muted loop playsinline preload="none"
-                    aria-label="Danat: printers, laptops, accessories, tools and servers"></video>
-                  <button type="button" data-film-play aria-label="Play the film">
-                    <Icon name="play" size={18} />
-                    <span>Watch</span>
-                  </button>
-                </div>
-              ) : null}
-              {img && !s.hero ? (
+    <figure class="td__fig">
+      <span class="td__glow" aria-hidden="true"></span>
+      <div class="td__part">
+        {/* Plays on a click, never on its own. */}
+        <div class="td__film" data-film>
+          <video src="/film/ecosystem.mp4" poster="/film/ecosystem.jpg"
+            muted loop playsinline preload="none"
+            aria-label="Danat: printers, laptops, accessories, tools and servers"></video>
+          <button type="button" data-film-play aria-label="Play the film">
+            <Icon name="play" size={18} />
+            <span>Watch</span>
+          </button>
+        </div>
+      </div>
+    </figure>
+
+    <div class="td__body">
+      <p class="td__eb" data-rise>{site.nameFull}</p>
+      <h2 class="td__h1" data-rise style="--d:80ms">
+        More than<br />just <em>a laptop</em>
+      </h2>
+      <p class="td__lead" data-rise style="--d:150ms">
+        Complete technology solutions to power your work, study and business.
+      </p>
+    </div>
+
+    <p class="td__script" aria-hidden="true">
+      Technology<br />for a Brighter<br />Tomorrow.
+    </p>
+  </div>
+
+  {/* ── the machine, on ONE stage ──
+      It used to be five more full-height bands you scrolled through. It
+      is one panel now, and the parts change on it. Same six stages, same
+      words, a fifth of the page height. */}
+  <div class="shell td__grid td__deck" data-deck>
+    <div class="td__rail">
+      {parts.map((s, i) => (
+        <span class="td__slide" data-i={i} data-on={i === 0 ? '' : undefined}>
+          <span class="td__n">{s.n}</span>
+          <span class="td__line" aria-hidden="true"></span>
+          <span class="td__k">{s.rail}</span>
+          {s.sub && <span class="td__sub">{s.sub}</span>}
+        </span>
+      ))}
+    </div>
+
+    <figure class="td__fig">
+      <span class="td__glow" aria-hidden="true"></span>
+      <div class="td__part td__part--deck">
+        {parts.map((s, i) => {
+          const img = render(s.n);
+          return (
+            <span class="td__slide" data-i={i} data-on={i === 0 ? '' : undefined}>
+              {img ? (
                 <Image src={img} alt="" widths={[420, 640, 900]}
                   sizes="(min-width: 62rem) 46vw, 92vw"
-                  quality={82} format="webp"
-                  loading={i === 0 ? 'eager' : 'lazy'} />
-              ) : null}
-              {!img && !s.hero ? (
+                  quality={82} format="webp" loading={i === 0 ? 'eager' : 'lazy'} />
+              ) : (
                 <span class="td__slot">
-                  <b>{s.n}</b>
-                  <i>{s.rail} render</i>
-                  <em>src/assets/renders/{s.n}.png</em>
+                  <b>{s.n}</b><i>{s.rail} render</i><em>src/assets/renders/{s.n}.png</em>
                 </span>
-              ) : null}
-            </div>
-          </figure>
+              )}
+            </span>
+          );
+        })}
+      </div>
+    </figure>
 
-          {/* spec */}
-          <div class="td__body">
-            {s.hero ? (
-              <>
-                <p class="td__eb" data-rise>{site.nameFull}</p>
-                <h2 class="td__h1" data-rise style="--d:80ms">
-                  More than<br />just <em>a laptop</em>
-                </h2>
-                <p class="td__lead" data-rise style="--d:150ms">
-                  Complete technology solutions to power your work, study and
-                  business.
-                </p>
-                <a class="td__cue" href="#stage-02" data-rise style="--d:220ms">
-                  <span aria-hidden="true"><Icon name="arrow" size={16} /></span>
-                  Scroll to explore
-                </a>
-              </>
-            ) : (
-              <>
-                <span class="td__ic" aria-hidden="true"><Icon name={s.icon} size={22} /></span>
-                <h3 class="td__h" data-rise>{s.title}</h3>
-                <p class="td__p" data-rise style="--d:70ms">{s.lead}</p>
-                <ul class="td__specs">
-                  {s.specs.map((sp, si) => (
-                    <li data-rise style={`--d:${120 + si * 60}ms`}>
-                      <Icon name="check" size={14} />{sp}
-                    </li>
-                  ))}
-                </ul>
-              </>
-            )}
-          </div>
-        </div>
+    <div class="td__body">
+      {parts.map((s, i) => (
+        <span class="td__slide" data-i={i} data-on={i === 0 ? '' : undefined}>
+          <span class="td__ic" aria-hidden="true"><Icon name={s.icon} size={22} /></span>
+          <h3 class="td__h">{s.title}</h3>
+          <p class="td__p">{s.lead}</p>
+          <ul class="td__specs">
+            {s.specs.map((sp) => <li><Icon name="check" size={14} />{sp}</li>)}
+          </ul>
+        </span>
+      ))}
 
-        {s.hero && (
-          <p class="td__script" aria-hidden="true">
-            Technology<br />for a Brighter<br />Tomorrow.
-          </p>
-        )}
-        <span id={`stage-${s.n}`} class="td__anchor" aria-hidden="true"></span>
-      </article>
-    );
-  })}
-
+      <ol class="td__dots" role="tablist" aria-label="Parts of the machine">
+        {parts.map((s, i) => (
+          <li>
+            <button type="button" data-go={i} data-on={i === 0 ? '' : undefined}
+              role="tab" aria-selected={i === 0 ? 'true' : 'false'}
+              aria-label={s.rail}><i></i></button>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </div>
 </section>
 
 <script is:inline>
-  /* Plays the teardown through by itself, stage by stage.
-
-     Scrolls with its own rAF tween rather than scrollIntoView({smooth}):
-     chained smooth-scroll calls interrupt one another, the browser gives
-     no completion signal, and the duration is not ours to set. A tween
-     is deterministic and cancellable on any frame.
-
-     It hands control back on the first wheel, touch, key or click —
-     those are user-only events, so our own window.scrollTo calls cannot
-     trip them. Reduced motion skips it entirely. */
+  /* One stage, five parts, turning on their own.
+     It used to scroll the page from band to band by itself — that is the
+     behaviour this replaces, not an animation added on top of it. */
   (() => {
-    const run = () => {
-      if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const setup = () => {
+      const deck = document.querySelector('[data-deck]');
+      if (!deck || deck.dataset.wired) return;
+      deck.dataset.wired = '1';
 
-      const stages = [...document.querySelectorAll('.td__stage')];
-      if (stages.length < 2) return;
+      const groups = [...deck.querySelectorAll('.td__rail, .td__part--deck, .td__body')];
+      const dots = [...deck.querySelectorAll('[data-go]')];
+      const N = dots.length;
+      let at = 0;
+      let timer = null;
 
-      let stop = false;
-      const cancel = () => {
-        stop = true;
-        document.documentElement.removeAttribute('data-td-playing');
-      };
-      for (const ev of ['wheel', 'touchstart', 'keydown', 'pointerdown']) {
-        window.addEventListener(ev, cancel, { passive: true, once: true });
-      }
-
-      const tweenTo = (y, ms) =>
-        new Promise((done) => {
-          const from = window.scrollY;
-          const dy = y - from;
-          const t0 = performance.now();
-          const frame = (now) => {
-            if (stop) return done();
-            const t = Math.min(1, (now - t0) / ms);
-            const e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-            window.scrollTo(0, from + dy * e);
-            t < 1 ? requestAnimationFrame(frame) : done();
-          };
-          requestAnimationFrame(frame);
-        });
-
-      const wait = (ms) => new Promise((r) => setTimeout(r, ms));
-
-      (async () => {
-        await wait(1500);
-        if (stop || window.scrollY > 60) return cancel();
-        document.documentElement.setAttribute('data-td-playing', '');
-
-        for (let i = 1; i < stages.length; i += 1) {
-          if (stop) return;
-          const r = stages[i].getBoundingClientRect();
-          const y = window.scrollY + r.top - (window.innerHeight - r.height) / 2;
-          await tweenTo(Math.max(0, y), 1400);
-          if (stop) return;
-          await wait(1100);
+      const show = (next) => {
+        at = ((next % N) + N) % N;
+        for (const g of groups) {
+          g.querySelectorAll(':scope > .td__slide').forEach((el, i) =>
+            el.toggleAttribute('data-on', i === at)
+          );
         }
-        cancel();
-      })();
+        dots.forEach((d, i) => {
+          d.toggleAttribute('data-on', i === at);
+          d.setAttribute('aria-selected', i === at ? 'true' : 'false');
+        });
+      };
+
+      const stop = () => { if (timer) clearInterval(timer); timer = null; };
+      const start = () => {
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        if (!timer) timer = setInterval(() => show(at + 1), 3600);
+      };
+
+      dots.forEach((d, i) => d.addEventListener('click', () => { show(i); stop(); start(); }));
+
+      /* Holds only while someone is working the dots, not for a pointer
+         resting anywhere near the section. */
+      deck.querySelector('.td__dots')?.addEventListener('pointerenter', stop);
+      deck.querySelector('.td__dots')?.addEventListener('pointerleave', start);
+      deck.addEventListener('focusin', stop);
+      deck.addEventListener('focusout', start);
+
+      /* Nothing turns while it is off screen. */
+      new IntersectionObserver(([e]) => (e.isIntersecting ? start() : stop()), {
+        threshold: 0.25,
+      }).observe(deck);
+
+      show(0);
     };
 
-    run();
-    // View Transitions swap the document without a reload.
-    document.addEventListener('astro:page-load', run);
+    document.addEventListener('astro:page-load', setup);
+    window.addEventListener('load', setup);
   })();
 </script>
 
@@ -266,16 +268,9 @@ const stages = [
 
   /* Each part gets its own band; the rules between them are what makes
      it read as a sequence rather than one long picture. */
-  .td__stage {
-    position: relative;
-    padding-block: clamp(3rem, 7vw, 5.5rem);
-    border-bottom: 1px solid rgb(255 255 255 / 0.07);
-  }
-  .td__stage[data-hero] {
-    padding-block: clamp(6.5rem, 11vw, 9rem) clamp(3rem, 7vw, 5.5rem);
-  }
 
-  .td__anchor { position: absolute; top: -5rem; }
+
+
 
   /* Shown only while the sequence is driving itself. */
   .td::after {
@@ -362,6 +357,90 @@ const stages = [
 
      --t is never published under reduced motion or with JS off; the
      fallback of 0.5 is the neutral pose, square to the camera. */
+  /* ---- one stage, five parts ---- */
+  .td__intro { padding-block: clamp(5.5rem, 10vw, 8rem) clamp(2rem, 4vw, 3rem); }
+  .td__deck {
+    position: relative;
+    padding-block: clamp(2rem, 4vw, 3rem) clamp(3.5rem, 7vw, 5.5rem);
+    border-top: 1px solid rgb(255 255 255 / 0.07);
+  }
+
+  /* Every part is stacked in the same cell; one is up at a time. Grid
+     rather than absolute, so the panel is as tall as its tallest part and
+     nothing jumps as they change. */
+  .td__deck .td__rail,
+  .td__deck .td__part--deck,
+  .td__deck .td__body { display: grid; }
+  .td__deck .td__rail > .td__slide,
+  .td__deck .td__part--deck > .td__slide,
+  .td__deck .td__body > .td__slide {
+    grid-area: 1 / 1;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 520ms var(--ease), transform 640ms var(--ease),
+      visibility 0s linear 520ms;
+    pointer-events: none;
+  }
+  /* The active rule has to match the SAME chain length as the one that
+     hides them. Astro stamps its scope attribute on every compound in a
+     selector, so a three-level chain carries three of them and a
+     two-level chain only two — the shorter rule loses and every slide
+     stayed hidden. */
+  .td__deck .td__rail > .td__slide[data-on],
+  .td__deck .td__part--deck > .td__slide[data-on],
+  .td__deck .td__body > .td__slide[data-on] {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    transition: opacity 520ms var(--ease), transform 640ms var(--ease);
+    pointer-events: auto;
+  }
+  /* The part turns in; the words rise. Different motions so the panel
+     does not read as one crossfade. */
+  .td__deck .td__part--deck > .td__slide { transform: rotateY(-12deg) scale(0.94); }
+  .td__deck .td__rail > .td__slide,
+  .td__deck .td__body > .td__slide { transform: translateY(14px); }
+  .td__deck .td__part--deck { perspective: 1200px; }
+  /* Each slide is a <span>, so without this its number, label and copy
+     all flow inline and land on top of one another. */
+  .td__deck .td__rail > .td__slide { display: grid; align-content: start; gap: 0.5rem; }
+  .td__deck .td__body > .td__slide { display: grid; align-content: center; }
+  .td__deck .td__rail { align-content: start; }
+  /* Two rows, so the dots sit under the copy rather than in the same
+     cell as every slide. */
+  .td__deck .td__body { grid-template-rows: minmax(0, 1fr) auto; align-content: stretch; }
+  .td__deck .td__body > .td__slide { grid-row: 1; }
+  .td__deck .td__dots { grid-row: 2; grid-column: 1; }
+  .td__deck .td__slide :global(img) { width: 100%; height: auto; }
+
+  .td__dots {
+    align-self: end;
+    display: flex;
+    gap: 0.5rem;
+    margin-top: auto;
+    padding-top: var(--s5);
+    z-index: 1;
+  }
+  .td__dots button {
+    display: grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: pointer;
+  }
+  .td__dots i {
+    width: 100%;
+    height: 3px;
+    border-radius: 2px;
+    background: rgb(255 255 255 / 0.22);
+    transition: background-color var(--t2) var(--ease);
+  }
+  .td__dots [data-on] i { background: var(--green-bright); }
+  .td__dots button:focus-visible { outline: 2px solid var(--green-bright); outline-offset: 2px; }
+
   /* The film panel. Sized by its own aspect so nothing jumps when the
      poster swaps for the video. */
   .td__film { position: relative; display: block; }
@@ -524,25 +603,6 @@ const stages = [
     color: rgb(255 255 255 / 0.74);
   }
 
-  .td__cue {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.7rem;
-    margin-top: var(--s5);
-    font-size: 0.875rem;
-    color: rgb(255 255 255 / 0.82);
-  }
-  .td__cue span {
-    display: grid;
-    place-items: center;
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    border: 1px solid rgb(255 255 255 / 0.28);
-    transform: rotate(90deg);
-    transition: background-color var(--t2) var(--ease), transform var(--t2) var(--ease);
-  }
-  .td__cue:hover span { background: rgb(255 255 255 / 0.1); transform: rotate(90deg) translateX(3px); }
 
   .td__ic {
     display: grid;
@@ -607,14 +667,22 @@ const stages = [
   }
 
   @media (prefers-reduced-motion: reduce) {
+    /* No turning: every part is shown, stacked, as the bands used to be. */
+    .td__deck .td__rail, .td__deck .td__part--deck, .td__deck .td__body { display: block; }
+    .td__deck .td__slide {
+      opacity: 1;
+      visibility: visible;
+      transform: none;
+      transition: none;
+      margin-bottom: var(--s5);
+    }
+    .td__dots { display: none; }
     /* It only ever plays on a click, so it is already safe here; the
        hover scale is the only thing to drop. */
     .td__film button:hover { transform: translate(-50%, -50%); }
     /* Square to the camera, no motion. --t is never set, so this only
        needs to drop the will-change hint. */
     .td__part { will-change: auto; }
-    .td__cue span { transform: none; transition: none; }
-    .td__cue span { transform: rotate(90deg); }
   }
 </style>
 
