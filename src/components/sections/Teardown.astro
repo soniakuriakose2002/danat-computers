@@ -113,6 +113,15 @@ const stages = [
           <figure class="td__fig" data-travel style={`--dir:${i % 2 ? -1 : 1}`}>
             <span class="td__glow" aria-hidden="true"></span>
             <div class="td__part">
+              {/* The opening frame plays the film. The still stays as the
+                  poster and is what paints first, so LCP is still an
+                  image; the video is attached by script afterwards and
+                  only where it is affordable. See the script below. */}
+              {s.hero && img ? (
+                <video class="td__film" data-film
+                  poster={img.src} muted loop playsinline preload="none"
+                  aria-label="Danat workshop film"></video>
+              ) : null}
               {img ? (
                 <Image src={img} alt="" widths={[420, 640, 900]}
                   sizes="(min-width: 62rem) 46vw, 92vw"
@@ -347,6 +356,20 @@ const stages = [
 
      --t is never published under reduced motion or with JS off; the
      fallback of 0.5 is the neutral pose, square to the camera. */
+  /* The film lies exactly over the still it replaces, so nothing moves
+     when it arrives and nothing is missing if it never does. */
+  .td__film {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    opacity: 0;
+    transition: opacity 600ms var(--ease);
+  }
+  .td__film[data-on] { opacity: 1; }
+
   .td__part {
     position: relative;
     z-index: 1;
@@ -533,6 +556,9 @@ const stages = [
   }
 
   @media (prefers-reduced-motion: reduce) {
+    /* Never attached in the first place — see the script — but belt and
+       braces if one is somehow playing. */
+    .td__film { display: none; }
     /* Square to the camera, no motion. --t is never set, so this only
        needs to drop the will-change hint. */
     .td__part { will-change: auto; }
@@ -540,3 +566,42 @@ const stages = [
     .td__cue span { transform: rotate(90deg); }
   }
 </style>
+
+<script is:inline>
+  (() => {
+    const setup = () => {
+      const v = document.querySelector('[data-film]');
+      if (!v || v.dataset.wired) return;
+      v.dataset.wired = '1';
+
+      /* The file is 4.6 MB. That is fine for a flourish and ruinous for a
+         first paint, so it is never part of the initial load: the poster
+         is what renders, and the source is attached only once the page is
+         idle AND the visit can afford it. */
+      const m = window.matchMedia('(prefers-reduced-motion: reduce)');
+      const net = navigator.connection || {};
+      const tooSlow = net.saveData === true || /(^|-)2g$/.test(net.effectiveType || '');
+      if (m.matches || tooSlow || window.innerWidth < 700) return;
+
+      const attach = () => {
+        v.src = '/film/hero.mp4';
+        v.addEventListener('canplay', () => {
+          v.setAttribute('data-on', '');
+          v.play().catch(() => v.removeAttribute('data-on'));
+        }, { once: true });
+
+        /* Off-screen it is wasted decode work. */
+        new IntersectionObserver(([e]) => {
+          if (e.isIntersecting) v.play().catch(() => {});
+          else v.pause();
+        }, { threshold: 0.15 }).observe(v);
+      };
+
+      if ('requestIdleCallback' in window) requestIdleCallback(attach, { timeout: 3000 });
+      else window.setTimeout(attach, 1200);
+    };
+
+    document.addEventListener('astro:page-load', setup);
+    window.addEventListener('load', setup);
+  })();
+</script>
