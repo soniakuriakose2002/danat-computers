@@ -190,7 +190,10 @@ const rows = [brands.slice(0, half), brands.slice(half)];
     letter-spacing: -0.04em;
     line-height: 1;
     white-space: nowrap;
-    color: var(--off-2);
+    /* Was --off-2 (#ececea), which is 1.18:1 on white — the names were
+       nearly invisible. #8b938f is 3.15:1, which clears AA for text this
+       size while still reading as a marquee rather than body copy. */
+    color: #8b938f;
     transition: color var(--t2) var(--ease);
   }
 

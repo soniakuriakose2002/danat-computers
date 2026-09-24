@@ -13,7 +13,7 @@ const { overlay = false } = Astro.props;
 <header class="hd" data-hd data-overlay={overlay ? '' : undefined}>
   <div class="hd__in">
     <a href="/" class="hd__brand" aria-label={`${site.nameFull} — home`}>
-      <Logo size={36} />
+      <Logo size={46} />
       <span class="hd__name">
         Danat<em>Computers</em>
       </span>
@@ -98,11 +98,11 @@ const { overlay = false } = Astro.props;
     color: #fff;
   }
 
-  /* Scrolled: frosted white. */
+  /* Scrolled: the SAME white it starts as. It used to go translucent
+     here, so on any page whose header begins opaque the bar visibly
+     changed shade the moment you scrolled — two whites on one page. */
   .hd[data-stuck] {
-    background: rgb(255 255 255 / 0.86);
-    backdrop-filter: blur(16px) saturate(150%);
-    -webkit-backdrop-filter: blur(16px) saturate(150%);
+    background: var(--white);
   }
 
   /* Scrolling down hides it; scrolling up brings it back. */
