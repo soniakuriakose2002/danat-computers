@@ -1,112 +1,22 @@
 ---
-import { Image } from 'astro:assets';
-import type { ImageMetadata } from 'astro';
 import Icon from '@components/ui/Icon.astro';
 import { site } from '@data/site';
 
 /**
- * TEARDOWN — the machine comes apart, part by part, as you scroll.
+ * THE OPENING — the film, the headline, and nothing else.
  *
- * Six stages. Each one is a band: the stage number on a rail at the
- * left, the render in the middle, the spec at the right. Scrolling
- * moves you through the disassembly rather than playing a video, which
- * means it stays sharp at any screen size, weighs a fraction of a video
- * file, and every word in it is real text that Google can read.
+ * This was six scrolling bands, then one turning panel. Both are gone at
+ * the client's instruction: the film carries the message on its own and
+ * the parts below it were repeating what it already shows.
  *
- * RENDERS: drop six images into src/assets/renders/ named
- *   01.png  02.png  03.png  04.png  05.png  06.png
- * (.jpg/.webp also fine). They are picked up automatically, converted to
- * WebP and sized per device at build time. Until a file is there, its
- * stage shows a marked empty frame rather than a broken one.
- *
- * Best results: transparent PNG, ~2000px wide, the part lit against
- * near-black with a green edge glow, shot from the same angle each time
- * so the six read as one machine coming apart.
+ * The renders in src/assets/renders/ are untouched and still on disk, so
+ * the sequence can come back from git without re-sourcing artwork.
  */
-const files = import.meta.glob<{ default: ImageMetadata }>(
-  '/src/assets/renders/*.{png,jpg,jpeg,webp,avif}',
-  { eager: true }
-);
-const render = (n: string): ImageMetadata | null =>
-  Object.entries(files).find(([p]) => p.includes(`/${n}.`))?.[1].default ?? null;
-
-const stages = [
-  {
-    n: '01',
-    rail: 'The complete system',
-    sub: null,
-    icon: 'laptop',
-    title: 'Brilliant display',
-    lead: 'Crystal clear visuals for a better viewing experience.',
-    specs: ['Full HD / 2K / 4K options', 'Anti-glare display', 'Vivid colour accuracy'],
-    hero: true,
-  },
-  {
-    n: '02',
-    rail: 'Display',
-    sub: 'See more.\nDo more.',
-    icon: 'laptop',
-    title: 'Brilliant display',
-    lead: 'Crystal clear visuals for a better viewing experience.',
-    specs: ['Full HD / 2K / 4K options', 'Anti-glare display', 'Vivid colour accuracy'],
-    hero: false,
-  },
-  {
-    n: '03',
-    rail: 'Performance',
-    sub: 'Built to\nkeep up.',
-    icon: 'chip',
-    title: 'Powerful performance',
-    lead: 'Latest Intel and AMD processors for seamless multitasking.',
-    specs: ['Intel Core / AMD Ryzen', 'High-speed RAM', 'Optimised for work, study and gaming'],
-    hero: false,
-  },
-  {
-    n: '04',
-    rail: 'Storage',
-    sub: 'Your data.\nAlways with you.',
-    icon: 'ssd',
-    title: 'Fast, reliable storage',
-    lead: 'More speed. More space. More possibilities.',
-    specs: ['SSD for faster performance', 'Large storage options', 'Secure data handling'],
-    hero: false,
-  },
-  {
-    n: '05',
-    rail: 'Cooling',
-    sub: 'Stay cool.\nPerform better.',
-    icon: 'fan',
-    title: 'Advanced cooling',
-    lead: 'Efficient thermal design for long-lasting performance.',
-    specs: ['Optimised airflow', 'Quieter operation', 'Stable performance'],
-    hero: false,
-  },
-  {
-    n: '06',
-    rail: 'Connectivity',
-    sub: 'Stay connected.\nEverywhere.',
-    icon: 'ports',
-    title: 'All the connections you need',
-    lead: 'Plug in, connect and get more done.',
-    specs: ['USB-C / USB-A', 'HDMI / display support', 'Audio and more'],
-    hero: false,
-  },
-];
-
-
-/** The opening block is its own thing; the deck cycles the rest. */
-const parts = stages.filter((s) => !s.hero);
 ---
 
 <section class="td" data-tone="ink">
   {/* ── the opening: this stays a block of its own ── */}
   <div class="shell td__grid td__intro">
-    <div class="td__rail" data-rise>
-      <span class="td__n">01</span>
-      <span class="td__line" aria-hidden="true"></span>
-      <span class="td__k">The complete system</span>
-    </div>
-
     <figure class="td__fig">
       <span class="td__glow" aria-hidden="true"></span>
       <div class="td__part">
@@ -141,127 +51,7 @@ const parts = stages.filter((s) => !s.hero);
     </p>
   </div>
 
-  {/* ── the machine, on ONE stage ──
-      It used to be five more full-height bands you scrolled through. It
-      is one panel now, and the parts change on it. Same six stages, same
-      words, a fifth of the page height. */}
-  <div class="shell td__grid td__deck" data-deck>
-    <div class="td__rail">
-      {parts.map((s, i) => (
-        <span class="td__slide" data-i={i} data-on={i === 0 ? '' : undefined}>
-          <span class="td__n">{s.n}</span>
-          <span class="td__line" aria-hidden="true"></span>
-          <span class="td__k">{s.rail}</span>
-          {s.sub && <span class="td__sub">{s.sub}</span>}
-        </span>
-      ))}
-    </div>
-
-    <figure class="td__fig">
-      <span class="td__glow" aria-hidden="true"></span>
-      <div class="td__part td__part--deck">
-        {parts.map((s, i) => {
-          const img = render(s.n);
-          return (
-            <span class="td__slide" data-i={i} data-on={i === 0 ? '' : undefined}>
-              {img ? (
-                <Image src={img} alt="" widths={[420, 640, 900]}
-                  sizes="(min-width: 62rem) 46vw, 92vw"
-                  quality={82} format="webp" loading={i === 0 ? 'eager' : 'lazy'} />
-              ) : (
-                <span class="td__slot">
-                  <b>{s.n}</b><i>{s.rail} render</i><em>src/assets/renders/{s.n}.png</em>
-                </span>
-              )}
-            </span>
-          );
-        })}
-      </div>
-    </figure>
-
-    <div class="td__body">
-      {parts.map((s, i) => (
-        <span class="td__slide" data-i={i} data-on={i === 0 ? '' : undefined}>
-          <span class="td__ic" aria-hidden="true"><Icon name={s.icon} size={22} /></span>
-          <h3 class="td__h">{s.title}</h3>
-          <p class="td__p">{s.lead}</p>
-          <ul class="td__specs">
-            {s.specs.map((sp) => <li><Icon name="check" size={14} />{sp}</li>)}
-          </ul>
-        </span>
-      ))}
-
-      <ol class="td__dots" role="tablist" aria-label="Parts of the machine">
-        {parts.map((s, i) => (
-          <li>
-            <button type="button" data-go={i} data-on={i === 0 ? '' : undefined}
-              role="tab" aria-selected={i === 0 ? 'true' : 'false'}
-              aria-label={s.rail}><i></i></button>
-          </li>
-        ))}
-      </ol>
-    </div>
-  </div>
 </section>
-
-<script is:inline>
-  /* One stage, five parts, turning on their own.
-     It used to scroll the page from band to band by itself — that is the
-     behaviour this replaces, not an animation added on top of it. */
-  (() => {
-    const setup = () => {
-      const deck = document.querySelector('[data-deck]');
-      if (!deck || deck.dataset.wired) return;
-      deck.dataset.wired = '1';
-
-      const groups = [...deck.querySelectorAll('.td__rail, .td__part--deck, .td__body')];
-      const dots = [...deck.querySelectorAll('[data-go]')];
-      const N = dots.length;
-      let at = 0;
-      let timer = null;
-
-      const show = (next) => {
-        at = ((next % N) + N) % N;
-        for (const g of groups) {
-          g.querySelectorAll(':scope > .td__slide').forEach((el, i) =>
-            el.toggleAttribute('data-on', i === at)
-          );
-        }
-        dots.forEach((d, i) => {
-          d.toggleAttribute('data-on', i === at);
-          d.setAttribute('aria-selected', i === at ? 'true' : 'false');
-        });
-      };
-
-      const stop = () => { if (timer) clearInterval(timer); timer = null; };
-      const start = () => {
-        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-        /* 3.6s read as a slideshow. At 1.8s with a shorter fade the
-           parts change like cuts in a film. */
-        if (!timer) timer = setInterval(() => show(at + 1), 1800);
-      };
-
-      dots.forEach((d, i) => d.addEventListener('click', () => { show(i); stop(); start(); }));
-
-      /* Holds only while someone is working the dots, not for a pointer
-         resting anywhere near the section. */
-      deck.querySelector('.td__dots')?.addEventListener('pointerenter', stop);
-      deck.querySelector('.td__dots')?.addEventListener('pointerleave', start);
-      deck.addEventListener('focusin', stop);
-      deck.addEventListener('focusout', start);
-
-      /* Nothing turns while it is off screen. */
-      new IntersectionObserver(([e]) => (e.isIntersecting ? start() : stop()), {
-        threshold: 0.25,
-      }).observe(deck);
-
-      show(0);
-    };
-
-    document.addEventListener('astro:page-load', setup);
-    window.addEventListener('load', setup);
-  })();
-</script>
 
 <style>
   .td {
@@ -362,89 +152,23 @@ const parts = stages.filter((s) => !s.hero);
 
      --t is never published under reduced motion or with JS off; the
      fallback of 0.5 is the neutral pose, square to the camera. */
-  /* ---- one stage, five parts ---- */
-  .td__intro { padding-block: clamp(5.5rem, 10vw, 8rem) clamp(2rem, 4vw, 3rem); }
-  .td__deck {
-    position: relative;
-    padding-block: clamp(2rem, 4vw, 3rem) clamp(3.5rem, 7vw, 5.5rem);
-    border-top: 1px solid rgb(255 255 255 / 0.07);
+  /* Two columns now the numbered rail is gone, and centred on each
+     other — the film was floating above a headline that started higher
+     than it did. */
+  .td__intro {
+    padding-block: clamp(4.5rem, 8vw, 6.5rem) clamp(3rem, 6vw, 4.5rem);
+    align-items: center;
   }
-
-  /* Every part is stacked in the same cell; one is up at a time. Grid
-     rather than absolute, so the panel is as tall as its tallest part and
-     nothing jumps as they change. */
-  .td__deck .td__rail,
-  .td__deck .td__part--deck,
-  .td__deck .td__body { display: grid; }
-  .td__deck .td__rail > .td__slide,
-  .td__deck .td__part--deck > .td__slide,
-  .td__deck .td__body > .td__slide {
-    grid-area: 1 / 1;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 300ms var(--ease), transform 420ms var(--ease),
-      visibility 0s linear 300ms;
-    pointer-events: none;
-  }
-  /* The active rule has to match the SAME chain length as the one that
-     hides them. Astro stamps its scope attribute on every compound in a
-     selector, so a three-level chain carries three of them and a
-     two-level chain only two — the shorter rule loses and every slide
-     stayed hidden. */
-  .td__deck .td__rail > .td__slide[data-on],
-  .td__deck .td__part--deck > .td__slide[data-on],
-  .td__deck .td__body > .td__slide[data-on] {
-    opacity: 1;
-    visibility: visible;
-    transform: none;
-    transition: opacity 300ms var(--ease), transform 420ms var(--ease);
-    pointer-events: auto;
-  }
-  /* The part turns in; the words rise. Different motions so the panel
-     does not read as one crossfade. */
-  .td__deck .td__part--deck > .td__slide { transform: rotateY(-12deg) scale(0.94); }
-  .td__deck .td__rail > .td__slide,
-  .td__deck .td__body > .td__slide { transform: translateY(14px); }
-  .td__deck .td__part--deck { perspective: 1200px; }
-  /* Each slide is a <span>, so without this its number, label and copy
-     all flow inline and land on top of one another. */
-  .td__deck .td__rail > .td__slide { display: grid; align-content: start; gap: 0.5rem; }
-  .td__deck .td__body > .td__slide { display: grid; align-content: center; }
-  .td__deck .td__rail { align-content: start; }
-  /* Two rows, so the dots sit under the copy rather than in the same
-     cell as every slide. */
-  .td__deck .td__body { grid-template-rows: minmax(0, 1fr) auto; align-content: stretch; }
-  .td__deck .td__body > .td__slide { grid-row: 1; }
-  .td__deck .td__dots { grid-row: 2; grid-column: 1; }
-  .td__deck .td__slide :global(img) { width: 100%; height: auto; }
-
-  .td__dots {
-    align-self: end;
-    display: flex;
-    gap: 0.5rem;
-    margin-top: auto;
-    padding-top: var(--s5);
-    z-index: 1;
-  }
-  .td__dots button {
-    display: grid;
-    place-items: center;
-    width: 26px;
-    height: 26px;
-    padding: 0;
-    border: 0;
-    background: none;
-    cursor: pointer;
-  }
-  .td__dots i {
-    width: 100%;
-    height: 3px;
-    border-radius: 2px;
-    background: rgb(255 255 255 / 0.22);
-    transition: background-color var(--t2) var(--ease);
-  }
-  .td__dots [data-on] i { background: var(--green-bright); }
-  .td__dots button:focus-visible { outline: 2px solid var(--green-bright); outline-offset: 2px; }
+  /* .td__fig centres its contents, which is right when the part is a
+     render with its own size. The film has none — its width is 100% of
+     its parent — so a centred parent shrink-wraps and the whole thing
+     collapses to a thumbnail. Stretch it, and the film fills the column. */
+  .td__intro .td__fig { justify-items: stretch; }
+  /* No swing left to make: --t came from data-travel on the old
+     scrolling figures. Unset it defaults to 0.5, which is a standing
+     translateZ(130px) against an 1100px perspective — a 1.13x
+     magnification that pushed the film out past its own column. */
+  .td__intro .td__part { width: 100%; transform: none; }
 
   /* The film panel. Sized by its own aspect so nothing jumps when the
      poster swaps for the video. */
@@ -453,7 +177,15 @@ const parts = stages.filter((s) => !s.hero);
     display: block;
     /* The slow zoom below would otherwise spill past the corners. */
     overflow: hidden;
-    border-radius: 14px;
+    border-radius: 22px;
+    /* A framed panel rather than a bare rectangle: a hairline ring on the
+       inside so the zoom cannot slide out from under it, a green cast in
+       the near shadow, and a deep one to lift it off the section. */
+    box-shadow:
+      inset 0 0 0 1px rgb(255 255 255 / 0.14),
+      0 0 0 1px rgb(111 201 106 / 0.16),
+      0 24px 50px -24px rgb(111 201 106 / 0.28),
+      0 50px 90px -40px rgb(0 0 0 / 0.85);
     animation: tdFilmIn 800ms var(--ease) both;
   }
   @keyframes tdFilmIn { from { opacity: 0; } }
@@ -681,23 +413,13 @@ const parts = stages.filter((s) => !s.hero);
 
   @media (min-width: 62rem) {
     .td__grid {
-      grid-template-columns: minmax(0, 0.42fr) minmax(0, 1.25fr) minmax(0, 0.9fr);
-      gap: clamp(1.5rem, 3vw, 3rem);
+      grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.85fr);
+      gap: clamp(2rem, 4vw, 3.5rem);
     }
     .td__script { display: block; }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    /* No turning: every part is shown, stacked, as the bands used to be. */
-    .td__deck .td__rail, .td__deck .td__part--deck, .td__deck .td__body { display: block; }
-    .td__deck .td__slide {
-      opacity: 1;
-      visibility: visible;
-      transform: none;
-      transition: none;
-      margin-bottom: var(--s5);
-    }
-    .td__dots { display: none; }
     /* It only ever plays on a click, so it is already safe here; the
        hover scale is the only thing to drop. */
     .td__film button:hover { transform: translate(-50%, -50%); }
