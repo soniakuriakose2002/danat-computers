@@ -1,6 +1,7 @@
 ---
 import { Image } from 'astro:assets';
 import Icon from '@components/ui/Icon.astro';
+import Brush from '@components/ui/Brush.astro';
 import { site, whatsappLink } from '@data/site';
 
 /* A clean macro on white — no people, no branded workwear, and it sits
@@ -54,29 +55,7 @@ const steps = [
 
       <h2 class="fd__h" data-rise style="--d:70ms">
         Something stopped working?<br />
-        {/*
-          The client's comp sets the emphasised half of a headline in a
-          brush hand over a painted stroke, with a few ticks thrown off
-          one corner. Three parts, and all three have to be here or it
-          reads as a highlighter pen: the hand, the stroke that is
-          brushed rather than rounded, and the ticks.
-
-          The stroke is a path, not a border-radius — a pill has two
-          equal ends and a brush has none. preserveAspectRatio is off so
-          it stretches to whatever the line measures.
-        */}
-        <em>
-          <svg class="fd__brush" viewBox="0 0 420 80" preserveAspectRatio="none" aria-hidden="true">
-            <path
-              d="M6 50C52 22 140 12 236 14c76 2 136 6 178-6-4 18-10 24-18 26-40 10-96 14-162 16-88 3-180 10-224 6-4-2-5-4-4-6Z"
-            />
-            <path class="fd__brush-2" d="M26 40c50-14 128-18 214-15 52 2 100 2 142-7" />
-          </svg>
-          <svg class="fd__spark" viewBox="0 0 44 44" aria-hidden="true">
-            <path d="M15 29 30 14M21 36 41 31M11 23 17 3" />
-          </svg>
-          <span>Bring it in.</span>
-        </em>
+        <Brush>Bring it in.</Brush>
       </h2>
 
       <p class="fd__p" data-rise style="--d:130ms">
@@ -206,74 +185,9 @@ const steps = [
     line-height: 1.1;
     color: var(--text);
   }
-  /* The brush hand. It carries a lot of slant and very little
-     x-height, so it needs to run larger than the grotesk above it and
-     be given room for the B's ascender and the g's descender. */
-  .fd__h em {
-    position: relative;
-    display: inline-block;
+  .fd__h :global(.brush) {
+    --brush-size: 1.34em;
     margin-top: 0.2em;
-    padding: 0.04em 0.3em 0.1em 0.16em;
-    font-family: var(--font-script);
-    font-style: normal;
-    font-weight: 400;
-    font-size: 1.34em;
-    line-height: 1.12;
-    letter-spacing: 0;
-    /* --green-deep is 6.8:1 on white and 5.6:1 over the stroke below,
-       comfortably past the 3:1 large text needs. */
-    color: var(--green-deep);
-  }
-  .fd__h em > span { position: relative; z-index: 1; }
-
-  .fd__brush {
-    position: absolute;
-    z-index: 0;
-    left: -0.16em;
-    right: -0.14em;
-    bottom: 0.2em;
-    height: 0.66em;
-    overflow: visible;
-    fill: rgb(89 170 84 / 0.24);
-    /* Painted on, left to right, once the line has arrived. */
-    clip-path: inset(0 100% 0 0);
-  }
-  /* The second, lighter pass a real brush leaves above the first. */
-  .fd__brush-2 {
-    fill: none;
-    stroke: rgb(89 170 84 / 0.2);
-    stroke-width: 13;
-    stroke-linecap: round;
-    vector-effect: non-scaling-stroke;
-  }
-  .fd__h[data-in] .fd__brush {
-    animation: fdPaint 640ms var(--ease) 430ms forwards;
-  }
-  @keyframes fdPaint {
-    to { clip-path: inset(0 -3% 0 0); }
-  }
-
-  /* The ticks thrown off the corner. */
-  .fd__spark {
-    position: absolute;
-    z-index: 2;
-    right: -0.5em;
-    top: -0.28em;
-    width: 0.56em;
-    height: 0.56em;
-    fill: none;
-    stroke: var(--green);
-    stroke-width: 3.6;
-    stroke-linecap: round;
-    opacity: 0;
-  }
-  .fd__h[data-in] .fd__spark {
-    animation: fdSpark 420ms var(--ease) 940ms forwards;
-  }
-  @keyframes fdSpark {
-    0% { opacity: 0; transform: scale(0.4) rotate(-14deg); }
-    60% { opacity: 1; transform: scale(1.14) rotate(5deg); }
-    100% { opacity: 1; transform: scale(1) rotate(0deg); }
   }
 
   .fd__p {
@@ -455,16 +369,5 @@ const steps = [
 
   @media (prefers-reduced-motion: reduce) {
     .fd__call a, .fd__call a:hover { transform: none; transition: none; }
-    /* The stroke and the ticks are the design, not decoration on top of
-       it — they arrive already painted rather than not at all. */
-    .fd__brush, .fd__h[data-in] .fd__brush {
-      animation: none;
-      clip-path: none;
-    }
-    .fd__spark, .fd__h[data-in] .fd__spark {
-      animation: none;
-      opacity: 1;
-      transform: none;
-    }
   }
 </style>

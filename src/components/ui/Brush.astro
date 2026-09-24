@@ -1,0 +1,138 @@
+---
+/**
+ * THE BRUSH ACCENT.
+ *
+ * The client's comps set the emphasised half of a headline in a brush
+ * hand over a painted stroke, with a few ticks thrown off one corner.
+ * All three parts have to be present or it reads as a highlighter pen,
+ * so they live together here rather than being rebuilt per section.
+ *
+ * The stroke is a path, not a border-radius: a pill has two equal ends
+ * and a brush has none. preserveAspectRatio is off so it stretches to
+ * whatever the line measures.
+ *
+ * Sizing is inherited — set --brush-size on the heading to change how
+ * much larger the hand runs than the grotesk above it.
+ */
+interface Props {
+  /** Hide the corner ticks where a neighbouring element already sits there. */
+  ticks?: boolean;
+  class?: string;
+}
+const { ticks = true, class: klass = '' } = Astro.props;
+---
+
+<em class:list={['brush', klass]}>
+  <svg class="brush__s" viewBox="0 0 420 80" preserveAspectRatio="none" aria-hidden="true">
+    {/* Both edges run nearly level after the left taper. An edge that
+        keeps climbing across the full width carries the stroke up out
+        of the words, so it looks painted under the first half of the
+        line and absent under the second. */}
+    <path
+      d="M4 52C40 30 120 22 210 21c90-1 160 2 206-3-1 12-6 18-16 20-60 7-130 12-210 13-75 1-148 7-178 7-7 0-10-2-8-6Z"
+    ></path>
+    <path class="brush__s2" d="M34 42c54-12 128-15 212-14 50 1 98 0 142-5"></path>
+  </svg>
+
+  {ticks && (
+    <svg class="brush__t" viewBox="0 0 44 44" aria-hidden="true">
+      <path d="M15 29 30 14M21 36 41 31M11 23 17 3"></path>
+    </svg>
+  )}
+
+  <span><slot /></span>
+</em>
+
+<style>
+  /* The hand carries a lot of slant and very little x-height, so it
+     runs larger than the grotesk around it and needs room for both the
+     ascenders and the descenders. */
+  .brush {
+    position: relative;
+    display: inline-block;
+    padding: 0.04em 0.3em 0.1em 0.16em;
+    font-family: var(--font-script);
+    font-style: normal;
+    font-weight: 400;
+    font-size: var(--brush-size, 1.3em);
+    line-height: 1.12;
+    letter-spacing: 0;
+    /* --green-deep is 6.8:1 on white and 5.6:1 over the stroke below,
+       comfortably past the 3:1 large text needs. */
+    color: var(--green-deep);
+  }
+  .brush > span {
+    position: relative;
+    z-index: 1;
+  }
+
+  .brush__s {
+    position: absolute;
+    z-index: 0;
+    left: -0.16em;
+    right: -0.14em;
+    bottom: 0.2em;
+    height: 0.66em;
+    overflow: visible;
+    fill: rgb(89 170 84 / 0.24);
+    /* Painted on, left to right, once the line has arrived. */
+    clip-path: inset(0 100% 0 0);
+  }
+  /* The second, lighter pass a real brush leaves above the first. */
+  .brush__s2 {
+    fill: none;
+    stroke: rgb(89 170 84 / 0.2);
+    stroke-width: 13;
+    stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .brush__t {
+    position: absolute;
+    z-index: 2;
+    right: -0.5em;
+    top: -0.28em;
+    width: 0.56em;
+    height: 0.56em;
+    fill: none;
+    stroke: var(--green);
+    stroke-width: 3.6;
+    stroke-linecap: round;
+    opacity: 0;
+  }
+
+  /* Keyed off the reveal engine's attribute on an ancestor heading. The
+     :global() is only the ancestor — the animated elements still carry
+     this component's scope, so nothing leaks. */
+  :global([data-in]) .brush__s {
+    animation: brushPaint 640ms var(--ease) 430ms forwards;
+  }
+  :global([data-in]) .brush__t {
+    animation: brushTicks 420ms var(--ease) 940ms forwards;
+  }
+
+  @keyframes brushPaint {
+    to { clip-path: inset(0 -3% 0 0); }
+  }
+  @keyframes brushTicks {
+    0% { opacity: 0; transform: scale(0.4) rotate(-14deg); }
+    60% { opacity: 1; transform: scale(1.14) rotate(5deg); }
+    100% { opacity: 1; transform: scale(1) rotate(0deg); }
+  }
+
+  /* The stroke and the ticks are the design, not decoration on top of
+     it — they arrive already painted rather than not at all. */
+  @media (prefers-reduced-motion: reduce) {
+    .brush__s,
+    :global([data-in]) .brush__s {
+      animation: none;
+      clip-path: none;
+    }
+    .brush__t,
+    :global([data-in]) .brush__t {
+      animation: none;
+      opacity: 1;
+      transform: none;
+    }
+  }
+</style>
