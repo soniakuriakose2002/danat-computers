@@ -102,7 +102,7 @@ const stats = [
           per visitor, no cookie banner, and the pins cannot drift. */}
       <figure class="ao__map">
         <Image src={imgMap} alt="Map of Oman marking the Danat branches in Ruwi, Sohar and Salalah"
-          widths={[428, 856]} sizes="(min-width: 68rem) 42rem, 92vw"
+          widths={[428, 856]} sizes="(min-width: 68rem) 27rem, 92vw"
           quality={82} format="webp" loading="lazy" />
 
         {list.map((b) => (
@@ -284,6 +284,13 @@ const stats = [
   .ao__map {
     position: relative;
     width: 100%;
+    /* The render is 856x1108 — a tall portrait, because Oman is. Left
+       to fill its track it ran taller than the viewport. The cap is on
+       the WIDTH, not the height: the pins are placed as a percentage of
+       this box, so cropping it with object-fit would slide them off
+       their cities. */
+    max-width: 27rem;
+    justify-self: end;
     border-radius: 20px;
     overflow: hidden;
     background: var(--off-2);
@@ -610,7 +617,7 @@ const stats = [
     /* The map carries the section, so it takes the wider track. The two
        columns meet at the top rather than being centred against each
        other, because the map is much the taller of the pair. */
-    .ao__grid { grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.18fr); gap: var(--s7); }
+    .ao__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 0.82fr); gap: var(--s7); }
   }
 
   @media (prefers-reduced-motion: reduce) {
