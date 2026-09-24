@@ -24,7 +24,7 @@ const years = new Date().getFullYear() - site.stats.since;
 const cities = branches.map((b) => b.city.split(',')[0]).join(', ');
 
 const paras = [
-  `Danat Computers opened on Computer Street in Ruwi in ${site.stats.since}, and has traded there ever since. ${years} years on it runs four branches across Oman — ${cities} — under the registered name ${site.legalName}.`,
+  `Danat Computers opened on Computer Street in Ruwi in ${site.stats.since}, and has traded there ever since. ${years} years on it runs three branches across Oman — ${cities} — under the registered name ${site.legalName}.`,
   `We sell, supply and repair: laptops and desktops, printers, CCTV, networking, and the parts that go inside all of them. ${site.stats.parts.toLocaleString('en-US')} lines across ${site.stats.categories} categories sit on the shelves, which is why most repairs do not wait on an order arriving from outside the country.`,
   'The part that sets the bench apart is what happens when a board fails. Most shops trace a fault that far, then quote a replacement mainboard — usually most of the value of the machine. We trace it to the component on the board and replace that instead.',
   'Diagnosis is free and comes before the quote. You are told what failed, what it will cost and how long it takes, and then you decide.',

@@ -78,7 +78,7 @@ export const hubServices: HubService[] = [
     key: 'support',
     title: 'IT Support',
     tagline: 'Respond. Resolve. Maintain.',
-    body: 'On-site and remote support for homes and businesses, with maintenance contracts covering all four branches.',
+    body: 'On-site and remote support for homes and businesses, with maintenance contracts covering all three branches.',
     href: '/services/hardware-troubleshooting',
     angle: 240,
     icon: 'headset',

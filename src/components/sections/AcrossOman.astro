@@ -11,7 +11,7 @@ const cardPos: Record<string, { x: number; y: number }> = {
   salalah: { x: 20, y: 77 },
 };
 
-const order = ['ruwi', 'sohar', 'hail', 'salalah'];
+const order = ['ruwi', 'sohar', 'salalah'];
 const list = order.map((s) => allBranches.find((b) => b.slug === s)!);
 
 const stats = [
@@ -32,7 +32,7 @@ const stats = [
       </h2>
 
       <p class="ao__sub" data-rise style="--d:130ms">
-        Four locations. One commitment. Serving individuals, businesses and
+        Three locations. One commitment. Serving individuals, businesses and
         communities across the Sultanate for over twenty years.
       </p>
 
@@ -118,7 +118,7 @@ const stats = [
 
       <div class="ao__map">
         <svg viewBox={OMAN_VIEWBOX} role="img"
-          aria-label="Map of Oman showing Danat branches in Ruwi, Sohar, Al Hail and Salalah">
+          aria-label="Map of Oman showing Danat branches in Ruwi, Sohar and Salalah">
           <path class="ao__land" d={OMAN_PATH} />
           {OMAN_ROUTES.map(([from, to]) => {
             const a = OMAN_PINS[from];

@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import Icon from '@components/ui/Icon.astro';
 import { site, branches, whatsappLink } from '@data/site';
+import { OMAN_PATH, OMAN_PINS } from '@data/omanMap';
 
 /**
  * ASK DANAT — an on-page guide, not a live agent and not an LLM.
@@ -21,8 +22,23 @@ const services = (await getCollection('services')).sort(
   (a, b) => a.data.index - b.data.index
 );
 
+/* The same outline and the same pin coordinates the branches page uses,
+   rendered here as a string because the answer is assembled by script. */
+const mapSvg = `<svg viewBox="0 0 1000 1342" fill="none" aria-hidden="true">
+  <path d="${OMAN_PATH}" fill="#e3f0e6" stroke="#bcd7c1" stroke-width="6" />
+  ${branches
+    .map((b) => {
+      const pin = OMAN_PINS[b.slug];
+      if (!pin) return '';
+      return `<circle cx="${pin.x}" cy="${pin.y}" r="42" fill="#2f6429" />` +
+        `<circle cx="${pin.x}" cy="${pin.y}" r="16" fill="#fff" />`;
+    })
+    .join('')}
+</svg>`;
+
 const kb = {
   wa: whatsappLink(),
+  map: mapSvg,
   tel: site.phone.tel,
   telDisplay: site.phone.display,
   email: site.email,
@@ -180,23 +196,40 @@ const kb = {
       const log = dlg.querySelector('[data-ask-log]');
       const scroll = dlg.querySelector('[data-ask-scroll]');
 
+      const PIN =
+        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"' +
+        ' stroke-linecap="round" stroke-linejoin="round">' +
+        '<path d="M12 21s7-5.6 7-11a7 7 0 1 0-14 0c0 5.4 7 11 7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg>';
+
       const esc = (t) =>
         String(t).replace(/[&<>"]/g, (c) =>
           ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]
         );
 
-      const branchAnswer = () =>
-        kb.branches
+      /* A card per branch beside the map, as drawn. No storefront
+         photographs exist, so each card leads with its pin instead of a
+         picture we would have to invent. */
+      const branchAnswer = () => {
+        const cards = kb.branches
           .map((b) => {
             const where = b.address
               ? esc(b.address)
-              : `<i>${esc(b.city)} — we are confirming the street address.</i>`;
-            const call = b.phone
-              ? `<br><a href="tel:${esc(b.phone.replace(/\s/g, ''))}">${esc(b.phone)}</a>`
-              : '<br><i>Number to confirm — reach us on the Ruwi line below.</i>';
-            return `<b>${esc(b.name)}</b><br>${where}${call}`;
+              : `${esc(b.city)} — address being confirmed`;
+            return (
+              `<a class="ab__bc" href="/branches">` +
+              `<span class="ab__bpin">${PIN}</span>` +
+              `<span><b>${esc(b.name.replace(/^Danat /, ''))}</b>` +
+              `<em>${where}</em><i>View on map ›</i></span></a>`
+            );
           })
-          .join('<hr>') + '<hr><a href="/branches">All four branches</a>';
+          .join('');
+        return (
+          `We have ${kb.branches.length} branches across Oman. You can visit any of ` +
+          `them for sales and service support.` +
+          `<span class="ab__branches"><span class="ab__map">${kb.map}</span>` +
+          `<span class="ab__bl">${cards}</span></span>`
+        );
+      };
 
       const hoursAnswer = () =>
         kb.branches
@@ -244,7 +277,7 @@ const kb = {
          the chips give. This is not a language model and does not claim
          to be one — anything it cannot place goes to a person. */
       const KEYS = [
-        ['branch', 'where', 'location', 'address', 'shop', 'ruwi', 'sohar', 'hail', 'salalah', 'near', 'find'],
+        ['branch', 'where', 'location', 'address', 'shop', 'ruwi', 'sohar', 'salalah', 'near', 'find'],
         ['hour', 'open', 'close', 'closing', 'time', 'timing', 'friday', 'weekend', 'today'],
         ['repair', 'fix', 'broken', 'service', 'printer', 'cctv', 'network', 'data', 'recovery', 'virus', 'screen'],
         ['buy', 'sell', 'laptop', 'desktop', 'product', 'stock', 'brand', 'hp', 'dell', 'lenovo', 'asus'],
@@ -703,5 +736,52 @@ const kb = {
   @media (prefers-reduced-motion: reduce) {
     .ab .ab__row { animation: none; }
     .ab .ab__dots b { animation: none; opacity: 0.6; }
+  }
+
+  /* ---- the branch answer ---- */
+  .ab .ab__branches {
+    display: grid;
+    grid-template-columns: 5.5rem minmax(0, 1fr);
+    gap: 0.5rem;
+    margin-top: 0.7rem;
+  }
+  .ab .ab__map {
+    display: block;
+    padding: 0.4rem;
+    border: 1px solid #dfeae2;
+    border-radius: 12px;
+    background: #f5faf6;
+  }
+  .ab .ab__map svg { display: block; width: 100%; height: auto; }
+  .ab .ab__bl { display: grid; gap: 0.3rem; align-content: start; }
+  .ab .ab__bc {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.45rem;
+    padding: 0.45rem 0.55rem;
+    border: 1px solid #e4ece6;
+    border-radius: 10px;
+    background: var(--white);
+    text-decoration: none;
+    transition: border-color 200ms ease, background-color 200ms ease;
+  }
+  .ab .ab__bc:hover { border-color: #59aa54; background: #f5faf6; }
+  .ab .ab__bpin { display: grid; place-items: start center; color: #2f6429; }
+  .ab .ab__bpin svg { width: 15px; height: 15px; }
+  .ab .ab__bc b { display: block; font-size: 0.8125rem; color: #14171a; }
+  .ab .ab__bc em {
+    display: block;
+    font-style: normal;
+    font-size: 0.6875rem;
+    line-height: 1.35;
+    color: #56606a;
+  }
+  .ab .ab__bc i {
+    display: block;
+    margin-top: 0.1rem;
+    font-style: normal;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    color: #2f6429;
   }
 </style>

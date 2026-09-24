@@ -37,7 +37,7 @@ const figures = [
 const journey = [
   { year: '2003', t: 'Opened our first store in Ruwi, Muscat.', verified: true },
   { year: '2010', t: 'Expanded our product range and IT solutions.', verified: false },
-  { year: '2016', t: 'Grew across Oman with new branches in Sohar, Al Hail and Salalah.', verified: false },
+  { year: '2016', t: 'Grew across Oman with new branches in Sohar and Salalah.', verified: false },
   { year: 'Today', t: 'Continuing to support individuals, businesses and organisations.', verified: true },
 ];
 
@@ -48,7 +48,7 @@ const proof = [
   { icon: 'bolt', t: 'Faster turnaround' },
 ];
 
-const mapOrder = ['sohar', 'hail', 'ruwi', 'salalah'];
+const mapOrder = ['sohar', 'ruwi', 'salalah'];
 const mapList = mapOrder.map((s) => branches.find((b) => b.slug === s)!);
 const W = 1000;
 const H = 1342;
@@ -60,7 +60,7 @@ const layers = [r01, r03, r04, r05];
 
 <PageLayout
   title="About"
-  description={`${site.nameFull} has supplied and repaired computers across Oman since ${site.stats.since} — four branches, ${site.stats.parts.toLocaleString('en-US')} lines in stock, board-level repair.`}
+  description={`${site.nameFull} has supplied and repaired computers across Oman since ${site.stats.since} — three branches, ${site.stats.parts.toLocaleString('en-US')} lines in stock, board-level repair.`}
 >
   {/* ══════ 01 · hero ══════ */}
   <section class="hero">
@@ -243,7 +243,7 @@ const layers = [r01, r03, r04, r05];
     <div class="shell pr__grid">
       <div class="pr__intro" data-rise>
         <p class="eb"><i class="eb__r" aria-hidden="true"></i>Our presence</p>
-        <h2 class="pr__h">Four branches,<br /><em>one standard.</em></h2>
+        <h2 class="pr__h">Three branches,<br /><em>one standard.</em></h2>
         <p class="pr__p">
           No matter which branch you visit, you get the same diagnosis, the
           same stock, and the same team. A branch is not a lesser version of
@@ -256,7 +256,7 @@ const layers = [r01, r03, r04, r05];
 
       <div class="pr__map" data-rise style="--d:90ms">
         <svg viewBox={OMAN_VIEWBOX} width="280" height="376" role="img"
-          aria-label="Map of Oman showing Danat branches in Sohar, Al Hail, Ruwi and Salalah">
+          aria-label="Map of Oman showing Danat branches in Sohar, Ruwi and Salalah">
           <path class="pr__land" d={OMAN_PATH} fill="#e4efe3" />
           <text class="pr__wm" x="420" y="900" aria-hidden="true">OMAN</text>
           {mapList.map((b, i) => (

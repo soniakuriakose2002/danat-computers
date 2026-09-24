@@ -15,31 +15,27 @@ export const OMAN_PATH =
 /**
  * Branch positions: the real coordinates run through the same projection.
  *   Sohar   24.347 N, 56.709 E
- *   Al Hail 23.670 N, 58.190 E
  *   Ruwi    23.588 N, 58.408 E
  *   Salalah 17.020 N, 54.093 E
  */
 export const OMAN_PINS: Record<string, { x: number; y: number }> = {
   sohar: { x: 603, y: 282 },
-  hail: { x: 793, y: 375 },
   ruwi: { x: 821, y: 387 },
   salalah: { x: 268, y: 1291 },
 };
 
 /** Dotted routes drawn between the branches, north to south. */
 export const OMAN_ROUTES: [string, string][] = [
-  ['sohar', 'hail'],
-  ['hail', 'ruwi'],
+  ['sohar', 'ruwi'],
   ['ruwi', 'salalah'],
 ];
 
 /**
  * Hub-and-spoke instead of a chain: every branch drawn back to Ruwi,
  * which is the main counter. Used on /branches, where the point is that
- * the four are one business rather than four stops on a road.
+ * the three are one business rather than three stops on a road.
  */
 export const OMAN_SPOKES: [string, string][] = [
   ['ruwi', 'sohar'],
-  ['ruwi', 'hail'],
   ['ruwi', 'salalah'],
 ];

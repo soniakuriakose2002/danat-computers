@@ -5,31 +5,23 @@ import { site, whatsappLink, branches } from '@data/site';
 import { OMAN_PATH, OMAN_VIEWBOX, OMAN_PINS, OMAN_SPOKES } from '@data/omanMap';
 
 /** North to south, matching the map. */
-const order = ['sohar', 'hail', 'ruwi', 'salalah'];
+const order = ['sohar', 'ruwi', 'salalah'];
 const list = order.map((s) => branches.find((b) => b.slug === s)!);
 
 const confirmed = list.filter((b) => b.verified).length;
 
-/**
- * Which side of its pin each label sits on, so the chips never collide.
- * Al Hail and Ruwi are only 28 map units apart, so Al Hail is pushed out
- * to the right while Sohar hangs to the left.
- */
+/** Which side of its pin each label sits on, so the chips never collide. */
 const labelSide: Record<string, 'left' | 'right'> = {
   sohar: 'left',
-  hail: 'right',
   ruwi: 'right',
   salalah: 'right',
 };
 
-/**
- * Al Hail and Ruwi are 28 map units apart — under 1% of the height — so
- * their chips would sit on top of each other. Push one up, one down.
- */
+/* The nudges existed only to separate two pins that sat 28 map units
+   apart. With that branch withdrawn nothing overlaps. */
 const labelNudge: Record<string, string> = {
   sohar: '0%',
-  hail: '-3.4%',
-  ruwi: '2.8%',
+  ruwi: '0%',
   salalah: '0%',
 };
 
@@ -51,7 +43,7 @@ const H = 1342;
 
 <PageLayout
   title="Branches"
-  description="Danat Computers has four branches across Oman — Ruwi, Sohar, Al Hail and Salalah. Addresses, opening hours and contact for each."
+  description="Danat Computers has three branches across Oman — Ruwi, Sohar and Salalah. Addresses, opening hours and contact for each."
 >
   {/* ─────────────────────── 01 · reach ─────────────────────── */}
   <section class="bh">
@@ -80,11 +72,11 @@ const H = 1342;
           </p>
 
           <h1 class="bh__h" data-rise style="--d:70ms">
-            Four branches.<br /><em>One standard.</em>
+            Three branches.<br /><em>One standard.</em>
           </h1>
 
           <p class="bh__p" data-rise style="--d:130ms">
-            Ruwi, Sohar, Al Hail and Salalah. The same technicians, the same
+            Ruwi, Sohar and Salalah. The same technicians, the same
             free diagnosis and the same stock behind every counter.
           </p>
 
@@ -119,7 +111,7 @@ const H = 1342;
         <div class="bh__map" data-rise style="--d:160ms">
           <div class="bh__mapin">
             <svg class="bh__svg" viewBox={OMAN_VIEWBOX} role="img"
-              aria-label="Map of Oman showing Danat branches in Sohar, Al Hail, Ruwi and Salalah">
+              aria-label="Map of Oman showing Danat branches in Sohar, Ruwi and Salalah">
               <defs>
                 <linearGradient id="omanFill" x1="0" y1="0" x2="0.4" y2="1">
                   <stop class="bh__s0" offset="0%" />
@@ -161,7 +153,7 @@ const H = 1342;
 
             <!-- A handwritten aside, set in the page's serif italic. -->
             <p class="bh__note" aria-hidden="true">
-              Four locations<br />Stronger together
+              Three locations<br />Stronger together
               <svg class="bh__arrow" viewBox="0 0 90 70" fill="none">
                 <path d="M78 4C84 24 74 46 50 56" stroke="currentColor"
                   stroke-width="3" stroke-linecap="round" pathLength="1" />

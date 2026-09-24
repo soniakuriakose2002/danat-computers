@@ -17,4 +17,4 @@ A repair starts with a free diagnosis. We tell you what failed, what it costs, a
 
 Where most workshops stop at "the motherboard has gone", we keep going. Our benches carry soldering and hot-air stations, microscopes, programmers and BGA rework tooling, and we stock solder balls from 0.35 mm up. A short on a power rail or a failed charging IC is a repair, not a write-off.
 
-When a part genuinely is beyond saving, we almost certainly have the replacement on the shelf — our four branches carry thousands of screens, keyboards, batteries, chargers, hinges and fans between them.
+When a part genuinely is beyond saving, we almost certainly have the replacement on the shelf — our three branches carry thousands of screens, keyboards, batteries, chargers, hinges and fans between them.

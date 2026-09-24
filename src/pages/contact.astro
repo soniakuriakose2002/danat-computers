@@ -9,11 +9,11 @@ const services = (await getCollection('services')).sort(
   (a, b) => a.data.index - b.data.index
 );
 
-const order = ['ruwi', 'sohar', 'hail', 'salalah'];
+const order = ['ruwi', 'sohar', 'salalah'];
 const list = order.map((s) => branches.find((b) => b.slug === s)!);
 
 /** North-to-south for the map, so the pins read top to bottom. */
-const mapOrder = ['sohar', 'hail', 'ruwi', 'salalah'];
+const mapOrder = ['sohar', 'ruwi', 'salalah'];
 const mapList = mapOrder.map((s) => branches.find((b) => b.slug === s)!);
 
 const promises = [
@@ -88,7 +88,7 @@ const faqs = [
   },
   {
     q: 'How can I check product availability?',
-    a: `We carry ${site.stats.parts.toLocaleString('en-US')} lines across ${site.stats.categories} categories. Send us the make and model on WhatsApp and we will check stock across all four branches before you travel.`,
+    a: `We carry ${site.stats.parts.toLocaleString('en-US')} lines across ${site.stats.categories} categories. Send us the make and model on WhatsApp and we will check stock across all three branches before you travel.`,
     pending: null,
   },
   {
@@ -106,18 +106,18 @@ const faqs = [
 const W = 1000;
 const H = 1342;
 
-/** Chip offsets: Al Hail and Ruwi sit under 1% apart on the map. */
+/* The offsets separated Al Hail from Ruwi, which sat under 1% apart.
+   Hail is withdrawn, so nothing needs pushing off anything else. */
 const nudge: Record<string, string> = {
   sohar: '0%',
-  hail: '-3.4%',
-  ruwi: '2.8%',
+  ruwi: '0%',
   salalah: '0%',
 };
 ---
 
 <PageLayout
   title="Contact"
-  description={`Talk to Danat Computers — call or WhatsApp ${site.phone.display}, email ${site.email}, or visit one of four branches across Oman.`}
+  description={`Talk to Danat Computers — call or WhatsApp ${site.phone.display}, email ${site.email}, or visit one of three branches across Oman.`}
 >
   {/* ═══════════════ 01 · hero + form ═══════════════ */}
   <section class="hx">
@@ -285,7 +285,7 @@ const nudge: Record<string, string> = {
           <p class="eb"><i class="eb__rule" aria-hidden="true"></i>Our branches</p>
           <h2 class="ao__h">Across Oman<br /><em>With You</em></h2>
           <p class="ao__p">
-            Four branches. Same commitment. Visit your nearest Danat location
+            Three branches. Same commitment. Visit your nearest Danat location
             for expert service, genuine products and reliable support.
           </p>
           <a class="btn btn--solid" href="/branches">
@@ -297,7 +297,7 @@ const nudge: Record<string, string> = {
         {/* map */}
         <div class="ao__map" data-rise style="--d:90ms">
           <svg viewBox={OMAN_VIEWBOX} width="300" height="403" role="img"
-            aria-label="Map of Oman showing Danat branches in Sohar, Al Hail, Ruwi and Salalah">
+            aria-label="Map of Oman showing Danat branches in Sohar, Ruwi and Salalah">
             <path class="ao__land" d={OMAN_PATH} fill="#dfe9df" />
             {OMAN_SPOKES.map(([a, b], i) => {
               const p = OMAN_PINS[a];

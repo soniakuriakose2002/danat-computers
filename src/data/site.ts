@@ -14,7 +14,7 @@ export const site = {
   legalName: 'ASTHAR TRADING CO LLC',
   tagline: 'We go deeper.',
   description:
-    'Twenty years of computer repair, CCTV, networking and IT supply across Oman. Board-level repair from four branches — Ruwi, Salalah, Sohar and Hail.',
+    'Twenty years of computer repair, CCTV, networking and IT supply across Oman. Board-level repair from three branches — Ruwi, Salalah and Sohar.',
   url: 'https://danatcomputers.com',
   locale: 'en',
 
@@ -69,7 +69,9 @@ export const site = {
   stats: {
     parts: 5430, // distinct SKUs in products_export
     categories: 249, // distinct product categories
-    branches: 4, // journal codes RW / SL / SO / HL
+    // Hail was withdrawn at the client's instruction. The ERP still
+    // carries an HL journal code from when it traded.
+    branches: 3, // journal codes RW / SL / SO
     since: 2003, // earliest ERP record: 2003-10-12
   },
 
@@ -132,18 +134,6 @@ export const branches: Branch[] = [
     tel: null,
     hours: ['Sat–Thu  09:00 – 13:00', 'Sat–Thu  16:00 – 21:00', 'Friday   Closed'],
     map: { x: 55, y: 17 },
-    verified: false,
-    hoursVerified: false,
-  },
-  {
-    slug: 'hail',
-    name: 'Danat Hail',
-    city: 'Al Hail, Seeb',
-    address: 'TODO — confirm street address with client',
-    phone: null,
-    tel: null,
-    hours: ['Sat–Thu  09:00 – 13:00', 'Sat–Thu  16:00 – 21:00', 'Friday   Closed'],
-    map: { x: 63, y: 26 },
     verified: false,
     hoursVerified: false,
   },

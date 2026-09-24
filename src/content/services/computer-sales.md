@@ -2,7 +2,7 @@
 index: 8
 title: Computer Sales
 summary: New and refurbished machines, parts and peripherals — retail and trade.
-intro: Four branches, thousands of lines in stock, and both new and refurbished on the same shelf.
+intro: Three branches, thousands of lines in stock, and both new and refurbished on the same shelf.
 plate: chassis
 covers:
   - New laptops, desktops and all-in-ones
