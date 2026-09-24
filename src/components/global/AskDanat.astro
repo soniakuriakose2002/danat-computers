@@ -49,32 +49,86 @@ const kb = {
 <dialog class="ab" data-ask aria-label="Ask Danat">
   <div class="ab__panel">
     <header class="ab__top">
-      <div>
-        <p class="ab__who">Ask Danat</p>
+      <span class="ab__blob" aria-hidden="true"></span>
+      {/* Drawn here rather than sourced: there is no Danat mascot asset,
+          and a stock 3D render would be someone else's character. */}
+      <svg class="ab__bot" viewBox="0 0 120 120" fill="none" aria-hidden="true">
+        <ellipse cx="60" cy="108" rx="34" ry="7" fill="#2f6429" opacity=".10" />
+        <rect x="34" y="64" width="52" height="38" rx="17" fill="#fff" stroke="#cfe1d4" stroke-width="2" />
+        <circle cx="60" cy="86" r="7" fill="#e7f1e9" stroke="#59aa54" stroke-width="2" />
+        <rect x="30" y="24" width="60" height="46" rx="18" fill="#fff" stroke="#cfe1d4" stroke-width="2" />
+        <rect x="38" y="33" width="44" height="28" rx="12" fill="#17311c" />
+        <circle cx="51" cy="46" r="3.4" fill="#8fdd8a" />
+        <circle cx="69" cy="46" r="3.4" fill="#8fdd8a" />
+        <path d="M54 54q6 5 12 0" stroke="#8fdd8a" stroke-width="2.4" stroke-linecap="round" />
+        <path d="M26 44a34 34 0 0 1 68 0" stroke="#2f6429" stroke-width="4" stroke-linecap="round" />
+        <rect x="18" y="40" width="14" height="22" rx="7" fill="#3d7f35" />
+        <rect x="88" y="40" width="14" height="22" rx="7" fill="#3d7f35" />
+        <path d="M60 24v-8" stroke="#2f6429" stroke-width="3" stroke-linecap="round" />
+        <circle cx="60" cy="13" r="4" fill="#59aa54" />
+        <path d="M86 74q16 2 18 14" stroke="#cfe1d4" stroke-width="2" stroke-linecap="round" />
+        <circle cx="106" cy="90" r="6" fill="#fff" stroke="#cfe1d4" stroke-width="2" />
+        <rect x="76" y="6" width="34" height="24" rx="9" fill="#3d7f35" />
+        <path d="M84 30l4-6h6z" fill="#3d7f35" />
+        <circle cx="86" cy="18" r="2.2" fill="#fff" />
+        <circle cx="93" cy="18" r="2.2" fill="#fff" />
+        <circle cx="100" cy="18" r="2.2" fill="#fff" />
+      </svg>
+
+      <div class="ab__id">
+        <p class="ab__eyebrow">Ask</p>
+        <p class="ab__who">Danat</p>
         <p class="ab__sub">Answers about our products and services</p>
       </div>
+
       <button class="ab__x" type="button" data-ask-close aria-label="Close">
-        <Icon name="plus" size={16} />
+        <Icon name="plus" size={18} />
       </button>
     </header>
 
-    <div class="ab__log" data-ask-log role="log" aria-live="polite"></div>
+    <div class="ab__scroll" data-ask-scroll>
+      <p class="ab__msg ab__intro" data-who="bot">
+        Hello. I am a guide on this page, not a person — I answer a few common
+        questions from what this site knows. For anything else, use
+        <b>Chat on WhatsApp</b> below.
+      </p>
+
+      <ul class="ab__sugs">
+        {[
+          { i: 'pin', q: 'Where are your branches?' },
+          { i: 'clock', q: 'What are your opening hours?' },
+          { i: 'wrench', q: 'What can you repair?' },
+          { i: 'laptop', q: 'Do you sell laptops?' },
+          { i: 'chart', q: 'How much will a repair cost?' },
+          { i: 'mail', q: 'I want a quote' },
+        ].map((t, n) => (
+          <li>
+            <button class="ab__sug" type="button" data-topic={n}>
+              <span class="ab__tile"><Icon name={t.i as any} size={18} /></span>
+              <span class="ab__q">{t.q}</span>
+              <span class="ab__go" aria-hidden="true"><Icon name="arrow" size={15} /></span>
+            </button>
+          </li>
+        ))}
+      </ul>
+
+      <div data-ask-log role="log" aria-live="polite"></div>
+    </div>
 
     <form class="ab__ask" data-ask-form>
-      <input type="text" name="q" autocomplete="off"
-        placeholder="Ask about repairs, branches, hours…" aria-label="Ask a question" />
-      <button type="submit" aria-label="Send">
-        <Icon name="arrow" size={17} />
-      </button>
+      <span class="ab__field">
+        <Icon name="chat" size={17} />
+        <input type="text" name="q" autocomplete="off"
+          placeholder="Ask about repairs, branches, hours…" aria-label="Ask a question" />
+      </span>
+      <button type="submit" aria-label="Send"><Icon name="send" size={17} /></button>
     </form>
 
     <footer class="ab__foot">
       <a class="ab__wa" href={kb.wa} target="_blank" rel="noopener noreferrer">
-        Chat on WhatsApp
+        <Icon name="whatsapp" size={19} /> Chat on WhatsApp
       </a>
-      <p class="ab__note">
-        Not a live agent. Confirm anything important with our team.
-      </p>
+      <p class="ab__note">Not a live agent. Confirm anything important with our team.</p>
     </footer>
   </div>
 </dialog>
@@ -94,10 +148,7 @@ const kb = {
 
       const kb = JSON.parse(raw.textContent || '{}');
       const log = dlg.querySelector('[data-ask-log]');
-      /* Suggestions live in the log, under the greeting, so the panel
-         keeps one column of content rather than four bands. */
-      const chipBox = document.createElement('div');
-      chipBox.className = 'ab__chips';
+      const scroll = dlg.querySelector('[data-ask-scroll]');
 
       const esc = (t) =>
         String(t).replace(/[&<>"]/g, (c) =>
@@ -189,7 +240,7 @@ const kb = {
         p.setAttribute('data-who', who);
         p.innerHTML = html;
         log.appendChild(p);
-        log.scrollTop = log.scrollHeight;
+        scroll.scrollTop = scroll.scrollHeight;
         return p;
       };
 
@@ -202,40 +253,22 @@ const kb = {
         window.setTimeout(() => {
           p.removeAttribute('data-typing');
           p.innerHTML = html;
-          log.scrollTop = log.scrollHeight;
+          scroll.scrollTop = scroll.scrollHeight;
         }, 620);
       };
 
-      const chips = () => {
-        chipBox.replaceChildren();
-        TOPICS.forEach((t) => {
-          const b = document.createElement('button');
-          b.type = 'button';
-          b.className = 'ab__chip';
-          b.textContent = t.q;
-          b.addEventListener('click', () => {
-            bubble('you', esc(t.q));
-            /* A beat before the reply, so the log reads as a reply rather
-               than as text that was always there. */
-            reply(t.a());
-          });
-          chipBox.appendChild(b);
+      /* The rows are real markup so they can carry real icons; the script
+         only wires them to the answers. */
+      dlg.querySelectorAll('[data-topic]').forEach((b) => {
+        b.addEventListener('click', () => {
+          const t = TOPICS[Number(b.dataset.topic)];
+          if (!t) return;
+          bubble('you', esc(t.q));
+          reply(t.a());
         });
-      };
+      });
 
-      let greeted = false;
       const open = () => {
-        if (!greeted) {
-          greeted = true;
-          bubble(
-            'bot',
-            'Hello. I am a guide on this page, not a person — I answer a few common ' +
-              'questions from what this site knows. For anything else, use ' +
-              '<b>Chat on WhatsApp</b> below.'
-          );
-          chips();
-          log.appendChild(chipBox);
-        }
         if (typeof dlg.showModal === 'function') dlg.showModal();
         else dlg.setAttribute('open', '');
         void dlg.offsetWidth;
@@ -324,81 +357,128 @@ const kb = {
   .ab__panel {
     display: grid;
     grid-template-rows: auto minmax(0, 1fr) auto auto;
-    max-height: min(36rem, 82vh);
+    max-height: min(51rem, 92vh);
     margin: 0 clamp(0.75rem, 2vw, 1.75rem) calc(clamp(0.9rem, 2vw, 1.75rem) + 4.6rem) 0;
-    border-radius: 20px;
+    border-radius: 26px;
     overflow: hidden;
     background: var(--white);
-    box-shadow: 0 44px 90px -34px rgb(10 30 12 / 0.55);
+    box-shadow: 0 48px 96px -34px rgb(10 30 12 / 0.5);
     opacity: 0;
     transform: translateY(12px);
     transition: opacity 200ms var(--ease), transform 280ms var(--ease);
   }
   .ab[data-in] .ab__panel { opacity: 1; transform: none; }
 
+  /* ---- header ---- */
   .ab__top {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 1rem;
-    padding: 1.15rem 1.25rem;
-    background: linear-gradient(135deg, #2f6429 0%, #3d7f35 100%);
-    color: #fff;
+    position: relative;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 0.9rem 1.1rem 1rem;
+    overflow: hidden;
+    background: linear-gradient(135deg, #e8f5ea 0%, #f2faf3 55%, #e4f2e7 100%);
+  }
+  .ab__blob {
+    position: absolute;
+    right: -3.5rem;
+    top: -4.5rem;
+    width: 14rem;
+    height: 14rem;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgb(89 170 84 / 0.16), rgb(89 170 84 / 0) 68%);
+  }
+  .ab__bot { position: relative; width: 5.6rem; height: 5.6rem; flex: none; }
+  .ab__id { position: relative; min-width: 0; }
+  .ab__eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--green-deep);
   }
   .ab__who {
-    font-size: 1.25rem;
+    font-size: 1.6rem;
     font-weight: 700;
-    letter-spacing: -0.035em;
-    line-height: 1.1;
+    letter-spacing: -0.045em;
+    line-height: 1;
+    color: var(--green-deep);
   }
-  /* The site's accent face, which it keeps for one line per page. It is
-     what stops this header reading as a plain system panel. */
   .ab__sub {
-    margin-top: 0.2rem;
-    font-family: var(--font-serif);
-    font-style: italic;
-    font-size: 0.9375rem;
-    letter-spacing: 0.005em;
-    color: rgb(255 255 255 / 0.88);
+    margin-top: 0.3rem;
+    font-size: 0.8125rem;
+    line-height: 1.35;
+    color: var(--text-2);
   }
   .ab__x {
+    position: relative;
     display: grid;
     place-items: center;
-    flex: none;
-    width: 30px;
-    height: 30px;
-    border: 0;
+    align-self: start;
+    width: 34px;
+    height: 34px;
+    border: 1px solid #d5e5d8;
     border-radius: 50%;
-    background: rgb(255 255 255 / 0.18);
-    color: #fff;
+    background: var(--white);
+    color: var(--text-2);
     cursor: pointer;
-    transition: background-color var(--t2) var(--ease);
+    transition: background-color var(--t2) var(--ease), color var(--t2) var(--ease);
   }
-  .ab__x:hover { background: rgb(255 255 255 / 0.3); }
+  .ab__x:hover { background: var(--green-deep); color: #fff; }
   .ab__x :global(svg) { transform: rotate(45deg); }
-  .ab__x:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+  .ab__x:focus-visible { outline: 2px solid var(--green-deep); outline-offset: 2px; }
 
-  .ab__log {
+  /* ---- conversation ---- */
+  .ab__scroll {
     display: grid;
-    gap: 0.7rem;
+    gap: 0.6rem;
     align-content: start;
-    padding: 1.15rem 1.25rem;
+    padding: 0.9rem 1.1rem;
     overflow-y: auto;
     background: var(--white);
   }
   .ab__msg {
     max-width: 94%;
-    padding: 0.9rem 1.05rem;
+    padding: 0.8rem 0.95rem;
     border-radius: 16px;
     font-size: 0.9375rem;
-    line-height: 1.65;
+    line-height: 1.55;
     letter-spacing: -0.005em;
+    animation: abIn 260ms var(--ease) both;
   }
-  /* Each bubble arrives rather than appearing. */
-  .ab__msg { animation: abIn 260ms var(--ease) both; }
-  @keyframes abIn {
-    from { opacity: 0; transform: translateY(8px); }
+  @keyframes abIn { from { opacity: 0; transform: translateY(8px); } }
+  .ab__msg[data-who='bot'] {
+    justify-self: start;
+    background: #f3f7f4;
+    border: 1px solid #e4ece6;
+    color: var(--text);
   }
+  /* The tail, as drawn — a square rotated behind the bubble's left edge. */
+  .ab__intro { position: relative; }
+  .ab__intro::after {
+    content: '';
+    position: absolute;
+    left: -5px;
+    bottom: 14px;
+    width: 12px;
+    height: 12px;
+    rotate: 45deg;
+    background: #f3f7f4;
+    border-left: 1px solid #e4ece6;
+    border-bottom: 1px solid #e4ece6;
+  }
+  .ab__msg[data-who='you'] {
+    justify-self: end;
+    background: var(--green-deep);
+    color: #fff;
+  }
+  .ab__msg :global(a) { color: var(--green-deep); text-decoration: underline; }
+  .ab__msg[data-who='you'] :global(a) { color: #fff; }
+  .ab__msg :global(b) { color: var(--green-deep); }
+  .ab__msg[data-who='you'] :global(b) { color: #fff; }
+  .ab__msg :global(hr) { border: 0; border-top: 1px solid var(--line-light); margin: 0.6rem 0; }
+  .ab__msg :global(i) { color: var(--text-2); font-style: italic; }
 
   .ab__msg[data-typing] { padding: 0.95rem 1.1rem; }
   .ab__dots { display: inline-flex; gap: 0.28rem; }
@@ -416,64 +496,71 @@ const kb = {
     0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
     30% { opacity: 1; transform: translateY(-3px); }
   }
-  .ab__msg[data-who='bot'] {
-    justify-self: start;
-    /* Two earlier tints were within a few percent of the panel and read
-       as plain text on white. This one is visibly a bubble. */
-    background: #e7f1e9;
-    border: 1px solid #cfe1d4;
-    color: var(--text);
-  }
-  .ab__msg[data-who='you'] {
-    justify-self: end;
-    background: var(--green-deep);
-    color: #fff;
-  }
-  .ab__msg :global(a) { color: var(--green-deep); text-decoration: underline; }
-  .ab__msg[data-who='you'] :global(a) { color: #fff; }
-  .ab__msg :global(hr) { border: 0; border-top: 1px solid var(--line-light); margin: 0.6rem 0; }
-  .ab__msg :global(i) { color: var(--text-2); font-style: italic; }
 
-  /* Suggestions, not chrome: they sit in the conversation and read as
-     things you could say next. */
-  .ab__chips { display: grid; gap: 0.35rem; justify-items: start; }
-  .ab__chip {
-    padding: 0.45rem 0.85rem;
-    border: 1px solid #bcd3c1;
-    border-radius: 999px;
+  /* ---- suggestions ---- */
+  .ab__sugs { display: grid; gap: 0.4rem; }
+  .ab__sug {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.4rem 0.75rem 0.4rem 0.4rem;
+    border: 1px solid #e4ece6;
+    border-radius: 14px;
     background: var(--white);
-    color: var(--green-deep);
     font: inherit;
-    font-size: 0.875rem;
-    font-weight: 600;
     text-align: left;
     cursor: pointer;
-    transition: background-color var(--t2) var(--ease), border-color var(--t2) var(--ease);
+    transition: border-color var(--t2) var(--ease), background-color var(--t2) var(--ease);
   }
-  .ab__chip:hover { background: #eef6ef; border-color: var(--green); }
-  .ab__chip:focus-visible { outline: 2px solid var(--green-deep); outline-offset: 2px; }
+  .ab__sug:hover { border-color: var(--green); background: #f5faf6; }
+  .ab__sug:focus-visible { outline: 2px solid var(--green-deep); outline-offset: 2px; }
+  .ab__tile {
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    background: #e7f1e9;
+    color: var(--green-deep);
+  }
+  .ab__q { font-size: 0.9375rem; color: var(--text); }
+  .ab__go { display: grid; place-items: center; color: var(--text-3); }
+  .ab__sug:hover .ab__go { color: var(--green-deep); }
 
+  /* ---- input ---- */
   .ab__ask {
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
     gap: 0.6rem;
-    padding: 0.85rem 1.25rem;
-    border-top: 1px solid var(--line-light);
+    padding: 0.7rem 1.1rem;
+    border-top: 1px solid #eef3ef;
     background: var(--white);
   }
-  .ab__ask input {
-    min-width: 0;
-    padding: 0.8rem 1.05rem;
-    border: 1px solid #d9e4db;
+  .ab__field {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.2rem 0.4rem 0.2rem 0.95rem;
+    border: 1px solid #cfe1d4;
     border-radius: 999px;
-    background: var(--white);
+    color: var(--text-3);
+  }
+  .ab__field input {
+    min-width: 0;
+    padding: 0.7rem 0.4rem 0.7rem 0;
+    border: 0;
+    background: none;
     font: inherit;
-    font-size: 0.875rem;
+    font-size: 0.9375rem;
     color: var(--text);
   }
-  .ab__ask input::placeholder { color: var(--text-3); }
-  .ab__ask input:focus-visible { outline: 2px solid var(--green-deep); outline-offset: 1px; }
+  .ab__field input:focus { outline: none; }
+  .ab__field:focus-within { border-color: var(--green); }
+  .ab__field input::placeholder { color: var(--text-3); }
   .ab__ask button {
     display: grid;
     place-items: center;
@@ -489,17 +576,33 @@ const kb = {
   .ab__ask button:hover { transform: scale(1.06); }
   .ab__ask button:focus-visible { outline: 2px solid var(--green-deep); outline-offset: 2px; }
 
+  /* ---- footer ---- */
   .ab__foot {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr);
     align-items: center;
-    gap: 1rem;
-    padding: 0.85rem 1.25rem 1rem;
-    background: var(--white);
+    gap: 0.95rem;
+    padding: 0.8rem 1.1rem;
+    background: #eef7f0;
   }
-  .ab__wa { font-size: 0.875rem; font-weight: 700; color: var(--green-deep); }
-  /* --text-3 is AA on white at this size. */
-  .ab__note { font-size: 0.75rem; line-height: 1.45; color: var(--text-3); }
+  .ab__wa {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9375rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--green-deep);
+  }
+  /* The rule belongs to the note, so it sits where the note starts
+     instead of at an arbitrary percentage of the footer. */
+  .ab__note {
+    padding-left: 0.95rem;
+    border-left: 1px solid #cfe1d4;
+    font-size: 0.75rem;
+    line-height: 1.4;
+    color: var(--text-2);
+  }
 
   @media (max-width: 30rem) {
     .ab__open span { display: none; }
