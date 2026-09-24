@@ -769,11 +769,16 @@ const features = [
 </style>
 
 <script>
-  const root = document.querySelector<HTMLElement>('[data-cf]');
-  const deck = root?.querySelector<HTMLElement>('[data-deck]');
-  const vp = root?.querySelector<HTMLElement>('[data-viewport]');
-
-  if (root && deck && vp) {
+  /* This has to be re-run on every page-load, not just at module
+     evaluation. <ClientRouter /> swaps the body without a page load and a
+     bundled <script> module only ever evaluates once, so from the second
+     page onwards none of this ran: the deck never got [data-ready], and
+     every card sat at opacity 0 behind the background photograph. */
+  const init = () => {
+    const root = document.querySelector<HTMLElement>('[data-cf]');
+    const deck = root?.querySelector<HTMLElement>('[data-deck]');
+    const vp = root?.querySelector<HTMLElement>('[data-viewport]');
+    if (!root || !deck || !vp) return;
     const cards = [...deck.querySelectorAll<HTMLElement>('[data-card]')];
     const N = cards.length;
     let active = 0;
@@ -845,12 +850,13 @@ const features = [
       down = true;
       startX = e.clientX;
     });
-    window.addEventListener('pointerup', (e) => {
+    const onUp = (e: PointerEvent) => {
       if (!down) return;
       down = false;
       const dx = e.clientX - startX;
       if (Math.abs(dx) > 45) drive(active + (dx < 0 ? 1 : -1));
-    });
+    };
+    window.addEventListener('pointerup', onUp);
 
     /* Wheel over the deck spins it — the "scroll to explore" the label
        promises. Throttled so one gesture moves one card, and it never
@@ -908,5 +914,21 @@ const features = [
 
     layout();
     reveal.observe(vp);
-  }
+
+    /* The next page-load binds all of this afresh, so the outgoing page's
+       observer, interval and window listeners have to be released or they
+       pile up and keep firing against a deck that no longer exists. */
+    const teardown = () => {
+      if (timer) window.clearInterval(timer);
+      reveal.disconnect();
+      window.removeEventListener('resize', layout);
+      window.removeEventListener('pointerup', onUp);
+      document.removeEventListener('astro:before-swap', teardown);
+    };
+    document.addEventListener('astro:before-swap', teardown);
+  };
+
+  let ran = false;
+  document.addEventListener('astro:page-load', () => { ran = true; init(); });
+  window.addEventListener('load', () => { if (!ran) { ran = true; init(); } });
 </script>
