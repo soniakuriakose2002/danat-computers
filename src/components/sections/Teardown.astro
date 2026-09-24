@@ -1,5 +1,4 @@
 ---
-import Icon from '@components/ui/Icon.astro';
 import { site } from '@data/site';
 
 /**
@@ -20,18 +19,23 @@ import { site } from '@data/site';
     <figure class="td__fig">
       <span class="td__glow" aria-hidden="true"></span>
       <div class="td__part">
-        {/* Plays on a click, never on its own. */}
+        {/*
+          No Watch button, and nothing on it to click. pointer-events are
+          off the video, so there is no context menu and no "save video
+          as"; controlsList and disablePictureInPicture remove the
+          browser's own download and pop-out affordances.
+
+          They do NOT make the file private. It is still fetched over
+          HTTP and can be taken from the network panel, or by asking for
+          /film/ecosystem.mp4 directly. Nothing served to a browser can
+          be stopped from being saved — only made inconvenient.
+        */}
         <div class="td__film" data-film>
           <video src="/film/ecosystem.mp4" poster="/film/ecosystem.jpg"
             autoplay muted loop playsinline preload="auto"
+            controlslist="nodownload noplaybackrate noremoteplayback"
+            disablepictureinpicture disableremoteplayback
             aria-label="Danat: printers, laptops, accessories, tools and servers"></video>
-          {/* Only a fallback now. Muted autoplay is allowed everywhere,
-              but a browser or a data-saving setting can still refuse it,
-              and a still frame with no way to start it is a dead end. */}
-          <button type="button" data-film-play aria-label="Play the film">
-            <Icon name="play" size={18} />
-            <span>Watch</span>
-          </button>
         </div>
       </div>
     </figure>
@@ -210,34 +214,11 @@ import { site } from '@data/site';
        was right under a black section; on a light one it flashes as a
        hole. */
     background: var(--off-2);
+    /* Nothing to click: no context menu, no player chrome. */
+    pointer-events: none;
+    -webkit-user-select: none;
+    user-select: none;
   }
-  .td__film button {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    translate: -50% -50%;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.6rem;
-    padding: 0.85rem 1.4rem;
-    border: 0;
-    border-radius: 999px;
-    background: rgb(255 255 255 / 0.94);
-    color: #07090a;
-    font: inherit;
-    font-size: 0.875rem;
-    font-weight: 700;
-    cursor: pointer;
-    backdrop-filter: blur(8px);
-    box-shadow: 0 18px 40px -18px rgb(0 0 0 / 0.7);
-    transition: transform var(--t2) var(--ease), opacity 260ms var(--ease);
-  }
-  .td__film button:hover { transform: translate(-50%, -50%) scale(1.05); }
-  .td__film button:focus-visible { outline: 2px solid var(--green-bright); outline-offset: 3px; }
-  .td__film[data-playing] button { opacity: 0; pointer-events: none; }
-  /* Hidden the moment playback is under way, however it started. */
-  .td__film[data-auto] button { opacity: 0; pointer-events: none; }
-
   .td__part {
     position: relative;
     z-index: 1;
@@ -422,7 +403,6 @@ import { site } from '@data/site';
   @media (prefers-reduced-motion: reduce) {
     /* It only ever plays on a click, so it is already safe here; the
        hover scale is the only thing to drop. */
-    .td__film button:hover { transform: translate(-50%, -50%); }
     .td__film, .td__film video { animation: none; }
     /* Square to the camera, no motion. --t is never set, so this only
        needs to drop the will-change hint. */
@@ -438,24 +418,33 @@ import { site } from '@data/site';
       box.dataset.wired = '1';
 
       const v = box.querySelector('video');
-      const btn = box.querySelector('[data-film-play]');
 
-      /* If autoplay is allowed the button never needs to appear. */
-      if (!v.paused) box.setAttribute('data-auto', '');
-      v.addEventListener('playing', () => box.setAttribute('data-auto', ''));
+      /* It starts itself and loops. Muted autoplay is allowed
+         everywhere, but a data-saving mode or a per-site setting can
+         still refuse it — and there is no Watch button to fall back on
+         any more, by design. So rather than asking, retry quietly on
+         the first thing the visitor does. */
+      const nudge = () => v.play().catch(() => {});
+      nudge();
 
-      btn.addEventListener('click', () => {
-        box.setAttribute('data-playing', '');
-        v.play().catch(() => box.removeAttribute('data-playing'));
-      });
+      const armed = ['pointerdown', 'touchstart', 'keydown', 'scroll'];
+      const once = () => {
+        nudge();
+        armed.forEach((t) => window.removeEventListener(t, once));
+      };
+      if (v.paused) armed.forEach((t) => window.addEventListener(t, once, { passive: true }));
 
-      /* Scrolled away mid-play is decode work for nobody. It resumes only
-         if it was already playing — it never starts itself. */
+      /* Decoding a film nobody is looking at costs battery for nothing,
+         so it rests off screen and picks straight back up on return. */
       new IntersectionObserver(([e]) => {
-        if (!box.hasAttribute('data-playing') && !box.hasAttribute('data-auto')) return;
-        if (e.isIntersecting) v.play().catch(() => {});
+        if (e.isIntersecting) nudge();
         else v.pause();
-      }, { threshold: 0.2 }).observe(box);
+      }, { threshold: 0.15 }).observe(box);
+
+      /* A tab restored from the back/forward cache comes back paused. */
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) nudge();
+      });
     };
 
     document.addEventListener('astro:page-load', setup);
