@@ -113,18 +113,33 @@ const stages = [
           <figure class="td__fig" data-travel style={`--dir:${i % 2 ? -1 : 1}`}>
             <span class="td__glow" aria-hidden="true"></span>
             <div class="td__part">
-              {img ? (
+              {/* The opening frame can play the ecosystem film. It does NOT
+                  start on its own — last time it did, it ambushed the page
+                  on open. The poster paints, and it plays when asked. */}
+              {s.hero ? (
+                <div class="td__film" data-film>
+                  <video src="/film/ecosystem.mp4" poster="/film/ecosystem.jpg"
+                    muted loop playsinline preload="none"
+                    aria-label="Danat: printers, laptops, accessories, tools and servers"></video>
+                  <button type="button" data-film-play aria-label="Play the film">
+                    <Icon name="play" size={18} />
+                    <span>Watch</span>
+                  </button>
+                </div>
+              ) : null}
+              {img && !s.hero ? (
                 <Image src={img} alt="" widths={[420, 640, 900]}
                   sizes="(min-width: 62rem) 46vw, 92vw"
                   quality={82} format="webp"
                   loading={i === 0 ? 'eager' : 'lazy'} />
-              ) : (
+              ) : null}
+              {!img && !s.hero ? (
                 <span class="td__slot">
                   <b>{s.n}</b>
                   <i>{s.rail} render</i>
                   <em>src/assets/renders/{s.n}.png</em>
                 </span>
-              )}
+              ) : null}
             </div>
           </figure>
 
@@ -347,6 +362,65 @@ const stages = [
 
      --t is never published under reduced motion or with JS off; the
      fallback of 0.5 is the neutral pose, square to the camera. */
+  /* The film panel. Sized by its own aspect so nothing jumps when the
+     poster swaps for the video. */
+  .td__film { position: relative; display: block; }
+  /* The header floats over this frame, and the film's top band carries
+     near-white neon: white nav text measured 1.03:1 against it. The
+     scrim below takes the worst pixel well clear of AA. */
+  .td__film::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 60%;
+    z-index: 1;
+    border-radius: 14px 14px 0 0;
+    /* Held near full strength across the band the nav actually occupies
+       — a straight fade was down to 0.52 by then and left white text at
+       3.48:1. Holding to 22% keeps the worst pixel above 12:1. */
+    background: linear-gradient(
+      180deg,
+      rgb(7 9 10 / 0.86) 0%,
+      rgb(7 9 10 / 0.82) 22%,
+      rgb(7 9 10 / 0) 100%
+    );
+    pointer-events: none;
+  }
+  .td__film button { z-index: 2; }
+  .td__film video {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: 14px;
+    background: #07090a;
+  }
+  .td__film button {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    translate: -50% -50%;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.85rem 1.4rem;
+    border: 0;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.94);
+    color: #07090a;
+    font: inherit;
+    font-size: 0.875rem;
+    font-weight: 700;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 18px 40px -18px rgb(0 0 0 / 0.7);
+    transition: transform var(--t2) var(--ease), opacity 260ms var(--ease);
+  }
+  .td__film button:hover { transform: translate(-50%, -50%) scale(1.05); }
+  .td__film button:focus-visible { outline: 2px solid var(--green-bright); outline-offset: 3px; }
+  .td__film[data-playing] button { opacity: 0; pointer-events: none; }
+
   .td__part {
     position: relative;
     z-index: 1;
@@ -533,6 +607,9 @@ const stages = [
   }
 
   @media (prefers-reduced-motion: reduce) {
+    /* It only ever plays on a click, so it is already safe here; the
+       hover scale is the only thing to drop. */
+    .td__film button:hover { transform: translate(-50%, -50%); }
     /* Square to the camera, no motion. --t is never set, so this only
        needs to drop the will-change hint. */
     .td__part { will-change: auto; }
@@ -540,3 +617,32 @@ const stages = [
     .td__cue span { transform: rotate(90deg); }
   }
 </style>
+
+<script is:inline>
+  (() => {
+    const setup = () => {
+      const box = document.querySelector('[data-film]');
+      if (!box || box.dataset.wired) return;
+      box.dataset.wired = '1';
+
+      const v = box.querySelector('video');
+      const btn = box.querySelector('[data-film-play]');
+
+      btn.addEventListener('click', () => {
+        box.setAttribute('data-playing', '');
+        v.play().catch(() => box.removeAttribute('data-playing'));
+      });
+
+      /* Scrolled away mid-play is decode work for nobody. It resumes only
+         if it was already playing — it never starts itself. */
+      new IntersectionObserver(([e]) => {
+        if (!box.hasAttribute('data-playing')) return;
+        if (e.isIntersecting) v.play().catch(() => {});
+        else v.pause();
+      }, { threshold: 0.2 }).observe(box);
+    };
+
+    document.addEventListener('astro:page-load', setup);
+    window.addEventListener('load', setup);
+  })();
+</script>
