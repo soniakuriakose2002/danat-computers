@@ -2,7 +2,6 @@
 import { getCollection } from 'astro:content';
 import Icon from '@components/ui/Icon.astro';
 import { site, branches, whatsappLink } from '@data/site';
-import { OMAN_PATH, OMAN_PINS } from '@data/omanMap';
 
 /**
  * ASK DANAT — an on-page guide, not a live agent and not an LLM.
@@ -22,23 +21,18 @@ const services = (await getCollection('services')).sort(
   (a, b) => a.data.index - b.data.index
 );
 
-/* The same outline and the same pin coordinates the branches page uses,
-   rendered here as a string because the answer is assembled by script. */
-const mapSvg = `<svg viewBox="0 0 1000 1342" fill="none" aria-hidden="true">
-  <path d="${OMAN_PATH}" fill="#e3f0e6" stroke="#bcd7c1" stroke-width="6" />
-  ${branches
-    .map((b) => {
-      const pin = OMAN_PINS[b.slug];
-      if (!pin) return '';
-      return `<circle cx="${pin.x}" cy="${pin.y}" r="42" fill="#2f6429" />` +
-        `<circle cx="${pin.x}" cy="${pin.y}" r="16" fill="#fff" />`;
-    })
-    .join('')}
-</svg>`;
+/* A real map rather than the drawn outline used elsewhere on the site.
+   OpenStreetMap's own embed: no API key, no ad tracking and no cookie
+   banner, which is why it is this and not Google tiles. The bbox frames
+   Oman so all three cities are in view; it is deliberately not centred on
+   a single pin, because we hold city coordinates and not shop ones. */
+const mapEmbed =
+  'https://www.openstreetmap.org/export/embed.html' +
+  '?bbox=51.8,16.4,60.0,26.6&layer=mapnik';
 
 const kb = {
   wa: whatsappLink(),
-  map: mapSvg,
+  map: mapEmbed,
   tel: site.phone.tel,
   telDisplay: site.phone.display,
   email: site.email,
@@ -232,7 +226,12 @@ const kb = {
         return (
           `We have ${kb.branches.length} branches across Oman. You can visit any of ` +
           `them for sales and service support.` +
-          `<span class="ab__branches"><span class="ab__map">${kb.map}</span>` +
+          `<span class="ab__branches">` +
+          /* No loading="lazy": the iframe is only created when someone
+                 asks for branches, so it is already deferred, and the
+                 attribute simply stopped it loading inside the dialog. */
+              `<span class="ab__map"><iframe src="${kb.map}" ` +
+          `title="Map of Oman" referrerpolicy="no-referrer"></iframe></span>` +
           `<span class="ab__bl">${cards}</span></span>`
         );
       };
@@ -758,20 +757,18 @@ const kb = {
   }
 
   /* ---- the branch answer ---- */
-  .ab .ab__branches {
-    display: grid;
-    grid-template-columns: 5.5rem minmax(0, 1fr);
-    gap: 0.5rem;
-    margin-top: 0.7rem;
-  }
+  .ab .ab__branches { display: grid; gap: 0.5rem; margin-top: 0.7rem; }
+  /* Full width and a fixed height: real tiles are unreadable in the
+     narrow column the drawn outline used to sit in. */
   .ab .ab__map {
     display: block;
-    padding: 0.4rem;
+    height: 9.5rem;
     border: 1px solid #dfeae2;
     border-radius: 12px;
-    background: #f5faf6;
+    overflow: hidden;
+    background: #eef4ef;
   }
-  .ab .ab__map svg { display: block; width: 100%; height: auto; }
+  .ab .ab__map iframe { display: block; width: 100%; height: 100%; border: 0; }
   .ab .ab__bl { display: grid; gap: 0.3rem; align-content: start; }
   .ab .ab__bc {
     display: grid;
