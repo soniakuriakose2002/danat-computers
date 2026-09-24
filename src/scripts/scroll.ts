@@ -139,7 +139,10 @@ export function initCounters(root: ParentNode = document) {
 
   const run = (el: HTMLElement) => {
     const to = Number(el.dataset.count ?? 0);
-    const dur = 1500;
+    /* 1500ms sounds long but the old quartic ease was 94% done by 750ms,
+       so the figure effectively snapped into place and there was nothing
+       to watch. Longer, and with a far gentler curve. */
+    const dur = 2200;
     if (REDUCED) {
       el.textContent = to.toLocaleString('en-US');
       return;
@@ -147,7 +150,7 @@ export function initCounters(root: ParentNode = document) {
     const t0 = performance.now();
     const step = (now: number) => {
       const t = Math.min(1, (now - t0) / dur);
-      const eased = 1 - Math.pow(1 - t, 4);
+      const eased = 1 - Math.pow(1 - t, 2);
       el.textContent = Math.round(to * eased).toLocaleString('en-US');
       if (t < 1) requestAnimationFrame(step);
     };
@@ -162,7 +165,10 @@ export function initCounters(root: ParentNode = document) {
         io.unobserve(e.target);
       }
     },
-    { threshold: 0.4 }
+    /* Starts when the figure is properly on screen rather than as it
+       clips the bottom edge — otherwise a quick scroll spends the whole
+       count off-view and you arrive at the finished number. */
+    { threshold: 0.4, rootMargin: '0px 0px -12% 0px' }
   );
   els.forEach((el) => io.observe(el));
 }

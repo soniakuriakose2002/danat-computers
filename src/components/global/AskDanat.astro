@@ -190,6 +190,20 @@ const kb = {
         p.innerHTML = html;
         log.appendChild(p);
         log.scrollTop = log.scrollHeight;
+        return p;
+      };
+
+      /* Three dots while it "thinks", then the dots become the answer.
+         Without it the reply simply materialises and the panel reads as a
+         list of canned text rather than an exchange. */
+      const reply = (html) => {
+        const p = bubble('bot', '<i class="ab__dots"><b></b><b></b><b></b></i>');
+        p.setAttribute('data-typing', '');
+        window.setTimeout(() => {
+          p.removeAttribute('data-typing');
+          p.innerHTML = html;
+          log.scrollTop = log.scrollHeight;
+        }, 620);
       };
 
       const chips = () => {
@@ -203,7 +217,7 @@ const kb = {
             bubble('you', esc(t.q));
             /* A beat before the reply, so the log reads as a reply rather
                than as text that was always there. */
-            window.setTimeout(() => bubble('bot', t.a()), 260);
+            reply(t.a());
           });
           chipBox.appendChild(b);
         });
@@ -241,16 +255,13 @@ const kb = {
         if (!text) return;
         bubble('you', esc(text));
         input.value = '';
-        window.setTimeout(() => {
-          const a = answerFor(text);
-          bubble(
-            'bot',
-            a ||
-              'I do not have an answer for that one — I only cover a few basics. ' +
-                `<a href="${esc(kb.wa)}" target="_blank" rel="noopener noreferrer">Ask a person on WhatsApp</a> ` +
-                `or call <a href="tel:${esc(kb.tel)}">${esc(kb.telDisplay)}</a>.`
-          );
-        }, 280);
+        const a = answerFor(text);
+        reply(
+          a ||
+            'I do not have an answer for that one — I only cover a few basics. ' +
+              `<a href="${esc(kb.wa)}" target="_blank" rel="noopener noreferrer">Ask a person on WhatsApp</a> ` +
+              `or call <a href="tel:${esc(kb.tel)}">${esc(kb.telDisplay)}</a>.`
+        );
       });
 
       document
@@ -334,9 +345,22 @@ const kb = {
     background: linear-gradient(135deg, #2f6429 0%, #3d7f35 100%);
     color: #fff;
   }
-  .ab__who { font-size: 1.0625rem; font-weight: 700; letter-spacing: -0.02em; }
-  /* 4.9:1 on the lighter end of the header gradient. */
-  .ab__sub { margin-top: 0.15rem; font-size: 0.8125rem; color: rgb(255 255 255 / 0.82); }
+  .ab__who {
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: -0.035em;
+    line-height: 1.1;
+  }
+  /* The site's accent face, which it keeps for one line per page. It is
+     what stops this header reading as a plain system panel. */
+  .ab__sub {
+    margin-top: 0.2rem;
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 0.9375rem;
+    letter-spacing: 0.005em;
+    color: rgb(255 255 255 / 0.88);
+  }
   .ab__x {
     display: grid;
     place-items: center;
@@ -364,16 +388,40 @@ const kb = {
   }
   .ab__msg {
     max-width: 94%;
-    padding: 0.85rem 1rem;
-    border-radius: 14px;
-    font-size: 0.875rem;
-    line-height: 1.6;
+    padding: 0.9rem 1.05rem;
+    border-radius: 16px;
+    font-size: 0.9375rem;
+    line-height: 1.65;
+    letter-spacing: -0.005em;
+  }
+  /* Each bubble arrives rather than appearing. */
+  .ab__msg { animation: abIn 260ms var(--ease) both; }
+  @keyframes abIn {
+    from { opacity: 0; transform: translateY(8px); }
+  }
+
+  .ab__msg[data-typing] { padding: 0.95rem 1.1rem; }
+  .ab__dots { display: inline-flex; gap: 0.28rem; }
+  .ab__dots b {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--green-deep);
+    opacity: 0.35;
+    animation: abDot 1.1s ease-in-out infinite;
+  }
+  .ab__dots b:nth-child(2) { animation-delay: 0.16s; }
+  .ab__dots b:nth-child(3) { animation-delay: 0.32s; }
+  @keyframes abDot {
+    0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+    30% { opacity: 1; transform: translateY(-3px); }
   }
   .ab__msg[data-who='bot'] {
     justify-self: start;
-    /* #f1f6f2 was so close to the panel it did not read as a bubble. */
-    background: #edf4ee;
-    border: 1px solid #e0ebe2;
+    /* Two earlier tints were within a few percent of the panel and read
+       as plain text on white. This one is visibly a bubble. */
+    background: #e7f1e9;
+    border: 1px solid #cfe1d4;
     color: var(--text);
   }
   .ab__msg[data-who='you'] {
@@ -391,12 +439,13 @@ const kb = {
   .ab__chips { display: grid; gap: 0.35rem; justify-items: start; }
   .ab__chip {
     padding: 0.45rem 0.85rem;
-    border: 1px solid #d9e4db;
+    border: 1px solid #bcd3c1;
     border-radius: 999px;
     background: var(--white);
     color: var(--green-deep);
     font: inherit;
-    font-size: 0.8125rem;
+    font-size: 0.875rem;
+    font-weight: 600;
     text-align: left;
     cursor: pointer;
     transition: background-color var(--t2) var(--ease), border-color var(--t2) var(--ease);
@@ -459,5 +508,7 @@ const kb = {
 
   @media (prefers-reduced-motion: reduce) {
     .ab__panel, .ab__open, .ab__open:hover { transition: none; transform: none; }
+    .ab__msg { animation: none; }
+    .ab__dots b { animation: none; opacity: 0.6; }
   }
 </style>
