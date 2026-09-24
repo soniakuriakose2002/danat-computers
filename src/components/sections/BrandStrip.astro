@@ -194,10 +194,13 @@ const rows = [brands.slice(0, half), brands.slice(half)];
     letter-spacing: -0.04em;
     line-height: 1;
     white-space: nowrap;
-    /* Was --off-2 (#ececea), which is 1.18:1 on white — the names were
-       nearly invisible. #8b938f is 3.15:1, which clears AA for text this
-       size while still reading as a marquee rather than body copy. */
-    color: #8b938f;
+    /* Was --off-2 (#ececea) at 1.18:1 — the names were nearly invisible.
+       #8b938f fixed that but still read as a watermark at 3.15:1 on
+       white, and only 2.86:1 where the strip's ground darkens to --off-2.
+       #6e7672 is 4.67:1 on white and 4.24:1 at the far end, so it holds
+       AA across the whole band and reads as a list of brands rather than
+       a texture behind one. */
+    color: #6e7672;
     transition: color var(--t2) var(--ease);
   }
 
