@@ -197,10 +197,11 @@ const rows = [brands.slice(0, half), brands.slice(half)];
     /* Was --off-2 (#ececea) at 1.18:1 — the names were nearly invisible.
        #8b938f fixed that but still read as a watermark at 3.15:1 on
        white, and only 2.86:1 where the strip's ground darkens to --off-2.
-       #6e7672 is 4.67:1 on white and 4.24:1 at the far end, so it holds
-       AA across the whole band and reads as a list of brands rather than
-       a texture behind one. */
-    color: #6e7672;
+       #6e7672 cleared AA but still sat back from the page. #4d5450 is
+       7.79:1 on white and 7.07:1 at the far end — a plain, readable list
+       of the brands carried, which is what it is. Hover still lifts one
+       name to full --text. */
+    color: #4d5450;
     transition: color var(--t2) var(--ease);
   }
 
