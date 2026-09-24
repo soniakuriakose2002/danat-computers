@@ -46,9 +46,6 @@ import { site } from '@data/site';
       </p>
     </div>
 
-    <p class="td__script" aria-hidden="true">
-      Technology<br />for a Brighter<br />Tomorrow.
-    </p>
   </div>
 
 </section>
@@ -56,8 +53,11 @@ import { site } from '@data/site';
 <style>
   .td {
     position: relative;
-    background: #07090a;
-    color: #fff;
+    /* Light, at the client's instruction. The green tokens below swap
+       with it: --green-bright is built for near-black and drops to
+       1.9:1 on white, so the deep green is what reads here. */
+    background: linear-gradient(180deg, #ffffff 0%, var(--off) 100%);
+    color: var(--text);
     overflow: hidden;
   }
 
@@ -186,10 +186,10 @@ import { site } from '@data/site';
        inside so the zoom cannot slide out from under it, a green cast in
        the near shadow, and a deep one to lift it off the section. */
     box-shadow:
-      inset 0 0 0 1px rgb(255 255 255 / 0.14),
-      0 0 0 1px rgb(111 201 106 / 0.16),
-      0 24px 50px -24px rgb(111 201 106 / 0.28),
-      0 50px 90px -40px rgb(0 0 0 / 0.85);
+      inset 0 0 0 1px rgb(255 255 255 / 0.22),
+      0 0 0 1px rgb(47 100 41 / 0.12),
+      0 26px 54px -26px rgb(47 100 41 / 0.26),
+      0 40px 80px -36px rgb(10 30 12 / 0.34);
     animation: tdFilmIn 800ms var(--ease) both;
   }
   @keyframes tdFilmIn { from { opacity: 0; } }
@@ -199,28 +199,6 @@ import { site } from '@data/site';
     animation: tdFilmZoom 18s ease-in-out 900ms infinite alternate;
   }
   @keyframes tdFilmZoom { to { transform: scale(1.08); } }
-  /* The header floats over this frame, and the film's top band carries
-     near-white neon: white nav text measured 1.03:1 against it. The
-     scrim below takes the worst pixel well clear of AA. */
-  .td__film::before {
-    content: '';
-    position: absolute;
-    inset: 0 0 auto 0;
-    height: 60%;
-    z-index: 1;
-    border-radius: 14px 14px 0 0;
-    /* Held near full strength across the band the nav actually occupies
-       — a straight fade was down to 0.52 by then and left white text at
-       3.48:1. Holding to 22% keeps the worst pixel above 12:1. */
-    background: linear-gradient(
-      180deg,
-      rgb(7 9 10 / 0.86) 0%,
-      rgb(7 9 10 / 0.82) 22%,
-      rgb(7 9 10 / 0) 100%
-    );
-    pointer-events: none;
-  }
-  .td__film button { z-index: 2; }
   .td__film video {
     display: block;
     width: 100%;
@@ -228,7 +206,10 @@ import { site } from '@data/site';
     aspect-ratio: 16 / 9;
     object-fit: cover;
     border-radius: 14px;
-    background: #07090a;
+    /* What shows for the moment before the first frame paints. Black
+       was right under a black section; on a light one it flashes as a
+       hole. */
+    background: var(--off-2);
   }
   .td__film button {
     position: absolute;
@@ -340,7 +321,8 @@ import { site } from '@data/site';
     font-size: 0.6875rem;
     letter-spacing: 0.2em;
     text-transform: uppercase;
-    color: var(--green-bright);
+    /* 6.8:1 on white; --green-bright would be 1.9:1. */
+    color: var(--green-deep);
   }
 
   .td__h1 {
@@ -350,14 +332,14 @@ import { site } from '@data/site';
     letter-spacing: -0.042em;
     font-weight: 700;
   }
-  .td__h1 em { font-style: normal; color: var(--green-bright); }
+  .td__h1 em { font-style: normal; color: var(--green-deep); }
 
   .td__lead {
     margin-top: var(--s4);
     max-width: 34ch;
     font-size: 0.9375rem;
     line-height: 1.6;
-    color: rgb(255 255 255 / 0.74);
+    color: var(--text-2);
   }
 
 
