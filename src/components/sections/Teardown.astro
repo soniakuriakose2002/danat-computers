@@ -14,44 +14,46 @@ import { site } from '@data/site';
 ---
 
 <section class="td" data-tone="ink">
-  {/*
-    THE OPENING IS THE FILM. Full bleed, full height, nothing beside it.
+  {/* ── the opening: this stays a block of its own ── */}
+  <div class="shell td__grid td__intro">
+    <figure class="td__fig">
+      <span class="td__glow" aria-hidden="true"></span>
+      <div class="td__part">
+        {/*
+          Motion, not a video player. Nothing here says "video": no
+          controls, no play button, no picture-in-picture, no context
+          menu — pointer-events are off, so there is nothing on it to
+          click at all. It runs by itself and loops.
 
-    The headline and standfirst that used to sit in a column here are
-    gone at the client's instruction — the film's own frames already
-    carry the words ("01 · DIAGNOSE — Full hardware scan"), so the
-    column was captioning something that captions itself, and a film in
-    a box beside a paragraph reads as a video embedded in a page rather
-    than as the page opening.
+          `controlsList` and `disablePictureInPicture` remove the
+          browser's own download and pop-out affordances. They do NOT
+          make the file private: it is still fetched over HTTP and can
+          be pulled from the network panel or by asking for
+          /film/ecosystem.mp4 directly. Nothing served to a browser can
+          be stopped from being saved.
+        */}
+        <div class="td__film" data-film>
+          <video src="/film/ecosystem.mp4" poster="/film/ecosystem.jpg"
+            autoplay muted loop playsinline preload="auto"
+            controlslist="nodownload noplaybackrate noremoteplayback"
+            disablepictureinpicture disableremoteplayback
+            aria-label="Danat: printers, laptops, accessories, tools and servers"></video>
+        </div>
+      </div>
+    </figure>
 
-    The heading stays in the markup, unseen. A homepage whose first
-    section announces nothing to a screen reader or a crawler is a
-    different kind of broken from one that looks wrong.
-  */}
-  <h2 class="td__sr">{site.nameFull} — more than just a laptop</h2>
-
-  <div class="td__intro">
-    {/*
-      Motion, not a video player. Nothing here says "video": no
-      controls, no play button, no picture-in-picture, no context
-      menu — pointer-events are off, so there is nothing on it to
-      click at all. It runs by itself and loops.
-
-      `controlsList` and `disablePictureInPicture` remove the
-      browser's own download and pop-out affordances. They do NOT
-      make the file private: it is still fetched over HTTP and can
-      be pulled from the network panel or by asking for
-      /film/ecosystem.mp4 directly. Nothing served to a browser can
-      be stopped from being saved.
-    */}
-    <div class="td__film" data-film>
-      <video src="/film/ecosystem.mp4" poster="/film/ecosystem.jpg"
-        autoplay muted loop playsinline preload="auto"
-        controlslist="nodownload noplaybackrate noremoteplayback"
-        disablepictureinpicture disableremoteplayback
-        aria-label="Danat: printers, laptops, accessories, tools and servers"></video>
+    <div class="td__body">
+      <p class="td__eb" data-rise>{site.nameFull}</p>
+      <h2 class="td__h1" data-rise style="--d:80ms">
+        More than<br />just <em>a laptop</em>
+      </h2>
+      <p class="td__lead" data-rise style="--d:150ms">
+        Complete technology solutions to power your work, study and business.
+      </p>
     </div>
+
   </div>
+
 </section>
 
 <style>
@@ -141,32 +143,9 @@ import { site } from '@data/site';
   /* Two columns now the numbered rail is gone, and centred on each
      other — the film was floating above a headline that started higher
      than it did. */
-  /* A post, not a backdrop. The film is a centred column on a black
-     band that runs the full width — so the page keeps the white theme
-     above and below it, and the film has something dark to sit on.
-
-     --hd-h is measured and published by the script below, because the
-     header's height is set by its own contents and a magic number here
-     would drift the first time anything in it changes. */
   .td__intro {
-    margin-top: var(--hd-h, 5.4rem);
-    padding: clamp(1.5rem, 3.5vw, 3rem) var(--gut, 1.25rem);
-    background: #0a0d0e;
-    display: grid;
-    justify-items: center;
-  }
-
-  /* Present to a screen reader and a crawler, absent to the eye. */
-  .td__sr {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    margin: -1px;
-    padding: 0;
-    overflow: hidden;
-    clip-path: inset(50%);
-    white-space: nowrap;
-    border: 0;
+    padding-block: clamp(4.5rem, 8vw, 6.5rem) clamp(3rem, 6vw, 4.5rem);
+    align-items: center;
   }
   /* .td__fig centres its contents, which is right when the part is a
      render with its own size. The film has none — its width is 100% of
@@ -184,38 +163,41 @@ import { site } from '@data/site';
   .td__film {
     position: relative;
     display: block;
-    width: 100%;
-    /* LinkedIn's landscape post. The source is 16:9, so this trims a
-       little off the top and bottom and leaves the framing — and the
-       captions burned into the bottom-left of each shot — alone. A
-       square or 4:5 crop would take 44-55% off the SIDES of a 16:9
-       film, which is most of every shot. */
-    aspect-ratio: 1.91 / 1;
-    max-width: 62rem;
     /* The slow zoom below would otherwise spill past the corners. */
     overflow: hidden;
-    /* Just enough of a corner to read as a post rather than a hole cut
-       in the band. No shadow: there is nothing lighter behind it for a
-       shadow to fall on. */
-    border-radius: 10px;
+    /* Back to the shape that was here before I misread a note about the
+       card rail as being about this frame. Two opposite corners cut
+       deeply, the other two tight: deliberate, and it leaves the subject
+       across the middle alone. */
+    border-radius: 78px 14px 78px 14px;
+    /* A framed panel rather than a bare rectangle: a hairline ring on the
+       inside so the zoom cannot slide out from under it, a green cast in
+       the near shadow, and a deep one to lift it off the section. */
+    box-shadow:
+      inset 0 0 0 1px rgb(255 255 255 / 0.22),
+      0 0 0 1px rgb(47 100 41 / 0.12),
+      0 26px 54px -26px rgb(47 100 41 / 0.26),
+      0 40px 80px -36px rgb(10 30 12 / 0.34);
     animation: tdFilmIn 800ms var(--ease) both;
   }
   @keyframes tdFilmIn { from { opacity: 0; } }
-  /* The slow 1.08x creep that used to live here is gone. It was a
-     magnification inside a clipping box, which is another word for a
-     crop — the film lost its edges to it on every cycle. The film has
-     its own camera moves; it does not need ours on top. */
+  /* Arrives, holds, then creeps in — the zoom starts only once it has
+     settled, so the two do not fight. */
+  .td__film video {
+    animation: tdFilmZoom 18s ease-in-out 900ms infinite alternate;
+  }
+  @keyframes tdFilmZoom { to { transform: scale(1.08); } }
   .td__film video {
     display: block;
-    width: 100%;    height: 100%;
-    /* CONTAIN, not cover. Cover was cropping the film to fill a 1.91:1
-       box from a 16:9 source. Contain shows every frame whole — and the
-       slivers it leaves above and below are the same colour as the band
-       behind it, so there are no visible bars to letterbox. */
-    object-fit: contain;
-    /* Matches the band exactly, so the contain slivers above and below
-       the film are invisible and the first paint does not flash. */
-    background: #0a0d0e;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: 14px;
+    /* What shows for the moment before the first frame paints. Black
+       was right under a black section; on a light one it flashes as a
+       hole. */
+    background: var(--off-2);
     /* Nothing to click, so no context menu, no player chrome, no
        "save video as". It reads as part of the page rather than
        something embedded in it. */
@@ -423,21 +405,6 @@ import { site } from '@data/site';
 <script is:inline>
   (() => {
     const setup = () => {
-      /* The header is fixed and sized by its own contents, so the film
-         cannot know how much of the viewport is left to it without
-         asking. Measured here and republished on resize. */
-      const head = document.querySelector('header');
-      const measure = () => {
-        if (!head) return;
-        document.documentElement.style.setProperty(
-          '--hd-h',
-          head.getBoundingClientRect().height + 'px'
-        );
-      };
-      measure();
-      if (head && 'ResizeObserver' in window) new ResizeObserver(measure).observe(head);
-      window.addEventListener('resize', measure, { passive: true });
-
       const box = document.querySelector('[data-film]');
       if (!box || box.dataset.wired) return;
       box.dataset.wired = '1';
@@ -457,7 +424,7 @@ import { site } from '@data/site';
         nudge();
         armed.forEach((t) => window.removeEventListener(t, once));
       };
-      if (v.paused) armed.forEach((t) => window.addEventListener(t, once, { passive: true }));
+      if (v.paused) armed.forEach((t) => window.addEventListener(t, once, { passive: true, once: false }));
 
       /* Decoding a film nobody is looking at costs battery for nothing,
          so it rests off screen — and picks straight back up, from where
