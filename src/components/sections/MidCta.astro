@@ -12,11 +12,14 @@ import imgBench from '@assets/photos/repair-board.jpg';
  *
  * Figures are ERP-derived, not marketing rounding.
  */
+/* Held as numbers, not pre-formatted strings, so each can run up from
+   zero. The counter writes the grouped form itself, and any suffix sits
+   outside the counting span so it does not get overwritten. */
 const figures = [
-  { v: site.stats.parts.toLocaleString('en-US'), l: 'Parts in stock' },
-  { v: String(site.stats.categories), l: 'Categories' },
-  { v: String(site.stats.branches), l: 'Branches' },
-  { v: `${new Date().getFullYear() - site.stats.since}+`, l: 'Years trading' },
+  { n: site.stats.parts, suffix: '', l: 'Parts in stock' },
+  { n: site.stats.categories, suffix: '', l: 'Categories' },
+  { n: site.stats.branches, suffix: '', l: 'Branches' },
+  { n: new Date().getFullYear() - site.stats.since, suffix: '+', l: 'Years trading' },
 ];
 ---
 
@@ -59,7 +62,7 @@ const figures = [
     <dl class="mid__figs" data-rise style="--d:240ms">
       {figures.map((f) => (
         <div>
-          <dt>{f.v}</dt>
+          <dt><span data-count={f.n}>0</span>{f.suffix}</dt>
           <dd>{f.l}</dd>
         </div>
       ))}
