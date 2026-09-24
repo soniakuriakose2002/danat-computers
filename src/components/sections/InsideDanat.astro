@@ -1,7 +1,10 @@
 ---
 import { Image } from 'astro:assets';
 
-import imgBoard from '@assets/photos/repair-board.jpg';
+/* NOT repair-board.jpg: its technician wears a uniform branded
+   ТЕХНОБЫТСЕРВИС, another repair company, and it is legible at this
+   size. */
+import imgBoard from '@assets/photos/repair-solder.jpg';
 import imgParts from '@assets/photos/network-patch.jpg';
 import imgDrive from '@assets/photos/datarecovery-drive.jpg';
 import imgShop from '@assets/photos/retail-display.jpg';
@@ -252,7 +255,11 @@ const N = items.length;
     --cg: clamp(0.75rem, 1.2vw, 1.15rem);
     display: flex;
     gap: var(--cg);
-    height: clamp(26rem, 34vw, 31rem);
+    /* Was 26-31rem, sized for a bare picture plus a caption floating
+       under it. The card is a panel now and ends where its words end, so
+       the old height left a band of empty white below every one. Still
+       tall enough for the hover excerpt, which overlays the whole card. */
+    height: clamp(21rem, 27vw, 25rem);
     will-change: transform;
     transition: transform 700ms var(--ease);
   }
@@ -286,14 +293,34 @@ const N = items.length;
 
   /* ---------- base state ---------- */
 
+  /* Was a bare picture with a caption floating beneath it. It is one
+     object now: a panel that holds both, lifts on hover, and keeps its
+     own edge so the rail reads as cards rather than a filmstrip. */
+  .gk__card {
+    border-radius: 18px;
+    overflow: hidden;
+    background: var(--white);
+    box-shadow:
+      0 1px 2px rgb(10 30 12 / 0.05),
+      0 18px 34px -22px rgb(10 30 12 / 0.28);
+    transition: transform var(--t2) var(--ease), box-shadow var(--t2) var(--ease);
+  }
+  .gk__card:hover {
+    transform: translateY(-5px);
+    box-shadow:
+      0 1px 2px rgb(10 30 12 / 0.06),
+      0 30px 54px -26px rgb(10 30 12 / 0.4);
+  }
+
   .gk__img {
     display: block;
     aspect-ratio: 4 / 3;
-    border-radius: 10px;
     overflow: hidden;
     background: var(--off-2);
     transition: opacity 320ms var(--ease);
   }
+  .gk__img :global(img) { transition: scale 600ms var(--ease); }
+  .gk__card:hover .gk__img :global(img) { scale: 1.04; }
 
   .gk__img :global(img) {
     width: 100%;
@@ -304,17 +331,28 @@ const N = items.length;
   .gk__cap {
     display: grid;
     gap: 0.4rem;
-    padding: 0.9rem 0.15rem 0;
+    /* Inside the panel now, so it needs the panel's padding. */
+    padding: 0.95rem 1.05rem 1.15rem;
     transition: opacity 320ms var(--ease);
   }
 
   .gk__kick {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
     font-family: var(--font-mono);
     font-size: 0.625rem;
     font-weight: 500;
     letter-spacing: 0.16em;
     text-transform: uppercase;
-    color: var(--text-3);
+    color: var(--green-deep);
+  }
+  .gk__kick::before {
+    content: '';
+    width: 16px;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--green);
   }
 
   .gk__ct {
@@ -344,7 +382,8 @@ const N = items.length;
     flex-direction: column;
     padding: clamp(1.15rem, 1.6vw, 1.6rem);
     border: 1px solid var(--green);
-    border-radius: 12px;
+    /* Matches the card it covers. */
+    border-radius: 18px;
     background: var(--white);
     box-shadow: 0 22px 50px -30px rgb(20 23 26 / 0.35);
     /* Always dark-on-white regardless of section tone. */
