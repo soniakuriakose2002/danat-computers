@@ -1,6 +1,6 @@
 ---
 import Icon from '@components/ui/Icon.astro';
-import { whatsappLink, branches as allBranches } from '@data/site';
+import { site, whatsappLink, branches as allBranches } from '@data/site';
 import { OMAN_PATH, OMAN_VIEWBOX, OMAN_PINS, OMAN_ROUTES } from '@data/omanMap';
 
 /** Where each photo card sits, nudged clear of its pin. */
@@ -15,9 +15,18 @@ const order = ['ruwi', 'sohar', 'salalah'];
 const list = order.map((s) => allBranches.find((b) => b.slug === s)!);
 
 const stats = [
-  { icon: 'pin' as const, value: '4', label: 'Branches', known: true },
-  { icon: 'users' as const, value: '20+', label: 'Years of Service', known: true },
-  { icon: 'heart' as const, value: null, label: 'Happy Customers', known: false },
+  /* Typed in as '4' and '20+', so neither followed the data — the branch
+     count stayed at four after Hail was withdrawn, and the years had not
+     moved since they were written. The customer figure is dropped rather
+     than held open: nobody has given us one, and an empty bar is just a
+     gap that looks like a fault. */
+  { icon: 'pin' as const, value: String(site.stats.branches), label: 'Branches', known: true },
+  {
+    icon: 'users' as const,
+    value: `${new Date().getFullYear() - site.stats.since}+`,
+    label: 'Years of Service',
+    known: true,
+  },
 ];
 ---
 
@@ -89,16 +98,6 @@ const stats = [
               </div>
             </div>
 
-            <!-- shopfront photo — empty until real photography arrives -->
-            <div class="ao__shot">
-              <div class="ao__slot ao__slot--photo">
-                <Icon name="camera" size={20} />
-                <span>Shopfront photo</span>
-              </div>
-              <span class="ao__chip">
-                <Icon name="pin" size={12} />{b.city.split(',')[0]} Branch
-              </span>
-            </div>
           </article>
         ))}
       </div>
@@ -117,37 +116,13 @@ const stats = [
       </p>
 
       <div class="ao__map">
-        <svg viewBox={OMAN_VIEWBOX} role="img"
-          aria-label="Map of Oman showing Danat branches in Ruwi, Sohar and Salalah">
-          <path class="ao__land" d={OMAN_PATH} />
-          {OMAN_ROUTES.map(([from, to]) => {
-            const a = OMAN_PINS[from];
-            const b = OMAN_PINS[to];
-            return (
-              <path class="ao__route"
-                d={`M${a.x},${a.y} Q${(a.x + b.x) / 2 + 70},${(a.y + b.y) / 2} ${b.x},${b.y}`} />
-            );
-          })}
-          {list.map((b, i) => (
-            <g class="ao__pin" data-pin={b.slug} data-on={i === 0 ? '' : undefined}
-              style={`--i:${i}`} transform={`translate(${OMAN_PINS[b.slug].x} ${OMAN_PINS[b.slug].y})`}>
-              <circle class="ao__halo" r="46"></circle>
-              <circle class="ao__dot" r="14"></circle>
-            </g>
-          ))}
-        </svg>
-
-        {list.map((b) => (
-          <button type="button" class="ao__mcard" data-mcard={b.slug}
-            data-on={b.slug === 'ruwi' ? '' : undefined}
-            style={`--x:${cardPos[b.slug].x}%; --y:${cardPos[b.slug].y}%`}
-            aria-label={`Show ${b.name}`}>
-            <span class="ao__slot ao__slot--thumb"><Icon name="camera" size={16} /></span>
-            <span class="ao__mlabel">
-              <Icon name="pin" size={11} />{b.city.split(',')[0]}
-            </span>
-          </button>
-        ))}
+        {/* A real map. OpenStreetMap's own embed — no API key, no ad
+            tracking, no cookie banner. The drawn outline it replaces sat
+            under placeholder photo cards that showed nothing. */}
+        <iframe
+          src="https://www.openstreetmap.org/export/embed.html?bbox=51.8,16.4,60.0,26.6&layer=mapnik"
+          title="Map of Oman showing where Danat Computers trades"
+          referrerpolicy="no-referrer"></iframe>
       </div>
 
       <dl class="ao__stats">
@@ -263,7 +238,7 @@ const stats = [
     box-shadow: 0 18px 40px -28px rgb(20 23 26 / 0.3);
     overflow: hidden;
   }
-  .ao__card[data-on] { display: grid; animation: ao-in 300ms var(--ease) both; }
+  .ao__card[data-on] { display: block; animation: ao-in 300ms var(--ease) both; }
   @keyframes ao-in {
     from { opacity: 0; transform: translateY(8px); }
     to { opacity: 1; transform: none; }
@@ -409,8 +384,18 @@ const stats = [
 
   .ao__mapwrap { position: relative; padding-top: 3rem; }
 
-  .ao__map { position: relative; width: 100%; max-width: 30rem; margin-inline: auto; }
-  .ao__map svg { width: 100%; height: auto; overflow: visible; }
+  .ao__map {
+    position: relative;
+    width: 100%;
+    max-width: 30rem;
+    margin-inline: auto;
+    /* A fixed frame, because an iframe has no intrinsic size to grow to. */
+    aspect-ratio: 4 / 3;
+    border: 1px solid var(--line-light);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  .ao__map iframe { display: block; width: 100%; height: 100%; border: 0; }
 
   .ao__land {
     fill: color-mix(in oklab, var(--green) 16%, #fff);
