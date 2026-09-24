@@ -97,6 +97,16 @@ export interface Branch {
   hours: string[];
   /** Map position as a % of the SVG viewBox — approximate, for the stylised map only. */
   map: { x: number; y: number };
+  /**
+   * Real coordinates, for the OpenStreetMap embed on each branch card.
+   *
+   * Ruwi is the shopfront: Computer Street is a published address.
+   * Sohar and Salalah are the CITY, not the shop — nobody has given us
+   * their street addresses, so their maps are labelled by city and
+   * their address slot stays open rather than dropping a pin on a
+   * building we are guessing at.
+   */
+  geo: { lat: number; lon: number; precise: boolean };
   /** Address/phone confirmed against a published source. */
   verified: boolean;
   /**
@@ -122,6 +132,7 @@ export const branches: Branch[] = [
     tel: '+96878323116',
     hours: ['Sat–Thu  09:00 – 13:00', 'Sat–Thu  16:00 – 21:00', 'Friday   Closed'],
     map: { x: 70, y: 30 },
+    geo: { lat: 23.593, lon: 58.556, precise: true },
     verified: true,
     hoursVerified: false,
   },
@@ -134,6 +145,7 @@ export const branches: Branch[] = [
     tel: null,
     hours: ['Sat–Thu  09:00 – 13:00', 'Sat–Thu  16:00 – 21:00', 'Friday   Closed'],
     map: { x: 55, y: 17 },
+    geo: { lat: 24.347, lon: 56.709, precise: false },
     verified: false,
     hoursVerified: false,
   },
@@ -146,6 +158,7 @@ export const branches: Branch[] = [
     tel: null,
     hours: ['Sat–Thu  09:00 – 13:00', 'Sat–Thu  16:00 – 21:00', 'Friday   Closed'],
     map: { x: 26, y: 76 },
+    geo: { lat: 17.019, lon: 54.089, precise: false },
     verified: false,
     hoursVerified: false,
   },

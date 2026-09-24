@@ -1,5 +1,7 @@
 ---
+import { Image } from 'astro:assets';
 import Icon from '@components/ui/Icon.astro';
+import imgMap from '@assets/photos/oman-map.png';
 import { site, whatsappLink, branches as allBranches } from '@data/site';
 import { OMAN_PATH, OMAN_VIEWBOX, OMAN_PINS, OMAN_ROUTES } from '@data/omanMap';
 
@@ -9,6 +11,22 @@ const cardPos: Record<string, { x: number; y: number }> = {
   ruwi: { x: 86, y: 20 },
   hail: { x: 84, y: 45 },
   salalah: { x: 20, y: 77 },
+};
+
+/**
+ * Where each branch falls on oman-map.png, as a % of that image.
+ *
+ * NOT eyeballed. The image is an OSM tile render cropped to
+ * lon 51.3–60.7, lat 15.9–27.2 at zoom 7, and these come out of the
+ * same Web Mercator projection that produced the crop. If the map is
+ * ever re-rendered at different bounds these must be recomputed with
+ * it — a linear guess is wrong, because Mercator is not linear in
+ * latitude.
+ */
+const SPOTS: Record<string, { x: number; y: number }> = {
+  ruwi: { x: 77.19, y: 32.8 },
+  sohar: { x: 57.54, y: 26.03 },
+  salalah: { x: 29.67, y: 90.42 },
 };
 
 const order = ['ruwi', 'sohar', 'salalah'];
@@ -45,64 +63,23 @@ const stats = [
         communities across the Sultanate for over twenty years.
       </p>
 
-      <div class="ao__tabs" role="tablist" aria-label="Branches" data-rise style="--d:190ms">
-        {list.map((b, i) => (
-          <button
-            type="button"
-            class="ao__tab"
-            data-tab={b.slug}
-            data-on={i === 0 ? '' : undefined}
-            role="tab"
-            aria-selected={i === 0 ? 'true' : 'false'}
-          >
-            <Icon name="pin" size={14} />
-            {b.city.split(',')[0]}
-          </button>
+      <dl class="ao__stats" data-rise style="--d:190ms">
+        {stats.map((s) => (
+          <div>
+            <dt><Icon name={s.icon} size={20} /></dt>
+            <dd>
+              {s.known ? <b>{s.value}</b> : <b class="ao__blank" aria-hidden="true"></b>}
+              <i>{s.label}</i>
+            </dd>
+          </div>
         ))}
-      </div>
+        <div>
+          <dt><Icon name="compass" size={20} /></dt>
+          <dd><b class="ao__word">Oman</b><i>Wherever you are</i></dd>
+        </div>
+      </dl>
 
-      <div class="ao__cards" data-rise style="--d:240ms">
-        {list.map((b, i) => (
-          <article class="ao__card" data-card={b.slug} data-on={i === 0 ? '' : undefined}>
-            <div class="ao__info">
-              <h3 class="ao__cn">{b.name}</h3>
-              <p class="ao__city">{b.city}</p>
-
-              {b.verified ? (
-                <address>{b.address.split('\n').map((l) => <>{l}<br /></>)}</address>
-              ) : (
-                <div class="ao__slot ao__slot--addr"><span>Address to be confirmed</span></div>
-              )}
-
-              <div class="ao__hours">
-                <Icon name="clock" size={17} />
-                <ul data-unverified={!b.hoursVerified ? '' : undefined}>
-                  {b.hours.map((h) => <li>{h}</li>)}
-                </ul>
-              </div>
-
-              <div class="ao__acts">
-                <a
-                  class="ao__wa"
-                  href={whatsappLink(`Hello Danat — I'd like to contact your ${b.name} branch about`)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  title={`WhatsApp ${b.name}`}
-                  aria-label={`Message ${b.name} on WhatsApp`}
-                >
-                  <Icon name="whatsapp" size={18} />
-                </a>
-                <span class="ao__dir" aria-disabled="true" title="Map link to be added">
-                  Get Directions <Icon name="send" size={14} />
-                </span>
-              </div>
-            </div>
-
-          </article>
-        ))}
-      </div>
-
-      <a class="ao__all" href="/branches" data-rise style="--d:300ms">
+      <a class="ao__all" href="/branches" data-rise style="--d:260ms">
         View all locations <Icon name="arrow" size={14} />
       </a>
 
@@ -115,37 +92,91 @@ const stats = [
         Same Trust<br />Across Every City
       </p>
 
-      <div class="ao__map">
-        {/* A real map. OpenStreetMap's own embed — no API key, no ad
-            tracking, no cookie banner. The drawn outline it replaces sat
-            under placeholder photo cards that showed nothing. */}
-        <iframe
-          src="https://www.openstreetmap.org/export/embed.html?bbox=51.8,16.4,60.0,26.6&layer=mapnik"
-          title="Map of Oman showing where Danat Computers trades"
-          referrerpolicy="no-referrer"></iframe>
-      </div>
+      {/* ONE map, three spots.
+          OpenStreetMap's embed takes a single `marker`, so three
+          branches meant three iframes — which is not a map of where the
+          business is, it is three maps of three towns. This is a real
+          OSM render of Oman, stitched from tiles once at build time and
+          served as our own image, with the pins placed from the same
+          Web Mercator maths that produced it. No key, no tile request
+          per visitor, no cookie banner, and the pins cannot drift. */}
+      <figure class="ao__map">
+        <Image src={imgMap} alt="Map of Oman marking the Danat branches in Ruwi, Sohar and Salalah"
+          widths={[428, 856]} sizes="(min-width: 68rem) 42rem, 92vw"
+          quality={82} format="webp" loading="lazy" />
 
-      <dl class="ao__stats">
-        {stats.map((s) => (
-          <div>
-            <dt><Icon name={s.icon} size={22} /></dt>
-            <dd>
-              {s.known ? <b>{s.value}</b> : <b class="ao__blank" aria-hidden="true"></b>}
-              <i>{s.label}</i>
-            </dd>
-          </div>
+        {list.map((b) => (
+          <a
+            class="ao__spot"
+            data-low={b.slug === 'salalah' ? '' : undefined}
+            style={`--x:${SPOTS[b.slug].x}%; --y:${SPOTS[b.slug].y}%`}
+            href={`https://www.openstreetmap.org/?mlat=${b.geo.lat}&mlon=${b.geo.lon}#map=${b.geo.precise ? 16 : 12}/${b.geo.lat}/${b.geo.lon}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span class="ao__halo" aria-hidden="true"></span>
+            <span class="ao__dot" aria-hidden="true"></span>
+            <span class="ao__lbl">{b.city.split(',')[0]}</span>
+          </a>
         ))}
-      </dl>
 
-      <p class="ao__compass" aria-hidden="true">
-        <Icon name="compass" size={30} />
-        <span>Serving<br />a Connected<br />Oman</span>
-      </p>
+        {/* ODbL requires this to stay visible. */}
+        <figcaption>&copy; OpenStreetMap contributors</figcaption>
+      </figure>
+
     </div>
   </div>
 
-  <!-- landmark strip — left empty until artwork is supplied -->
-  <div class="ao__strip" aria-hidden="true"></div>
+
+  {/* All three, side by side. They used to be one card behind a row of
+      tabs, so two of the three branches were never on screen. Each one
+      carries its own OpenStreetMap embed with a real marker — the single
+      overview map this replaces was rendering the whole world. */}
+  <div class="ao__row shell">
+    {list.map((b, i) => (
+      <article class="ao__card" data-card={b.slug} data-rise style={`--d:${120 + i * 90}ms`}>
+        <div class="ao__info">
+          <h3 class="ao__cn">{b.name}</h3>
+          <p class="ao__city">{b.city}</p>
+
+          {b.verified ? (
+            <address>{b.address.split(String.fromCharCode(10)).map((l) => <>{l}<br /></>)}</address>
+          ) : (
+            <div class="ao__slot ao__slot--addr"><span>Address to be confirmed</span></div>
+          )}
+
+          <div class="ao__hours">
+            <Icon name="clock" size={17} />
+            <ul data-unverified={!b.hoursVerified ? '' : undefined}>
+              {b.hours.map((h) => <li>{h}</li>)}
+            </ul>
+          </div>
+
+          <div class="ao__acts">
+            <a
+              class="ao__wa"
+              href={whatsappLink(`Hello Danat — I'd like to contact your ${b.name} branch about`)}
+              target="_blank"
+              rel="noopener noreferrer"
+              title={`WhatsApp ${b.name}`}
+              aria-label={`Message ${b.name} on WhatsApp`}
+            >
+              <Icon name="whatsapp" size={18} />
+            </a>
+            <a
+              class="ao__dir"
+              href={`https://www.openstreetmap.org/?mlat=${b.geo.lat}&mlon=${b.geo.lon}#map=${b.geo.precise ? 17 : 13}/${b.geo.lat}/${b.geo.lon}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Open in maps <Icon name="send" size={14} />
+            </a>
+          </div>
+        </div>
+      </article>
+    ))}
+  </div>
+
 </section>
 
 <style>
@@ -169,7 +200,7 @@ const stats = [
     display: grid;
     gap: var(--s7);
     align-items: start;
-    padding-bottom: clamp(3rem, 6vw, 5rem);
+    padding-bottom: clamp(1.5rem, 3vw, 2.5rem);
   }
 
   /* ---------- left ---------- */
@@ -217,25 +248,123 @@ const stats = [
   .ao__tab:hover { border-color: var(--green); color: var(--green-deep); }
   .ao__tab[data-on] { background: var(--green); border-color: var(--green); color: #fff; }
 
-  .ao__cards { position: relative; display: grid; margin-top: 0.85rem; }
+  /* ---------- the three branches ---------- */
+
+  .ao__row {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    gap: clamp(1rem, 1.8vw, 1.6rem);
+    padding-bottom: clamp(3rem, 6vw, 5rem);
+  }
 
   .ao__card {
-    grid-area: 1 / 1;
-    display: none;
+    display: grid;
+    /* The card ends where its words end; the info block takes the slack
+       so the three action rows line up across the row. */
+    grid-template-rows: auto minmax(0, 1fr);
     border: 1px solid var(--line-light);
-    border-left: 3px solid var(--green);
-    border-radius: 12px;
+    border-radius: 18px;
     background: var(--white);
-    box-shadow: 0 18px 40px -28px rgb(20 23 26 / 0.3);
+    box-shadow:
+      0 1px 2px rgb(10 30 12 / 0.05),
+      0 20px 40px -26px rgb(10 30 12 / 0.3);
     overflow: hidden;
+    transition: transform var(--t2) var(--ease), box-shadow var(--t2) var(--ease);
   }
-  .ao__card[data-on] { display: block; animation: ao-in 300ms var(--ease) both; }
-  @keyframes ao-in {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: none; }
+  .ao__card:hover {
+    transform: translateY(-4px);
+    box-shadow:
+      0 1px 2px rgb(10 30 12 / 0.06),
+      0 32px 56px -28px rgb(10 30 12 / 0.4);
   }
 
-  .ao__info { padding: 1.35rem 1.4rem; }
+  /* ---------- the one map ---------- */
+
+  .ao__map {
+    position: relative;
+    width: 100%;
+    border-radius: 20px;
+    overflow: hidden;
+    background: var(--off-2);
+    box-shadow:
+      0 1px 2px rgb(10 30 12 / 0.05),
+      0 24px 46px -28px rgb(10 30 12 / 0.34);
+  }
+  .ao__map :global(img) { display: block; width: 100%; height: auto; }
+
+  .ao__map figcaption {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    padding: 0.3rem 0.55rem;
+    border-top-left-radius: 8px;
+    background: rgb(255 255 255 / 0.86);
+    font-size: 0.625rem;
+    color: var(--text-3);
+  }
+
+  /* Anchored by its pin tip, which is what --x/--y describe. */
+  .ao__spot {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    translate: -50% -100%;
+    display: grid;
+    justify-items: center;
+  }
+
+  .ao__dot {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: var(--green-deep);
+    box-shadow: 0 0 0 4px var(--white), 0 4px 10px -3px rgb(10 30 12 / 0.6);
+  }
+
+  .ao__halo {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 15px;
+    height: 15px;
+    translate: -50% -50%;
+    border-radius: 50%;
+    background: rgb(89 170 84 / 0.5);
+    animation: ao-ping 2.8s var(--ease) infinite;
+  }
+
+  .ao__lbl {
+    margin-top: 0.4rem;
+    padding: 0.22rem 0.55rem;
+    border-radius: 999px;
+    background: var(--white);
+    box-shadow: 0 4px 12px -5px rgb(20 23 26 / 0.45);
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text);
+    white-space: nowrap;
+    transition: background-color var(--t2) var(--ease), color var(--t2) var(--ease);
+  }
+  .ao__spot:hover .ao__lbl { background: var(--green-deep); color: #fff; }
+
+  /* Salalah sits at 90% of the height — its label would hang off the
+     bottom edge, so it goes above the dot instead. */
+  .ao__spot[data-low] {
+    flex-direction: column-reverse;
+  }
+  .ao__spot[data-low] .ao__lbl {
+    order: -1;
+    margin: 0 0 0.4rem;
+  }
+
+  .ao__info {
+    display: grid;
+    align-content: start;
+    padding: 1.35rem 1.4rem;
+  }
   .ao__cn { font-size: 1.2rem; font-weight: 700; letter-spacing: -0.025em; }
 
   .ao__city {
@@ -273,6 +402,8 @@ const stats = [
   .ao__hours ul[data-unverified] { opacity: 0.55; }
 
   .ao__acts {
+    margin-top: auto;
+    padding-top: 1.1rem;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -296,7 +427,6 @@ const stats = [
   }
   .ao__wa:hover { background: var(--text); transform: translateY(-2px); }
 
-  /* Inert until real map links exist — shown as pending, not clickable. */
   .ao__dir {
     display: inline-flex;
     align-items: center;
@@ -306,9 +436,10 @@ const stats = [
     border-radius: 999px;
     font-size: 0.875rem;
     font-weight: 500;
-    color: var(--text-3);
-    cursor: not-allowed;
+    color: var(--text-2);
+    transition: border-color var(--t2) var(--ease), color var(--t2) var(--ease);
   }
+  .ao__dir:hover { border-color: var(--green); color: var(--green-deep); }
 
   .ao__shot { position: relative; min-height: 11rem; }
 
@@ -355,7 +486,7 @@ const stats = [
     opacity: 0.9;
   }
   .ao__script--low { margin-top: var(--s6); }
-  .ao__script--high { position: absolute; right: 0; top: 0; text-align: right; z-index: 3; }
+  .ao__script--high { text-align: right; }
 
   .ao__all {
     display: inline-flex;
@@ -373,20 +504,8 @@ const stats = [
 
   /* ---------- map ---------- */
 
-  .ao__mapwrap { position: relative; padding-top: 3rem; }
+  .ao__mapwrap { position: relative; display: grid; align-content: start; gap: var(--s5); }
 
-  .ao__map {
-    position: relative;
-    width: 100%;
-    max-width: 30rem;
-    margin-inline: auto;
-    /* A fixed frame, because an iframe has no intrinsic size to grow to. */
-    aspect-ratio: 4 / 3;
-    border: 1px solid var(--line-light);
-    border-radius: 14px;
-    overflow: hidden;
-  }
-  .ao__map iframe { display: block; width: 100%; height: 100%; border: 0; }
 
   .ao__land {
     fill: color-mix(in oklab, var(--green) 16%, #fff);
@@ -444,12 +563,20 @@ const stats = [
 
   /* ---------- stats ---------- */
 
-  .ao__stats { display: grid; gap: var(--s5); margin-top: var(--s6); }
-  .ao__stats > div { display: flex; align-items: center; gap: 0.85rem; }
+  /* A row of three, not a stranded stack. */
+  .ao__stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--s4);
+    margin-top: clamp(1.75rem, 3.5vw, 2.5rem);
+    padding-top: var(--s5);
+    border-top: 1px solid var(--line-light);
+  }
+  .ao__stats > div { display: flex; align-items: center; gap: 0.7rem; }
   .ao__stats dt { color: var(--green); display: grid; place-items: center; }
   .ao__stats dd b {
     display: block;
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     font-weight: 700;
     letter-spacing: -0.03em;
     line-height: 1;
@@ -462,6 +589,8 @@ const stats = [
     color: var(--text-2);
   }
 
+  .ao__word { font-size: 1.15rem !important; letter-spacing: -0.02em; }
+
   /* Unverified figure: reserved blank rather than an invented number. */
   .ao__blank {
     width: 6.5rem;
@@ -471,70 +600,24 @@ const stats = [
     background: repeating-linear-gradient(45deg, #fafafa 0 8px, #f4f4f2 8px 16px);
   }
 
-  .ao__compass {
-    display: flex;
-    align-items: center;
-    gap: 0.8rem;
-    margin-top: var(--s6);
-    color: var(--text-3);
-    font-size: 0.75rem;
-    line-height: 1.45;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-  }
-
-  /* ---------- landmark strip ---------- */
-
-  .ao__strip {
-    height: clamp(4rem, 9vw, 8.5rem);
-    border-top: 1px dashed var(--line-light);
-    background: repeating-linear-gradient(45deg, #fbfbfa 0 10px, #f5f6f4 10px 20px);
-  }
-
   /* ---------- layout ---------- */
 
   @media (min-width: 48rem) {
-    .ao__card[data-on] { grid-template-columns: 1.15fr 1fr; }
+    .ao__row { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   }
 
   @media (min-width: 68rem) {
-    .ao__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: var(--s8); }
-    .ao__stats { position: absolute; right: 0; top: 32%; margin: 0; width: 11rem; }
-    .ao__compass { position: absolute; right: 0; bottom: 4%; margin: 0; width: 11rem; }
-    .ao__map { max-width: 25rem; margin-left: 0; }
+    /* The map carries the section, so it takes the wider track. The two
+       columns meet at the top rather than being centred against each
+       other, because the map is much the taller of the pair. */
+    .ao__grid { grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.18fr); gap: var(--s7); }
   }
 
   @media (prefers-reduced-motion: reduce) {
     .ao__route, .ao__halo { animation: none !important; }
-    .ao__card[data-on] { animation: none; }
+    .ao__card, .ao__card:hover { transition: none; transform: none; }
   }
 </style>
 
-<script>
-  const root = document.querySelector<HTMLElement>('[data-oman]');
-  if (root) {
-    const q = <T extends Element>(s: string) => [...root.querySelectorAll<T>(s)];
-    const tabs = q<HTMLElement>('[data-tab]');
-    const cards = q<HTMLElement>('[data-card]');
-    const pins = q<SVGGElement>('[data-pin]');
-    const mcards = q<HTMLElement>('[data-mcard]');
-
-    /* One function drives tabs, pins and map cards alike. */
-    const show = (slug: string) => {
-      const on = (el: Element, key?: string) => el.toggleAttribute('data-on', key === slug);
-      tabs.forEach((el) => {
-        on(el, el.dataset.tab);
-        el.setAttribute('aria-selected', String(el.dataset.tab === slug));
-      });
-      cards.forEach((el) => on(el, el.dataset.card));
-      pins.forEach((el) => on(el, el.dataset.pin));
-      mcards.forEach((el) => on(el, el.dataset.mcard));
-    };
-
-    tabs.forEach((el) => el.addEventListener('click', () => show(el.dataset.tab!)));
-    mcards.forEach((el) => {
-      el.addEventListener('click', () => show(el.dataset.mcard!));
-      el.addEventListener('pointerenter', () => show(el.dataset.mcard!));
-    });
-  }
-</script>
+{/* The selector script is gone with the tabs. All three branches are
+    on screen at once, so there is nothing left to switch between. */}
