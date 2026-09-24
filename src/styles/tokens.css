@@ -57,6 +57,11 @@
   --font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Mono', Menlo, monospace;
   /* Italic only. Reserved for one emotive line per page. */
   --font-serif: 'Instrument Serif', Georgia, 'Times New Roman', serif;
+  /* The brush hand from the client's comp. Headline accents only —
+     never body copy, never below ~1.75rem, where it stops being
+     legible. Cursive is the right fallback here: everything about the
+     treatment around it assumes a slanted, connected face. */
+  --font-script: 'Kaushan Script', 'Segoe Script', 'Brush Script MT', cursive;
 
   --d1: clamp(2.75rem, 7.4vw, 7.5rem); /* hero */
   --d2: clamp(2.25rem, 5vw, 4.5rem); /* section heads */

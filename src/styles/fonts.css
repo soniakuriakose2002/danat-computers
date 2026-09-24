@@ -1,7 +1,7 @@
 /* ============================================================
    DANAT — fonts.css
    Self-hosted, subset to Latin + the punctuation the design uses.
-   Total 39.5 KB across three faces. No third-party request.
+   Total 55.2 KB across four faces. No third-party request.
    ============================================================ */
 
 /* Switzer — display AND text. One variable file, 300-900.
@@ -20,6 +20,18 @@
   src: url('/fonts/instrument-italic.woff2') format('woff2');
   font-weight: 400;
   font-style: italic;
+  font-display: swap;
+}
+
+/* Kaushan Script — the brush accent the client's comp sets headline
+   emphasis in. SIL OFL 1.1, free to self-host commercially. Google's
+   latin cut is 34 KB; subset to ASCII + the quotes and dashes the site
+   uses it brings it to 15.4 KB. */
+@font-face {
+  font-family: 'Kaushan Script';
+  src: url('/fonts/kaushan-script.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
   font-display: swap;
 }
 

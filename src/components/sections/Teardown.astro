@@ -411,7 +411,9 @@ import { site } from '@data/site';
 
   @media (min-width: 62rem) {
     .td__grid {
-      grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.85fr);
+      /* The film was leaving a column of empty green to the right of the
+         copy. More of the row goes to the picture. */
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 0.8fr);
       gap: clamp(2rem, 4vw, 3.5rem);
     }
     .td__script { display: block; }

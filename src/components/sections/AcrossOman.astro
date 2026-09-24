@@ -149,18 +149,9 @@ const stats = [
 </section>
 
 <style>
-  /* A slanted cut carries the green band down into this section —
-     angular, where the section above uses a curve. */
-  .ao::before {
-    content: '';
-    position: absolute;
-    inset: 0 0 auto 0;
-    height: clamp(42px, 6vw, 96px);
-    background: #27551f;
-    clip-path: polygon(0 0, 100% 0, 100% 0, 0 100%);
-    z-index: 2;
-    pointer-events: none;
-  }
+  /* The slanted green cut that used to sit here carried the band above
+     down into this section. That band is light now, so the wedge was a
+     dark shape belonging to nothing. */
 
   .ao {
     position: relative;
