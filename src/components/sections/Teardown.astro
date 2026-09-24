@@ -1,4 +1,5 @@
 ---
+import Icon from '@components/ui/Icon.astro';
 import { site } from '@data/site';
 
 /**
@@ -19,25 +20,18 @@ import { site } from '@data/site';
     <figure class="td__fig">
       <span class="td__glow" aria-hidden="true"></span>
       <div class="td__part">
-        {/*
-          Motion, not a video player. Nothing here says "video": no
-          controls, no play button, no picture-in-picture, no context
-          menu — pointer-events are off, so there is nothing on it to
-          click at all. It runs by itself and loops.
-
-          `controlsList` and `disablePictureInPicture` remove the
-          browser's own download and pop-out affordances. They do NOT
-          make the file private: it is still fetched over HTTP and can
-          be pulled from the network panel or by asking for
-          /film/ecosystem.mp4 directly. Nothing served to a browser can
-          be stopped from being saved.
-        */}
+        {/* Plays on a click, never on its own. */}
         <div class="td__film" data-film>
           <video src="/film/ecosystem.mp4" poster="/film/ecosystem.jpg"
             autoplay muted loop playsinline preload="auto"
-            controlslist="nodownload noplaybackrate noremoteplayback"
-            disablepictureinpicture disableremoteplayback
             aria-label="Danat: printers, laptops, accessories, tools and servers"></video>
+          {/* Only a fallback now. Muted autoplay is allowed everywhere,
+              but a browser or a data-saving setting can still refuse it,
+              and a still frame with no way to start it is a dead end. */}
+          <button type="button" data-film-play aria-label="Play the film">
+            <Icon name="play" size={18} />
+            <span>Watch</span>
+          </button>
         </div>
       </div>
     </figure>
@@ -73,11 +67,29 @@ import { site } from '@data/site';
 
 
 
-  /* A fixed "Playing — scroll to take over" pill used to sit here. It
-     belonged to the scroll-driven sequence that is gone, nothing has
-     set data-td-playing since, and a status pill is exactly what makes
-     a film read as an embedded player rather than part of the page. */
-
+  /* Shown only while the sequence is driving itself. */
+  .td::after {
+    content: 'Playing — scroll to take over';
+    position: fixed;
+    left: 50%;
+    bottom: 1.25rem;
+    z-index: 40;
+    padding: 0.4rem 0.9rem;
+    border-radius: 999px;
+    border: 1px solid rgb(255 255 255 / 0.18);
+    background: rgb(7 9 10 / 0.82);
+    backdrop-filter: blur(8px);
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgb(255 255 255 / 0.72);
+    translate: -50% 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity var(--t2) var(--ease);
+  }
+  :global(html[data-td-playing]) .td::after { opacity: 1; }
 
   .td__grid {
     display: grid;
@@ -198,13 +210,34 @@ import { site } from '@data/site';
        was right under a black section; on a light one it flashes as a
        hole. */
     background: var(--off-2);
-    /* Nothing to click, so no context menu, no player chrome, no
-       "save video as". It reads as part of the page rather than
-       something embedded in it. */
-    pointer-events: none;
-    -webkit-user-select: none;
-    user-select: none;
   }
+  .td__film button {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    translate: -50% -50%;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.85rem 1.4rem;
+    border: 0;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.94);
+    color: #07090a;
+    font: inherit;
+    font-size: 0.875rem;
+    font-weight: 700;
+    cursor: pointer;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 18px 40px -18px rgb(0 0 0 / 0.7);
+    transition: transform var(--t2) var(--ease), opacity 260ms var(--ease);
+  }
+  .td__film button:hover { transform: translate(-50%, -50%) scale(1.05); }
+  .td__film button:focus-visible { outline: 2px solid var(--green-bright); outline-offset: 3px; }
+  .td__film[data-playing] button { opacity: 0; pointer-events: none; }
+  /* Hidden the moment playback is under way, however it started. */
+  .td__film[data-auto] button { opacity: 0; pointer-events: none; }
+
   .td__part {
     position: relative;
     z-index: 1;
@@ -306,14 +339,12 @@ import { site } from '@data/site';
 
   .td__h1 {
     margin-top: var(--s4);
-    /* Tracks the copy column, not the viewport: the film took most of
-       the row, so a vw-scaled headline overflowed what was left. */
-    font-size: clamp(1.9rem, 3.4vw, 3rem);
-    line-height: 1.06;
+    font-size: clamp(2.1rem, 4.6vw, 3.4rem);
+    line-height: 1.04;
     letter-spacing: -0.042em;
     font-weight: 700;
   }
-  .td__h1 em { font-style: normal; color: var(--green-deep); white-space: nowrap; }
+  .td__h1 em { font-style: normal; color: var(--green-deep); }
 
   .td__lead {
     margin-top: var(--s4);
@@ -382,12 +413,8 @@ import { site } from '@data/site';
     .td__grid {
       /* The film was leaving a column of empty green to the right of the
          copy. More of the row goes to the picture. */
-      /* The film carries the opening; the copy beside it is three short
-         lines. It takes as much of the row as the words will leave. */
-      /* Not narrower than this: "just a laptop" breaks to three lines
-         below roughly 17rem of copy column, and the em lands alone. */
-      grid-template-columns: minmax(0, 2.3fr) minmax(0, 0.74fr);
-      gap: clamp(1.25rem, 2.5vw, 2.25rem);
+      grid-template-columns: minmax(0, 1.55fr) minmax(0, 0.8fr);
+      gap: clamp(2rem, 4vw, 3.5rem);
     }
     .td__script { display: block; }
   }
@@ -395,6 +422,7 @@ import { site } from '@data/site';
   @media (prefers-reduced-motion: reduce) {
     /* It only ever plays on a click, so it is already safe here; the
        hover scale is the only thing to drop. */
+    .td__film button:hover { transform: translate(-50%, -50%); }
     .td__film, .td__film video { animation: none; }
     /* Square to the camera, no motion. --t is never set, so this only
        needs to drop the will-change hint. */
@@ -410,34 +438,24 @@ import { site } from '@data/site';
       box.dataset.wired = '1';
 
       const v = box.querySelector('video');
+      const btn = box.querySelector('[data-film-play]');
 
-      /* It runs by itself and it keeps running. Muted autoplay is
-         allowed everywhere, but a data-saving mode or a per-site
-         setting can still refuse it — and there is no Watch button to
-         fall back on any more, by design. So instead of asking, we
-         retry quietly on the first thing the visitor does. */
-      const nudge = () => v.play().catch(() => {});
-      nudge();
+      /* If autoplay is allowed the button never needs to appear. */
+      if (!v.paused) box.setAttribute('data-auto', '');
+      v.addEventListener('playing', () => box.setAttribute('data-auto', ''));
 
-      const armed = ['pointerdown', 'touchstart', 'keydown', 'scroll'];
-      const once = () => {
-        nudge();
-        armed.forEach((t) => window.removeEventListener(t, once));
-      };
-      if (v.paused) armed.forEach((t) => window.addEventListener(t, once, { passive: true, once: false }));
-
-      /* Decoding a film nobody is looking at costs battery for nothing,
-         so it rests off screen — and picks straight back up, from where
-         it left off, the moment it returns. */
-      new IntersectionObserver(([e]) => {
-        if (e.isIntersecting) nudge();
-        else v.pause();
-      }, { threshold: 0.15 }).observe(box);
-
-      /* A tab restored from the back/forward cache comes back paused. */
-      document.addEventListener('visibilitychange', () => {
-        if (!document.hidden) nudge();
+      btn.addEventListener('click', () => {
+        box.setAttribute('data-playing', '');
+        v.play().catch(() => box.removeAttribute('data-playing'));
       });
+
+      /* Scrolled away mid-play is decode work for nobody. It resumes only
+         if it was already playing — it never starts itself. */
+      new IntersectionObserver(([e]) => {
+        if (!box.hasAttribute('data-playing') && !box.hasAttribute('data-auto')) return;
+        if (e.isIntersecting) v.play().catch(() => {});
+        else v.pause();
+      }, { threshold: 0.2 }).observe(box);
     };
 
     document.addEventListener('astro:page-load', setup);
