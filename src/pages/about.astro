@@ -3,14 +3,18 @@ import { Image } from 'astro:assets';
 import PageLayout from '@layouts/PageLayout.astro';
 import Icon from '@components/ui/Icon.astro';
 import PurposeOrbit from '@components/sections/PurposeOrbit.astro';
+import MeetTeam from '@components/sections/MeetTeam.astro';
 import VideoModal from '@components/global/VideoModal.astro';
 import StoryCard from '@components/global/StoryCard.astro';
-import { site, branches } from '@data/site';
+import { site, branches, brands } from '@data/site';
 import { OMAN_PATH, OMAN_VIEWBOX, OMAN_PINS } from '@data/omanMap';
 import imgTech from '@assets/photos/repair-solder.jpg';
 import imgFilm from '@assets/photos/film-poster.jpg';
 import imgHero from '@assets/photos/support-desk.jpg';
-import laptop from '@assets/products/laptop-hero.png';
+import teamDesk from '@assets/photos/support-agent.jpg';
+import teamBench from '@assets/photos/repair-solder.jpg';
+import teamNet from '@assets/photos/network-eng.jpg';
+import teamBiz from '@assets/photos/support-desk.jpg';
 import Brush from '@components/ui/Brush.astro';
 
 const years = new Date().getFullYear() - site.stats.since;
@@ -47,6 +51,32 @@ const proof = [
   { icon: 'bolt', t: 'Faster turnaround' },
 ];
 
+/**
+ * "What our team does": the photos illustrate the four kinds of work and
+ * are not presented as named Danat staff, so no names are shown. Swap in
+ * real staff photos (and add names) whenever they are available.
+ *
+ * ⚠ DRAFT — the review cards in "Trusted by" are placeholders. Replace
+ * them with real customer reviews before going live, or set
+ * SHOW_REVIEWS to false to hide just the reviews.
+ */
+const SHOW_REVIEWS = true;
+const team = [
+  { img: teamDesk, role: 'Service desk', note: 'First contact, diagnosis booking and quotes' },
+  { img: teamBench, role: 'Board-level repair', note: 'Tracing faults to the component' },
+  { img: teamNet, role: 'Networks & CCTV', note: 'Surveys, cabling and installation' },
+  { img: teamBiz, role: 'Business support', note: 'Contracts, supply and on-site visits' },
+];
+const quotes = [
+  { who: 'Customer name', where: 'Ruwi', kind: 'Laptop repair' },
+  { who: 'Business name', where: 'Ruwi', kind: 'Office network' },
+  { who: 'Customer name', where: 'Sohar', kind: 'Data recovery' },
+  { who: 'Customer name', where: 'Sohar', kind: 'Printer service' },
+  { who: 'Business name', where: 'Salalah', kind: 'CCTV installation' },
+  { who: 'Customer name', where: 'Salalah', kind: 'Laptop upgrade' },
+];
+/* three columns for the moving "wall" of reviews */
+const cols = [0, 1, 2].map((c) => quotes.filter((_, i) => i % 3 === c));
 const mapOrder = ['sohar', 'ruwi', 'salalah'];
 const mapList = mapOrder.map((s) => branches.find((b) => b.slug === s)!);
 const W = 1000;
@@ -59,18 +89,14 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
   description={`${site.nameFull} has supplied and repaired computers across Oman since ${site.stats.since} — three branches, ${site.stats.parts.toLocaleString('en-US')} lines in stock, board-level repair.`}
 >
   {/* ══════ 01 · hero — full screen, the photo drifts as you scroll ══════ */}
-  <section class="ah" data-ah data-tone="ink">
-    <div class="ah__bg" data-ah-bg aria-hidden="true">
-      <Image src={imgHero} alt="" widths={[900, 1400, 2000]} sizes="100vw" quality={72} format="webp" loading="eager" />
-    </div>
-    <div class="shell ah__in" data-ah-tilt>
-      <p class="eb eb--inv ah__eb"><i class="eb__r" aria-hidden="true"></i>About Danat</p>
-      <h1 class="ah__h">
-        <span class="ah__l"><span>Technology</span></span>
-        <span class="ah__l"><span>That Keeps</span></span>
-        <span class="ah__l"><span><em>Oman Moving.</em></span></span>
-      </h1>
-      <div class="ah__row">
+<section class="ah" data-ah>
+    <div class="shell ah__in">
+      <div class="ah__copy" data-ah-tilt>
+        <p class="eb ah__eb"><i class="eb__r" aria-hidden="true"></i>About Danat</p>
+        <h1 class="ah__h">
+          <span class="ah__l"><span>Technology that keeps</span></span>
+          <span class="ah__l"><span><Brush>Oman moving.</Brush></span></span>
+        </h1>
         <p class="ah__p">
           For over two decades, Danat Computers has been a trusted name in
           computer products, services and business solutions across Oman. We
@@ -85,15 +111,24 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
             <span><b>Watch the film</b><em>Inside Danat Computers</em></span>
           </button>
         </div>
+        <p class="ah__mantra">People · Products · Support · A brighter tomorrow</p>
       </div>
-      <p class="ah__mantra">People · Products · Support · A brighter tomorrow</p>
     </div>
-    <span class="ah__hint" aria-hidden="true">Scroll</span>
-    <div class="ah__wave" aria-hidden="true">
-      <svg viewBox="0 0 1440 130" preserveAspectRatio="none"><path class="b" d="M0,38 C106,6 214,42 336,76 C524,130 712,80 908,38 C1104,-4 1276,116 1440,14 L1440,134 L0,134 Z"/><path class="f" d="M0,58 C118,22 248,64 380,98 C570,146 760,100 950,52 C1140,4 1300,132 1440,34 L1440,134 L0,134 Z"/></svg>
+    <div class="ah__bg" data-ah-bg aria-hidden="true">
+      <Image src={imgHero} alt="" widths={[900, 1400, 2000]} sizes="(min-width:62rem) 58vw, 100vw" quality={74} format="webp" loading="eager" />
     </div>
   </section>
 
+  {/* ══════ view switch: Who we are / Meet our team ══════ */}
+  <div class="av" data-av>
+    <div class="av__bar" role="tablist" aria-label="About Danat">
+      <span class="av__pill" data-av-pill aria-hidden="true"></span>
+      <button class="av__tab" role="tab" type="button" id="av-tab-who" aria-controls="av-who" aria-selected="true" data-av-tab="who">Who we are</button>
+      <button class="av__tab" role="tab" type="button" id="av-tab-team" aria-controls="av-team" aria-selected="false" tabindex="-1" data-av-tab="team">Meet our team</button>
+    </div>
+  </div>
+
+  <div class="av__view is-on" id="av-who" role="tabpanel" aria-labelledby="av-tab-who" data-av-view="who">
   {/* ══════ 02 · figures — 3D tilt cards with a light that follows the pointer ══════ */}
   <section class="af">
     <dl class="shell af__grid">
@@ -124,7 +159,7 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
       </div>
       <ol class="aj__stack">
         {journey.map((j, i) => (
-          <li class:list={['aj__card', `aj__card--${i % 4}`]} data-aj-card style={`--i:${i}`}>
+          <li class:list={['aj__card', `aj__card--${i % 2}`]} data-aj-card style={`--i:${i}`}>
             <span class="aj__n">{String(i + 1).padStart(2, '0')} / {String(journey.length).padStart(2, '0')}</span>
             <b class="aj__yr">{j.year}</b>
             <p class="aj__t">{j.t}</p>
@@ -138,15 +173,15 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
   <PurposeOrbit />
 
   {/* ══════ 05 · the difference — the photo opens out to full width ══════ */}
-  <section class="ad" data-ad data-tone="ink">
-    <figure class="ad__shot" data-ad-shot>
-      <Image src={imgTech} alt="A Danat technician tracing a fault on a mainboard"
-        widths={[900, 1400, 2000]} sizes="100vw" quality={74} format="webp" loading="lazy" />
-    </figure>
+<section class="ad" data-ad>
     <div class="shell ad__in">
+      <figure class="ad__shot" data-ad-shot>
+        <Image src={imgTech} alt="A Danat technician tracing a fault on a mainboard"
+          widths={[700, 1100, 1500]} sizes="(min-width:62rem) 48vw, 100vw" quality={74} format="webp" loading="lazy" />
+      </figure>
       <div class="ad__copy">
-        <p class="eb eb--inv" data-rise><i class="eb__r" aria-hidden="true"></i>The difference</p>
-        <h2 class="ad__h" data-rise style="--d:70ms">Most shops replace<br />the board. <em>We repair it.</em></h2>
+        <p class="eb" data-rise><i class="eb__r" aria-hidden="true"></i>The difference</p>
+        <h2 class="ad__h" data-rise style="--d:70ms">Most shops replace the board. <Brush>We repair it.</Brush></h2>
         <p class="ad__p" data-rise style="--d:130ms">
           A replacement mainboard is often most of the value of the machine. A
           failed component on it is usually worth a fraction of that. Tracing
@@ -165,6 +200,47 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
       </div>
     </div>
   </section>
+
+
+      {/* ══════ 05c · trusted by — brand marquee + a moving wall of reviews ══════ */}
+      <section class="aq">
+        <div class="shell aq__head">
+          <p class="eb"><i class="eb__r" aria-hidden="true"></i>Trusted by</p>
+          <h2 class="aq__h">Brands we carry, <em>customers we keep.</em></h2>
+        </div>
+        <div class="aq__mq" aria-label={`Brands we carry: ${brands.flat().join(', ')}`}>
+          <div class="aq__track">
+            {[0, 1].map((dup) => (
+              <ul aria-hidden={dup ? 'true' : undefined}>{brands.flat().map((b) => <li>{b}</li>)}</ul>
+            ))}
+          </div>
+        </div>
+        {SHOW_REVIEWS && (
+          <div class="shell">
+            <div class="aq__wall">
+              {cols.map((col, c) => (
+                <div class="aq__col" style={`--dur:${[38, 46, 42][c]}s`}>
+                  <div class="aq__run">
+                    {[0, 1].map((dup) => col.map((q) => (
+                      <figure class="aq__q" aria-hidden={dup ? 'true' : undefined}>
+                        <span class="aq__mark" aria-hidden="true">“</span>
+                        <div class="aq__top">
+                          <span class="aq__av" aria-hidden="true">{q.who.charAt(0)}</span>
+                          <span class="aq__who"><b>{q.who}</b><small>{q.kind} · Danat {q.where}</small></span>
+                          <span class="aq__g" aria-hidden="true">G</span>
+                        </div>
+                        <span class="aq__stars" aria-label="5 out of 5">★★★★★</span>
+                        <blockquote>Customer review goes here — one or two sentences about the repair, the price or the service.</blockquote>
+                      </figure>
+                    )))}
+                  </div>
+                </div>
+              ))}
+            </div>
+            <p class="aq__draft">Draft — the reviews are placeholders. Replace them with real customer reviews (for example from Google) before going live.</p>
+          </div>
+        )}
+      </section>
 
   {/* ══════ 06 · presence ══════ */}
   <section class="pr section">
@@ -217,18 +293,21 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
     </div>
   </section>
 
+  </div>
+
+  <div class="av__view" id="av-team" role="tabpanel" aria-labelledby="av-tab-team" data-av-view="team" hidden>
+    <MeetTeam />
+  </div>
+
   {/* ══════ 07 · cta ══════ */}
-  <section class="ac" data-tone="ink">
-    <div class="shell ac__in">
-      <div>
-        <p class="eb eb--inv" data-rise><i class="eb__r" aria-hidden="true"></i>Let's build a brighter tomorrow</p>
+<section class="ac">
+    <div class="shell">
+      <div class="ac__panel">
+        <p class="eb" data-rise><i class="eb__r" aria-hidden="true"></i>Let's build a brighter tomorrow</p>
         <h2 class="ac__h" data-rise style="--d:70ms">Need <Brush>expert advice?</Brush></h2>
         <p class="ac__p" data-rise style="--d:130ms">Our team is here to help you find the right solution.</p>
         <a class="ac__b" href="/contact" data-mag data-rise style="--d:190ms">Contact us<Icon name="arrow" size={15} /></a>
       </div>
-      <figure class="ac__fig" data-ac-fig aria-hidden="true">
-        <Image src={laptop} alt="" width={900} format="png" loading="lazy" />
-      </figure>
     </div>
   </section>
 
@@ -283,115 +362,135 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
   .ghost:hover span { transform: translateX(3px); }
 
 
+  /* ───── pastel palette ───── */
+  :global(:root) { --p-mint: #e3f3e6; --p-mint-ink: #1f8a4c; --p-blush: #fbe6e7; --p-blush-ink: #c93c4f;
+    --p-sky: #e4edfa; --p-sky-ink: #2d6fd0; --p-butter: #fbf0dc; --p-butter-ink: #c77410; --p-lilac: #efe8f8; --p-lilac-ink: #7a4bd0; }
+
   /* ───── 01 hero ───── */
-  .ah { position: relative; min-height: 100svh; display: grid; align-items: end; overflow: hidden; color: #fff; background: var(--ink); }
-  .ah__bg { position: absolute; inset: -8% 0 0; will-change: transform; }
-  .ah__bg :global(img) { width: 100%; height: 100%; object-fit: cover; transform: scale(1.08); animation: ahIn 2.4s var(--ease) both; }
-  @keyframes ahIn { from { transform: scale(1.18); filter: blur(6px); opacity: 0.4; } }
-  .ah::before { content: ''; position: absolute; inset: 0; z-index: 1;
-    background: linear-gradient(180deg, rgb(8 10 9 / 0.55) 0%, rgb(8 10 9 / 0.25) 35%, rgb(8 10 9 / 0.88) 100%),
-      linear-gradient(90deg, rgb(8 10 9 / 0.75) 0%, transparent 70%); }
-  .ah__in { position: relative; z-index: 2; transform-style: preserve-3d; transition: transform 0.6s var(--ease); padding-top: calc(var(--hdr, 88px) + 3rem); padding-bottom: clamp(7rem, 15vh, 10rem); }
-  .ah__eb { opacity: 0; animation: ahFade 0.9s var(--ease) 0.2s both; }
-  .ah__h { perspective: 900px; margin-top: var(--s5); font-weight: 700; font-size: var(--d1); line-height: 0.95; letter-spacing: var(--tr1); }
-  .ah__h em { font-style: normal; color: var(--green-bright); }
-  .ah__l { display: block; overflow: hidden; padding-bottom: 0.04em; }
-  .ah__l > span { display: block; transform-origin: 50% 100%; transform: translateY(70%) rotateX(-75deg); opacity: 0; animation: ahUp 1.3s var(--ease) both; }
-  .ah__l:nth-child(1) > span { animation-delay: 0.25s; }
-  .ah__l:nth-child(2) > span { animation-delay: 0.37s; }
-  .ah__l:nth-child(3) > span { animation-delay: 0.49s; }
+  .ah { position: relative; color: var(--text); overflow: hidden;
+    background: radial-gradient(40% 50% at 6% 18%, rgb(251 230 231 / 0.45), transparent 70%),
+      radial-gradient(35% 45% at 28% 90%, rgb(228 237 250 / 0.5), transparent 70%),
+      linear-gradient(180deg, #ffffff 0%, #f8faf8 100%); }
+  .ah__in { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 0.95fr) minmax(0, 1fr); gap: clamp(2rem, 5vw, 5rem); align-items: center; min-height: min(78svh, 46rem);
+    padding-top: calc(var(--hdr, 88px) + clamp(2.5rem, 6vw, 4.5rem)); padding-bottom: clamp(5rem, 9vw, 7rem); }
+  .ah__copy { transition: transform 0.6s var(--ease); }
+  .ah__eb { opacity: 0; animation: ahFade 0.9s var(--ease) 0.15s both; }
+  .ah__h { perspective: 900px; margin-top: var(--s4); font-weight: 700; font-size: var(--d4); line-height: 1.04; letter-spacing: var(--tr4); --brush-size: 1.15; }
+  .ah__l { display: block; overflow: hidden; padding-bottom: 0.08em; }
+  .ah__l > span { display: block; transform-origin: 50% 100%; transform: translateY(70%) rotateX(-70deg); opacity: 0; animation: ahUp 1.2s var(--ease) both; }
+  .ah__l:nth-child(1) > span { animation-delay: 0.2s; }
+  .ah__l:nth-child(2) > span { animation-delay: 0.34s; }
   @keyframes ahUp { to { transform: none; opacity: 1; } }
   @keyframes ahFade { to { opacity: 1; } }
-  .ah__row { margin-top: clamp(1.5rem, 4vh, 2.5rem); display: flex; flex-wrap: wrap; gap: 1.5rem 3rem; align-items: center; opacity: 0; animation: ahFade 1s var(--ease) 0.8s both; }
-  .ah__p { max-width: 46ch; color: rgb(255 255 255 / 0.78); line-height: 1.65; }
-  .ah__acts { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; }
-  .ah__film { display: inline-flex; align-items: center; gap: 0.8rem; padding: 0; border: 0; background: none; color: #fff; text-align: left; cursor: pointer; }
+  .ah__p { margin-top: var(--s4); max-width: 44ch; font-size: 0.9375rem; line-height: 1.68; color: var(--text-2); opacity: 0; animation: ahFade 1s var(--ease) 0.55s both; }
+  .ah__acts { margin-top: 1.8rem; display: flex; flex-wrap: wrap; gap: 1rem 1.4rem; align-items: center; opacity: 0; animation: ahFade 1s var(--ease) 0.7s both; }
+  .ah__film { display: inline-flex; align-items: center; gap: 0.8rem; padding: 0; border: 0; background: none; color: var(--text); text-align: left; cursor: pointer; }
   .ah__film span:last-child { display: grid; }
   .ah__film b { font-size: 0.95rem; }
-  .ah__film em { font-style: normal; font-size: 0.8rem; color: rgb(255 255 255 / 0.6); }
-  .ah__play { position: relative; display: grid; place-items: center; width: 46px; height: 46px; border-radius: 50%; border: 1px solid rgb(255 255 255 / 0.5); }
-  .ah__play::after { content: ''; position: absolute; inset: -6px; border-radius: 50%; border: 1px solid rgb(122 211 116 / 0.6); animation: ahPing 2.4s var(--ease) infinite; }
+  .ah__film em { font-style: normal; font-size: 0.8rem; color: var(--text-3); }
+  .ah__play { position: relative; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; border: 1px solid rgb(0 0 0 / 0.15); color: var(--green-deep); }
+  .ah__play::after { content: ''; position: absolute; inset: -6px; border-radius: 50%; border: 1px solid rgb(89 170 84 / 0.5); animation: ahPing 2.4s var(--ease) infinite; }
   @keyframes ahPing { from { transform: scale(0.8); opacity: 1; } to { transform: scale(1.4); opacity: 0; } }
-  .ah__mantra { margin-top: 2rem; font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; color: rgb(255 255 255 / 0.5); opacity: 0; animation: ahFade 1s var(--ease) 1s both; }
-  .ah__hint { position: absolute; z-index: 2; right: var(--gut); bottom: clamp(5rem, 12vh, 8rem); font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgb(255 255 255 / 0.55); writing-mode: vertical-rl; }
-  .ah__hint::after { content: ''; display: block; width: 1px; height: 48px; margin: 0.8rem auto 0; background: linear-gradient(currentColor, transparent); animation: ahDrip 1.8s ease-in-out infinite; }
-  @keyframes ahDrip { 0% { transform: scaleY(0); transform-origin: top; } 50% { transform: scaleY(1); transform-origin: top; } 51% { transform-origin: bottom; } 100% { transform: scaleY(0); transform-origin: bottom; } }
-  .ah__wave { position: absolute; left: -4%; right: -4%; bottom: -1px; z-index: 3; height: clamp(44px, 6vw, 110px); pointer-events: none; }
-  .ah__wave svg { display: block; width: 100%; height: 100%; }
-  .ah__wave .b { fill: color-mix(in oklab, var(--white) 88%, var(--green)); }
-  .ah__wave .f { fill: var(--white); }
+  .ah__mantra { margin-top: 2rem; font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-3); opacity: 0; animation: ahFade 1s var(--ease) 0.9s both; }
+  /* the photo fills the right side and melts into the page — no frame */
+  .ah__bg { position: absolute; top: 0; right: 0; bottom: 0; width: 58%; z-index: 0; will-change: transform;
+    -webkit-mask: linear-gradient(90deg, transparent 0%, #000 38%); mask: linear-gradient(90deg, transparent 0%, #000 38%);
+    animation: ahReveal 1.6s var(--ease) 0.1s both; }
+  .ah__bg::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, transparent 70%, #f8faf8 100%); }
+  @keyframes ahReveal { from { opacity: 0; transform: scale(1.06); } to { opacity: 1; transform: none; } }
+  .ah__bg :global(img) { width: 100%; height: 112%; object-fit: cover; object-position: 60% 30%; }
+
+  /* ───── view switch ───── */
+  .av { position: relative; z-index: 20; display: flex; justify-content: center; margin-top: -1.9rem; pointer-events: none; }
+  .av__bar { position: relative; display: inline-flex; padding: 6px; border-radius: 999px; pointer-events: auto;
+    background: rgb(255 255 255 / 0.82); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgb(0 0 0 / 0.08); box-shadow: 0 18px 40px -22px rgb(20 40 25 / 0.45); }
+  .av__pill { position: absolute; top: 6px; bottom: 6px; left: 0; width: 0; border-radius: 999px; background: var(--green-deep);
+    box-shadow: 0 8px 20px -10px rgb(20 60 25 / 0.6); transition: transform 0.5s var(--ease), width 0.5s var(--ease); }
+  .av__tab { position: relative; z-index: 1; padding: 0.8rem 1.6rem; border: 0; border-radius: 999px; background: none; cursor: pointer;
+    font-weight: 700; font-size: 1rem; letter-spacing: -0.01em; color: var(--text-2); transition: color 0.3s; }
+  .av__tab[aria-selected='true'] { color: #fff; }
+  .av__view.is-on { animation: avIn 0.6s var(--ease) both; }
+  @keyframes avIn { from { opacity: 0; transform: translateY(18px); } }
 
   /* ───── 02 figures ───── */
-  .af { background: var(--white); padding-block: clamp(3.5rem, 7vw, 6rem); }
+  .af { background: #fff; padding-block: clamp(3.5rem, 7vw, 6rem); }
   .af__grid { display: grid; grid-template-columns: 1.3fr 1fr 1fr; grid-template-rows: auto auto; gap: 1rem; margin: 0; perspective: 1200px; }
   .af__c { position: relative; display: grid; align-content: end; gap: 0.2rem; min-height: 11rem; padding: 1.6rem 1.6rem 1.4rem; border-radius: 24px; overflow: hidden;
     background: var(--off); border: 1px solid rgb(0 0 0 / 0.06); transform-style: preserve-3d;
     transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); transition: transform 0.5s var(--ease), box-shadow 0.5s var(--ease); }
   .af__c:hover { box-shadow: 0 30px 60px -30px rgb(20 40 25 / 0.35); }
-  .af__c--0 { grid-row: span 2; background: radial-gradient(120% 90% at 20% 0%, #1f4f22 0%, var(--ink) 70%); color: #fff; border-color: transparent; }
+  .af__c { --tint: var(--p-mint); --pink: var(--p-mint-ink); background: #fff !important; border-color: rgb(0 0 0 / 0.06) !important; box-shadow: inset 0 3px 0 var(--tint); }
+  .af__c--0 { grid-row: span 2; --tint: var(--p-mint); --pink: var(--p-mint-ink); }
+  .af__c--1 { --tint: var(--p-blush); --pink: var(--p-blush-ink); }
+  .af__c--2 { --tint: var(--p-sky); --pink: var(--p-sky-ink); }
+  .af__c--3 { --tint: var(--p-butter); --pink: var(--p-butter-ink); }
+  .af__c .af__i { background: var(--tint) !important; color: var(--pink) !important; }
+  .af__c--0 dt { color: var(--green-deep); }
   .af__c--3 { grid-column: span 2; }
   .af__glow { position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity 0.3s;
     background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 50%), rgb(89 170 84 / 0.22), transparent 70%); }
   .af__c:hover .af__glow { opacity: 1; }
   .af__i { position: absolute; top: 1.3rem; left: 1.4rem; display: grid; place-items: center; width: 42px; height: 42px; border-radius: 12px;
     background: rgb(89 170 84 / 0.14); color: var(--green-deep); transform: translateZ(30px); }
-  .af__c--0 .af__i { background: rgb(255 255 255 / 0.1); color: var(--green-bright); }
-  .af__c dt { font-size: var(--d3); font-weight: 700; letter-spacing: var(--tr3); line-height: 1; transform: translateZ(45px); }
-  .af__c--0 dt { font-size: var(--d2); color: var(--green-bright); }
+  .af__c--0 .af__i { background: rgb(89 170 84 / 0.14); color: var(--green-deep); }
+  .af__c dt { font-size: var(--d4); font-weight: 700; letter-spacing: var(--tr4); line-height: 1; transform: translateZ(45px); }
+  .af__c--0 dt { font-size: var(--d3); color: var(--green-deep); }
   .af__c dd { margin: 0.5rem 0 0; font-weight: 700; transform: translateZ(25px); }
   .af__c small { color: var(--text-3); font-size: 0.82rem; transform: translateZ(18px); }
-  .af__c--0 small { color: rgb(255 255 255 / 0.6); }
+  
 
   /* ───── 03 journey ───── */
-  /* Pastel, not tonal. Each milestone gets its own soft ground instead of
-     the old white/near-black alternation — four chalky tints that read as
-     one family because they share a low saturation and a high value.
-     Contrast computed, not eyeballed (see the table below each pair). */
-  .aj { background: linear-gradient(180deg, #f3f7f2 0%, #f7f3ed 55%, #f4f1f5 100%);
+  .aj { background: linear-gradient(180deg, #f5f6f4 0%, #f4f6f8 55%, #f5f3f8 100%);
     padding-block: clamp(5rem, 10vw, 8rem) clamp(3rem, 6vw, 5rem); }
   .aj__intro { max-width: 44rem; margin-bottom: clamp(2.5rem, 6vw, 4rem); }
-  .aj__h { margin-top: var(--s4); font-size: var(--d4); font-weight: 700; letter-spacing: var(--tr4); line-height: 1.06; }
+  .aj__h { margin-top: var(--s4); font-size: var(--d5); font-weight: 700; letter-spacing: var(--tr5); line-height: 1.1; }
   .aj__p { margin-top: var(--s4); max-width: 44ch; color: var(--text-2); line-height: 1.65; }
   .aj__stack { list-style: none; margin: 0; padding: 0; display: grid; gap: 2.5rem; perspective: 1400px; }
   /* each card pins a little lower than the one before; the ones underneath tip back */
-  .aj__card { position: sticky; top: calc(var(--hdr, 88px) + 2rem + var(--i) * 22px); min-height: min(58vh, 30rem);
+  .aj__card { position: sticky; top: calc(var(--hdr, 88px) + 2rem + var(--i) * 22px); min-height: min(46vh, 22rem);
     display: grid; align-content: space-between; padding: clamp(1.6rem, 4vw, 3rem); border-radius: 28px;
-    background: var(--pc, #fff); border: 1px solid rgb(20 40 25 / 0.05); box-shadow: 0 34px 64px -44px rgb(40 50 45 / 0.38);
+    background: var(--pc, #fff); border: 1px solid rgb(20 40 25 / 0.05); box-shadow: inset 4px 0 0 var(--yr), 0 30px 60px -42px rgb(40 50 45 / 0.36);
     transform-origin: 50% 0%; transform: translateZ(0) scale(var(--s, 1)) rotateX(var(--r, 0deg)); filter: brightness(var(--b, 1));
     will-change: transform; }
-  /*                ground     year ink   ── year on ground / body #14171A
-     mint   2003    #E6F0E4    #2F6429       6.03 : 1  /  15.38 : 1
-     sand   2010    #F3EADC    #8A5518       5.19 : 1  /  15.09 : 1
-     blush  2016    #F4E6E3    #9B4A3C       5.02 : 1  /  14.80 : 1
-     mist   Today   #E3ECEF    #2D5866       6.49 : 1  /  15.00 : 1
-     All AA at any size; the years are large text, which needs only 3:1. */
-  .aj__card--0 { --pc: #e6f0e4; --yr: #2f6429; }
-  .aj__card--1 { --pc: #f3eadc; --yr: #8a5518; }
-  .aj__card--2 { --pc: #f4e6e3; --yr: #9b4a3c; }
-  .aj__card--3 { --pc: #e3ecef; --yr: #2d5866; }
-  /* --text-3 drops to 4.15:1 on blush, which small mono text cannot have.
-     --text-2 clears 5.27:1 on the worst of the four. */
+  /* The four-hue idea is kept from the package; the execution is not.
+     Its year colours sat on white at 4.38:1 (green) and 4.32:1 (teal),
+     both under the 4.5 minimum. Each hue now has a pastel ground of its
+     own and an ink deepened until it clears — worst case 5.03:1, with
+     body text at 14.9:1 or better on all four.
+                  ground     year ink   year:ground   body:ground */
+  .aj__card:nth-child(4n+1) { --pc: #e6f0e4; --yr: #1a7340; }  /* 5.03 · 15.38 */
+  .aj__card:nth-child(4n+2) { --pc: #e4eaf6; --yr: #2a5cae; }  /* 5.37 · 14.91 */
+  .aj__card:nth-child(4n+3) { --pc: #e0efef; --yr: #106e71; }  /* 5.09 · 15.22 */
+  .aj__card:nth-child(4n+4) { --pc: #ede9f7; --yr: #5b43a8; }  /* 6.26 · 15.08 */
+  /* --text-3 is 4.2:1 on these grounds, which small mono text cannot
+     have; --text-2 clears 5.3:1 on the worst of the four. */
   .aj__n { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.18em; color: var(--text-2); }
   /* The serif italic, not the grotesk — the one place on this page the
-     type changes voice. Serif display faces are drawn with their own
-     fit, so the negative tracking the grotesk needed comes back off. */
+     type changes voice. A serif display face carries its own fit, so the
+     grotesk's negative tracking comes back off. */
   .aj__yr { display: block; font-family: var(--font-serif); font-style: italic; font-weight: 400;
-    font-size: var(--d2); letter-spacing: var(--tr2); line-height: 0.95; color: var(--yr, var(--green-deep)); }
-  .aj__t { max-width: 30ch; font-size: var(--lead); font-weight: 500; letter-spacing: -0.015em; line-height: 1.4; color: var(--text); }
+    font-size: var(--d3); letter-spacing: -0.012em; line-height: 0.95; color: var(--yr, var(--green-deep)); }
+  .aj__t { max-width: 34ch; font-size: var(--lead); font-weight: 500; letter-spacing: -0.015em; line-height: 1.4; color: var(--text); }
 
   /* ───── 05 difference ───── */
-  .ad { position: relative; overflow: hidden; color: #fff; background: var(--ink); min-height: 100svh; display: grid; align-items: center; }
-  .ad__shot { position: absolute; inset: 0; margin: 0; clip-path: inset(var(--ci, 12%) var(--ci, 12%) var(--ci, 12%) var(--ci, 12%) round var(--cr, 28px)); will-change: clip-path; }
+  .ad { background: radial-gradient(50% 60% at 90% 20%, rgb(239 232 248 / 0.7), transparent 70%), #fbfbfd; color: var(--text); padding-block: clamp(5rem, 10vw, 8rem); overflow: hidden; }
+  .ad__in { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(2rem, 5vw, 5rem); align-items: center; }
+  /* the photo opens out from a smaller frame as it arrives */
+  .ad__shot { margin: 0; aspect-ratio: 4 / 5; border-radius: 28px; overflow: hidden; box-shadow: 0 40px 80px -50px rgb(20 40 25 / 0.45);
+    clip-path: inset(var(--ci, 10%) round 28px); will-change: clip-path; }
   .ad__shot :global(img) { width: 100%; height: 100%; object-fit: cover; transform: scale(var(--cs, 1.12)); }
-  .ad__shot::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent 20%, rgb(8 10 9 / 0.9) 70%); opacity: var(--co, 0); }
-  .ad__in { position: relative; z-index: 1; display: grid; justify-items: end; padding-block: clamp(5rem, 10vw, 8rem); }
-  .ad__copy { max-width: 36rem; display: grid; justify-items: start; gap: 0; }
-  .ad__h { margin-top: var(--s4); font-size: var(--d4); font-weight: 700; letter-spacing: var(--tr4); line-height: 1.06; }
-  .ad__h em { font-style: normal; color: var(--green-bright); }
-  .ad__p { margin-top: var(--s4); color: rgb(255 255 255 / 0.78); line-height: 1.65; }
+  .ad__copy { display: grid; justify-items: start; }
+  .ad__h { margin-top: var(--s4); font-size: var(--d5); font-weight: 700; letter-spacing: var(--tr5); line-height: 1.1; --brush-size: 1.15; }
+  .ad__p { margin-top: var(--s4); max-width: 46ch; font-size: 0.9375rem; line-height: 1.68; color: var(--text-2); }
   .ad__proof { list-style: none; margin: 1.6rem 0 1.8rem; padding: 0; display: flex; flex-wrap: wrap; gap: 0.5rem; }
-  .ad__proof li { display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.5rem 0.9rem; border-radius: 999px; border: 1px solid rgb(255 255 255 / 0.2); background: rgb(255 255 255 / 0.06); backdrop-filter: blur(6px); font-size: 0.85rem; }
-  .ad__proof span { color: var(--green-bright); display: grid; }
+  .ad__proof li { display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.5rem 0.9rem; border-radius: 999px; background: #fff; border: 1px solid rgb(0 0 0 / 0.08); font-size: 0.85rem; }
+  .ad__proof span { color: var(--green-deep); display: grid; }
+  .ad__proof li { border-color: transparent; }
+  .ad__proof li:nth-child(1) { background: var(--p-mint); } .ad__proof li:nth-child(1) span { color: var(--p-mint-ink); }
+  .ad__proof li:nth-child(2) { background: var(--p-butter); } .ad__proof li:nth-child(2) span { color: var(--p-butter-ink); }
+  .ad__proof li:nth-child(3) { background: var(--p-blush); } .ad__proof li:nth-child(3) span { color: var(--p-blush-ink); }
+  .ad__proof li:nth-child(4) { background: #fff; } .ad__proof li:nth-child(4) span { color: var(--p-sky-ink); }
 
   /* ───── 06 presence ───── */
   .pr {
@@ -470,35 +569,96 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
   .br:hover .br__go { transform: translateX(3px); }
 
 
+  /* ───── 05b team (draft) ───── */
+  .at { background: var(--white); padding-block: clamp(5rem, 10vw, 8rem); }
+  .at__head { display: flex; justify-content: space-between; align-items: end; gap: 2rem; flex-wrap: wrap; margin-bottom: 2.5rem; }
+  .at__h { margin-top: var(--s4); font-size: var(--d5); font-weight: 700; letter-spacing: var(--tr5); line-height: 1.1; }
+  .at__h em { font-style: normal; color: var(--green-deep); }
+  .at__p { max-width: 34ch; color: var(--text-2); line-height: 1.6; }
+  .at__grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; perspective: 1200px; }
+  .at__card { position: relative; border-radius: 22px; overflow: hidden; background: var(--off); border: 1px solid rgb(0 0 0 / 0.06);
+    transform-style: preserve-3d; transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); transition: transform 0.5s var(--ease), box-shadow 0.5s var(--ease); }
+  .at__card:hover { box-shadow: 0 30px 60px -30px rgb(20 40 25 / 0.35); }
+  .at__img { margin: 0; aspect-ratio: 4 / 5; overflow: hidden; }
+  .at__img :global(img) { width: 100%; height: 100%; object-fit: cover; filter: grayscale(0.35); transition: filter 0.5s, transform 0.8s var(--ease); }
+  .at__card:hover .at__img :global(img) { filter: none; transform: scale(1.05); }
+  .at__meta { display: grid; gap: 0.2rem; padding: 1rem 1.1rem 1.2rem; transform: translateZ(30px); }
+  .at__role { font-size: 1.1rem; font-weight: 700; letter-spacing: -0.02em; color: var(--green-deep); }
+  .at__meta small { color: var(--text-2); font-size: 0.82rem; line-height: 1.45; }
+
+  /* ───── 05c trusted by ───── */
+  .aq { background: #fff; padding-block: clamp(5rem, 10vw, 8rem); overflow: hidden; }
+  .aq__head { text-align: center; display: grid; justify-items: center; }
+  .aq__h { margin-top: var(--s4); font-size: var(--d5); font-weight: 700; letter-spacing: var(--tr5); line-height: 1.1; }
+  .aq__h em { font-style: normal; color: var(--green-deep); }
+  /* brands glide past in one endless row, fading out at both edges */
+  .aq__mq { margin: 2.6rem 0 3.4rem; -webkit-mask: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); mask: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); }
+  .aq__track { display: flex; width: max-content; animation: aqMq 40s linear infinite; }
+  .aq__mq:hover .aq__track { animation-play-state: paused; }
+  .aq__track ul { display: flex; list-style: none; margin: 0; padding: 0; }
+  .aq__track li { padding: 0.9rem 2.2rem; font-weight: 700; font-size: var(--d7); letter-spacing: var(--tr7); color: rgb(0 0 0 / 0.32); transition: color 0.3s; white-space: nowrap; }
+  .aq__track li:hover { color: var(--green-deep); }
+  @keyframes aqMq { to { transform: translateX(-50%); } }
+  /* the wall: three columns of reviews drifting upward at different speeds */
+  .aq__wall { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; height: 34rem; overflow: hidden;
+    -webkit-mask: linear-gradient(180deg, transparent, #000 14%, #000 86%, transparent); mask: linear-gradient(180deg, transparent, #000 14%, #000 86%, transparent); }
+  .aq__run { display: grid; gap: 1rem; animation: aqUp var(--dur, 40s) linear infinite; }
+  .aq__col:nth-child(2) .aq__run { animation-direction: reverse; }
+  .aq__wall:hover .aq__run { animation-play-state: paused; }
+  @keyframes aqUp { to { transform: translateY(calc(-50% - 0.5rem)); } }
+  .aq__q { margin: 0; display: grid; gap: 0.8rem; padding: 1.4rem; border-radius: 20px; background: var(--white); border: 1px solid rgb(0 0 0 / 0.06);
+    box-shadow: 0 20px 40px -32px rgb(20 40 25 / 0.35); transition: transform 0.4s var(--ease), box-shadow 0.4s var(--ease); }
+  .aq__q:hover { transform: translateY(-3px); box-shadow: 0 26px 50px -30px rgb(20 40 25 / 0.45); }
+  .aq__q { position: relative; margin-top: 1.4rem; }
+  .aq__mark { position: absolute; top: -1.55rem; left: 1rem; font-family: Georgia, serif; font-size: 4.2rem; line-height: 1; font-weight: 700; color: var(--green); }
+  .aq__col .aq__run > :nth-child(3n+2) .aq__mark { color: #e8a33d; }
+  .aq__col .aq__run > :nth-child(3n) .aq__mark { color: #6aa9d8; }
+  .aq__top { display: flex; align-items: center; gap: 0.75rem; }
+  .aq__av { display: grid; place-items: center; width: 42px; height: 42px; flex: none; border-radius: 50%; background: var(--p-mint); color: var(--p-mint-ink); font-weight: 700; }
+  .aq__col:nth-child(2) .aq__av { background: var(--p-sky); color: var(--p-sky-ink); }
+  .aq__col:nth-child(3) .aq__av { background: var(--p-blush); color: var(--p-blush-ink); }
+  .aq__who { display: grid; min-width: 0; }
+  .aq__who b { font-size: 0.95rem; }
+  .aq__who small { color: var(--text-3); font-size: 0.78rem; }
+  .aq__g { margin-left: auto; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; border: 1px solid rgb(0 0 0 / 0.1); font-weight: 700; font-size: 0.8rem; color: #4285f4; }
+  .aq__stars { color: #f5b400; letter-spacing: 0.12em; font-size: 0.85rem; }
+  .aq__q blockquote { margin: 0; font-size: 0.95rem; line-height: 1.6; color: var(--text-3); }
+  .aq__draft { margin-top: 1.2rem; text-align: center; font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.08em; color: #b26a00; }
+  @media (max-width: 56rem) {
+    .aq__wall { grid-template-columns: 1fr; height: auto; -webkit-mask: none; mask: none; }
+    .aq__col:not(:first-child) { display: none; }
+    .aq__run { animation: none; }
+    .aq__run > [aria-hidden='true'] { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .aq__track, .aq__run { animation: none; }
+    .aq__wall { height: auto; -webkit-mask: none; mask: none; }
+  }
+
   /* ───── 07 cta ───── */
-  .ac { background: radial-gradient(70% 90% at 80% 50%, #15301a 0%, var(--ink) 65%); color: #fff; padding-block: clamp(5rem, 10vw, 8rem); overflow: hidden; }
-  .ac__in { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr); gap: 2rem; align-items: center; }
-  .ac__h { margin-top: var(--s4); font-size: var(--d3); font-weight: 700; letter-spacing: var(--tr3); line-height: 1.02; --brush-size: 1.05; }
-  .ac__h :global(.brush) { color: var(--green-bright); }
-  .ac__p { margin-top: var(--s4); color: rgb(255 255 255 / 0.72); }
-  .ac__b { display: inline-flex; align-items: center; gap: 0.7rem; margin-top: 2rem; padding: 1.05rem 1.7rem; border-radius: 999px; background: var(--green); color: #fff; font-weight: 700; transition: background 0.25s; }
-  .ac__b:hover { background: var(--green-bright); color: var(--ink); }
-  .ac__fig { margin: 0; perspective: 1000px; animation: acFloat 6s ease-in-out infinite alternate; }
-  .ac__fig :global(img) { transform: rotateY(var(--fy, -8deg)) rotateX(var(--fx, 4deg)); transition: transform 0.6s var(--ease); }
-  .ac__fig :global(img) { width: 100%; height: auto; filter: drop-shadow(0 30px 40px rgb(0 0 0 / 0.5)); }
-  @keyframes acFloat { from { transform: translateY(-8px) rotate(-1deg); } to { transform: translateY(8px) rotate(0.5deg); } }
+  .ac { background: var(--white); padding-block: clamp(4rem, 8vw, 6rem); }
+  .ac__panel { display: grid; justify-items: center; text-align: center; padding: clamp(3rem, 7vw, 5rem) 1.5rem; border-radius: 32px;
+    background: linear-gradient(120deg, rgb(227 243 230 / 0.7) 0%, #fbfcfb 50%, rgb(228 237 250 / 0.7) 100%); border: 1px solid rgb(0 0 0 / 0.05); }
+  .ac__h { margin-top: var(--s4); font-size: var(--d5); font-weight: 700; letter-spacing: var(--tr5); line-height: 1.1; --brush-size: 1.15; }
+  .ac__p { margin-top: var(--s3); color: var(--text-2); font-size: 0.9375rem; }
+  .ac__b { display: inline-flex; align-items: center; gap: 0.7rem; margin-top: 1.8rem; padding: 1rem 1.7rem; border-radius: 999px; background: var(--green-deep); color: #fff; font-weight: 700; transition: background 0.25s, transform 0.3s; }
+  .ac__b:hover { background: var(--green); }
 
   /* ───── responsive ───── */
   @media (min-width: 62rem) {
     .pr__grid { grid-template-columns: minmax(0, 0.85fr) minmax(0, 0.7fr) minmax(0, 1.1fr); }
   }
   @media (max-width: 56rem) {
-    .af__grid { grid-template-columns: 1fr 1fr; }
-    .af__c--0 { grid-row: auto; grid-column: span 2; }
+    .ah__in, .ad__in { grid-template-columns: 1fr; }
+      .af__c--0 { grid-row: auto; grid-column: span 2; }
     .af__c--3 { grid-column: span 2; }
     .ac__in { grid-template-columns: 1fr; }
-    .ad__shot::after { background: linear-gradient(180deg, rgb(8 10 9 / 0.3), rgb(8 10 9 / 0.9)); }
-    .ad__in { justify-items: start; }
-    .ah__hint { display: none; }
   }
   @media (prefers-reduced-motion: reduce) {
-    .ah__bg :global(img), .ah__l > span, .ah__eb, .ah__row, .ah__mantra, .ah__play::after, .ah__hint::after, .ac__fig { animation: none; opacity: 1; transform: none; }
+    .ah__bg, .ah__l > span, .ah__eb, .ah__p, .ah__acts, .ah__mantra, .ah__play::after{ animation: none; opacity: 1; transform: none; clip-path: none; }
     .aj__card { transform: none; filter: none; }
+    .av__view.is-on { animation: none; }
+    .av__pill { transition: none; }
     .af__c { transform: none; }
     .ad__shot { clip-path: none; }
     .pr__map :is(.pr__land, .pr__pin, .pr__chip) { opacity: 1; scale: 1; transition: none; }
@@ -514,6 +674,38 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
     hero.dataset.wired = '1';
     const header = document.querySelector('header');
     if (header) document.documentElement.style.setProperty('--hdr', `${header.offsetHeight}px`);
+    /* Who we are / Meet our team */
+    const av = document.querySelector<HTMLElement>('[data-av]');
+    if (av) {
+      const tabs = [...av.querySelectorAll<HTMLButtonElement>('[data-av-tab]')];
+      const pill = av.querySelector<HTMLElement>('[data-av-pill]')!;
+      const place = (t: HTMLElement) => { pill.style.width = `${t.offsetWidth}px`; pill.style.transform = `translateX(${t.offsetLeft - 6}px)`; };
+      const show = (key: string, scroll: boolean) => {
+        const t = tabs.find((x) => x.dataset.avTab === key) ?? tabs[0];
+        tabs.forEach((x) => { const on = x === t; x.setAttribute('aria-selected', String(on)); x.tabIndex = on ? 0 : -1; });
+        document.querySelectorAll<HTMLElement>('[data-av-view]').forEach((v) => {
+          const on = v.dataset.avView === t.dataset.avTab;
+          v.hidden = !on; v.classList.remove('is-on'); if (on) { void v.offsetWidth; v.classList.add('is-on'); }
+        });
+        place(t);
+        history.replaceState(null, '', t.dataset.avTab === 'team' ? '#team' : location.pathname);
+        if (scroll) {
+          const y = av.getBoundingClientRect().top + scrollY - (header?.offsetHeight ?? 0) - 12;
+          const l = (window as any).__lenis; l ? l.scrollTo(y, { duration: 0.8 }) : scrollTo({ top: y, behavior: 'smooth' });
+        }
+        dispatchEvent(new Event('resize'));
+      };
+      tabs.forEach((t, i) => {
+        t.addEventListener('click', () => show(t.dataset.avTab!, true));
+        t.addEventListener('keydown', (e) => {
+          const d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+          if (!d) return; const n = tabs[(i + d + tabs.length) % tabs.length]; n.focus(); show(n.dataset.avTab!, false);
+        });
+      });
+      requestAnimationFrame(() => show(location.hash === '#team' ? 'team' : 'who', false));
+      addEventListener('resize', () => place(tabs.find((t) => t.getAttribute('aria-selected') === 'true')!));
+    }
+
     if (reduced) return;
 
     const bg = hero.querySelector<HTMLElement>('[data-ah-bg]')!;
@@ -528,7 +720,7 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
       const H = innerHeight;
       /* hero photo drifts slower than the page */
       const hr = hero.getBoundingClientRect();
-      if (hr.bottom > 0) bg.style.transform = `translate3d(0, ${-hr.top * 0.35}px, 0)`;
+      if (hr.bottom > 0) (bg.querySelector('img') as HTMLElement | null)?.style.setProperty('transform', `translate3d(0, ${Math.max(-80, hr.top * 0.18)}px, 0)`);
       /* journey: cards that have been covered by the next one tip back and dim */
       cards.forEach((c, i) => {
         const next = cards[i + 1];
@@ -537,20 +729,15 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
         const cover = clamp((a.bottom - n.top) / a.height);          // 0 → 1 as the next card slides over
         c.style.setProperty('--s', (1 - 0.07 * cover).toFixed(4));
         c.style.setProperty('--r', `${(8 * cover).toFixed(2)}deg`);
-        /* 0.25 was tuned against white and near-black. Pastels have
-           nowhere to go when darkened — they turn grey rather than dim —
-           so the covered card recedes by a tenth, not a quarter. */
-        c.style.setProperty('--b', (1 - 0.1 * cover).toFixed(3));
+        c.style.setProperty('--b', (1 - 0.06 * cover).toFixed(3));
       });
       /* difference: the framed photo opens out to full width as it arrives */
       if (ad && shot) {
         const r = ad.getBoundingClientRect();
         const p = clamp((H - r.top) / (H * 0.9));
         const e = 1 - Math.pow(1 - p, 3);
-        shot.style.setProperty('--ci', `${(1 - e) * 12}%`);
-        shot.style.setProperty('--cr', `${(1 - e) * 28}px`);
+        shot.style.setProperty('--ci', `${(1 - e) * 10}%`);
         shot.style.setProperty('--cs', String(1.12 - 0.12 * e));
-        shot.style.setProperty('--co', String(clamp((p - 0.5) * 2)));
       }
     };
     const req = () => { if (!raf) raf = requestAnimationFrame(tick); };
@@ -574,15 +761,9 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
       hero.addEventListener('pointermove', (e) => {
         const x = e.clientX / innerWidth - 0.5, y = e.clientY / innerHeight - 0.5;
         tilt.style.transform = `perspective(1400px) rotateY(${x * 4}deg) rotateX(${-y * 3}deg)`;
-        bg.style.translate = `${-x * 18}px ${-y * 12}px`;
+        bg.style.translate = `${-x * 10}px ${-y * 8}px`;
       });
       hero.addEventListener('pointerleave', () => { tilt.style.transform = ''; bg.style.translate = ''; });
-      /* ending: the laptop turns toward the pointer */
-      const fig = document.querySelector<HTMLElement>('[data-ac-fig]');
-      fig?.closest('section')?.addEventListener('pointermove', (e) => {
-        const r = fig.getBoundingClientRect(), x = (e.clientX - (r.left + r.width / 2)) / innerWidth, y = (e.clientY - (r.top + r.height / 2)) / innerHeight;
-        fig.style.setProperty('--fy', `${x * 30 - 8}deg`); fig.style.setProperty('--fx', `${-y * 20 + 4}deg`);
-      });
     }
 
     /* the call-to-action button leans toward the pointer */
