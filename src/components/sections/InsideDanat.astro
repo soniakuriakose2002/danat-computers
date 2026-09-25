@@ -9,7 +9,6 @@ import Brush from '@components/ui/Brush.astro';
 import imgBoard from '@assets/photos/repair-solder.jpg';
 import imgParts from '@assets/photos/network-patch.jpg';
 import imgDrive from '@assets/photos/datarecovery-drive.jpg';
-import imgShop from '@assets/photos/retail-display.jpg';
 import imgTeam from '@assets/photos/support-agent.jpg';
 import imgPrinter from '@assets/photos/printer-machine.jpg';
 
@@ -53,15 +52,20 @@ const items = [
     img: imgDrive,
     alt: 'Inside an opened hard disk drive',
   },
-  {
-    kicker: 'New and refurbished',
-    title: 'Refurbished is not a lesser shelf.',
-    sub: 'Tested, warranted machines standing beside the new ones.',
-    icon: 'laptop' as const,
-    href: '/services/computer-sales',
-    img: imgShop,
-    alt: 'Retail display of computer products',
-  },
+  /* ⚠ A SIXTH CARD IS MISSING, AND SHOULD COME BACK.
+     "Refurbished is not a lesser shelf" — tested, warranted machines
+     beside the new ones — was illustrated with retail-display.jpg,
+     which is visibly an art and craft shop: "Artebella ART & CRAFT" is
+     legible on its shelving. It was not Danat's counter and not
+     anything like it.
+
+     Nothing in the library shows a shop floor, a shelf of machines or a
+     counter, and a card about what Danat SELLS cannot be illustrated
+     with a repair bench. So the card is out rather than dressed in
+     somebody else's shop.
+
+     One photograph of the Ruwi shop floor brings it straight back: the
+     copy above is written and correct. */
   {
     kicker: 'Business supply',
     title: 'Hospitals and retailers buy from us at trade.',

@@ -1,6 +1,6 @@
 import type { ImageMetadata } from 'astro';
 
-import repairBoard from '@assets/photos/repair-board.jpg';
+import driveMacro from '@assets/photos/drive-macro.jpg';
 import repairSolder from '@assets/photos/repair-solder.jpg';
 import printerMachine from '@assets/photos/printer-machine.jpg';
 import cctvWall from '@assets/photos/cctv-wall.jpg';
@@ -8,12 +8,12 @@ import networkPatch from '@assets/photos/network-patch.jpg';
 import networkEng from '@assets/photos/network-eng.jpg';
 import driveOpen from '@assets/photos/datarecovery-drive.jpg';
 import supportDesk from '@assets/photos/support-desk.jpg';
-import retail from '@assets/photos/retail-display.jpg';
+
 
 /** One photo per service slug, chosen for how it crops wide. */
 export const serviceMedia: Record<string, { img: ImageMetadata; alt: string }> = {
   'computer-repair': {
-    img: repairBoard,
+    img: repairSolder,
     alt: 'Technician testing a laptop mainboard with a multimeter',
   },
   'printer-services': {
@@ -33,17 +33,19 @@ export const serviceMedia: Record<string, { img: ImageMetadata; alt: string }> =
     alt: 'Support team working at their desks',
   },
   'hardware-troubleshooting': {
-    img: repairSolder,
-    alt: 'Technician probing a laptop board with a meter',
+    img: driveMacro,
+    alt: 'A drive controller board photographed close',
   },
   'data-recovery': {
     img: driveOpen,
     alt: 'Inside an opened hard disk drive, platter and actuator arm visible',
   },
-  'computer-sales': {
-    img: retail,
-    alt: 'Retail display of computer products and accessories',
-  },
+  /* computer-sales HAS NO PHOTO. It used retail-display.jpg, which is
+     visibly an art and craft shop — "Artebella ART & CRAFT" is legible
+     on the shelving — and is not Danat's business or anything like it.
+     Nothing in the library shows a counter, a shelf of machines or a
+     shopfront, so the entry is removed and fallbackMedia serves it
+     until one is shot. Do not fill this with another approximation. */
 };
 
 /** Fallback so a new service without a photo never breaks the build. */
