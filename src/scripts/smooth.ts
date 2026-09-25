@@ -26,6 +26,7 @@ export function initSmooth() {
     stopInertiaOnNavigate: true,
     prevent: (node) => !!node.closest?.('dialog, [aria-modal="true"], [data-lenis-prevent]'),
   });
+  (window as any).__lenis = lenis;
   const root = document.documentElement;
   const frame = (t: number) => {
     const locked = root.style.overflow === 'hidden' || !!document.querySelector('dialog[open]');

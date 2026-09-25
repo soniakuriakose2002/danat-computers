@@ -15,19 +15,25 @@ const figs = [
   <div class="shell">
     <div class="nb__grid">
       {figs.map((f) => (
-        <div class="nb__c"><div class="nb__v">{f.plain ? f.v : <span data-count={f.v}>{f.v.toLocaleString('en-US')}</span>}</div><div class="nb__l">{f.l}</div></div>
+        <div class="nb__c"><div class="nb__v">{f.plain ? <span data-count={f.v} data-count-plain>{f.v}</span> : <span data-count={f.v}>{f.v.toLocaleString('en-US')}</span>}</div><div class="nb__l">{f.l}</div></div>
       ))}
     </div>
   </div>
 </section>
 
 <style>
-  .nb { background: var(--ink); color: #fff; padding-block: clamp(4rem, 7vw, 6rem); }
-  .nb__grid { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid rgb(255 255 255 / 0.12); }
-  .nb__c { padding: 2rem 1.5rem 2rem 0; border-right: 1px solid rgb(255 255 255 / 0.12); }
-  .nb__c:last-child { border-right: 0; }
+  /* three equal columns, each figure centred in its own column */
+  .nb { background: var(--ink); color: #fff; padding-block: clamp(3.5rem, 6vw, 5rem); }
+  .nb__grid { display: grid; grid-template-columns: repeat(3, 1fr); align-items: center; }
+  .nb__c { display: grid; justify-items: center; text-align: center; padding: 0.5rem 1.5rem; border-left: 1px solid rgb(255 255 255 / 0.12); }
+  .nb__c:first-child { border-left: 0; }
   .nb__v { font-size: clamp(2.2rem, 4.2vw, 4rem); font-weight: 700; letter-spacing: -0.045em; line-height: 1; }
   .nb__l { margin-top: 0.8rem; font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; color: rgb(255 255 255 / 0.55); }
-  @media (max-width: 51.25rem) { .nb__grid { grid-template-columns: 1fr; } .nb__c { border-right: 0; border-bottom: 1px solid rgb(255 255 255 / 0.12); } }
+  @media (max-width: 51.25rem) {
+    .nb__grid { grid-template-columns: 1fr; gap: 0; }
+    .nb__c { border-left: 0; padding: 1.6rem 0; border-top: 1px solid rgb(255 255 255 / 0.12); }
+    .nb__c:first-child { border-top: 0; }
+  }
 </style>
+
 

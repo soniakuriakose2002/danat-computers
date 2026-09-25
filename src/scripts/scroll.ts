@@ -139,19 +139,21 @@ export function initCounters(root: ParentNode = document) {
 
   const run = (el: HTMLElement) => {
     const to = Number(el.dataset.count ?? 0);
+    /* data-count-plain: a year or an id, shown without a thousands comma */
+    const fmt = (n: number) => (el.dataset.countPlain !== undefined ? String(n) : n.toLocaleString('en-US'));
     /* 1500ms sounds long but the old quartic ease was 94% done by 750ms,
        so the figure effectively snapped into place and there was nothing
        to watch. Longer, and with a far gentler curve. */
     const dur = 2200;
     if (REDUCED) {
-      el.textContent = to.toLocaleString('en-US');
+      el.textContent = fmt(to);
       return;
     }
     const t0 = performance.now();
     const step = (now: number) => {
       const t = Math.min(1, (now - t0) / dur);
       const eased = 1 - Math.pow(1 - t, 2);
-      el.textContent = Math.round(to * eased).toLocaleString('en-US');
+      el.textContent = fmt(Math.round(to * eased));
       if (t < 1) requestAnimationFrame(step);
     };
     requestAnimationFrame(step);

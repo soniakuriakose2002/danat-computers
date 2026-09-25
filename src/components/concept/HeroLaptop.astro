@@ -1,24 +1,21 @@
 ---
 /**
- * HERO — a real laptop photograph with the Danat film playing inside its
- * screen. Scrolling tilts it into place, then zooms into the screen until
- * the film fills the page; the film ends in the site's two-layer wave.
- * Scrolling back up reverses it.
+ * HERO — "More than just a laptop" with the original front-facing laptop
+ * (laptop-front.png) playing the Danat film on its screen. The laptop
+ * stands on the bottom edge and the wave covers where the photo is cut.
  *
- * The photo is a complete laptop at three-quarter view, cleaned up
- * (edge fringe removed, bezel brand mark removed): laptop-hero.png.
- * Its glass was measured on the 900x640 photo as a four-corner shape:
- * TL 139,236.5  TR 518.5,229.5  BR 561,463  BL 187.5,505.
- * The film is fitted to exactly that shape with a perspective transform,
- * so it sits in the screen at the same angle as the laptop. Zooming in
- * moves those four corners out to the edges of the page, which straightens
- * the screen as the camera flies in.
- * The film's own Get Support button is made clickable while it is on
- * screen (12.4–15.1 s of each loop), measured from the film.
+ * Scrolling zooms smoothly into the screen until the film fills the page.
+ * Once it has, it stays: no zooming back out, and when the hero scrolls
+ * away the page simply carries on to the next section. Coming back from
+ * Get Support arrives on the film directly (sessionStorage
+ * 'danat-hero-done'); a reload starts from the laptop again.
+ *
+ * Glass on the 900x640 photo: x 221–680, y 171–429 (16:9, like the film).
+ * The film's Get Support button is clickable while it shows (12.3–15.3 s).
  */
 import { Image } from 'astro:assets';
 import { site, whatsappLink } from '@data/site';
-import laptop from '@assets/products/laptop-hero.png';
+import laptop from '@assets/products/laptop-front.png';
 ---
 <section class="hl" data-hl aria-label="Danat Computers">
   <div class="hl__stage">
@@ -31,10 +28,7 @@ import laptop from '@assets/products/laptop-hero.png';
             muted loop playsinline autoplay preload="auto"
             controlslist="nodownload noplaybackrate noremoteplayback" disablepictureinpicture disableremoteplayback
             aria-label="Danat Computers IT support film"></video>
-          {/* WhatsApp, not /contact. Every other "Get Support" on the site
-          — the header button this imitates, and the mobile nav —
-          opens WhatsApp on the verified number. */}
-    <a class="hl__hot" href={whatsappLink()} target="_blank" rel="noopener noreferrer"
+          <a class="hl__hot" href={whatsappLink()} target="_blank" rel="noopener noreferrer"
       data-hl-hot aria-label="Get Support" tabindex="-1"></a>
           <span class="hl__glare" aria-hidden="true"></span>
         </div>
@@ -96,8 +90,22 @@ import laptop from '@assets/products/laptop-hero.png';
   .hl__wave .b { fill: color-mix(in oklab, var(--white) 88%, var(--green)); }
   .hl__wave .f { fill: var(--white); }
 
+  /* settled: the film in place, no fly-in, content below follows naturally */
+  .hl.is-done { height: 100vh; height: 100svh; }
+  .hl.is-done .hl__stage { position: relative; }
+  .hl.is-done .hl__copy, .hl.is-done .hl__hud { display: none; }
+  .hl.is-done .hl__view { transition: none; opacity: 1; transform: none; }
+  /* no composite: only the original film, covering the hero at 16:9 */
+  .hl.is-done :global(.hl__img), .hl.is-done .hl__floor, .hl.is-done .hl__glare { display: none; }
+  .hl.is-done .hl__dev { inset: 0; width: 100%; height: 100%; aspect-ratio: auto; transform: none !important; }
+  .hl.is-done .hl__scr { left: 50%; top: 50%; width: max(100%, 100svh * 16 / 9); height: auto; aspect-ratio: 16 / 9; transform: translate(-50%, -50%) !important; }
+  .hl.is-done.is-seen .hl__view { animation: hlSettle 1.1s var(--ease) both; }
+  @keyframes hlSettle { from { opacity: 0.35; transform: translate3d(0, 18px, 0) scale(1.02); } to { opacity: 1; transform: none; } }
+
   @media (max-width: 51.25rem) {
-    .hl__dev { width: 94vw; }
+    .hl__dev { width: 140vw !important; } /* the photo has wide margins around the laptop */
+    .hl__copy { top: calc(var(--hdr, 72px) + 1.5rem); bottom: auto; right: var(--gut); }
+    .hl__hud--tr, .hl__hud--bl { display: none; }
     .hl__hud--br { display: none; }
   }
   @media (prefers-reduced-motion: reduce) {
@@ -106,6 +114,7 @@ import laptop from '@assets/products/laptop-hero.png';
     .hl__l > span { transform: none; transition: none; }
     .hl__hud { display: none; }
     .hl__view { opacity: 1; transform: none; transition: none; }
+    .hl.is-done.is-seen .hl__view { animation: none; }
   }
 </style>
 
@@ -116,7 +125,8 @@ import laptop from '@assets/products/laptop-hero.png';
 
   type P = number[];
   /* glass corners on the 900x640 photo: TL, TR, BR, BL */
-  const GLASS: P[] = [[139, 236.5], [518.5, 229.5], [561, 463], [187.5, 505]];
+  /* glass of the original front-facing laptop (laptop-front.png, 900x640): a plain 16:9 rectangle */
+  const GLASS: P[] = [[221, 171], [680, 171], [680, 429], [221, 429]];
   const RECT: P[] = [[0, 0], [1600, 0], [1600, 900], [0, 900]];
 
   /* 3x3 projective map taking four points onto four points */
@@ -163,24 +173,71 @@ import laptop from '@assets/products/laptop-hero.png';
     ['pointerdown', 'touchstart', 'keydown', 'wheel'].forEach((t) => addEventListener(t, play, { once: true, passive: true }));
     requestAnimationFrame(() => sec.classList.add('is-in'));
 
-    let visible = true, raf = 0;
-    new IntersectionObserver(([e]) => { visible = e.isIntersecting; visible ? (play(), loop()) : vid.pause(); }).observe(sec);
+    const KEY = 'danat-hero-done';
+    const stored = () => { try { return sessionStorage.getItem(KEY) === '1'; } catch { return false; } };
+    /* FLY_IN = false: no zoom at all. The IT Support film simply appears in
+       place, full width with the wave, and the page scrolls on normally.
+       Set it to true to bring back the laptop fly-in. */
+    const FLY_IN = true;
+    let latched = !FLY_IN || stored(), done = false;
+    let visible = true, raf = 0, seen = false;
+    const lenis = () => (window as any).__lenis;
+    const jump = (y: number) => { const l = lenis(); l ? l.scrollTo(y, { immediate: true, force: true }) : scrollTo(0, y); };
+    /* collapse the fly-in track to one screen without the page jumping */
+    function settle() {
+      if (done && sec!.dataset.settled) return;
+      sec!.dataset.settled = '1';
+      const before = sec!.offsetHeight, top = sec!.getBoundingClientRect().top + scrollY, y = scrollY;
+      sec!.classList.add('is-done'); done = true;
+      const after = sec!.offsetHeight, track = before - innerHeight;
+      if (y > top + track) jump(y - (before - after));      // below the hero: keep what is on screen
+      else if (y > top) jump(top);                           // inside the old track: show the film
+      loop();
+    }
+    /* reaching the full film latches it for this page view only; coming back
+       from Get Support (remembered) arrives settled. A fresh visit or a
+       reload shows the laptop again. */
+    function latch() { latched = true; }
+    hot.addEventListener('click', () => { latch(); try { sessionStorage.setItem(KEY, '1'); } catch {} });
+    /* a reload is a fresh look: forget the Get Support return */
+    const nav = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
+    const w = window as any;
+    if (!w.__hlLoadChecked) {                       // only for the real page load, not in-site navigation
+      w.__hlLoadChecked = true;
+      if (FLY_IN && nav && nav.type === 'reload') { try { sessionStorage.removeItem(KEY); } catch {} latched = false; }
+    }
+    if (latched) settle();
+
+    new IntersectionObserver(([e]) => {
+      visible = e.isIntersecting;
+      if (visible) {
+        play(); loop();
+        if (done && !seen) { seen = true; sec!.classList.add('is-seen'); }
+      } else {
+        vid.pause();
+        if (latched && !done && sec!.getBoundingClientRect().bottom <= 0) settle();
+      }
+    }, { threshold: 0.12 }).observe(sec);
 
     function frame() {
       raf = 0;
       if (!visible || !sec!.isConnected) return;
       const r = sec!.getBoundingClientRect();
       const p = reduced ? 0 : clamp(-r.top / Math.max(1, r.height - innerHeight));
-      const d = ease(clamp((p - 0.08) / 0.72)), w = clamp((p - 0.9) / 0.1);
-      title.style.opacity = String(1 - clamp(p / 0.16));
+      let d = ease(clamp((p - 0.08) / 0.72)), w = 1;   // the wave is always there
+      if (d > 0.97 && !latched) latch();
+      if (latched) { d = 1; w = 1; }                    // once filled, never zoom back out
+      title.style.opacity = latched ? '0' : String(1 - clamp(p / 0.16));
       title.style.transform = `translateY(${-clamp(p / 0.16) * 60}px)`;
-      huds.forEach((h) => (h.style.opacity = String(1 - clamp(p / 0.25))));
+      huds.forEach((h) => (h.style.opacity = latched ? '0' : String(1 - clamp(p / 0.25))));
       wave.style.height = `${w * Math.min(110, Math.max(44, innerWidth * 0.06))}px`;
 
       const W = innerWidth, H = innerHeight, dw = dev.offsetWidth, dh = dev.offsetHeight, k = dw / 900;
       const Q = GLASS.map(([x, y]) => [x * k, y * k]);
       const x0 = W > 900 ? W - dw - W * 0.03 : (W - dw) / 2;
-      const y0 = W > 900 ? (H - dh) / 2 + H * 0.06 : H * 0.18;
+      /* the laptop stands on the bottom edge; the wave covers where the photo is cut */
+      const waveH = Math.min(110, Math.max(44, innerWidth * 0.06));
+      const y0 = H - dh + waveH * 0.45;
       /* where the glass must end up: a 16:9 box covering the whole page */
       const cw = Math.max(W, H * 16 / 9) * 1.01, ch = cw * 9 / 16, cx = (W - cw) / 2, cy = (H - ch) / 2;
       const R = [[cx, cy], [cx + cw, cy], [cx + cw, cy + ch], [cx, cy + ch]];

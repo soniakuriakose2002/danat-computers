@@ -3,8 +3,27 @@ import Icon from '@components/ui/Icon.astro';
 import { site, whatsappLink } from '@data/site';
 ---
 
+{/*
+  The WhatsApp button behaves like the chat widgets on business sites
+  (a delayed badge plus a greeting, as in Click to Chat, Jotform and
+  similar): it glides into its corner once the visitor starts reading,
+  a red "1" pops onto it, and a short greeting types itself in beside it.
+  It keeps a soft pulse the whole time. The greeting closes itself after
+  a while; the badge stays until the button is used. Shown once per
+  visit (sessionStorage 'danat-wa-seen'); reduced motion gets no movement.
+*/}
+<div class="wa-note" data-wa-note hidden>
+  <button class="wa-note__x" type="button" data-wa-close aria-label="Close message">×</button>
+  <a class="wa-note__body" href={whatsappLink()} target="_blank" rel="noopener noreferrer" data-wa-open>
+    <span class="wa-note__head"><b>Danat Support</b><i class="wa-note__dot"></i><span>online</span></span>
+    <span class="wa-note__typing" data-wa-typing aria-hidden="true"><i></i><i></i><i></i></span>
+    <span class="wa-note__msg" data-wa-msg>Hi! Need help with a laptop, printer or network? Message us on WhatsApp.</span>
+  </a>
+</div>
+
 <a
   class="wa"
+  data-wa-btn
   href={whatsappLink()}
   target="_blank"
   rel="noopener noreferrer"
@@ -12,6 +31,8 @@ import { site, whatsappLink } from '@data/site';
 >
   <span class="wa__icon"><Icon name="whatsapp" size={28} /></span>
   <span class="wa__ping" aria-hidden="true"></span>
+  <span class="wa__ping wa__ping--2" aria-hidden="true"></span>
+  <span class="wa__badge" data-wa-badge aria-hidden="true">1</span>
 </a>
 
 <style>
@@ -57,9 +78,81 @@ import { site, whatsappLink } from '@data/site';
     inset: 0;
     border-radius: 50%;
     box-shadow: 0 0 0 0 rgb(37 211 102 / 0.6);
-    animation: wa-ping 3s var(--ease) infinite;
+    animation: wa-ping 2.4s var(--ease) infinite;
     pointer-events: none;
   }
+  .wa__ping--2 { animation-delay: 1.2s; }
+
+  /* arrives from the edge once the visitor starts reading */
+  .wa.is-away { transform: translate3d(140%, 0, 0) rotate(40deg); }
+  .wa.is-arriving { animation: wa-arrive 0.9s cubic-bezier(0.2, 1.4, 0.4, 1) both; }
+  @keyframes wa-arrive {
+    0% { transform: translate3d(140%, 0, 0) rotate(40deg); }
+    70% { transform: translate3d(-6%, 0, 0) rotate(-8deg); }
+    100% { transform: none; }
+  }
+  .wa.is-nudge { animation: wa-nudge 0.8s ease both; }
+  @keyframes wa-nudge {
+    0%, 100% { transform: none; }
+    20% { transform: rotate(-14deg) scale(1.06); }
+    40% { transform: rotate(12deg) scale(1.06); }
+    60% { transform: rotate(-8deg); }
+    80% { transform: rotate(4deg); }
+  }
+
+  /* the red count, as on messaging apps */
+  .wa__badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: #ff3b30;
+    color: #fff;
+    border: 2px solid #fff;
+    font: 700 12px/18px var(--font);
+    text-align: center;
+    box-shadow: 0 4px 10px rgb(255 59 48 / 0.45);
+    transform: scale(0);
+    pointer-events: none;
+  }
+  .wa__badge.is-on { animation: wa-pop 0.55s cubic-bezier(0.2, 1.6, 0.4, 1) both; }
+  @keyframes wa-pop { from { transform: scale(0); } to { transform: scale(1); } }
+
+  /* the greeting beside the button */
+  .wa-note {
+    position: fixed;
+    right: calc(clamp(0.9rem, 2vw, 1.75rem) + 4.25rem);
+    bottom: calc(clamp(0.9rem, 2vw, 1.75rem) + 0.25rem);
+    z-index: 121;
+    width: min(290px, calc(100vw - 7rem));
+    margin-bottom: env(safe-area-inset-bottom, 0px);
+    background: #fff;
+    color: #111b21;
+    border-radius: 14px 14px 4px 14px;
+    box-shadow: 0 14px 40px -12px rgb(11 20 26 / 0.45);
+    transform-origin: 100% 100%;
+    animation: wa-note-in 0.45s var(--ease) both;
+  }
+  .wa-note[hidden] { display: none; }
+  .wa-note.is-out { animation: wa-note-out 0.3s var(--ease) both; }
+  @keyframes wa-note-in { from { opacity: 0; transform: translate3d(12px, 8px, 0) scale(0.9); } to { opacity: 1; transform: none; } }
+  @keyframes wa-note-out { to { opacity: 0; transform: translate3d(8px, 6px, 0) scale(0.94); } }
+  .wa-note__body { display: grid; gap: 0.35rem; padding: 0.8rem 2.2rem 0.85rem 0.95rem; color: inherit; text-decoration: none; }
+  .wa-note__head { display: flex; align-items: center; gap: 0.35rem; font-size: 0.78rem; color: #667781; }
+  .wa-note__head b { color: #111b21; font-size: 0.85rem; }
+  .wa-note__dot { width: 7px; height: 7px; border-radius: 50%; background: #25d366; }
+  .wa-note__msg { font-size: 0.9rem; line-height: 1.4; }
+  .wa-note__msg[hidden], .wa-note__typing[hidden] { display: none; }
+  .wa-note__typing { display: inline-flex; gap: 4px; padding: 0.45rem 0.6rem; width: max-content; background: #f0f2f5; border-radius: 10px; }
+  .wa-note__typing i { width: 6px; height: 6px; border-radius: 50%; background: #8696a0; animation: wa-dot 1s infinite ease-in-out; }
+  .wa-note__typing i:nth-child(2) { animation-delay: 0.15s; }
+  .wa-note__typing i:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes wa-dot { 0%, 60%, 100% { transform: none; opacity: 0.5; } 30% { transform: translateY(-3px); opacity: 1; } }
+  .wa-note__x { position: absolute; top: 0.35rem; right: 0.45rem; width: 26px; height: 26px; border: 0; border-radius: 50%; background: transparent; color: #667781; font-size: 1.1rem; line-height: 1; cursor: pointer; }
+  .wa-note__x:hover { background: #f0f2f5; }
 
   @keyframes wa-ping {
     0% {
@@ -77,8 +170,77 @@ import { site, whatsappLink } from '@data/site';
     .wa {
       transition: none;
     }
-    .wa__ping {
+    .wa__ping, .wa.is-arriving, .wa.is-nudge, .wa-note, .wa-note.is-out, .wa-note__typing i {
       animation: none;
     }
+    .wa.is-away { transform: none; }
+    .wa__badge.is-on { animation: none; transform: none; }
   }
 </style>
+
+<script>
+  function startWa() {
+    const btn = document.querySelector<HTMLElement>('[data-wa-btn]');
+    const note = document.querySelector<HTMLElement>('[data-wa-note]');
+    if (!btn || !note || btn.dataset.wired) return;
+    btn.dataset.wired = '1';
+    const badge = btn.querySelector<HTMLElement>('[data-wa-badge]')!;
+    const typing = note.querySelector<HTMLElement>('[data-wa-typing]')!;
+    const msg = note.querySelector<HTMLElement>('[data-wa-msg]')!;
+    const KEY = 'danat-wa-seen';
+    const seen = (() => { try { return sessionStorage.getItem(KEY); } catch { return null; } })();
+    const mark = (v: string) => { try { sessionStorage.setItem(KEY, v); } catch {} };
+
+    const clear = () => { badge.classList.remove('is-on'); badge.style.transform = 'scale(0)'; mark('read'); hideNote(); };
+    btn.addEventListener('click', clear);
+    note.querySelector('[data-wa-open]')!.addEventListener('click', clear);
+    note.querySelector('[data-wa-close]')!.addEventListener('click', () => hideNote());
+
+    let noteTimer = 0;
+    /* sit above whatever is stacked over the button (the Ask pill), right-aligned with it */
+    function placeNote() {
+      const b = btn!.getBoundingClientRect();
+      let top = b.top;
+      document.querySelectorAll<HTMLElement>('body *').forEach((el) => {
+        if (el === btn || btn!.contains(el) || note!.contains(el)) return;
+        const cs = getComputedStyle(el); if (cs.position !== 'fixed') return;
+        const r = el.getBoundingClientRect();
+        if (r.width && r.bottom <= b.top + 2 && r.bottom > b.top - 140 && r.right > b.left - 20 && r.left < b.right + 20) top = Math.min(top, r.top);
+      });
+      note!.style.right = `${innerWidth - b.right}px`;
+      note!.style.bottom = `${innerHeight - top + 10}px`;
+      note!.style.borderRadius = '14px 14px 4px 14px';
+    }
+    addEventListener('resize', () => { if (!note!.hidden) placeNote(); });
+    function hideNote() {
+      if (note!.hidden) return;
+      note!.classList.add('is-out');
+      setTimeout(() => { note!.hidden = true; note!.classList.remove('is-out'); }, 300);
+      clearTimeout(noteTimer);
+    }
+    if (seen === 'read') return;                    // already used this visit
+    if (seen === 'shown') { badge.classList.add('is-on'); return; } // keep the badge, no replay
+
+    btn.style.transition = 'none'; btn.classList.add('is-away'); void btn.offsetWidth; btn.style.transition = '';
+    let fired = false;
+    const fire = () => {
+      if (fired) return; fired = true;
+      removeEventListener('scroll', onScroll);
+      btn.classList.remove('is-away'); btn.classList.add('is-arriving');
+      setTimeout(() => {
+        btn.classList.remove('is-arriving');
+        badge.classList.add('is-on');
+        btn.classList.add('is-nudge'); setTimeout(() => btn.classList.remove('is-nudge'), 800);
+        placeNote();
+        note!.hidden = false; typing.hidden = false; msg.hidden = true;
+        setTimeout(() => { typing.hidden = true; msg.hidden = false; }, 1400);
+        noteTimer = window.setTimeout(hideNote, 11000);
+        mark('shown');
+      }, 900);
+    };
+    const onScroll = () => { if (scrollY > innerHeight * 0.35) fire(); };
+    addEventListener('scroll', onScroll, { passive: true });
+    setTimeout(fire, 6000);                          // or after a few seconds of reading
+  }
+  document.addEventListener('astro:page-load', startWa);
+</script>
