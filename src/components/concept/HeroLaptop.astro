@@ -11,7 +11,7 @@
  * screen (12.4–15.1 s of each loop), measured from the film.
  */
 import { Image } from 'astro:assets';
-import { site } from '@data/site';
+import { site, whatsappLink } from '@data/site';
 import laptop from '@assets/products/lenovo.png';
 ---
 <section class="hl" data-hl aria-label="Danat Computers">
@@ -25,7 +25,8 @@ import laptop from '@assets/products/lenovo.png';
             muted loop playsinline autoplay preload="auto"
             controlslist="nodownload noplaybackrate noremoteplayback" disablepictureinpicture disableremoteplayback
             aria-label="Danat Computers IT support film"></video>
-          <a class="hl__hot" href="/contact" data-hl-hot aria-label="Get Support" tabindex="-1"></a>
+          <a class="hl__hot" href={whatsappLink()} target="_blank" rel="noopener noreferrer"
+      data-hl-hot aria-label="Get Support" tabindex="-1"></a>
           <span class="hl__glare" aria-hidden="true"></span>
         </div>
       </div>
