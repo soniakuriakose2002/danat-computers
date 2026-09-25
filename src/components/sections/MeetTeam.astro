@@ -9,6 +9,7 @@
 import { Image } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 import Icon from '@components/ui/Icon.astro';
+import Mark from '@components/ui/Mark.astro';
 import { team, teamBranches, deptLabels } from '@data/team';
 
 const files = import.meta.glob<{ default: ImageMetadata }>('/src/assets/team/*.{jpg,jpeg,png,webp,JPG,JPEG,PNG,WEBP}', { eager: true });
@@ -25,7 +26,7 @@ const tabs = [{ slug: 'all', name: 'All team' }, ...teamBranches];
   <div class="shell">
     <header class="mt__head">
       <span class="mt__deco" aria-hidden="true"><i></i><i></i><b></b></span>
-      <h2 class="mt__h">Meet Our <em>Team</em></h2>
+      <h2 class="mt__h">Meet Our <Mark as="underline"><em>Team</em></Mark></h2>
       <p class="mt__p">A passionate team of experts working together to deliver the best technology solutions and support across Oman.</p>
       <div class="mt__tabs" role="tablist" aria-label="Filter by branch">
         <span class="mt__pill" data-mt-pill aria-hidden="true"></span>

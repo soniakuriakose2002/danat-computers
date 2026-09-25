@@ -16,6 +16,7 @@ import teamBench from '@assets/photos/repair-solder.jpg';
 import teamNet from '@assets/photos/network-eng.jpg';
 import teamBiz from '@assets/photos/support-desk.jpg';
 import Brush from '@components/ui/Brush.astro';
+import Mark from '@components/ui/Mark.astro';
 
 const years = new Date().getFullYear() - site.stats.since;
 
@@ -95,7 +96,7 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
         <p class="eb ah__eb"><i class="eb__r" aria-hidden="true"></i>About Danat</p>
         <h1 class="ah__h">
           <span class="ah__l"><span>Technology that keeps</span></span>
-          <span class="ah__l"><span><Brush>Oman moving.</Brush></span></span>
+          <span class="ah__l"><span><Brush><span class="rot" data-rot><span class="rot__w is-on">Oman moving.</span><span class="rot__w" aria-hidden="true">businesses running.</span><span class="rot__w" aria-hidden="true">homes connected.</span><span class="rot__w" aria-hidden="true">devices working.</span></span></Brush></span></span>
         </h1>
         <p class="ah__p">
           For over two decades, Danat Computers has been a trusted name in
@@ -145,11 +146,11 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
   </section>
 
   {/* ══════ 03 · journey — milestone cards stack up in 3D as you scroll ══════ */}
-  <section class="aj" id="journey" data-aj>
+  <section class="aj" id="journey">
     <div class="shell">
       <div class="aj__intro">
         <p class="eb"><i class="eb__r" aria-hidden="true"></i>Our journey</p>
-        <h2 class="aj__h">From a small shop<br />to a <Brush>trusted partner.</Brush></h2>
+        <h2 class="aj__h">From a <Mark as="highlight" tone="butter">small shop</Mark><br />to a trusted partner.</h2>
         <p class="aj__p">
           What started as a single counter has grown into a company with
           branches across Oman, serving thousands of customers. Our focus has
@@ -157,11 +158,12 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
           long-term relationships.
         </p>
       </div>
-      <ol class="aj__stack">
+      <ol class="aj__line" data-aj>
+        <span class="aj__rail" aria-hidden="true"><i></i><b class="aj__spark"></b></span>
         {journey.map((j, i) => (
-          <li class:list={['aj__card', `aj__card--${i % 2}`]} data-aj-card style={`--i:${i}`}>
-            <span class="aj__n">{String(i + 1).padStart(2, '0')} / {String(journey.length).padStart(2, '0')}</span>
-            <b class="aj__yr">{j.year}</b>
+          <li class="aj__m" style={`--i:${i}`}>
+            <span class="aj__dot" aria-hidden="true"><Icon name={['building', 'box', 'pin', 'users'][i % 4]} size={20} /></span>
+            <b class="aj__yr" data-aj-yr={j.year}>{j.year}</b>
             <p class="aj__t">{j.t}</p>
           </li>
         ))}
@@ -181,7 +183,7 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
       </figure>
       <div class="ad__copy">
         <p class="eb" data-rise><i class="eb__r" aria-hidden="true"></i>The difference</p>
-        <h2 class="ad__h" data-rise style="--d:70ms">Most shops replace the board. <Brush>We repair it.</Brush></h2>
+        <h2 class="ad__h" data-rise style="--d:70ms">Most shops replace the board. <Mark as="underline">We repair it.</Mark></h2>
         <p class="ad__p" data-rise style="--d:130ms">
           A replacement mainboard is often most of the value of the machine. A
           failed component on it is usually worth a fraction of that. Tracing
@@ -206,7 +208,7 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
       <section class="aq">
         <div class="shell aq__head">
           <p class="eb"><i class="eb__r" aria-hidden="true"></i>Trusted by</p>
-          <h2 class="aq__h">Brands we carry, <em>customers we keep.</em></h2>
+          <h2 class="aq__h">Brands we carry, <Mark as="highlight" tone="mint">customers we keep.</Mark></h2>
         </div>
         <div class="aq__mq" aria-label={`Brands we carry: ${brands.flat().join(', ')}`}>
           <div class="aq__track">
@@ -304,7 +306,7 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
     <div class="shell">
       <div class="ac__panel">
         <p class="eb" data-rise><i class="eb__r" aria-hidden="true"></i>Let's build a brighter tomorrow</p>
-        <h2 class="ac__h" data-rise style="--d:70ms">Need <Brush>expert advice?</Brush></h2>
+        <h2 class="ac__h" data-rise style="--d:70ms">Need <Mark as="highlight" tone="butter">expert</Mark> <Mark as="underline" tone="blue">advice?</Mark></h2>
         <p class="ac__p" data-rise style="--d:130ms">Our team is here to help you find the right solution.</p>
         <a class="ac__b" href="/contact" data-mag data-rise style="--d:190ms">Contact us<Icon name="arrow" size={15} /></a>
       </div>
@@ -392,6 +394,13 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
   .ah__play::after { content: ''; position: absolute; inset: -6px; border-radius: 50%; border: 1px solid rgb(89 170 84 / 0.5); animation: ahPing 2.4s var(--ease) infinite; }
   @keyframes ahPing { from { transform: scale(0.8); opacity: 1; } to { transform: scale(1.4); opacity: 0; } }
   .ah__mantra { margin-top: 2rem; font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-3); opacity: 0; animation: ahFade 1s var(--ease) 0.9s both; }
+  /* rotating phrase: each one rolls up and out as the next rolls in */
+  .rot { display: inline-grid; vertical-align: bottom; perspective: 600px; transition: width 0.6s var(--ease); }
+  .rot__w { grid-area: 1 / 1; white-space: nowrap; opacity: 0; transform: translateY(55%) rotateX(-65deg); filter: blur(4px);
+    transform-origin: 50% 100%; transition: opacity 0.55s var(--ease), transform 0.75s var(--ease), filter 0.55s var(--ease); }
+  .rot__w.is-on { opacity: 1; transform: none; filter: none; }
+  .rot__w.is-out { opacity: 0; transform: translateY(-55%) rotateX(65deg); filter: blur(4px); transform-origin: 50% 0%; }
+
   /* the photo fills the right side and melts into the page — no frame */
   .ah__bg { position: absolute; top: 0; right: 0; bottom: 0; width: 58%; z-index: 0; will-change: transform;
     -webkit-mask: linear-gradient(90deg, transparent 0%, #000 38%); mask: linear-gradient(90deg, transparent 0%, #000 38%);
@@ -441,37 +450,47 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
   
 
   /* ───── 03 journey ───── */
-  .aj { background: linear-gradient(180deg, #f5f6f4 0%, #f4f6f8 55%, #f5f3f8 100%);
-    padding-block: clamp(5rem, 10vw, 8rem) clamp(3rem, 6vw, 5rem); }
-  .aj__intro { max-width: 44rem; margin-bottom: clamp(2.5rem, 6vw, 4rem); }
+  .aj { background: #fff; padding-block: clamp(5rem, 10vw, 8rem); }
+  .aj__intro { max-width: 44rem; margin: 0 auto clamp(3rem, 6vw, 4.5rem); text-align: center; display: grid; justify-items: center; }
   .aj__h { margin-top: var(--s4); font-size: var(--d5); font-weight: 700; letter-spacing: var(--tr5); line-height: 1.1; }
-  .aj__p { margin-top: var(--s4); max-width: 44ch; color: var(--text-2); line-height: 1.65; }
-  .aj__stack { list-style: none; margin: 0; padding: 0; display: grid; gap: 2.5rem; perspective: 1400px; }
-  /* each card pins a little lower than the one before; the ones underneath tip back */
-  .aj__card { position: sticky; top: calc(var(--hdr, 88px) + 2rem + var(--i) * 22px); min-height: min(46vh, 22rem);
-    display: grid; align-content: space-between; padding: clamp(1.6rem, 4vw, 3rem); border-radius: 28px;
-    background: var(--pc, #fff); border: 1px solid rgb(20 40 25 / 0.05); box-shadow: inset 4px 0 0 var(--yr), 0 30px 60px -42px rgb(40 50 45 / 0.36);
-    transform-origin: 50% 0%; transform: translateZ(0) scale(var(--s, 1)) rotateX(var(--r, 0deg)); filter: brightness(var(--b, 1));
-    will-change: transform; }
-  /* The four-hue idea is kept from the package; the execution is not.
-     Its year colours sat on white at 4.38:1 (green) and 4.32:1 (teal),
-     both under the 4.5 minimum. Each hue now has a pastel ground of its
-     own and an ink deepened until it clears — worst case 5.03:1, with
-     body text at 14.9:1 or better on all four.
-                  ground     year ink   year:ground   body:ground */
-  .aj__card:nth-child(4n+1) { --pc: #e6f0e4; --yr: #1a7340; }  /* 5.03 · 15.38 */
-  .aj__card:nth-child(4n+2) { --pc: #e4eaf6; --yr: #2a5cae; }  /* 5.37 · 14.91 */
-  .aj__card:nth-child(4n+3) { --pc: #e0efef; --yr: #106e71; }  /* 5.09 · 15.22 */
-  .aj__card:nth-child(4n+4) { --pc: #ede9f7; --yr: #5b43a8; }  /* 6.26 · 15.08 */
-  /* --text-3 is 4.2:1 on these grounds, which small mono text cannot
-     have; --text-2 clears 5.3:1 on the worst of the four. */
-  .aj__n { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.18em; color: var(--text-2); }
-  /* The serif italic, not the grotesk — the one place on this page the
-     type changes voice. A serif display face carries its own fit, so the
-     grotesk's negative tracking comes back off. */
-  .aj__yr { display: block; font-family: var(--font-serif); font-style: italic; font-weight: 400;
-    font-size: var(--d3); letter-spacing: -0.012em; line-height: 0.95; color: var(--yr, var(--green-deep)); }
-  .aj__t { max-width: 34ch; font-size: var(--lead); font-weight: 500; letter-spacing: -0.015em; line-height: 1.4; color: var(--text); }
+  .aj__p { margin-top: var(--s4); max-width: 52ch; font-size: 0.9375rem; line-height: 1.68; color: var(--text-2); }
+  /* one line across, four stops; the line draws itself and each stop pops in as it arrives */
+  .aj__line { position: relative; list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.4rem; }
+  .aj__rail { position: absolute; left: 12.5%; right: 12.5%; top: 29px; height: 2px; background: rgb(0 0 0 / 0.08); border-radius: 2px; }
+  .aj__rail i { display: block; height: 100%; width: 100%; border-radius: 2px; transform-origin: left; transform: scaleX(0);
+    background: linear-gradient(90deg, #1f8a4c, #2d6fd0, #14878a, #6f52c9); transition: transform 1.6s cubic-bezier(0.6, 0, 0.2, 1) 0.2s; }
+  .aj__line.is-in .aj__rail i { transform: scaleX(1); }
+  .aj__m { --c: #1f8a4c; --t: #e3f3e6; position: relative; display: grid; justify-items: center; text-align: center; gap: 0.35rem; padding: 0 0.4rem;
+    opacity: 0; transform: translateY(18px); transition: opacity 0.6s var(--ease), transform 0.7s var(--ease); transition-delay: calc(0.3s + var(--i) * 0.35s); }
+  .aj__m:nth-child(3) { --c: #2d6fd0; --t: #e4edfa; }
+  .aj__m:nth-child(4) { --c: #14878a; --t: #dff2f1; }
+  .aj__m:nth-child(5) { --c: #6f52c9; --t: #efe8f8; }
+  .aj__line.is-in .aj__m { opacity: 1; transform: none; }
+  .aj__dot { display: grid; place-items: center; width: 60px; height: 60px; border-radius: 50%; background: var(--t); color: var(--c);
+    box-shadow: 0 0 0 6px #fff, 0 12px 26px -14px var(--c); transform: scale(0.4); transition: transform 0.6s cubic-bezier(0.3, 1.6, 0.5, 1); transition-delay: calc(0.35s + var(--i) * 0.35s); }
+  .aj__line.is-in .aj__dot { transform: none; }
+  .aj__m:hover .aj__dot { transform: translateY(-4px) scale(1.05); transition-delay: 0s; }
+  /* a light that runs along the finished line, over and over */
+  .aj__spark { position: absolute; top: 50%; left: 0; width: 70px; height: 6px; margin-top: -3px; border-radius: 6px; opacity: 0;
+    background: radial-gradient(closest-side, #fff, rgb(255 255 255 / 0)); box-shadow: 0 0 14px 4px rgb(89 170 84 / 0.55); }
+  .aj__line.is-run .aj__spark { animation: ajSpark 3.2s cubic-bezier(0.45, 0, 0.55, 1) infinite; }
+  @keyframes ajSpark { 0% { left: -4%; opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { left: 96%; opacity: 0; } }
+  /* the stop that is "current" gets a pulse ring and lifts a little */
+  .aj__dot { position: relative; }
+  .aj__dot::before, .aj__dot::after { content: ''; position: absolute; inset: -8px; border-radius: 50%; pointer-events: none; }
+  .aj__dot::before { border: 2px solid var(--c); opacity: 0; }
+  .aj__m.is-cur .aj__dot::before { animation: ajPulse 1.6s ease-out infinite; }
+  @keyframes ajPulse { 0% { transform: scale(0.85); opacity: 0.8; } 100% { transform: scale(1.45); opacity: 0; } }
+  .aj__dot::after { inset: -6px; border: 1.5px dashed color-mix(in oklab, var(--c) 55%, transparent); opacity: 0; transition: opacity 0.3s; }
+  .aj__m:hover .aj__dot::after, .aj__m.is-cur .aj__dot::after { opacity: 1; animation: ajSpin 8s linear infinite; }
+  @keyframes ajSpin { to { transform: rotate(360deg); } }
+  .aj__line.is-in .aj__m.is-cur .aj__dot { transform: scale(1.1); background: var(--c); color: #fff; transition-delay: 0s; }
+  .aj__m.is-cur .aj__yr { transform: translateY(-3px); }
+  .aj__yr { transition: transform 0.4s var(--ease); font-variant-numeric: tabular-nums; }
+  .aj__m::after { content: ''; display: block; width: 0; height: 2px; margin-top: 0.3rem; border-radius: 2px; background: var(--c); transition: width 0.5s var(--ease); }
+  .aj__m.is-cur::after, .aj__m:hover::after { width: 36px; }
+  .aj__yr { margin-top: 0.8rem; font-size: var(--d6); font-weight: 700; letter-spacing: var(--tr6); color: var(--c); }
+  .aj__t { max-width: 24ch; font-size: 0.9rem; line-height: 1.55; color: var(--text-2); }
 
   /* ───── 05 difference ───── */
   .ad { background: radial-gradient(50% 60% at 90% 20%, rgb(239 232 248 / 0.7), transparent 70%), #fbfbfd; color: var(--text); padding-block: clamp(5rem, 10vw, 8rem); overflow: hidden; }
@@ -649,6 +668,13 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
     .pr__grid { grid-template-columns: minmax(0, 0.85fr) minmax(0, 0.7fr) minmax(0, 1.1fr); }
   }
   @media (max-width: 56rem) {
+    .aj__line { grid-template-columns: 1fr; gap: 2rem; padding-left: 0; }
+    .aj__rail { left: 29px; right: auto; top: 30px; bottom: 30px; width: 2px; height: auto; }
+    .aj__rail i { transform-origin: top; transform: scaleY(0); }
+    .aj__line.is-in .aj__rail i { transform: scaleY(1); }
+    .aj__m { grid-template-columns: 60px 1fr; justify-items: start; text-align: left; column-gap: 1rem; }
+    .aj__dot { grid-row: span 2; }
+    .aj__yr { margin-top: 0.4rem; }
     .ah__in, .ad__in { grid-template-columns: 1fr; }
       .af__c--0 { grid-row: auto; grid-column: span 2; }
     .af__c--3 { grid-column: span 2; }
@@ -656,7 +682,8 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
   }
   @media (prefers-reduced-motion: reduce) {
     .ah__bg, .ah__l > span, .ah__eb, .ah__p, .ah__acts, .ah__mantra, .ah__play::after{ animation: none; opacity: 1; transform: none; clip-path: none; }
-    .aj__card { transform: none; filter: none; }
+    .aj__m, .aj__dot, .aj__rail i { opacity: 1; transform: none; transition: none; }
+    .aj__spark { display: none; }
     .av__view.is-on { animation: none; }
     .av__pill { transition: none; }
     .af__c { transform: none; }
@@ -706,10 +733,60 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
       addEventListener('resize', () => place(tabs.find((t) => t.getAttribute('aria-selected') === 'true')!));
     }
 
+    /* hero: rotate the handwritten phrase */
+    const rot = document.querySelector<HTMLElement>('[data-rot]');
+    if (rot && !reduced) {
+      const ws = [...rot.querySelectorAll<HTMLElement>('.rot__w')];
+      let i = 0;
+      const fit = () => { rot.style.width = `${ws[i].scrollWidth}px`; };
+      fit(); addEventListener('resize', fit);
+      setInterval(() => {
+        if (document.hidden || !rot.isConnected) return;
+        const cur = ws[i]; i = (i + 1) % ws.length; const nxt = ws[i];
+        cur.classList.remove('is-on'); cur.classList.add('is-out');
+        nxt.classList.remove('is-out'); nxt.classList.add('is-on');
+        setTimeout(() => cur.classList.remove('is-out'), 800);
+        fit();
+      }, 2800);
+    }
+
     if (reduced) return;
 
     const bg = hero.querySelector<HTMLElement>('[data-ah-bg]')!;
-    const cards = [...document.querySelectorAll<HTMLElement>('[data-aj-card]')];
+    const line = document.querySelector<HTMLElement>('[data-aj]');
+    if (line) new IntersectionObserver((es, o) => {
+      if (!es[0].isIntersecting) return;
+      o.disconnect();
+      line.classList.add('is-in');
+      const stops = [...line.querySelectorAll<HTMLElement>('.aj__m')];
+      const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (still) return;
+      /* each year counts up (or types itself) as its stop pops in */
+      stops.forEach((m, i) => {
+        const el = m.querySelector<HTMLElement>('[data-aj-yr]')!;
+        const target = el.dataset.ajYr!;
+        const n = Number(target);
+        el.textContent = Number.isFinite(n) ? String(n - 60) : '';   // start value while the stop is still hidden
+        setTimeout(() => {
+          if (Number.isFinite(n)) {
+            const from = n - 60, t0 = performance.now();
+            const step = (t: number) => { const k = Math.min(1, (t - t0) / 900); el.textContent = String(Math.round(from + (n - from) * (1 - Math.pow(1 - k, 3)))); if (k < 1) requestAnimationFrame(step); };
+            requestAnimationFrame(step);
+          } else {
+            el.textContent = ''; let c = 0;
+            const iv = setInterval(() => { el.textContent = target.slice(0, ++c); if (c >= target.length) clearInterval(iv); }, 90);
+          }
+        }, 350 + i * 350);
+      });
+      /* once all four are in: the light starts running and the "current" stop steps along */
+      setTimeout(() => {
+        line.classList.add('is-run');
+        let cur = 0;
+        const mark = () => stops.forEach((m, i) => m.classList.toggle('is-cur', i === cur));
+        mark();
+        setInterval(() => { if (!document.hidden && line.isConnected) { cur = (cur + 1) % stops.length; mark(); } }, 2400);
+      }, 350 + stops.length * 350 + 600);
+    }, { threshold: 0.35 }).observe(line);
     const ad = document.querySelector<HTMLElement>('[data-ad]');
     const shot = ad?.querySelector<HTMLElement>('[data-ad-shot]');
     const clamp = (v: number) => Math.min(1, Math.max(0, v));
@@ -721,16 +798,6 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
       /* hero photo drifts slower than the page */
       const hr = hero.getBoundingClientRect();
       if (hr.bottom > 0) (bg.querySelector('img') as HTMLElement | null)?.style.setProperty('transform', `translate3d(0, ${Math.max(-80, hr.top * 0.18)}px, 0)`);
-      /* journey: cards that have been covered by the next one tip back and dim */
-      cards.forEach((c, i) => {
-        const next = cards[i + 1];
-        if (!next) return;
-        const a = c.getBoundingClientRect(), n = next.getBoundingClientRect();
-        const cover = clamp((a.bottom - n.top) / a.height);          // 0 → 1 as the next card slides over
-        c.style.setProperty('--s', (1 - 0.07 * cover).toFixed(4));
-        c.style.setProperty('--r', `${(8 * cover).toFixed(2)}deg`);
-        c.style.setProperty('--b', (1 - 0.06 * cover).toFixed(3));
-      });
       /* difference: the framed photo opens out to full width as it arrives */
       if (ad && shot) {
         const r = ad.getBoundingClientRect();
