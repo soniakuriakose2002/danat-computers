@@ -222,7 +222,10 @@
     scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
 
     const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 100);
-    camera.position.set(0, 2.0, 7.4);
+    /* Raised to about 30 degrees of elevation. OrbitControls keeps
+       whatever direction it starts with, and from 15 degrees a laptop
+       is edge-on: you see its rim and none of the deck. */
+    camera.position.set(0, 4.2, 7.4);
     /* Without this the camera stares along -Z from its own height and
        the machine sits low and uncentred: a camera that is raised must
        also be aimed. */
@@ -568,7 +571,7 @@
     controls.dampingFactor = 0.075;
     controls.enablePan = false;
     controls.minDistance = 4;
-    controls.maxDistance = 16;
+    controls.maxDistance = 22;
     /* Stopped short of both poles: under a laptop there is nothing, and
        straight down loses the object against its own shadow. */
     controls.minPolarAngle = 0.3;
@@ -603,11 +606,24 @@
       if (!w || !h) return;
       renderer.setSize(w, h, false);
       camera.aspect = w / h;
-      /* Narrow viewports need the camera further back or the machine
-         runs off both sides. */
-      camera.position.z = w < 640 ? 10.5 : 7.4;
-      camera.lookAt(0, 0.1, 0);
       camera.updateProjectionMatrix();
+
+      /* Distance, not position. OrbitControls owns camera.position — it
+         recomputes it from its own spherical coordinates on every
+         update — so assigning a z here was overwritten on the next
+         frame and the machine never pulled back. Move it ALONG the
+         direction it is already looking from, and the controls keep it.
+
+         Framed for the exploded state, not the closed one: the screen
+         travels a full body-width up, so a distance that suits the shut
+         laptop loses the top of the stack the moment you scroll. */
+      const want = Math.max(
+        8.2,
+        (W * 2.35) / Math.min(1.9, Math.max(0.7, camera.aspect))
+      );
+      const dir = camera.position.clone().sub(controls.target).normalize();
+      camera.position.copy(controls.target).addScaledVector(dir, want);
+      controls.update();
     };
     new ResizeObserver(resize).observe(stage);
     resize();
