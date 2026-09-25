@@ -16,7 +16,7 @@ const rows = hubServices.map((s) => {
 <section class="sx" data-sx id="services" aria-labelledby="sx-title">
   <div class="shell">
     <div class="sx__top">
-      <h2 id="sx-title">What do you need help with?</h2>
+      <div><p class="label">Our services</p><h2 id="sx-title">What do you<br />need <em>help with?</em></h2></div>
       <p>Complete IT solutions for homes and businesses across Oman. Walk in to any branch, or message us first.</p>
     </div>
     <ul class="sx__list">
@@ -33,13 +33,14 @@ const rows = hubServices.map((s) => {
 <style>
   .sx { background: var(--off); color: var(--text); padding-block: clamp(6rem, 12vw, 11rem); }
   .sx__top { display: flex; justify-content: space-between; align-items: end; gap: 2rem; margin-bottom: 3.5rem; }
-  .sx__top h2 { font-size: clamp(2.4rem, 6vw, 6rem); font-weight: 800; letter-spacing: -0.055em; line-height: 0.92; max-width: 12ch; }
+  .sx__top h2 { margin-top: var(--s4); font-size: clamp(2rem, 3.6vw, 3.1rem); font-weight: 700; letter-spacing: -0.038em; line-height: 1.06; }
+  .sx__top h2 em { font-style: normal; color: var(--green); }
   .sx__top p { max-width: 34ch; color: var(--text-2); line-height: 1.55; }
   .sx__list { list-style: none; margin: 0; padding: 0; border-top: 1px solid rgb(0 0 0 / 0.12); }
-  .sx__row { display: grid; grid-template-columns: 4rem 1fr auto; align-items: center; gap: 1.5rem; padding: 1.6rem 0; border-bottom: 1px solid rgb(0 0 0 / 0.12);
+  .sx__row { display: grid; grid-template-columns: 4rem 1fr auto; align-items: center; gap: 1.5rem; padding: 1.25rem 0; border-bottom: 1px solid rgb(0 0 0 / 0.12);
     color: inherit; text-decoration: none; transition: padding 0.5s var(--ease), color 0.4s; }
   .sx__n { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.18em; color: var(--text-2); }
-  .sx__t { font-size: clamp(2rem, 5.4vw, 5.6rem); font-weight: 800; letter-spacing: -0.055em; line-height: 1; }
+  .sx__t { font-size: clamp(1.5rem, 3vw, 2.75rem); font-weight: 700; letter-spacing: -0.035em; line-height: 1.1; }
   .sx__s { color: var(--text-2); text-align: right; }
   .sx__list:hover .sx__row { color: rgb(0 0 0 / 0.28); }
   .sx__list .sx__row:hover, .sx__row:focus-visible { color: var(--text); padding-left: 1.4rem; }

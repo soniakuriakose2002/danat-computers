@@ -25,7 +25,8 @@ const shown = branches.filter((b) => SPOTS[b.slug]);
       ))}
     </div>
     <div>
-      <h2 id="bm-title">{shown.length} branches.<br /><em>Closer to you.</em></h2>
+      <p class="label">Our branches</p>
+      <h2 id="bm-title">Across Oman.<br /><em>Closer to you.</em></h2>
       <ul class="bm__list">
         {shown.map((b) => (
           <li class="bm__item">
@@ -48,8 +49,8 @@ const shown = branches.filter((b) => SPOTS[b.slug]);
 <style>
   .bm { background: var(--white); color: var(--text); padding-block: clamp(6rem, 12vw, 11rem); }
   .bm__grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: clamp(2rem, 6vw, 6rem); align-items: center; }
-  .bm h2 { font-size: clamp(2.4rem, 6vw, 6rem); font-weight: 800; letter-spacing: -0.055em; line-height: 0.92; }
-  .bm h2 em { font-style: normal; color: var(--green-deep); }
+  .bm h2 { margin-top: var(--s4); font-size: clamp(2rem, 3.6vw, 3.1rem); font-weight: 700; letter-spacing: -0.038em; line-height: 1.06; }
+  .bm h2 em { font-style: normal; color: var(--green); }
   .bm__map { position: relative; border-radius: 28px; overflow: hidden; background: #e9ece8; }
   .bm__map :global(img) { display: block; width: 100%; height: auto; filter: grayscale(1) contrast(1.05) brightness(1.04); opacity: 0.8; }
   .bm__pin { position: absolute; left: var(--x); top: var(--y); transform: translate(-50%, -50%); }
@@ -60,7 +61,7 @@ const shown = branches.filter((b) => SPOTS[b.slug]);
   @keyframes bmPing { from { transform: scale(0.4); opacity: 1; } to { transform: scale(1.6); opacity: 0; } }
   .bm__list { list-style: none; margin: 2.6rem 0 0; padding: 0; border-top: 1px solid rgb(0 0 0 / 0.1); }
   .bm__item { display: grid; grid-template-columns: 1fr auto; gap: 1rem; padding: 1.6rem 0; border-bottom: 1px solid rgb(0 0 0 / 0.1); align-items: center; }
-  .bm__item h3 { font-size: clamp(1.6rem, 2.8vw, 2.6rem); font-weight: 800; letter-spacing: -0.045em; }
+  .bm__item h3 { font-size: clamp(1.25rem, 1.8vw, 1.6rem); font-weight: 700; letter-spacing: -0.03em; }
   .bm__item p { color: var(--text-2); margin-top: 0.35rem; line-height: 1.45; }
   .bm__acts { display: flex; gap: 0.6rem; }
   .bm__pill { display: inline-flex; align-items: center; border-radius: 999px; padding: 0.75rem 1.2rem; font-weight: 600; font-size: 0.95rem; border: 1px solid rgb(0 0 0 / 0.18); color: inherit; text-decoration: none; transition: background 0.25s, color 0.25s, border-color 0.25s; }

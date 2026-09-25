@@ -6,6 +6,7 @@
  */
 import { Image } from 'astro:assets';
 import { site } from '@data/site';
+import Brush from '@components/ui/Brush.astro';
 import supportDesk from '@assets/photos/support-desk.jpg';
 import repairSolder from '@assets/photos/repair-solder.jpg';
 import cctvPair from '@assets/photos/cctv-pair.jpg';
@@ -17,13 +18,14 @@ import supportAgent from '@assets/photos/support-agent.jpg';
 import driveMacro from '@assets/photos/drive-macro.jpg';
 import cctvWhite from '@assets/photos/cctv-white.jpg';
 
-/* TEN CARDS, NOT TWELVE, and the ring is spaced to suit.
-   Two of the twelve were retail-display.jpg (an art and craft shop) and
-   repair-board.jpg (a competitor's branded uniform). Both are deleted,
-   so those imports would not build.
+/* TEN CARDS, NOT TWELVE, with the ring spaced to suit.
+   Two of the twelve were retail-display.jpg — an art and craft shop,
+   "Artebella ART & CRAFT" legible on its shelving — and repair-board.jpg,
+   whose technician wears a competitor's ТЕХНОБЫТСЕРВИС uniform. Both
+   files are deleted, so those imports do not build.
 
-   'Retail' has no replacement — nothing in the library shows a counter
-   or a shelf of machines — so that card is out rather than filled with
+   'Retail' has no replacement: nothing in the library shows a counter
+   or a shelf of machines, so that card is out rather than filled with
    something that is not a shop. 'Boards' takes drive-macro, which is
    genuinely a board photographed close.
 
@@ -39,7 +41,7 @@ const STEP = 360 / cards.length;
 <section class="rg" data-rg aria-label={`Fixing Oman since ${site.stats.since}`}>
   <div class="rg__stage">
     <div class="rg__guides" aria-hidden="true"></div>
-    <h2 class="rg__text"><span>Fixing Oman</span><span>since <em>{site.stats.since}.</em></span></h2>
+    <h2 class="rg__text"><span>Fixing Oman</span><span><Brush>since {site.stats.since}.</Brush></span></h2>
     <div class="rg__wheel" data-rg-wheel>
       {cards.map(([img, label], i) => (
         <figure class="rg__card" style={`--a:${i * STEP}deg;--tilt:${tilts[i]}deg`}>
@@ -59,9 +61,9 @@ const STEP = 360 / cards.length;
   .rg__guides::before { content: ''; position: absolute; left: 50%; top: 68%; width: min(120vmin, 1200px); aspect-ratio: 1; border: 1px solid rgb(18 32 24 / 0.14); border-radius: 50%; transform: translate(-50%, -50%); }
   .rg__guides::after { content: ''; position: absolute; left: 0; right: 0; top: 36%; border-top: 1px solid rgb(18 32 24 / 0.1); box-shadow: 0 30vh 0 -0.5px rgb(18 32 24 / 0.1); }
   .rg__text { position: absolute; left: 0; right: 0; top: 47%; transform: translateY(-50%); z-index: 1; text-align: center;
-    font-weight: 800; letter-spacing: -0.075em; line-height: 0.8; font-size: clamp(4.4rem, 17vw, 19rem); }
+    font-weight: 700; letter-spacing: -0.05em; line-height: 1.05; font-size: clamp(2.6rem, 7vw, 7rem); --brush-size: 1.05; }
   .rg__text span { display: block; }
-  .rg__text em { font-style: normal; color: var(--green-deep); }
+  
   .rg__wheel { position: absolute; left: 50%; top: 68%; width: 0; height: 0; z-index: 2; --R: min(60vmin, 600px); transform: rotate(var(--rot, 0deg)); }
   .rg__card { position: absolute; left: 0; top: 0; margin: 0; width: clamp(96px, 10.5vw, 190px); aspect-ratio: 4 / 5; background: #fff;
     padding: clamp(6px, 0.7vw, 11px); box-shadow: 0 18px 40px rgb(20 30 24 / 0.18);

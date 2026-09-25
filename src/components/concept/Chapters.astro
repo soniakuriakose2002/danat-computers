@@ -4,6 +4,7 @@
  * scrolls down. On phones they stack vertically instead.
  */
 import { Image } from 'astro:assets';
+import Brush from '@components/ui/Brush.astro';
 import supportDesk from '@assets/photos/support-desk.jpg';
 import repairSolder from '@assets/photos/repair-solder.jpg';
 import cctvPair from '@assets/photos/cctv-pair.jpg';
@@ -21,7 +22,7 @@ const chapters = [
 <section class="ch" data-ch id="chapters" aria-label="What we do">
   <div class="ch__stage">
     <div class="ch__head">
-      <h2>From the bench,<br /><em>not the brochure.</em></h2>
+      <div><p class="label ch__lbl">Inside Danat</p><h2>From the bench,<br /><Brush>not the brochure.</Brush></h2></div>
       <span class="ch__count">05 chapters</span>
     </div>
     <div class="ch__track" data-ch-track>
@@ -41,19 +42,21 @@ const chapters = [
   .ch { position: relative; background: var(--ink); color: #fff; }
   .ch__stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; display: grid; align-content: center; }
   .ch__head { position: absolute; top: calc(var(--hdr, 88px) + 24px); left: var(--gut); right: var(--gut); display: flex; justify-content: space-between; align-items: end; gap: 2rem; z-index: 2; }
-  .ch__head h2 { font-size: clamp(2rem, 4.4vw, 4.4rem); font-weight: 800; letter-spacing: -0.05em; line-height: 0.95; }
-  .ch__head em { font-style: normal; color: var(--green-bright); }
+  .ch__head h2 { margin-top: var(--s4); font-size: clamp(2rem, 3.6vw, 3.1rem); font-weight: 700; letter-spacing: -0.038em; line-height: 1.06; }
+  .ch__lbl { color: rgb(255 255 255 / 0.6); }
+  .ch__head :global(.brush) { color: var(--green-bright); }
+  
   .ch__count, .ch__k { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; }
   .ch__count { color: rgb(255 255 255 / 0.55); }
-  .ch__track { display: flex; gap: 2.2vw; padding-inline: var(--gut); margin-top: 9vh; will-change: transform; }
-  .ch__card { position: relative; flex: none; width: min(62vw, 980px); height: 62vh; border-radius: 28px; overflow: hidden; background: #111; }
+  .ch__track { display: flex; gap: 2.2vw; padding-inline: var(--gut); margin-top: 24vh; will-change: transform; }
+  .ch__card { position: relative; flex: none; width: min(58vw, 920px); height: 56vh; border-radius: 28px; overflow: hidden; background: #111; }
   .ch__card :global(img) { position: absolute; inset: -6% -12%; width: 124%; height: 112%; object-fit: cover; will-change: transform; }
   .ch__card::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgb(0 0 0 / 0.05) 30%, rgb(0 0 0 / 0.78) 100%); }
   .ch__meta { position: absolute; left: 2.2rem; right: 2.2rem; bottom: 2rem; z-index: 2; display: grid; gap: 0.6rem; }
-  .ch__n { position: absolute; top: 1.2rem; right: 1.8rem; z-index: 2; font-weight: 800; font-size: clamp(4rem, 9vw, 9rem); letter-spacing: -0.06em; line-height: 1; color: transparent; -webkit-text-stroke: 1.5px rgb(255 255 255 / 0.55); }
+  .ch__n { position: absolute; top: 1.2rem; right: 1.8rem; z-index: 2; font-weight: 700; font-size: clamp(3rem, 6vw, 6rem); letter-spacing: -0.05em; line-height: 1; color: transparent; -webkit-text-stroke: 1.5px rgb(255 255 255 / 0.55); }
   .ch__k { color: var(--green-bright); }
-  .ch__t { font-size: clamp(2rem, 4vw, 3.8rem); font-weight: 800; letter-spacing: -0.05em; line-height: 0.95; }
-  .ch__p { max-width: 36ch; color: rgb(255 255 255 / 0.78); font-size: 1.05rem; line-height: 1.5; }
+  .ch__t { font-size: clamp(1.4rem, 2.3vw, 2.1rem); font-weight: 700; letter-spacing: -0.035em; line-height: 1.1; }
+  .ch__p { max-width: 36ch; color: rgb(255 255 255 / 0.78); font-size: 0.95rem; line-height: 1.55; }
   .ch__bar { position: absolute; left: var(--gut); right: var(--gut); bottom: 5vh; height: 1px; background: rgb(255 255 255 / 0.12); }
   .ch__bar i { display: block; height: 100%; width: 0; background: var(--green-bright); }
   @media (max-width: 51.25rem), (prefers-reduced-motion: reduce) {

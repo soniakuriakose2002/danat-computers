@@ -30,7 +30,11 @@ import laptop from '@assets/products/lenovo.png';
         </div>
       </div>
     </div>
-    <h1 class="hl__title" data-hl-title><span class="hl__l"><span>More than</span></span><span class="hl__l"><span>just a <em>laptop.</em></span></span></h1>
+    <div class="hl__copy" data-hl-title>
+      <p class="hl__eb"><span class="hl__l"><span>{site.nameFull}</span></span></p>
+      <h1 class="hl__title"><span class="hl__l"><span>More than</span></span><span class="hl__l"><span>just <em>a laptop</em></span></span></h1>
+      <p class="hl__lead"><span class="hl__l"><span>Complete technology solutions to power your work, study and business.</span></span></p>
+    </div>
     <div class="hl__hud hl__hud--tr mono-label" data-hl-hud><span>{site.nameFull}</span><span>Ruwi · Sohar · Salalah</span><span>23.59° N  58.55° E</span></div>
     <div class="hl__hud hl__hud--br mono-label" data-hl-hud><span class="hl__line"></span><span>Scroll to step inside</span></div>
     <div class="hl__hud hl__hud--bl mono-label" data-hl-hud>Since {site.stats.since}</div>
@@ -52,34 +56,25 @@ import laptop from '@assets/products/lenovo.png';
     background: linear-gradient(115deg, rgb(255 255 255 / 0.12) 0%, rgb(255 255 255 / 0.03) 28%, transparent 45%); }
   .hl__floor { position: absolute; left: 50%; top: 96%; width: 120%; height: 40%; transform: translateX(-50%); z-index: -1; opacity: var(--gl, 1);
     background: radial-gradient(closest-side, rgb(89 170 84 / 0.35), transparent); filter: blur(10px); }
-  .hl__hot { position: absolute; left: 7.4%; top: 69.9%; width: 20.4%; height: 9.8%; z-index: 3; border-radius: 999px; pointer-events: none; }
+  .hl__hot { position: absolute; left: 6.6%; top: 68.6%; width: 22%; height: 12.4%; z-index: 3; border-radius: 999px; pointer-events: none; }
   .hl__hot.is-live { pointer-events: auto; cursor: pointer; }
   .hl__hot.is-live:hover, .hl__hot.is-live:focus-visible { box-shadow: 0 0 0 3px rgb(255 255 255 / 0.85), 0 0 40px rgb(122 211 116 / 0.75); outline: none; }
 
-  /* Was clamp(3.2rem, 10.5vw, 11.5rem) — 151px at 1440, wide enough to
-     run under the laptop and fight it. Two thirds of that reads as
-     confidently and leaves the machine its own space. */
-  /* pointer-events: none is THE fix for the film's Get Support button.
-     The headline sits over that corner of the film and only fades to
-     opacity 0 — it is still in the page and still hit-testable, so it
-     swallowed every click before the button underneath could see one.
-     Nothing in this overlay is clickable, so none of it should take
-     clicks.
-
-     Size: was clamp(3.2rem, 10.5vw, 11.5rem), 151px at 1440, wide
-     enough to run under the laptop and fight it. */
-  .hl__title { position: absolute; left: var(--gut); bottom: 12vh; z-index: 3; pointer-events: none; font-weight: 800; font-size: clamp(2.5rem, 6.6vw, 7rem);
-    line-height: 0.92; letter-spacing: -0.05em; max-width: 14ch; will-change: transform, opacity; }
+  .hl__copy { position: absolute; left: var(--gut); bottom: 14vh; z-index: 3; max-width: 34rem; will-change: transform, opacity; pointer-events: none; }
+  .hl__eb { display: flex; align-items: center; gap: 0.7rem; font-size: clamp(1rem, 1.5vw, 1.25rem); font-weight: 600; letter-spacing: -0.015em; color: var(--green-bright); }
+  .hl__eb::before { content: ''; width: 34px; height: 2px; border-radius: 2px; background: var(--green-bright); }
+  .hl__title { margin-top: var(--s4); font-weight: 700; font-size: clamp(2.6rem, 5.4vw, 5.25rem); line-height: 1.02; letter-spacing: -0.045em; }
+  .hl__lead { margin-top: var(--s4); max-width: 34ch; font-size: 1rem; line-height: 1.6; color: rgb(255 255 255 / 0.72); }
   .hl__l { display: block; overflow: hidden; }
   .hl__l > span { display: block; transform: translateY(105%); transition: transform 1.3s var(--ease); }
-  .hl__l:nth-child(2) > span { transition-delay: 0.1s; }
+  .hl__title .hl__l:nth-child(2) > span { transition-delay: 0.1s; }
+  .hl__lead .hl__l > span { transition-delay: 0.2s; }
   .hl.is-in .hl__l > span { transform: none; }
   .hl__title em { font-style: normal; color: var(--green-bright); }
   .mono-label { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; }
-  /* Same reason as the headline: faded, but still catching clicks. */
-  .hl__hud { position: absolute; z-index: 3; pointer-events: none; color: rgb(255 255 255 / 0.62); }
+  .hl__hud { position: absolute; z-index: 3; color: rgb(255 255 255 / 0.62); pointer-events: none; }
   .hl__hud--tr { top: calc(var(--hdr, 88px) + 24px); right: var(--gut); text-align: right; display: grid; gap: 0.4rem; }
-  .hl__hud--br { right: var(--gut); bottom: 12vh; display: flex; align-items: center; gap: 0.8rem; }
+  .hl__hud--br { right: var(--gut); bottom: 14vh; display: flex; align-items: center; gap: 0.8rem; }
   .hl__line { width: 46px; height: 1px; background: currentColor; }
   .hl__hud--bl { left: var(--gut); bottom: 5vh; }
   .hl__wave { position: absolute; left: -4%; right: -4%; bottom: -1px; z-index: 6; height: 0; pointer-events: none; }
@@ -148,16 +143,7 @@ import laptop from '@assets/products/lenovo.png';
       dev.style.transform = `translate3d(${lerp(x0, x1, d)}px,${lerp(y0, y1, d) + (1 - a) * 60}px,0) rotateX(${(1 - a) * 16}deg) scale(${lerp(1, S, d)})`;
       dev.style.setProperty('--gl', (1 - d).toFixed(3));
 
-      /* WHY THIS WAS NOT WORKING.
-         It required the laptop to be >97% zoomed AND the film to be
-         between 12.4s and 15.1s of a 15.6s loop — 2.7 seconds, 17% of
-         the time, and only if you happened to stop scrolling at the
-         very end of the zoom. Practically unhittable.
-
-         The zoom gate drops to 0.82, which is anywhere in the last
-         fifth of the zoom rather than its final 3%, and the window runs
-         from 11.8s to the end of the loop instead of closing early. */
-      const live = d > 0.82 && vid.currentTime >= 11.8;
+      const live = d > 0.85 && vid.currentTime >= 12.3 && vid.currentTime <= 15.3;
       hot.classList.toggle('is-live', live);
       hot.tabIndex = live ? 0 : -1;
       loop();
