@@ -24,7 +24,7 @@ interface Props {
 const { show = 'both', bookLink = '/contact', businessLink = '/business', imageFolder = '' } = Astro.props;
 ---
 <div class="d3-root" data-images={imageFolder}>
-  {show !== 'it' && <section class="d3-product d3-dark" id="laptop" data-tone="ink" data-product="0" aria-label="Laptop service" data-link={bookLink}><div class="d3-stage"></div></section>}
+  {show !== 'it' && <section class="d3-product d3-light" id="laptop" data-tone="off" data-product="0" aria-label="Laptop service" data-link={bookLink}><div class="d3-stage"></div></section>}
   {show !== 'laptop' && <section class="d3-product d3-light" id="it" data-tone="off" data-product="1" aria-label="IT support" data-link={businessLink}><div class="d3-stage"></div></section>}
 </div>
 
@@ -69,6 +69,11 @@ const { show = 'both', bookLink = '/contact', businessLink = '/business', imageF
   .d3-bar{flex:1;height:2px;background:var(--line);border-radius:2px;overflow:hidden}
   .d3-bar i{display:block;height:100%;width:0;background:var(--accent)}
 
+  /* UNUSED. The laptop teardown was the only thing on this palette and
+     it is light now, at the client's instruction: the Danat direction
+     is light and clean, and this was the largest dark surface on the
+     site. Left here because restoring it is a single class swap on the
+     section above. */
   .d3-dark{--bg:var(--d3-ink);--fg:#eef2f7;--muted:#93a699;--line:#233328;--card:rgba(24,40,30,.78);--accent:var(--green-bright,#6fc96a);--tagbg:rgba(89,170,84,.2);--shadow:rgba(0,0,0,.6)}
   .d3-light{--bg:var(--d3-mist);--fg:#111a14;--muted:#5d6b61;--line:#d5ded6;--card:rgba(255,255,255,.7);--accent:var(--green-deep,#2f6429);--tagbg:rgba(76,170,79,.14);--shadow:rgba(20,40,25,.22)}
 
