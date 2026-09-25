@@ -1,0 +1,302 @@
+---
+import { Image } from 'astro:assets';
+
+import fOpen from '@assets/teardown/laptop-open.jpg';
+import fScreen from '@assets/teardown/laptop-screen.jpg';
+import fTop from '@assets/teardown/laptop-topcase.jpg';
+import fExploded from '@assets/teardown/laptop-exploded.jpg';
+
+/**
+ * THE LAPTOP, TAKEN APART — photographs, scrubbed on scroll.
+ *
+ * The manager's note was that the 3D version read as "a box with an
+ * image placed inside": a framed panel on a page rather than a product
+ * you are looking at. Three things cause that, and all three are fixed
+ * here rather than tuned.
+ *
+ * It is FULL BLEED. No card, no border, no shadow, no container — the
+ * picture is the section, edge to edge, and the copy sits on it.
+ *
+ * The backdrop is sampled from the photographs themselves, so the frame
+ * has no visible edge against the page. That single colour is what
+ * stops it reading as an image on a background.
+ *
+ * And it answers the wheel DIRECTLY. No smoothing, no lerp: scroll
+ * position maps straight to frame position, so the machine comes apart
+ * exactly as fast as you scroll.
+ *
+ * ⚠ SOURCE. These are the client's own reference render, sliced into
+ * frames. Panel 1 of that sheet — the closed lid — is deliberately NOT
+ * used: it carries an HP logo, and Danat sells HP rather than speaking
+ * for it. The sequence therefore starts open.
+ *
+ * They are ~600px originals upscaled to 1280, so they are soft at full
+ * width. Real photography or a rendered sequence replaces them here
+ * with no change to this file.
+ */
+const frames = [
+  {
+    img: fOpen,
+    n: 'Open',
+    t: 'Free diagnosis',
+    p: 'We tell you what failed, what it costs and how long it takes — before you agree to anything.',
+    alt: 'A laptop open on a bench',
+  },
+  {
+    img: fScreen,
+    n: 'Screen',
+    t: 'Screen replacement',
+    p: 'Cracked, flickering or dim panels, matched to your model.',
+    alt: 'The screen separated from the body of a laptop',
+  },
+  {
+    img: fTop,
+    n: 'Keyboard',
+    t: 'Keyboard and trackpad',
+    p: 'Stuck keys, spills, and trackpads that stop responding.',
+    alt: 'The keyboard and top case lifted away from a laptop',
+  },
+  {
+    img: fExploded,
+    n: 'Inside',
+    t: 'Board-level repair',
+    p: 'Battery, memory, storage, cooling and the board itself. Most shops replace it. We fix it.',
+    alt: 'A laptop fully exploded into its components',
+  },
+];
+---
+
+<section class="sq" data-sq style={`--n:${frames.length}`}>
+  <div class="sq__track" data-sq-track>
+    <div class="sq__pin">
+      {frames.map((f, i) => (
+        <figure class="sq__f" data-f={i} data-on={i === 0 ? '' : undefined}>
+          <Image src={f.img} alt={f.alt} widths={[900, 1280]} sizes="100vw"
+            quality={86} format="webp" loading={i === 0 ? 'eager' : 'lazy'} />
+        </figure>
+      ))}
+
+      <div class="sq__veil" aria-hidden="true"></div>
+
+      <div class="sq__copy">
+        <p class="sq__eb">Laptop service</p>
+        <div class="sq__cards">
+          {frames.map((f, i) => (
+            <article data-c={i} data-on={i === 0 ? '' : undefined}>
+              <h2>{f.t}</h2>
+              <p>{f.p}</p>
+            </article>
+          ))}
+        </div>
+        <a class="sq__cta" href="/contact">Book a laptop repair</a>
+      </div>
+
+      <ol class="sq__ix">
+        {frames.map((f, i) => (
+          <li data-i={i} data-on={i === 0 ? '' : undefined}>
+            <b>{String(i + 1).padStart(2, '0')}</b><span>{f.n}</span>
+          </li>
+        ))}
+      </ol>
+
+      <div class="sq__bar" aria-hidden="true"><i data-sq-bar></i></div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* 88svh per frame. Short on purpose: the note was that the scrolling
+     is too slow, and a frame that needs a screen and a half to change
+     is what makes a teardown feel like homework. */
+  .sq { --pane: 88svh; background: #67868f; }
+  .sq__track { height: calc(var(--n) * var(--pane)); }
+  .sq__pin {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    overflow: hidden;
+    /* Sampled from the photographs. With the page the same colour as
+       the frames, there is no edge — which is the whole difference
+       between a product filling the screen and a picture in a box. */
+    background: #67868f;
+  }
+
+  .sq__f {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    opacity: 0;
+    transition: opacity 340ms linear;
+  }
+  .sq__f[data-on] { opacity: 1; }
+  .sq__f :global(img) {
+    width: 100%;
+    height: 100%;
+    /* CONTAIN, not cover. These are 16:9; a 100svh pin is 1.6 on a
+       desktop and about 0.46 on a phone, so cover crops three quarters
+       of the width away on a handset and shows a fragment of a laptop.
+       Contain shows the whole machine at every size — and because the
+       page is the same colour the frames are, the bands it leaves are
+       invisible. That is what the sampled backdrop buys. */
+    object-fit: contain;
+    /* A slow push across each frame's turn, so a still never sits dead
+       still. Scroll-linked, not a timed loop. */
+    scale: calc(1.02 + var(--z, 0) * 0.05);
+    transform-origin: 58% 45%;
+  }
+
+  /* Readability over an ungraded photograph, on the side the copy is. */
+  .sq__veil {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      100deg,
+      rgb(10 22 26 / 0.86) 0%,
+      rgb(10 22 26 / 0.62) 32%,
+      rgb(10 22 26 / 0.06) 62%
+    );
+  }
+
+  .sq__copy {
+    position: absolute;
+    left: var(--gut, 1.5rem);
+    top: 50%;
+    translate: 0 -50%;
+    z-index: 2;
+    width: min(27rem, 78vw);
+  }
+
+  .sq__eb {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    /* --green-bright is built for near-black; on this ground it reads. */
+    color: var(--green-bright);
+  }
+
+  .sq__cards { display: grid; margin-top: var(--s5); }
+  .sq__cards article {
+    grid-area: 1 / 1;
+    opacity: 0;
+    translate: 0 14px;
+    transition: opacity 300ms var(--ease), translate 300ms var(--ease);
+  }
+  .sq__cards article[data-on] { opacity: 1; translate: 0 0; }
+  .sq__cards h2 {
+    font-size: clamp(1.9rem, 3.4vw, 3rem);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1.04;
+    color: #fff;
+  }
+  .sq__cards p {
+    margin-top: var(--s4);
+    max-width: 30ch;
+    font-size: var(--small);
+    line-height: 1.62;
+    color: rgb(255 255 255 / 0.84);
+  }
+
+  .sq__cta {
+    display: inline-flex;
+    align-items: center;
+    margin-top: var(--s5);
+    padding: 0.8rem 1.4rem;
+    border-radius: 999px;
+    background: var(--green);
+    color: #fff;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    transition: transform var(--t2) var(--ease), background-color var(--t2) var(--ease);
+  }
+  .sq__cta:hover { transform: translateY(-2px); background: var(--green-deep); }
+
+  .sq__ix {
+    position: absolute;
+    left: var(--gut, 1.5rem);
+    bottom: 2.6rem;
+    z-index: 2;
+    display: flex;
+    gap: 1.3rem;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .sq__ix li { display: flex; gap: 0.45rem; color: rgb(255 255 255 / 0.45); transition: color 300ms var(--ease); }
+  .sq__ix li[data-on] { color: #fff; }
+  .sq__ix b { color: var(--green-bright); font-weight: 500; }
+
+  .sq__bar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 3;
+    height: 2px;
+    background: rgb(255 255 255 / 0.18);
+  }
+  .sq__bar i { display: block; height: 100%; width: 0; background: var(--green-bright); }
+
+  @media (max-width: 48rem) {
+    .sq__copy { top: auto; bottom: 6.5rem; translate: 0 0; width: auto; right: var(--gut, 1.25rem); }
+    .sq__veil {
+      background: linear-gradient(0deg, rgb(10 22 26 / 0.9) 0%, rgb(10 22 26 / 0.5) 42%, rgb(10 22 26 / 0.05) 72%);
+    }
+    .sq__ix { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sq__f, .sq__cards article { transition: none; }
+    .sq__f :global(img) { scale: 1.02; }
+  }
+</style>
+
+<script>
+  function boot() {
+    const root = document.querySelector<HTMLElement>('[data-sq]');
+    const track = root?.querySelector<HTMLElement>('[data-sq-track]');
+    if (!root || !track || root.dataset.wired) return;
+    root.dataset.wired = '1';
+
+    const figs = [...root.querySelectorAll<HTMLElement>('[data-f]')];
+    const cards = [...root.querySelectorAll<HTMLElement>('[data-c]')];
+    const ix = [...root.querySelectorAll<HTMLElement>('[data-i]')];
+    const bar = root.querySelector<HTMLElement>('[data-sq-bar]');
+    const n = figs.length;
+    let active = -1;
+
+    const paint = () => {
+      const r = track.getBoundingClientRect();
+      const span = r.height - innerHeight;
+      /* Straight from scroll position. No smoothing and no easing on
+         the value itself — the note was that the machine lags the
+         wheel, and any lerp here is exactly that lag. */
+      const p = span > 0 ? Math.min(1, Math.max(0, -r.top / span)) : 0;
+      if (bar) bar.style.width = `${(p * 100).toFixed(1)}%`;
+
+      /* Each frame's own 0-1 progress drives its push, so the picture
+         keeps moving between changes rather than holding still. */
+      const at = p * n;
+      figs.forEach((el, i) => {
+        const z = Math.min(1, Math.max(0, at - i));
+        el.style.setProperty('--z', z.toFixed(3));
+      });
+
+      const k = Math.min(n - 1, Math.floor(p * n * 0.999));
+      if (k === active) return;
+      active = k;
+      figs.forEach((el, i) => el.toggleAttribute('data-on', i === k));
+      cards.forEach((el, i) => el.toggleAttribute('data-on', i === k));
+      ix.forEach((el, i) => el.toggleAttribute('data-on', i === k));
+    };
+
+    addEventListener('scroll', paint, { passive: true });
+    addEventListener('resize', paint, { passive: true });
+    paint();
+  }
+
+  boot();
+  document.addEventListener('astro:page-load', boot);
+</script>
