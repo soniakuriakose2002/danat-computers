@@ -67,7 +67,9 @@ const kb = {
     <rect x="3" y="18" width="7" height="12" rx="3.5" fill="#3d7f35" />
     <rect x="34" y="18" width="7" height="12" rx="3.5" fill="#3d7f35" />
   </svg>
-  <span>Ask</span>
+  {/* The word is gone at the client's instruction — the character
+      alone is the button now. It stays in the accessible name via
+      aria-label above, so a screen reader still hears "Ask Danat". */}
 </button>
 
 <dialog class="ab" data-ask aria-label="Ask Danat">
@@ -434,22 +436,34 @@ const kb = {
     right: clamp(0.9rem, 2vw, 1.75rem);
     bottom: calc(clamp(0.9rem, 2vw, 1.75rem) + 4.6rem);
     z-index: 119;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.45rem;
-    padding: 0.5rem 1.05rem 0.5rem 0.6rem;
+    display: grid;
+    place-items: center;
+    width: 3.25rem;
+    height: 3.25rem;
+    padding: 0;
     border: 1px solid var(--line-light);
-    border-radius: 999px;
+    border-radius: 50%;
     background: var(--white);
     color: var(--green-deep);
-    font-size: 0.8125rem;
-    font-weight: 700;
     cursor: pointer;
     box-shadow: 0 14px 30px -16px rgb(10 30 12 / 0.45);
     transition: transform var(--t2) var(--ease), background-color var(--t2) var(--ease);
+    /* The heartbeat: two quick beats, then a long rest, like a pulse
+       rather than a throb. 'both' beats fall inside the first 30% so
+       the remaining 70% is the pause that makes it read as a heartbeat
+       instead of a bounce. */
+    animation: abBeat 2.6s var(--ease) infinite;
   }
-  .ab__open:hover { transform: translateY(-2px); background: #eef6ef; }
-  .ab__face { width: 30px; height: 30px; flex: none; }
+  @keyframes abBeat {
+    0%, 30%, 100% { transform: scale(1); }
+    8%  { transform: scale(1.14); }
+    16% { transform: scale(1); }
+    24% { transform: scale(1.09); }
+  }
+  /* Hovering stops the beat — it has your attention already. */
+  .ab__open:hover { animation-play-state: paused; }
+  .ab__open:hover { transform: scale(1.06); background: #eef6ef; }
+  .ab__face { width: 32px; height: 32px; flex: none; }
   /* A small nod on hover, so the button feels like a character rather
      than a glyph. */
   .ab__open:hover .ab__face { animation: abNod 700ms var(--ease); }
@@ -666,12 +680,11 @@ const kb = {
   }
 
   @media (max-width: 30rem) {
-    .ab__open span { display: none; }
-    .ab__open { padding: 0.45rem; }
+    .ab__open { width: 3rem; height: 3rem; }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .ab__panel, .ab__open, .ab__open:hover { transition: none; transform: none; }
+    .ab__panel, .ab__open, .ab__open:hover { transition: none; transform: none; animation: none; }
     .ab__row { animation: none; }
     .ab__dots b { animation: none; opacity: 0.6; }
     .ab__open:hover .ab__face { animation: none; }
