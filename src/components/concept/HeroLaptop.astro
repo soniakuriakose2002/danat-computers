@@ -56,15 +56,28 @@ import laptop from '@assets/products/lenovo.png';
   .hl__hot.is-live { pointer-events: auto; cursor: pointer; }
   .hl__hot.is-live:hover, .hl__hot.is-live:focus-visible { box-shadow: 0 0 0 3px rgb(255 255 255 / 0.85), 0 0 40px rgb(122 211 116 / 0.75); outline: none; }
 
-  .hl__title { position: absolute; left: var(--gut); bottom: 12vh; z-index: 3; font-weight: 800; font-size: clamp(3.2rem, 10.5vw, 11.5rem);
-    line-height: 0.86; letter-spacing: -0.065em; will-change: transform, opacity; }
+  /* Was clamp(3.2rem, 10.5vw, 11.5rem) — 151px at 1440, wide enough to
+     run under the laptop and fight it. Two thirds of that reads as
+     confidently and leaves the machine its own space. */
+  /* pointer-events: none is THE fix for the film's Get Support button.
+     The headline sits over that corner of the film and only fades to
+     opacity 0 — it is still in the page and still hit-testable, so it
+     swallowed every click before the button underneath could see one.
+     Nothing in this overlay is clickable, so none of it should take
+     clicks.
+
+     Size: was clamp(3.2rem, 10.5vw, 11.5rem), 151px at 1440, wide
+     enough to run under the laptop and fight it. */
+  .hl__title { position: absolute; left: var(--gut); bottom: 12vh; z-index: 3; pointer-events: none; font-weight: 800; font-size: clamp(2.5rem, 6.6vw, 7rem);
+    line-height: 0.92; letter-spacing: -0.05em; max-width: 14ch; will-change: transform, opacity; }
   .hl__l { display: block; overflow: hidden; }
   .hl__l > span { display: block; transform: translateY(105%); transition: transform 1.3s var(--ease); }
   .hl__l:nth-child(2) > span { transition-delay: 0.1s; }
   .hl.is-in .hl__l > span { transform: none; }
   .hl__title em { font-style: normal; color: var(--green-bright); }
   .mono-label { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; }
-  .hl__hud { position: absolute; z-index: 3; color: rgb(255 255 255 / 0.62); }
+  /* Same reason as the headline: faded, but still catching clicks. */
+  .hl__hud { position: absolute; z-index: 3; pointer-events: none; color: rgb(255 255 255 / 0.62); }
   .hl__hud--tr { top: calc(var(--hdr, 88px) + 24px); right: var(--gut); text-align: right; display: grid; gap: 0.4rem; }
   .hl__hud--br { right: var(--gut); bottom: 12vh; display: flex; align-items: center; gap: 0.8rem; }
   .hl__line { width: 46px; height: 1px; background: currentColor; }
@@ -135,7 +148,16 @@ import laptop from '@assets/products/lenovo.png';
       dev.style.transform = `translate3d(${lerp(x0, x1, d)}px,${lerp(y0, y1, d) + (1 - a) * 60}px,0) rotateX(${(1 - a) * 16}deg) scale(${lerp(1, S, d)})`;
       dev.style.setProperty('--gl', (1 - d).toFixed(3));
 
-      const live = d > 0.97 && vid.currentTime >= 12.4 && vid.currentTime <= 15.1;
+      /* WHY THIS WAS NOT WORKING.
+         It required the laptop to be >97% zoomed AND the film to be
+         between 12.4s and 15.1s of a 15.6s loop — 2.7 seconds, 17% of
+         the time, and only if you happened to stop scrolling at the
+         very end of the zoom. Practically unhittable.
+
+         The zoom gate drops to 0.82, which is anywhere in the last
+         fifth of the zoom rather than its final 3%, and the window runs
+         from 11.8s to the end of the loop instead of closing early. */
+      const live = d > 0.82 && vid.currentTime >= 11.8;
       hot.classList.toggle('is-live', live);
       hot.tabIndex = live ? 0 : -1;
       loop();
