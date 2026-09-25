@@ -9,10 +9,9 @@ import { site, branches } from '@data/site';
 import { OMAN_PATH, OMAN_VIEWBOX, OMAN_PINS } from '@data/omanMap';
 import imgTech from '@assets/photos/repair-solder.jpg';
 import imgFilm from '@assets/photos/film-poster.jpg';
-import r01 from '@assets/renders/01.png';
-import r03 from '@assets/renders/03.png';
-import r04 from '@assets/renders/04.png';
-import r05 from '@assets/renders/05.png';
+import imgHero from '@assets/photos/support-desk.jpg';
+import laptop from '@assets/products/laptop-hero.png';
+import Brush from '@components/ui/Brush.astro';
 
 const years = new Date().getFullYear() - site.stats.since;
 
@@ -54,187 +53,116 @@ const W = 1000;
 const H = 1342;
 const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%', salalah: '0%' };
 
-/** The exploded hero, layered from the teardown renders we already have. */
-const layers = [r01, r03, r04, r05];
 ---
-
 <PageLayout
   title="About"
   description={`${site.nameFull} has supplied and repaired computers across Oman since ${site.stats.since} — three branches, ${site.stats.parts.toLocaleString('en-US')} lines in stock, board-level repair.`}
 >
-  {/* ══════ 01 · hero ══════ */}
-  <section class="hero">
-    <span class="hero__wash" aria-hidden="true"></span>
-
-    <div class="shell hero__grid">
-      <div class="hero__copy">
-        <p class="eb" data-rise><i class="eb__r" aria-hidden="true"></i>About Danat</p>
-
-        <h1 class="hero__h" data-rise style="--d:70ms">
-          Technology<br />That Keeps<br /><em>Oman Moving.</em>
-        </h1>
-
-        <p class="hero__p" data-rise style="--d:130ms">
+  {/* ══════ 01 · hero — full screen, the photo drifts as you scroll ══════ */}
+  <section class="ah" data-ah data-tone="ink">
+    <div class="ah__bg" data-ah-bg aria-hidden="true">
+      <Image src={imgHero} alt="" widths={[900, 1400, 2000]} sizes="100vw" quality={72} format="webp" loading="eager" />
+    </div>
+    <div class="shell ah__in" data-ah-tilt>
+      <p class="eb eb--inv ah__eb"><i class="eb__r" aria-hidden="true"></i>About Danat</p>
+      <h1 class="ah__h">
+        <span class="ah__l"><span>Technology</span></span>
+        <span class="ah__l"><span>That Keeps</span></span>
+        <span class="ah__l"><span><em>Oman Moving.</em></span></span>
+      </h1>
+      <div class="ah__row">
+        <p class="ah__p">
           For over two decades, Danat Computers has been a trusted name in
           computer products, services and business solutions across Oman. We
           don't just sell technology — we keep it running.
         </p>
-
-        <div class="hero__acts" data-rise style="--d:200ms">
+        <div class="ah__acts">
           <button class="btn" type="button" data-story-open>
-            Our story
-            <span class="btn__i" aria-hidden="true"><Icon name="arrow" size={15} /></span>
+            Our story<span class="btn__i" aria-hidden="true"><Icon name="arrow" size={15} /></span>
           </button>
-          {/* The actual opening frame of the company's film, cropped clear
-              of the thumbnail's overlay bars. A real frame says what the
-              film is; a ring of text only says that one exists. */}
-          <button class="film" type="button" data-video-open
-            aria-label="Watch the film: inside Danat Computers">
-            <span class="film__shot">
-              <Image src={imgFilm} alt="" widths={[220, 360]} sizes="180px"
-                quality={78} format="webp" loading="lazy" />
-              <span class="film__play" aria-hidden="true">
-                <Icon name="play" size={13} />
-              </span>
-            </span>
-            <span class="film__t">
-              <b>Watch the film</b>
-              <em>Inside Danat Computers</em>
-            </span>
+          <button class="ah__film" type="button" data-video-open aria-label="Watch the film: inside Danat Computers">
+            <span class="ah__play" aria-hidden="true"><Icon name="play" size={13} /></span>
+            <span><b>Watch the film</b><em>Inside Danat Computers</em></span>
           </button>
         </div>
-
-        <p class="hero__mantra" data-rise style="--d:260ms">
-          <i class="eb__r" aria-hidden="true"></i>
-          People <b>·</b> Products <b>·</b> Support <b>·</b> A brighter tomorrow
-        </p>
       </div>
-
-      <div class="hero__media" data-rise style="--d:160ms">
-        {/* Exploded from the teardown renders rather than a flat photo. */}
-        <div class="explode">
-          {layers.map((l, i) => (
-            <figure class="explode__l" style={`--i:${i}`}>
-              <Image src={l} alt="" widths={[380, 560]} sizes="(min-width:62rem) 34vw, 78vw"
-                quality={80} format="webp" loading={i === 0 ? 'eager' : 'lazy'} />
-            </figure>
-          ))}
-        </div>
-
-        <p class="hero__script" aria-hidden="true">
-          From Products<br />to Lifelong<br />Support
-          <svg viewBox="0 0 80 64" fill="none">
-            <path d="M66 6C72 24 60 44 36 52" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" />
-            <path d="M46 48 35 53l8 9" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" />
-          </svg>
-        </p>
-
-        <p class="hero__trust">
-          <i aria-hidden="true"><Icon name="users" size={17} /></i>
-          <span>Trusted by<b>1000+ customers</b>across Oman</span>
-        </p>
-      </div>
+      <p class="ah__mantra">People · Products · Support · A brighter tomorrow</p>
     </div>
+    <span class="ah__hint" aria-hidden="true">Scroll</span>
+    <div class="ah__wave" aria-hidden="true">
+      <svg viewBox="0 0 1440 130" preserveAspectRatio="none"><path class="b" d="M0,38 C106,6 214,42 336,76 C524,130 712,80 908,38 C1104,-4 1276,116 1440,14 L1440,134 L0,134 Z"/><path class="f" d="M0,58 C118,22 248,64 380,98 C570,146 760,100 950,52 C1140,4 1300,132 1440,34 L1440,134 L0,134 Z"/></svg>
+    </div>
+  </section>
 
-    <ol class="hero__rail" aria-hidden="true">
-      {['01', '02', '03', '04', '05', '06'].map((n, i) => (
-        <li data-on={i === 0 ? '' : undefined}>{n}</li>
+  {/* ══════ 02 · figures — 3D tilt cards with a light that follows the pointer ══════ */}
+  <section class="af">
+    <dl class="shell af__grid">
+      {figures.map((f, i) => (
+        <div class:list={['af__c', `af__c--${i}`]} data-tilt>
+          <span class="af__glow" aria-hidden="true"></span>
+          <span class="af__i" aria-hidden="true"><Icon name={f.icon} size={20} /></span>
+          <dt><span data-count={f.v}>{Number(f.v).toLocaleString('en-US')}</span>{f.suffix}</dt>
+          <dd>{f.l}</dd>
+          <small>{f.sub}</small>
+        </div>
       ))}
-    </ol>
+    </dl>
   </section>
 
-  {/* ══════ 02 · figures ══════ */}
-  <section class="fig">
-    <div class="shell fig__grid">
-      <dl class="fig__cards">
-        {figures.map((f, i) => (
-          <div class="fc" data-rise style={`--d:${i * 70}ms`}>
-            <span class="fc__i" aria-hidden="true"><Icon name={f.icon} size={19} /></span>
-            <dt><span data-count={f.v}>{Number(f.v).toLocaleString('en-US')}</span>{f.suffix}</dt>
-            <dd>{f.l}</dd>
-            <small>{f.sub}</small>
-          </div>
-        ))}
-      </dl>
-      <p class="fig__script" aria-hidden="true">Same<br />Commitment<br />Bigger<br />Possibilities</p>
-    </div>
-  </section>
-
-  {/* ══════ 03 · journey ══════ */}
-  <section class="jr section" id="journey">
-    <span class="jr__wash" aria-hidden="true"></span>
-    <div class="shell jr__grid">
-      <div class="jr__intro" data-rise>
-        <p class="eb eb--clay"><i class="eb__r" aria-hidden="true"></i>Our journey</p>
-        <h2 class="jr__h">From a small shop<br />to a <em>trusted partner.</em></h2>
-        <p class="jr__p">
-          What started as a single counter has grown into a company with four
-          branches, serving thousands of customers across Oman. Our focus has
+  {/* ══════ 03 · journey — milestone cards stack up in 3D as you scroll ══════ */}
+  <section class="aj" id="journey" data-aj>
+    <div class="shell">
+      <div class="aj__intro">
+        <p class="eb"><i class="eb__r" aria-hidden="true"></i>Our journey</p>
+        <h2 class="aj__h">From a small shop<br />to a <Brush>trusted partner.</Brush></h2>
+        <p class="aj__p">
+          What started as a single counter has grown into a company with
+          branches across Oman, serving thousands of customers. Our focus has
           always been the same — genuine products, expert service and
           long-term relationships.
         </p>
-        <a class="ghost" href="/branches">
-          Our journey<span aria-hidden="true"><Icon name="arrow" size={14} /></span>
-        </a>
       </div>
-
-      <ol class="jr__line">
+      <ol class="aj__stack">
         {journey.map((j, i) => (
-          <li data-rise style={`--d:${i * 90}ms`}>
-            <span class="jr__dot" aria-hidden="true"></span>
-            <b class="jr__yr">{j.year}</b>
-            <p class="jr__t">{j.t}</p>
-            {/* Shopfront photography has not been supplied — frame held. */}
-            <span class="jr__shot">
-              <i>Photo to follow</i>
-            </span>
+          <li class:list={['aj__card', `aj__card--${i % 2}`]} data-aj-card style={`--i:${i}`}>
+            <span class="aj__n">{String(i + 1).padStart(2, '0')} / {String(journey.length).padStart(2, '0')}</span>
+            <b class="aj__yr">{j.year}</b>
+            <p class="aj__t">{j.t}</p>
           </li>
         ))}
       </ol>
     </div>
   </section>
 
-  {/* ══════ 04 · our purpose ══════ */}
+  {/* ══════ 04 · purpose (unchanged) ══════ */}
   <PurposeOrbit />
 
-  {/* ══════ 05 · the difference ══════ */}
-  <section class="df" data-tone="ink">
-    <figure class="df__shot">
+  {/* ══════ 05 · the difference — the photo opens out to full width ══════ */}
+  <section class="ad" data-ad data-tone="ink">
+    <figure class="ad__shot" data-ad-shot>
       <Image src={imgTech} alt="A Danat technician tracing a fault on a mainboard"
-        widths={[700, 1100, 1500]} sizes="(min-width:62rem) 46vw, 100vw"
-        quality={74} format="webp" loading="lazy" />
-      <figcaption>
-        <i aria-hidden="true"><Icon name="users" size={16} /></i>
-        <span>Expert technicians<b>Care about the details</b></span>
-      </figcaption>
+        widths={[900, 1400, 2000]} sizes="100vw" quality={74} format="webp" loading="lazy" />
     </figure>
-
-    <div class="df__panel">
-      <div class="df__copy">
+    <div class="shell ad__in">
+      <div class="ad__copy">
         <p class="eb eb--inv" data-rise><i class="eb__r" aria-hidden="true"></i>The difference</p>
-        <h2 class="df__h" data-rise style="--d:70ms">
-          Most shops replace<br />the board. <em>We repair it.</em>
-        </h2>
-        <p class="df__p" data-rise style="--d:130ms">
+        <h2 class="ad__h" data-rise style="--d:70ms">Most shops replace<br />the board. <em>We repair it.</em></h2>
+        <p class="ad__p" data-rise style="--d:130ms">
           A replacement mainboard is often most of the value of the machine. A
           failed component on it is usually worth a fraction of that. Tracing
           the fault to the component takes a bench, a meter and someone who
           knows what they are looking at — which is what {years} years buys
           you, and what almost nobody else in Oman does in-house.
         </p>
-        <a class="btn" href="/services" data-rise style="--d:190ms">
-          Our repair services
-          <span class="btn__i" aria-hidden="true"><Icon name="arrow" size={15} /></span>
+        <ul class="ad__proof">
+          {proof.map((p, i) => (
+            <li data-rise style={`--d:${190 + i * 60}ms`}><span aria-hidden="true"><Icon name={p.icon} size={16} /></span>{p.t}</li>
+          ))}
+        </ul>
+        <a class="btn" href="/services" data-rise style="--d:420ms">
+          Our repair services<span class="btn__i" aria-hidden="true"><Icon name="arrow" size={15} /></span>
         </a>
       </div>
-
-      <ul class="df__proof">
-        {proof.map((p, i) => (
-          <li data-rise style={`--d:${i * 70}ms`}>
-            <span aria-hidden="true"><Icon name={p.icon} size={17} /></span>{p.t}
-          </li>
-        ))}
-      </ul>
     </div>
   </section>
 
@@ -290,25 +218,20 @@ const layers = [r01, r03, r04, r05];
   </section>
 
   {/* ══════ 07 · cta ══════ */}
-  <section class="cta" data-tone="ink">
-    <div class="shell cta__in">
-      <div class="cta__copy">
+  <section class="ac" data-tone="ink">
+    <div class="shell ac__in">
+      <div>
         <p class="eb eb--inv" data-rise><i class="eb__r" aria-hidden="true"></i>Let's build a brighter tomorrow</p>
-        <h2 class="cta__h" data-rise style="--d:70ms">Need <em>expert advice</em>?</h2>
-        <p class="cta__p" data-rise style="--d:130ms">
-          Our team is here to help you find the right solution.
-        </p>
-        <a class="cta__b" href="/contact" data-rise style="--d:190ms">
-          Contact us<Icon name="arrow" size={15} />
-        </a>
+        <h2 class="ac__h" data-rise style="--d:70ms">Need <Brush>expert advice?</Brush></h2>
+        <p class="ac__p" data-rise style="--d:130ms">Our team is here to help you find the right solution.</p>
+        <a class="ac__b" href="/contact" data-mag data-rise style="--d:190ms">Contact us<Icon name="arrow" size={15} /></a>
       </div>
-      <figure class="cta__fig" aria-hidden="true">
-        <Image src={r01} alt="" widths={[420, 640]} sizes="(min-width:62rem) 34vw, 70vw"
-          quality={80} format="webp" loading="lazy" />
+      <figure class="ac__fig" data-ac-fig aria-hidden="true">
+        <Image src={laptop} alt="" width={900} format="png" loading="lazy" />
       </figure>
-      <p class="cta__script" aria-hidden="true">Technology<br />for a Brighter<br />Tomorrow</p>
     </div>
   </section>
+
   <StoryCard />
   <VideoModal />
 </PageLayout>
@@ -359,328 +282,98 @@ const layers = [r01, r03, r04, r05];
   }
   .ghost:hover span { transform: translateX(3px); }
 
-  .script,
-  .hero__script, .fig__script, .cta__script {
-    font-family: var(--font-serif, Georgia, serif);
-    font-style: italic; line-height: 1.28; pointer-events: none;
-  }
 
   /* ───── 01 hero ───── */
-  .hero {
-    position: relative;
-    background: linear-gradient(178deg, #fbfdfb, #eef6ee 70%, #f7fbf7);
-    padding-block: clamp(6rem, 10vw, 8rem) clamp(2.5rem, 5vw, 4rem);
-    overflow: hidden; isolation: isolate;
-  }
-  .hero__wash {
-    position: absolute; z-index: -1; right: -18%; top: -22%;
-    width: min(46rem, 58vw); aspect-ratio: 1;
-    border-radius: 46% 54% 52% 48% / 54% 46% 54% 46%;
-    background: radial-gradient(circle at 38% 34%, color-mix(in oklab, var(--green) 18%, transparent), transparent 66%);
-    filter: blur(18px);
-  }
-  .hero__grid { display: grid; gap: clamp(2rem, 4vw, 3rem); align-items: center;
-    /* Single column at mobile, but an auto column's minimum is its
-       content size — the film card refused to shrink and burst the
-       hero out of the viewport, taking the whole page's width with
-       it. minmax(0, 1fr) is what lets it shrink. */
-    grid-template-columns: minmax(0, 1fr);
-  }
-  /* A minmax(0,1fr) TRACK is only half of it: the grid item itself keeps
-     min-width:auto and will still overflow the track it sits in. Both
-     children need an explicit zero minimum before the hero can actually
-     fit a phone. */
-  .hero__copy, .hero__media { min-width: 0; }
-  .hero__copy { display: grid; justify-items: start; }
-
-  .hero__h {
-    margin-top: var(--s4);
-    font-size: clamp(2.2rem, 4.8vw, 3.5rem);
-    line-height: 1.04; letter-spacing: -0.045em; font-weight: 700;
-  }
-  .hero__h em { font-style: normal; color: var(--green-deep); }
-  .hero__p {
-    margin-top: var(--s4); max-width: 42ch;
-    font-size: 0.9375rem; line-height: 1.62; color: var(--text-2);
-  }
-  .hero__acts {
-    display: flex; flex-wrap: wrap; align-items: center;
-    gap: var(--s4) var(--s5); margin-top: var(--s5);
-  }
-  .film {
-    display: flex;
-    align-items: center;
-    min-width: 0;
-    max-width: 100%;
-    gap: 0.85rem;
-    padding: 0.4rem 1rem 0.4rem 0.4rem;
-    border: 1px solid var(--line-light);
-    border-radius: 999px;
-    background: rgb(255 255 255 / 0.8);
-    backdrop-filter: blur(8px);
-    cursor: pointer;
-    text-align: left;
-    box-shadow: 0 1px 2px rgb(10 30 12 / 0.04), 0 12px 28px -20px rgb(10 30 12 / 0.4);
-    transition:
-      transform var(--t2) var(--ease),
-      border-color var(--t2) var(--ease),
-      box-shadow var(--t2) var(--ease);
-  }
-  .film:hover {
-    transform: translateY(-2px);
-    border-color: color-mix(in oklab, var(--green) 34%, var(--line-light));
-    box-shadow: 0 1px 2px rgb(10 30 12 / 0.04), 0 22px 40px -22px rgb(10 30 12 / 0.42);
-  }
-  .film:focus-visible { outline: 2px solid var(--green-deep); outline-offset: 3px; }
-
-  .film__shot {
-    position: relative;
-    display: block;
-    width: 74px;
-    aspect-ratio: 16 / 10;
-    flex: none;
-    border-radius: 999px;
-    overflow: hidden;
-    background: var(--off);
-  }
-  .film__shot :global(img) {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: 50% 32%;
-    transition: scale var(--t3) var(--ease);
-  }
-  .film:hover .film__shot :global(img) { scale: 1.08; }
-
-  .film__play {
-    position: absolute;
-    inset: 0;
-    display: grid;
-    place-items: center;
-    /* Measured against the real frame, not guessed: at 0.42 the white
-       play mark was 2.90:1 over the photo's brightest pixels, under the
-       3:1 a non-text graphic needs. 0.52 gives 4.01:1. */
-    background: rgb(7 9 10 / 0.52);
-    color: #fff;
-    transition: background-color var(--t2) var(--ease);
-  }
-  .film:hover .film__play { background: rgb(47 100 41 / 0.72); }
-  /* The play mark breathes, so the control reads as live at rest. */
-  @media (prefers-reduced-motion: no-preference) {
-    .film__play :global(svg) { animation: film-beat 2.6s var(--ease) infinite; }
-  }
-  @keyframes film-beat {
-    0%, 70%, 100% { transform: scale(1); }
-    12% { transform: scale(1.22); }
-    24% { transform: scale(1); }
-  }
-
-  .film__t { display: grid; min-width: 0; overflow-wrap: anywhere; }
-  .film__t b { font-size: 0.875rem; font-weight: 700; letter-spacing: -0.02em; }
-  .film__t em {
-    font-style: normal;
-    font-family: var(--font-mono);
-    font-size: 0.5625rem;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    color: var(--text-3);
-  }
-
-  .hero__mantra {
-    display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem;
-    margin-top: var(--s5); padding-top: var(--s5);
-    border-top: 1px solid var(--line-light);
-    font-family: var(--font-mono); font-size: 0.625rem;
-    letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-3);
-  }
-  .hero__mantra b { color: var(--green); }
-
-  /* exploded stack */
-  .hero__media { position: relative; }
-  .explode {
-    position: relative;
-    display: grid;
-    perspective: 1400px;
-    transform-style: preserve-3d;
-  }
-  .explode__l {
-    grid-area: 1 / 1;
-    transform:
-      translateY(calc(var(--i) * 15%))
-      translateZ(calc(var(--i) * -30px))
-      rotateX(8deg) scale(calc(1 - var(--i) * 0.05));
-    filter: drop-shadow(0 22px 30px rgb(10 30 12 / 0.35));
-  }
-  .explode__l :global(img) { width: 100%; height: auto; }
-
-  .hero__script {
-    position: absolute; right: -4%; top: 2%;
-    max-width: 8.5rem; text-align: center;
-    font-size: clamp(0.9rem, 1.5vw, 1.15rem);
-    color: var(--green-deep); rotate: -5deg; display: none;
-  }
-  .hero__script svg { display: block; width: 58px; margin: 0.2rem auto 0; color: var(--green); }
-
-  .hero__trust {
-    display: flex; align-items: center; gap: 0.7rem;
-    width: fit-content; margin: 0.8rem 0 0 auto;
-    padding: 0.8rem 1.1rem; border-radius: 14px;
-    background: rgb(255 255 255 / 0.94); backdrop-filter: blur(8px);
-    box-shadow: 0 16px 34px -24px rgb(10 30 12 / 0.55);
-  }
-  .hero__trust i {
-    display: grid; place-items: center; width: 36px; height: 36px; flex: none;
-    border-radius: 10px; color: var(--clay-deep); background: var(--clay-wash);
-  }
-  .hero__trust span { display: grid; font-size: 0.75rem; color: var(--text-3); }
-  .hero__trust b { font-size: 0.9375rem; color: var(--text); }
-
-  .hero__rail {
-    position: absolute; right: 1rem; top: 50%; translate: 0 -50%;
-    display: none; gap: 0.7rem; grid-auto-flow: row;
-    font-family: var(--font-mono); font-size: 0.5625rem;
-    letter-spacing: 0.14em; color: var(--text-3);
-  }
-  .hero__rail li[data-on] { color: var(--green-deep); font-weight: 600; }
+  .ah { position: relative; min-height: 100svh; display: grid; align-items: end; overflow: hidden; color: #fff; background: var(--ink); }
+  .ah__bg { position: absolute; inset: -8% 0 0; will-change: transform; }
+  .ah__bg :global(img) { width: 100%; height: 100%; object-fit: cover; transform: scale(1.08); animation: ahIn 2.4s var(--ease) both; }
+  @keyframes ahIn { from { transform: scale(1.18); filter: blur(6px); opacity: 0.4; } }
+  .ah::before { content: ''; position: absolute; inset: 0; z-index: 1;
+    background: linear-gradient(180deg, rgb(8 10 9 / 0.55) 0%, rgb(8 10 9 / 0.25) 35%, rgb(8 10 9 / 0.88) 100%),
+      linear-gradient(90deg, rgb(8 10 9 / 0.75) 0%, transparent 70%); }
+  .ah__in { position: relative; z-index: 2; transform-style: preserve-3d; transition: transform 0.6s var(--ease); padding-top: calc(var(--hdr, 88px) + 3rem); padding-bottom: clamp(7rem, 15vh, 10rem); }
+  .ah__eb { opacity: 0; animation: ahFade 0.9s var(--ease) 0.2s both; }
+  .ah__h { perspective: 900px; margin-top: var(--s5); font-weight: 700; font-size: clamp(3rem, 8vw, 7.5rem); line-height: 0.95; letter-spacing: -0.05em; }
+  .ah__h em { font-style: normal; color: var(--green-bright); }
+  .ah__l { display: block; overflow: hidden; padding-bottom: 0.04em; }
+  .ah__l > span { display: block; transform-origin: 50% 100%; transform: translateY(70%) rotateX(-75deg); opacity: 0; animation: ahUp 1.3s var(--ease) both; }
+  .ah__l:nth-child(1) > span { animation-delay: 0.25s; }
+  .ah__l:nth-child(2) > span { animation-delay: 0.37s; }
+  .ah__l:nth-child(3) > span { animation-delay: 0.49s; }
+  @keyframes ahUp { to { transform: none; opacity: 1; } }
+  @keyframes ahFade { to { opacity: 1; } }
+  .ah__row { margin-top: clamp(1.5rem, 4vh, 2.5rem); display: flex; flex-wrap: wrap; gap: 1.5rem 3rem; align-items: center; opacity: 0; animation: ahFade 1s var(--ease) 0.8s both; }
+  .ah__p { max-width: 46ch; color: rgb(255 255 255 / 0.78); line-height: 1.65; }
+  .ah__acts { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; }
+  .ah__film { display: inline-flex; align-items: center; gap: 0.8rem; padding: 0; border: 0; background: none; color: #fff; text-align: left; cursor: pointer; }
+  .ah__film span:last-child { display: grid; }
+  .ah__film b { font-size: 0.95rem; }
+  .ah__film em { font-style: normal; font-size: 0.8rem; color: rgb(255 255 255 / 0.6); }
+  .ah__play { position: relative; display: grid; place-items: center; width: 46px; height: 46px; border-radius: 50%; border: 1px solid rgb(255 255 255 / 0.5); }
+  .ah__play::after { content: ''; position: absolute; inset: -6px; border-radius: 50%; border: 1px solid rgb(122 211 116 / 0.6); animation: ahPing 2.4s var(--ease) infinite; }
+  @keyframes ahPing { from { transform: scale(0.8); opacity: 1; } to { transform: scale(1.4); opacity: 0; } }
+  .ah__mantra { margin-top: 2rem; font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; color: rgb(255 255 255 / 0.5); opacity: 0; animation: ahFade 1s var(--ease) 1s both; }
+  .ah__hint { position: absolute; z-index: 2; right: var(--gut); bottom: clamp(5rem, 12vh, 8rem); font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgb(255 255 255 / 0.55); writing-mode: vertical-rl; }
+  .ah__hint::after { content: ''; display: block; width: 1px; height: 48px; margin: 0.8rem auto 0; background: linear-gradient(currentColor, transparent); animation: ahDrip 1.8s ease-in-out infinite; }
+  @keyframes ahDrip { 0% { transform: scaleY(0); transform-origin: top; } 50% { transform: scaleY(1); transform-origin: top; } 51% { transform-origin: bottom; } 100% { transform: scaleY(0); transform-origin: bottom; } }
+  .ah__wave { position: absolute; left: -4%; right: -4%; bottom: -1px; z-index: 3; height: clamp(44px, 6vw, 110px); pointer-events: none; }
+  .ah__wave svg { display: block; width: 100%; height: 100%; }
+  .ah__wave .b { fill: color-mix(in oklab, var(--white) 88%, var(--green)); }
+  .ah__wave .f { fill: var(--white); }
 
   /* ───── 02 figures ───── */
-  .fig { background: var(--white); padding-block: clamp(2rem, 4vw, 3rem); }
-  .fig__grid { display: grid; gap: var(--s5); align-items: center; }
-  .fig__cards { display: grid; gap: clamp(0.7rem, 1.6vw, 1rem); }
-
-  .fc {
-    padding: 1.35rem 1.3rem; border-radius: 18px; background: var(--white);
-    box-shadow: 0 1px 2px rgb(10 30 12 / 0.05), 0 12px 28px -18px rgb(10 30 12 / 0.26);
-    transition: transform var(--t3) var(--ease), box-shadow var(--t3) var(--ease);
-  }
-  .fc:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 1px 2px rgb(10 30 12 / 0.05), 0 26px 44px -22px rgb(10 30 12 / 0.32);
-  }
-  .fc__i {
-    display: grid; place-items: center; width: 42px; height: 42px;
-    border-radius: 13px; color: var(--clay-deep); background: var(--clay-wash);
-    transition: transform var(--t3) var(--ease);
-  }
-  .fc:hover .fc__i { transform: scale(1.08) rotate(-6deg); }
-  .fc dt {
-    margin-top: 0.85rem; font-size: clamp(1.5rem, 2.6vw, 2rem);
-    font-weight: 700; letter-spacing: -0.04em; line-height: 1;
-    font-variant-numeric: tabular-nums;
-  }
-  .fc dd { margin-top: 0.35rem; font-size: 0.875rem; color: var(--text-2); }
-  .fc small {
-    display: block; margin-top: 0.4rem; font-family: var(--font-mono);
-    font-size: 0.5625rem; letter-spacing: 0.1em; text-transform: uppercase;
-    color: var(--text-3);
-  }
-  .fig__script {
-    font-size: clamp(1rem, 1.7vw, 1.4rem); color: var(--green-deep);
-    rotate: -7deg; justify-self: center;
-  }
+  .af { background: var(--white); padding-block: clamp(3.5rem, 7vw, 6rem); }
+  .af__grid { display: grid; grid-template-columns: 1.3fr 1fr 1fr; grid-template-rows: auto auto; gap: 1rem; margin: 0; perspective: 1200px; }
+  .af__c { position: relative; display: grid; align-content: end; gap: 0.2rem; min-height: 11rem; padding: 1.6rem 1.6rem 1.4rem; border-radius: 24px; overflow: hidden;
+    background: var(--off); border: 1px solid rgb(0 0 0 / 0.06); transform-style: preserve-3d;
+    transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); transition: transform 0.5s var(--ease), box-shadow 0.5s var(--ease); }
+  .af__c:hover { box-shadow: 0 30px 60px -30px rgb(20 40 25 / 0.35); }
+  .af__c--0 { grid-row: span 2; background: radial-gradient(120% 90% at 20% 0%, #1f4f22 0%, var(--ink) 70%); color: #fff; border-color: transparent; }
+  .af__c--3 { grid-column: span 2; }
+  .af__glow { position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity 0.3s;
+    background: radial-gradient(260px circle at var(--mx, 50%) var(--my, 50%), rgb(89 170 84 / 0.22), transparent 70%); }
+  .af__c:hover .af__glow { opacity: 1; }
+  .af__i { position: absolute; top: 1.3rem; left: 1.4rem; display: grid; place-items: center; width: 42px; height: 42px; border-radius: 12px;
+    background: rgb(89 170 84 / 0.14); color: var(--green-deep); transform: translateZ(30px); }
+  .af__c--0 .af__i { background: rgb(255 255 255 / 0.1); color: var(--green-bright); }
+  .af__c dt { font-size: clamp(2.6rem, 5vw, 4.6rem); font-weight: 700; letter-spacing: -0.05em; line-height: 1; transform: translateZ(45px); }
+  .af__c--0 dt { font-size: clamp(4rem, 9vw, 8rem); color: var(--green-bright); }
+  .af__c dd { margin: 0.5rem 0 0; font-weight: 700; transform: translateZ(25px); }
+  .af__c small { color: var(--text-3); font-size: 0.82rem; transform: translateZ(18px); }
+  .af__c--0 small { color: rgb(255 255 255 / 0.6); }
 
   /* ───── 03 journey ───── */
-  .jr {
-    position: relative;
-    background: linear-gradient(190deg, #fdf8f4, #fbf1ea 60%, #fdfaf7);
-    overflow: hidden; isolation: isolate;
-  }
-  .jr__wash {
-    position: absolute; z-index: -1; left: -14%; bottom: -26%;
-    width: min(32rem, 44vw); aspect-ratio: 1;
-    border-radius: 52% 48% 44% 56% / 46% 54% 46% 54%;
-    background: radial-gradient(circle at 40% 38%, color-mix(in oklab, var(--clay) 14%, transparent), transparent 68%);
-    filter: blur(16px);
-  }
-  .jr__grid { display: grid; gap: clamp(1.75rem, 4vw, 2.75rem); }
-  .jr__intro { display: grid; justify-items: start; }
-  .jr__h {
-    margin-top: var(--s4); font-size: clamp(1.7rem, 3.2vw, 2.4rem);
-    font-weight: 700; letter-spacing: -0.04em; line-height: 1.08;
-  }
-  .jr__h em { font-style: normal; color: var(--clay-deep); }
-  .jr__p {
-    margin-top: var(--s4); max-width: 36ch;
-    font-size: 0.875rem; line-height: 1.62; color: var(--text-2);
-  }
-
-  .jr__line { display: grid; gap: clamp(1rem, 2.2vw, 1.4rem); }
-  .jr__line li {
-    position: relative; display: grid; gap: 0.4rem;
-    padding-top: 1.5rem;
-  }
-  /* The dotted rail runs between nodes, not past the last one. */
-  .jr__line li:not(:last-child)::before {
-    content: ''; position: absolute; left: 5px; top: 1.1rem; bottom: -1rem;
-    width: 1px;
-    background: repeating-linear-gradient(to bottom,
-      color-mix(in oklab, var(--clay) 55%, transparent) 0 4px, transparent 4px 9px);
-  }
-  .jr__dot {
-    position: absolute; top: 0.55rem; left: 0;
-    width: 11px; height: 11px; border-radius: 50%; background: var(--clay);
-    box-shadow: 0 0 0 3px color-mix(in oklab, var(--clay) 16%, transparent);
-  }
-  .jr__yr {
-    font-size: 1.05rem; font-weight: 700; letter-spacing: -0.03em;
-    font-variant-numeric: tabular-nums;
-  }
-  .jr__t { max-width: 34ch; font-size: 0.8125rem; line-height: 1.55; color: var(--text-2); }
-
-  /* Shopfront photography has not been supplied. */
-  .jr__shot {
-    display: grid; place-items: center;
-    aspect-ratio: 4 / 3; margin-top: 0.4rem;
-    border: 1px dashed color-mix(in oklab, var(--clay) 34%, var(--line-light));
-    border-radius: 12px;
-    background: repeating-linear-gradient(-45deg,
-      color-mix(in oklab, var(--clay) 7%, transparent) 0 1px, transparent 1px 10px);
-  }
-  .jr__shot i {
-    font-style: normal; font-family: var(--font-mono); font-size: 0.5625rem;
-    letter-spacing: 0.14em; text-transform: uppercase; color: var(--clay-deep);
-  }
+  .aj { background: var(--off); padding-block: clamp(5rem, 10vw, 8rem) clamp(3rem, 6vw, 5rem); }
+  .aj__intro { max-width: 44rem; margin-bottom: clamp(2.5rem, 6vw, 4rem); }
+  .aj__h { margin-top: var(--s4); font-size: clamp(2rem, 3.6vw, 3.1rem); font-weight: 700; letter-spacing: -0.038em; line-height: 1.06; }
+  .aj__p { margin-top: var(--s4); max-width: 44ch; color: var(--text-2); line-height: 1.65; }
+  .aj__stack { list-style: none; margin: 0; padding: 0; display: grid; gap: 2.5rem; perspective: 1400px; }
+  /* each card pins a little lower than the one before; the ones underneath tip back */
+  .aj__card { position: sticky; top: calc(var(--hdr, 88px) + 2rem + var(--i) * 22px); min-height: min(58vh, 30rem);
+    display: grid; align-content: space-between; padding: clamp(1.6rem, 4vw, 3rem); border-radius: 28px;
+    background: var(--white); border: 1px solid rgb(0 0 0 / 0.06); box-shadow: 0 30px 60px -40px rgb(20 40 25 / 0.4);
+    transform-origin: 50% 0%; transform: translateZ(0) scale(var(--s, 1)) rotateX(var(--r, 0deg)); filter: brightness(var(--b, 1));
+    will-change: transform; }
+  .aj__card--1 { background: radial-gradient(120% 100% at 100% 0%, #1f4f22 0%, var(--ink) 65%); color: #fff; border-color: transparent; }
+  .aj__n { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.18em; color: var(--text-3); }
+  .aj__card--1 .aj__n { color: rgb(255 255 255 / 0.5); }
+  .aj__yr { display: block; font-size: clamp(4rem, 13vw, 11rem); font-weight: 700; letter-spacing: -0.06em; line-height: 0.9; color: var(--green-deep); }
+  .aj__card--1 .aj__yr { color: var(--green-bright); }
+  .aj__t { max-width: 30ch; font-size: clamp(1.1rem, 1.8vw, 1.5rem); font-weight: 600; letter-spacing: -0.02em; line-height: 1.35; }
 
   /* ───── 05 difference ───── */
-  .df { display: grid; background: #0d2a14; color: #fff; }
-  .df__shot { position: relative; }
-  .df__shot :global(img) { width: 100%; height: 100%; object-fit: cover; }
-  .df__shot figcaption {
-    position: absolute; left: clamp(1rem, 3vw, 2rem); bottom: clamp(1rem, 3vw, 2rem);
-    display: flex; align-items: center; gap: 0.65rem;
-    padding: 0.7rem 1rem; border-radius: 12px;
-    background: rgb(255 255 255 / 0.95); backdrop-filter: blur(8px);
-  }
-  .df__shot i {
-    display: grid; place-items: center; width: 32px; height: 32px; flex: none;
-    border-radius: 9px; color: var(--clay-deep); background: var(--clay-wash);
-  }
-  .df__shot span { display: grid; font-size: 0.6875rem; color: var(--text-3); }
-  .df__shot b { font-size: 0.8125rem; color: var(--text); }
-
-  .df__panel {
-    display: grid; gap: clamp(1.5rem, 3vw, 2.5rem);
-    padding: clamp(2rem, 5vw, 3.5rem) clamp(1.25rem, 4vw, 3rem);
-  }
-  .df__copy { display: grid; justify-items: start; }
-  .df__h {
-    margin-top: var(--s4); font-size: clamp(1.5rem, 2.8vw, 2.1rem);
-    font-weight: 700; letter-spacing: -0.04em; line-height: 1.12;
-  }
-  .df__h em { font-style: normal; color: var(--green-bright); }
-  .df__p {
-    margin-top: var(--s4); margin-bottom: var(--s5); max-width: 46ch;
-    font-size: 0.875rem; line-height: 1.65; color: rgb(255 255 255 / 0.78);
-  }
-
-  .df__proof { display: grid; gap: 0.5rem; align-content: start; }
-  .df__proof li {
-    display: flex; align-items: center; gap: 0.7rem;
-    padding: 0.7rem 0.9rem; border-radius: 11px;
-    background: rgb(255 255 255 / 0.06);
-    font-size: 0.8125rem; color: rgb(255 255 255 / 0.9);
-  }
-  .df__proof span { color: var(--green-bright); display: grid; place-items: center; }
+  .ad { position: relative; overflow: hidden; color: #fff; background: var(--ink); min-height: 100svh; display: grid; align-items: center; }
+  .ad__shot { position: absolute; inset: 0; margin: 0; clip-path: inset(var(--ci, 12%) var(--ci, 12%) var(--ci, 12%) var(--ci, 12%) round var(--cr, 28px)); will-change: clip-path; }
+  .ad__shot :global(img) { width: 100%; height: 100%; object-fit: cover; transform: scale(var(--cs, 1.12)); }
+  .ad__shot::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent 20%, rgb(8 10 9 / 0.9) 70%); opacity: var(--co, 0); }
+  .ad__in { position: relative; z-index: 1; display: grid; justify-items: end; padding-block: clamp(5rem, 10vw, 8rem); }
+  .ad__copy { max-width: 36rem; display: grid; justify-items: start; gap: 0; }
+  .ad__h { margin-top: var(--s4); font-size: clamp(2rem, 3.6vw, 3.1rem); font-weight: 700; letter-spacing: -0.038em; line-height: 1.06; }
+  .ad__h em { font-style: normal; color: var(--green-bright); }
+  .ad__p { margin-top: var(--s4); color: rgb(255 255 255 / 0.78); line-height: 1.65; }
+  .ad__proof { list-style: none; margin: 1.6rem 0 1.8rem; padding: 0; display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .ad__proof li { display: inline-flex; align-items: center; gap: 0.45rem; padding: 0.5rem 0.9rem; border-radius: 999px; border: 1px solid rgb(255 255 255 / 0.2); background: rgb(255 255 255 / 0.06); backdrop-filter: blur(6px); font-size: 0.85rem; }
+  .ad__proof span { color: var(--green-bright); display: grid; }
 
   /* ───── 06 presence ───── */
   .pr {
@@ -758,79 +451,124 @@ const layers = [r01, r03, r04, r05];
   }
   .br:hover .br__go { transform: translateX(3px); }
 
+
   /* ───── 07 cta ───── */
-  .cta {
-    position: relative; color: #fff;
-    background: linear-gradient(104deg, #10301a, #1e4a26 52%, #2a3a22);
-    padding-block: clamp(2.25rem, 4.5vw, 3.25rem); overflow: hidden;
-  }
-  .cta__in { display: grid; gap: var(--s5); align-items: center; }
-  .cta__copy { display: grid; justify-items: start; }
-  .cta__h {
-    margin-top: var(--s4); font-size: clamp(1.6rem, 3vw, 2.3rem);
-    font-weight: 700; letter-spacing: -0.04em; line-height: 1.06;
-  }
-  .cta__h em { font-style: normal; color: var(--clay-bright); }
-  .cta__p {
-    margin-top: var(--s4); margin-bottom: var(--s5); max-width: 34ch;
-    font-size: 0.9375rem; line-height: 1.6; color: rgb(255 255 255 / 0.78);
-  }
-  .cta__b {
-    display: inline-flex; align-items: center; gap: 0.5rem;
-    padding: 0.8rem 1.4rem; border-radius: 999px;
-    background: #fff; color: #10301a; font-size: 0.9375rem; font-weight: 600;
-    transition: transform var(--t2) var(--ease), background-color var(--t2) var(--ease);
-  }
-  .cta__b:hover { transform: translateY(-2px); background: var(--green-bright); }
-  .cta__fig :global(img) { width: 100%; height: auto; object-fit: contain; }
-  .cta__script {
-    font-size: clamp(1rem, 1.7vw, 1.35rem); color: var(--clay-bright);
-    rotate: -7deg; justify-self: center;
-  }
+  .ac { background: radial-gradient(70% 90% at 80% 50%, #15301a 0%, var(--ink) 65%); color: #fff; padding-block: clamp(5rem, 10vw, 8rem); overflow: hidden; }
+  .ac__in { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr); gap: 2rem; align-items: center; }
+  .ac__h { margin-top: var(--s4); font-size: clamp(2.4rem, 5vw, 4.4rem); font-weight: 700; letter-spacing: -0.045em; line-height: 1.02; --brush-size: 1.05; }
+  .ac__h :global(.brush) { color: var(--green-bright); }
+  .ac__p { margin-top: var(--s4); color: rgb(255 255 255 / 0.72); }
+  .ac__b { display: inline-flex; align-items: center; gap: 0.7rem; margin-top: 2rem; padding: 1.05rem 1.7rem; border-radius: 999px; background: var(--green); color: #fff; font-weight: 700; transition: background 0.25s; }
+  .ac__b:hover { background: var(--green-bright); color: var(--ink); }
+  .ac__fig { margin: 0; perspective: 1000px; animation: acFloat 6s ease-in-out infinite alternate; }
+  .ac__fig :global(img) { transform: rotateY(var(--fy, -8deg)) rotateX(var(--fx, 4deg)); transition: transform 0.6s var(--ease); }
+  .ac__fig :global(img) { width: 100%; height: auto; filter: drop-shadow(0 30px 40px rgb(0 0 0 / 0.5)); }
+  @keyframes acFloat { from { transform: translateY(-8px) rotate(-1deg); } to { transform: translateY(8px) rotate(0.5deg); } }
 
   /* ───── responsive ───── */
-  @media (min-width: 40rem) {
-    .fig__cards { grid-template-columns: repeat(2, 1fr); }
-    .jr__line { grid-template-columns: repeat(2, 1fr); }
-  }
-
   @media (min-width: 62rem) {
-    .hero__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); }
-    .hero__script, .hero__rail { display: grid; }
-
-    .fig__grid { grid-template-columns: minmax(0, 1fr) auto; }
-    .fig__cards { grid-template-columns: repeat(4, 1fr); }
-
-    .jr__grid { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.7fr); }
-    .jr__line { grid-template-columns: repeat(4, 1fr); gap: 1rem; }
-    /* Horizontal rail across the four nodes. */
-    .jr__line li { padding-top: 1.6rem; }
-    .jr__line li::before {
-      content: ''; position: absolute; left: 11px; right: -1rem;
-      top: 5px; bottom: auto; width: auto; height: 1px;
-      background: repeating-linear-gradient(to right,
-        color-mix(in oklab, var(--clay) 55%, transparent) 0 4px, transparent 4px 9px);
-    }
-    .jr__line li:last-child::before { display: none; }
-    .jr__dot { top: 0; }
-
-    .df { grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr); }
-    .df__panel { grid-template-columns: minmax(0, 1.5fr) minmax(0, 0.85fr); align-items: center; }
     .pr__grid { grid-template-columns: minmax(0, 0.85fr) minmax(0, 0.7fr) minmax(0, 1.1fr); }
-    .cta__in { grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr) auto; }
   }
-
-  @media (max-width: 62rem) {
-    .fig__script, .cta__script { rotate: none; }
+  @media (max-width: 56rem) {
+    .af__grid { grid-template-columns: 1fr 1fr; }
+    .af__c--0 { grid-row: auto; grid-column: span 2; }
+    .af__c--3 { grid-column: span 2; }
+    .ac__in { grid-template-columns: 1fr; }
+    .ad__shot::after { background: linear-gradient(180deg, rgb(8 10 9 / 0.3), rgb(8 10 9 / 0.9)); }
+    .ad__in { justify-items: start; }
+    .ah__hint { display: none; }
   }
-
   @media (prefers-reduced-motion: reduce) {
-    .film, .film:hover { transform: none; transition: none; }
-    .film__play :global(svg) { animation: none; }
-    .film:hover .film__shot :global(img) { scale: 1; }
+    .ah__bg :global(img), .ah__l > span, .ah__eb, .ah__row, .ah__mantra, .ah__play::after, .ah__hint::after, .ac__fig { animation: none; opacity: 1; transform: none; }
+    .aj__card { transform: none; filter: none; }
+    .af__c { transform: none; }
+    .ad__shot { clip-path: none; }
     .pr__map :is(.pr__land, .pr__pin, .pr__chip) { opacity: 1; scale: 1; transition: none; }
-    .btn, .btn:hover, .fc, .fc:hover, .fc__i, .br, .br:hover, .cta__b, .cta__b:hover {
-      transform: none; transition: none;
-    }
+    .btn, .btn:hover, .br, .br:hover { transform: none; transition: none; }
   }
 </style>
+
+<script>
+  function start() {
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const hero = document.querySelector<HTMLElement>('[data-ah]');
+    if (!hero || hero.dataset.wired) return;
+    hero.dataset.wired = '1';
+    const header = document.querySelector('header');
+    if (header) document.documentElement.style.setProperty('--hdr', `${header.offsetHeight}px`);
+    if (reduced) return;
+
+    const bg = hero.querySelector<HTMLElement>('[data-ah-bg]')!;
+    const cards = [...document.querySelectorAll<HTMLElement>('[data-aj-card]')];
+    const ad = document.querySelector<HTMLElement>('[data-ad]');
+    const shot = ad?.querySelector<HTMLElement>('[data-ad-shot]');
+    const clamp = (v: number) => Math.min(1, Math.max(0, v));
+
+    let raf = 0;
+    const tick = () => {
+      raf = 0;
+      const H = innerHeight;
+      /* hero photo drifts slower than the page */
+      const hr = hero.getBoundingClientRect();
+      if (hr.bottom > 0) bg.style.transform = `translate3d(0, ${-hr.top * 0.35}px, 0)`;
+      /* journey: cards that have been covered by the next one tip back and dim */
+      cards.forEach((c, i) => {
+        const next = cards[i + 1];
+        if (!next) return;
+        const a = c.getBoundingClientRect(), n = next.getBoundingClientRect();
+        const cover = clamp((a.bottom - n.top) / a.height);          // 0 → 1 as the next card slides over
+        c.style.setProperty('--s', (1 - 0.07 * cover).toFixed(4));
+        c.style.setProperty('--r', `${(8 * cover).toFixed(2)}deg`);
+        c.style.setProperty('--b', (1 - 0.25 * cover).toFixed(3));
+      });
+      /* difference: the framed photo opens out to full width as it arrives */
+      if (ad && shot) {
+        const r = ad.getBoundingClientRect();
+        const p = clamp((H - r.top) / (H * 0.9));
+        const e = 1 - Math.pow(1 - p, 3);
+        shot.style.setProperty('--ci', `${(1 - e) * 12}%`);
+        shot.style.setProperty('--cr', `${(1 - e) * 28}px`);
+        shot.style.setProperty('--cs', String(1.12 - 0.12 * e));
+        shot.style.setProperty('--co', String(clamp((p - 0.5) * 2)));
+      }
+    };
+    const req = () => { if (!raf) raf = requestAnimationFrame(tick); };
+    addEventListener('scroll', req, { passive: true });
+    addEventListener('resize', req);
+    tick();
+
+    const fine = matchMedia('(hover: hover) and (pointer: fine)').matches;
+    if (fine) {
+      /* figures: each card tilts toward the pointer, with a light under it */
+      document.querySelectorAll<HTMLElement>('[data-tilt]').forEach((c) => {
+        c.addEventListener('pointermove', (e) => {
+          const r = c.getBoundingClientRect(), x = (e.clientX - r.left) / r.width, y = (e.clientY - r.top) / r.height;
+          c.style.setProperty('--ry', `${(x - 0.5) * 14}deg`); c.style.setProperty('--rx', `${(0.5 - y) * 12}deg`);
+          c.style.setProperty('--mx', `${x * 100}%`); c.style.setProperty('--my', `${y * 100}%`);
+        });
+        c.addEventListener('pointerleave', () => { c.style.setProperty('--rx', '0deg'); c.style.setProperty('--ry', '0deg'); });
+      });
+      /* hero: the headline block leans a touch with the pointer */
+      const tilt = hero.querySelector<HTMLElement>('[data-ah-tilt]')!;
+      hero.addEventListener('pointermove', (e) => {
+        const x = e.clientX / innerWidth - 0.5, y = e.clientY / innerHeight - 0.5;
+        tilt.style.transform = `perspective(1400px) rotateY(${x * 4}deg) rotateX(${-y * 3}deg)`;
+        bg.style.translate = `${-x * 18}px ${-y * 12}px`;
+      });
+      hero.addEventListener('pointerleave', () => { tilt.style.transform = ''; bg.style.translate = ''; });
+      /* ending: the laptop turns toward the pointer */
+      const fig = document.querySelector<HTMLElement>('[data-ac-fig]');
+      fig?.closest('section')?.addEventListener('pointermove', (e) => {
+        const r = fig.getBoundingClientRect(), x = (e.clientX - (r.left + r.width / 2)) / innerWidth, y = (e.clientY - (r.top + r.height / 2)) / innerHeight;
+        fig.style.setProperty('--fy', `${x * 30 - 8}deg`); fig.style.setProperty('--fx', `${-y * 20 + 4}deg`);
+      });
+    }
+
+    /* the call-to-action button leans toward the pointer */
+    document.querySelectorAll<HTMLElement>('[data-mag]').forEach((b) => {
+      b.addEventListener('pointermove', (e) => { const r = b.getBoundingClientRect(); b.style.transform = `translate(${(e.clientX - r.left - r.width / 2) * 0.2}px, ${(e.clientY - r.top - r.height / 2) * 0.3}px)`; });
+      b.addEventListener('pointerleave', () => (b.style.transform = ''));
+    });
+  }
+  document.addEventListener('astro:page-load', start);
+</script>
