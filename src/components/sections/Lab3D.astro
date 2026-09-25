@@ -127,7 +127,11 @@
     left: 1rem;
     bottom: 1rem;
     z-index: 3;
-    max-width: min(30rem, calc(100% - 2rem));
+    max-width: min(34rem, calc(100% - 2rem));
+    /* Tall enough to screenshot in one go, capped so it cannot cover
+       the model it is describing. */
+    max-height: min(22rem, 60%);
+    overflow-y: auto;
     padding: 0.9rem 1rem 1rem;
     border-radius: 14px;
     border: 1px solid var(--line-light);
@@ -505,9 +509,14 @@
         if (!names.length) return;
         const d = document.createElement('p');
         d.className = 'lb__l';
-        /* textContent, not innerHTML: these strings come out of a file
+        /* Every name, not the first two dozen. The point of this panel
+           is that a screenshot of it is the whole evidence — a
+           truncated list means another round trip to find out what was
+           in the "+14 more".
+
+           textContent, not innerHTML: these strings come out of a file
            somebody downloaded from the internet. */
-        d.textContent = `${title}: ${names.slice(0, 24).join(', ')}${names.length > 24 ? ` +${names.length - 24} more` : ''}`;
+        d.textContent = `${title} (${names.length}): ${names.join(', ')}`;
         out.append(d);
       };
       list('Matched', hit);
