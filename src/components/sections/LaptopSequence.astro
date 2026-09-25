@@ -136,10 +136,29 @@ const total = String(frames.length).padStart(2, '0');
     background: var(--bg, #426d7e);
     transition: background-color 380ms linear;
   }
+  /* A soft floor shadow under the machine — his sits in a lit space
+     rather than on a flat colour, and this is what supplies that. */
+  .sq__pin::after {
+    content: '';
+    position: absolute;
+    left: calc(var(--rail) + 6%);
+    right: 12%;
+    bottom: 5.5rem;
+    height: 5rem;
+    z-index: 0;
+    background: radial-gradient(closest-side, rgb(4 12 16 / 0.5), transparent);
+    pointer-events: none;
+  }
 
+  /* THE PICTURE SITS IN THE STAGE, NOT OVER THE WHOLE PIN.
+     Filling the pin edge to edge put the machine under the rail text
+     and ran it off all four sides. His version gives the product room
+     and keeps the left column clear, which is most of why it reads as
+     calmer. So the frame starts where the rail ends and is inset, and
+     the machine is contained inside that. */
   .sq__f {
     position: absolute;
-    inset: 0;
+    inset: 4.5rem clamp(1.5rem, 4vw, 4rem) 6.5rem var(--rail);
     margin: 0;
     opacity: 0;
     transition: opacity 360ms linear;
@@ -148,24 +167,26 @@ const total = String(frames.length).padStart(2, '0');
   .sq__f :global(img) {
     width: 100%;
     height: 100%;
-    /* Every frame is already 16:9, so cover has almost nothing to trim
-       and the machine is never cropped. */
-    object-fit: cover;
+    /* Contained, so the whole machine is always visible with space
+       around it. The pin is painted the frame's own backdrop colour, so
+       that space cannot be told from the photograph. */
+    object-fit: contain;
     /* A slow push across each frame's turn, tied to scroll rather than a
        timer, so a still never sits completely dead. */
     scale: calc(1.01 + var(--z, 0) * 0.045);
     transform-origin: 62% 50%;
   }
 
+  /* A column, not a wash across the product. Its edge is feathered over
+     the last 4rem so it does not draw a hard line down the picture. */
   .sq__veil {
     position: absolute;
     inset: 0;
     background: linear-gradient(
-      100deg,
-      rgb(7 18 24 / 0.9) 0%,
-      rgb(7 18 24 / 0.78) calc(var(--rail) - 6rem),
-      rgb(7 18 24 / 0.1) calc(var(--rail) + 11rem),
-      rgb(7 18 24 / 0) 70%
+      90deg,
+      rgb(9 20 26 / 0.62) 0%,
+      rgb(9 20 26 / 0.62) calc(var(--rail) - 4rem),
+      rgb(9 20 26 / 0) var(--rail)
     );
   }
 
