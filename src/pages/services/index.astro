@@ -119,9 +119,9 @@ const promises = [
         </p>
 
         <p class="sh__pill" data-rise style="--d:760ms">
-          <span><b data-count={services.length}>0</b>Services</span>
+          <span><b data-count={services.length}>{Number(services.length).toLocaleString('en-US')}</b>Services</span>
           <i aria-hidden="true"></i>
-          <span><b data-count={site.stats.branches}>0</b>Branches</span>
+          <span><b data-count={site.stats.branches}>{Number(site.stats.branches).toLocaleString('en-US')}</b>Branches</span>
           <i aria-hidden="true"></i>
           <span><b>{site.stats.since}</b>Trading since</span>
         </p>

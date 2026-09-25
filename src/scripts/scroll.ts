@@ -161,9 +161,12 @@ export function initCounters(root: ParentNode = document) {
     (entries) => {
       for (const e of entries) {
         const el = e.target as HTMLElement;
-        if (e.isIntersecting) {
+        if (e.isIntersecting && e.intersectionRatio >= 0.25) {
+          if (el.dataset.counting) continue;
+          el.dataset.counting = '1';
           run(el);
-        } else {
+        } else if (!e.isIntersecting) {
+          delete el.dataset.counting;
           /* Armed again. It used to unobserve after the first run, so
              scrolling back past a figure showed the finished number and
              never the count — which read as the animation being gone. */
@@ -174,7 +177,7 @@ export function initCounters(root: ParentNode = document) {
     /* Starts when the figure is properly on screen rather than as it
        clips the bottom edge — otherwise a quick scroll spends the whole
        count off-view and you arrive at the finished number. */
-    { threshold: 0.4, rootMargin: '0px 0px -12% 0px' }
+    { threshold: [0, 0.25] }
   );
   els.forEach((el) => io.observe(el));
 }

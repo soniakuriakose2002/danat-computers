@@ -10,14 +10,17 @@ import InsideDanat from '@components/sections/InsideDanat.astro';
 import MidCta from '@components/sections/MidCta.astro';
 import AcrossOman from '@components/sections/AcrossOman.astro';
 import BusinessSolutions from '@components/sections/BusinessSolutions.astro';
+import ServiceLayers3D from '@components/sections/ServiceLayers3D.astro';
 ---
 
 <PageLayout>
   {/* 01 — What do you actually sell?    */}<Teardown />
   {/* 02 — Are you legitimate?           */}<BrandStrip />
+  {/* 02b — Show me, part by part       */}<ServiceLayers3D show="laptop" />
   {/* 03 — Can you fix my problem?       */}<ServiceCoverflow />
   {/* 04 — Why you and not them?         */}<InsideDanat />
   {/* 05 — I'm convinced, now what?      */}<MidCta />
   {/* 06 — Are you near me?              */}<AcrossOman />
+  {/* 07b — Can you run my office IT?   */}<ServiceLayers3D show="it" />
   {/* 08 — I'm a business, not a home    */}<BusinessSolutions />
 </PageLayout>

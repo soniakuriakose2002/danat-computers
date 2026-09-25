@@ -68,7 +68,7 @@ const steps = [
           <div>
             <dt><span class="fd__ic"><Icon name={f.icon} size={20} /></span></dt>
             <dd>
-              <b><span data-count={f.n}>0</span>{f.suffix}</b>
+              <b><span data-count={f.n}>{f.n.toLocaleString('en-US')}</span>{f.suffix}</b>
               <i>{f.l}</i>
             </dd>
           </div>

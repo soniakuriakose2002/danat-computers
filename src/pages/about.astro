@@ -150,7 +150,7 @@ const layers = [r01, r03, r04, r05];
         {figures.map((f, i) => (
           <div class="fc" data-rise style={`--d:${i * 70}ms`}>
             <span class="fc__i" aria-hidden="true"><Icon name={f.icon} size={19} /></span>
-            <dt><span data-count={f.v}>0</span>{f.suffix}</dt>
+            <dt><span data-count={f.v}>{Number(f.v).toLocaleString('en-US')}</span>{f.suffix}</dt>
             <dd>{f.l}</dd>
             <small>{f.sub}</small>
           </div>

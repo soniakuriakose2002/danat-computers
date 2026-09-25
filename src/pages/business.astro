@@ -272,7 +272,7 @@ const figures = [
       <dl class="st__figs">
         {figures.map((f) => (
           <div>
-            <dt><span data-count={f.v}>0</span>{f.suffix}</dt>
+            <dt><span data-count={f.v}>{Number(f.v).toLocaleString('en-US')}</span>{f.suffix}</dt>
             <dd>{f.l}</dd>
           </div>
         ))}

@@ -87,7 +87,7 @@ const H = 1342;
                   <Icon name={f.icon} size={19} />
                 </span>
                 <div>
-                  <dt><span data-count={f.v}>0</span>{f.suffix}</dt>
+                  <dt><span data-count={f.v}>{Number(f.v).toLocaleString('en-US')}</span>{f.suffix}</dt>
                   <dd>{f.l}</dd>
                 </div>
               </div>

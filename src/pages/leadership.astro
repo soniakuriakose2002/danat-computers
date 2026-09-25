@@ -182,7 +182,7 @@ const values = [
       <dl class="fg__figs">
         {figures.map((f, i) => (
           <div data-rise style={`--d:${i * 70}ms`}>
-            <dt><span data-count={f.v}>0</span>{f.suffix}</dt>
+            <dt><span data-count={f.v}>{Number(f.v).toLocaleString('en-US')}</span>{f.suffix}</dt>
             <dd>{f.l}</dd>
           </div>
         ))}

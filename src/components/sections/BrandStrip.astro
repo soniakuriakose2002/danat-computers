@@ -44,9 +44,9 @@ const rows = [brands.slice(0, half), brands.slice(half)];
   <div class="shell bs__head">
     <p class="label">What we carry</p>
     <p class="bs__count">
-      <b><span data-count={brands.length}>0</span></b> brands
+      <b><span data-count={brands.length}>{Number(brands.length).toLocaleString('en-US')}</span></b> brands
       <span aria-hidden="true">·</span>
-      <b><span data-count={site.stats.parts}>0</span></b> lines in stock
+      <b><span data-count={site.stats.parts}>{Number(site.stats.parts).toLocaleString('en-US')}</span></b> lines in stock
     </p>
   </div>
 

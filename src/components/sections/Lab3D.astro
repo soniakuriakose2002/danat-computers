@@ -107,6 +107,9 @@
   import * as THREE from 'three';
   import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
   import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
+  import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+  import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
+  import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 
   const GREEN = 0x59aa54;
 
@@ -244,6 +247,72 @@
     // Closed to start; the scroll opens it.
     hinge.rotation.x = -0.02;
 
+    /* ── a real model, if one has been supplied ──────────────────
+       Drop a file at public/models/laptop.glb and it replaces
+       everything above. Nothing else changes: same lights, same
+       environment, same drag and scroll.
+
+       The three decoders are all self-hosted — Draco from
+       node_modules into /draco, meshopt bundled — so no CDN is hit and
+       the site keeps its no-third-party-request rule. They are only
+       fetched if the file actually uses that compression.
+
+       A 404 is the normal case while no model exists, so it is handled
+       quietly: the procedural machine stays and nothing is logged as an
+       error. */
+    const MODEL_URL = '/models/laptop.glb';
+    let modelHinge: THREE.Object3D | null = null;
+
+    fetch(MODEL_URL, { method: 'HEAD' })
+      .then((r) => {
+        if (!r.ok) return;
+
+        const draco = new DRACOLoader().setDecoderPath('/draco/');
+        const loader = new GLTFLoader()
+          .setDRACOLoader(draco)
+          .setMeshoptDecoder(MeshoptDecoder);
+
+        loader.load(MODEL_URL, (gltf) => {
+          const m = gltf.scene;
+
+          /* Exports arrive at wildly different scales and origins — a
+             Blender default is metres, a CAD export is often
+             millimetres. Normalise to the same box the procedural
+             machine occupies, or the camera framing is meaningless. */
+          const box = new THREE.Box3().setFromObject(m);
+          const size = box.getSize(new THREE.Vector3());
+          const centre = box.getCenter(new THREE.Vector3());
+          const scale = W / Math.max(size.x, 0.0001);
+          m.scale.setScalar(scale);
+          m.position.sub(centre.multiplyScalar(scale));
+          m.position.y += (size.y * scale) / 2 - T / 2;
+
+          m.traverse((o) => {
+            const mesh = o as THREE.Mesh;
+            if (!mesh.isMesh) return;
+            mesh.castShadow = true;
+            mesh.receiveShadow = true;
+          });
+
+          /* If the artist named the lid, it can still be hinged. Most
+             bought models are one welded mesh and simply will not open
+             — which is worth knowing before paying for one. */
+          modelHinge =
+            m.getObjectByName('lid') ??
+            m.getObjectByName('Lid') ??
+            m.getObjectByName('screen') ??
+            null;
+
+          laptop.clear();
+          laptop.add(m);
+          canvas.dataset.model = 'glb';
+        });
+      })
+      .catch(() => {
+        /* Offline, or no file. The procedural machine is the fallback
+           and it is already on screen. */
+      });
+
     /* The shadow the machine sits on. A plane that takes shadow only —
        invisible itself, so the section's own background shows through
        and the object is not stuck on a grey card. */
@@ -346,8 +415,11 @@
       if (!reduced) laptop.position.y = Math.sin(t * 0.7) * 0.035;
 
       // 0 closed, 1 open at about 115 degrees.
-      hinge.rotation.x = -0.02 - open * 2.0;
-      screenMat.emissiveIntensity = 0.04 + open * 0.3;
+      if (modelHinge) modelHinge.rotation.x = -open * 2.0;
+      else {
+        hinge.rotation.x = -0.02 - open * 2.0;
+        screenMat.emissiveIntensity = 0.04 + open * 0.3;
+      }
 
       renderer.render(scene, camera);
       canvas.dataset.frames = String((+(canvas.dataset.frames || 0)) + 1);
