@@ -176,10 +176,17 @@ export function initCounters(root: ParentNode = document) {
         }
       }
     },
-    /* Starts when the figure is properly on screen rather than as it
-       clips the bottom edge — otherwise a quick scroll spends the whole
-       count off-view and you arrive at the finished number. */
-    { threshold: [0, 0.25] }
+    /* threshold alone is not enough. A figure is 25% visible the
+       instant it clips the bottom edge, and with Lenis easing the
+       scroll the 2.2s count then finishes before the number is
+       anywhere near the middle of the screen — so the count happens,
+       but always off-view, and what you see is the end state. That is
+       why it read as "not counting".
+
+       The negative bottom margin holds the trigger back until the
+       figure is a third of a viewport above the bottom edge: by then
+       you are looking at it. */
+    { threshold: [0, 0.25], rootMargin: '0px 0px -33% 0px' }
   );
   els.forEach((el) => io.observe(el));
 }

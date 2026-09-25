@@ -28,7 +28,11 @@ import laptop from '@assets/products/laptop-front.png';
             muted loop playsinline autoplay preload="auto"
             controlslist="nodownload noplaybackrate noremoteplayback" disablepictureinpicture disableremoteplayback
             aria-label="Danat Computers IT support film"></video>
-          <a class="hl__hot" href={whatsappLink()} target="_blank" rel="noopener noreferrer"
+          {/* data-support-open makes this behave like every other Get
+          Support on the site: it opens the support drawer. The
+          WhatsApp href stays as the fallback for no-JS, exactly
+          as the header button does it. */}
+    <a class="hl__hot" href={whatsappLink()} data-support-open target="_blank" rel="noopener noreferrer"
       data-hl-hot aria-label="Get Support" tabindex="-1"></a>
           <span class="hl__glare" aria-hidden="true"></span>
         </div>
