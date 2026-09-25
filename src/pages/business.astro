@@ -477,9 +477,9 @@ const figures = [
 
   .hero__h {
     margin-top: var(--s4);
-    font-size: clamp(2rem, 4.4vw, 3.2rem);
+    font-size: var(--d4);
     line-height: 1.08;
-    letter-spacing: -0.042em;
+    letter-spacing: var(--tr4);
     font-weight: 700;
   }
   .hero__h em { font-style: normal; color: var(--green-deep); }
@@ -538,7 +538,7 @@ const figures = [
     gap: 0.5rem;
     text-align: right;
   }
-  .hero__script { font-size: clamp(0.85rem, 1.4vw, 1.1rem); color: var(--green-deep); }
+  .hero__script { font-size: var(--body); color: var(--green-deep); }
   .hero__logo { display: block; width: clamp(4.5rem, 8vw, 6.5rem); }
   .hero__logo :global(img) {
     width: 100%;
@@ -584,9 +584,9 @@ const figures = [
   /* ── left ── */
   .bs__h {
     margin-top: var(--s4);
-    font-size: clamp(2.1rem, 4vw, 3.05rem);
+    font-size: var(--d4);
     font-weight: 700;
-    letter-spacing: -0.045em;
+    letter-spacing: var(--tr4);
     line-height: 1.04;
   }
   .bs__h em { font-style: normal; color: var(--green-deep); }
@@ -645,7 +645,7 @@ const figures = [
   .bs__script {
     margin-top: clamp(1.75rem, 4vw, 3rem);
     font-family: var(--font-serif);
-    font-size: clamp(1.05rem, 1.8vw, 1.45rem);
+    font-size: var(--d7);
     font-style: italic;
     line-height: 1.34;
     color: var(--green-deep);
@@ -899,9 +899,9 @@ const figures = [
   .pr__head { display: grid; gap: var(--s5); align-items: end; }
   .pr__h {
     margin-top: var(--s4);
-    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    font-size: var(--d6);
     font-weight: 700;
-    letter-spacing: -0.04em;
+    letter-spacing: var(--tr6);
   }
   .pr__h em { font-style: normal; color: var(--green-deep); }
   .pr__aside { font-size: 0.8125rem; line-height: 1.7; color: var(--text-2); }
@@ -973,17 +973,17 @@ const figures = [
   }
   .st__h {
     margin-top: var(--s4);
-    font-size: clamp(1.4rem, 2.6vw, 2rem);
+    font-size: var(--d6);
     font-weight: 700;
-    letter-spacing: -0.038em;
+    letter-spacing: var(--tr6);
     line-height: 1.16;
   }
   .st__figs { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--s5) var(--s4); }
   .st__figs > div + div { padding-left: var(--s4); border-left: 1px solid rgb(255 255 255 / 0.22); }
   .st__figs dt {
-    font-size: clamp(1.4rem, 2.4vw, 1.9rem);
+    font-size: var(--d6);
     font-weight: 700;
-    letter-spacing: -0.04em;
+    letter-spacing: var(--tr6);
     line-height: 1;
     font-variant-numeric: tabular-nums;
   }
@@ -1050,9 +1050,9 @@ const figures = [
   }
   .ct__in { display: grid; gap: var(--s5); align-items: center; }
   .ct__h {
-    font-size: clamp(1.5rem, 2.8vw, 2.1rem);
+    font-size: var(--d6);
     font-weight: 700;
-    letter-spacing: -0.04em;
+    letter-spacing: var(--tr6);
   }
   .ct__h em { font-style: normal; color: var(--green-deep); }
   .ct__p { margin-top: var(--s4); font-size: 0.9375rem; color: var(--text-2); }

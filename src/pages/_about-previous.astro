@@ -395,8 +395,8 @@ const layers = [r01, r03, r04, r05];
 
   .hero__h {
     margin-top: var(--s4);
-    font-size: clamp(2.2rem, 4.8vw, 3.5rem);
-    line-height: 1.04; letter-spacing: -0.045em; font-weight: 700;
+    font-size: var(--d4);
+    line-height: 1.04; letter-spacing: var(--tr4); font-weight: 700;
   }
   .hero__h em { font-style: normal; color: var(--green-deep); }
   .hero__p {
@@ -516,7 +516,7 @@ const layers = [r01, r03, r04, r05];
   .hero__script {
     position: absolute; right: -4%; top: 2%;
     max-width: 8.5rem; text-align: center;
-    font-size: clamp(0.9rem, 1.5vw, 1.15rem);
+    font-size: var(--lead);
     color: var(--green-deep); rotate: -5deg; display: none;
   }
   .hero__script svg { display: block; width: 58px; margin: 0.2rem auto 0; color: var(--green); }
@@ -564,8 +564,8 @@ const layers = [r01, r03, r04, r05];
   }
   .fc:hover .fc__i { transform: scale(1.08) rotate(-6deg); }
   .fc dt {
-    margin-top: 0.85rem; font-size: clamp(1.5rem, 2.6vw, 2rem);
-    font-weight: 700; letter-spacing: -0.04em; line-height: 1;
+    margin-top: 0.85rem; font-size: var(--d6);
+    font-weight: 700; letter-spacing: var(--tr6); line-height: 1;
     font-variant-numeric: tabular-nums;
   }
   .fc dd { margin-top: 0.35rem; font-size: 0.875rem; color: var(--text-2); }
@@ -575,7 +575,7 @@ const layers = [r01, r03, r04, r05];
     color: var(--text-3);
   }
   .fig__script {
-    font-size: clamp(1rem, 1.7vw, 1.4rem); color: var(--green-deep);
+    font-size: var(--lead); color: var(--green-deep);
     rotate: -7deg; justify-self: center;
   }
 
@@ -595,8 +595,8 @@ const layers = [r01, r03, r04, r05];
   .jr__grid { display: grid; gap: clamp(1.75rem, 4vw, 2.75rem); }
   .jr__intro { display: grid; justify-items: start; }
   .jr__h {
-    margin-top: var(--s4); font-size: clamp(1.7rem, 3.2vw, 2.4rem);
-    font-weight: 700; letter-spacing: -0.04em; line-height: 1.08;
+    margin-top: var(--s4); font-size: var(--d5);
+    font-weight: 700; letter-spacing: var(--tr5); line-height: 1.08;
   }
   .jr__h em { font-style: normal; color: var(--clay-deep); }
   .jr__p {
@@ -664,8 +664,8 @@ const layers = [r01, r03, r04, r05];
   }
   .df__copy { display: grid; justify-items: start; }
   .df__h {
-    margin-top: var(--s4); font-size: clamp(1.5rem, 2.8vw, 2.1rem);
-    font-weight: 700; letter-spacing: -0.04em; line-height: 1.12;
+    margin-top: var(--s4); font-size: var(--d6);
+    font-weight: 700; letter-spacing: var(--tr6); line-height: 1.12;
   }
   .df__h em { font-style: normal; color: var(--green-bright); }
   .df__p {
@@ -689,8 +689,8 @@ const layers = [r01, r03, r04, r05];
   .pr__grid { display: grid; gap: clamp(1.75rem, 4vw, 2.75rem); align-items: center; }
   .pr__intro { display: grid; justify-items: start; }
   .pr__h {
-    margin-top: var(--s4); font-size: clamp(1.7rem, 3.2vw, 2.4rem);
-    font-weight: 700; letter-spacing: -0.04em; line-height: 1.08;
+    margin-top: var(--s4); font-size: var(--d5);
+    font-weight: 700; letter-spacing: var(--tr5); line-height: 1.08;
   }
   .pr__h em { font-style: normal; color: var(--green-deep); }
   .pr__p {
@@ -767,8 +767,8 @@ const layers = [r01, r03, r04, r05];
   .cta__in { display: grid; gap: var(--s5); align-items: center; }
   .cta__copy { display: grid; justify-items: start; }
   .cta__h {
-    margin-top: var(--s4); font-size: clamp(1.6rem, 3vw, 2.3rem);
-    font-weight: 700; letter-spacing: -0.04em; line-height: 1.06;
+    margin-top: var(--s4); font-size: var(--d5);
+    font-weight: 700; letter-spacing: var(--tr5); line-height: 1.06;
   }
   .cta__h em { font-style: normal; color: var(--clay-bright); }
   .cta__p {
@@ -784,7 +784,7 @@ const layers = [r01, r03, r04, r05];
   .cta__b:hover { transform: translateY(-2px); background: var(--green-bright); }
   .cta__fig :global(img) { width: 100%; height: auto; object-fit: contain; }
   .cta__script {
-    font-size: clamp(1rem, 1.7vw, 1.35rem); color: var(--clay-bright);
+    font-size: var(--lead); color: var(--clay-bright);
     rotate: -7deg; justify-self: center;
   }
 

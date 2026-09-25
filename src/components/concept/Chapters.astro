@@ -42,7 +42,7 @@ const chapters = [
   .ch { position: relative; background: var(--ink); color: #fff; }
   .ch__stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; display: grid; align-content: center; }
   .ch__head { position: absolute; top: calc(var(--hdr, 88px) + 24px); left: var(--gut); right: var(--gut); display: flex; justify-content: space-between; align-items: end; gap: 2rem; z-index: 2; }
-  .ch__head h2 { margin-top: var(--s4); font-size: clamp(2rem, 3.6vw, 3.1rem); font-weight: 700; letter-spacing: -0.038em; line-height: 1.06; }
+  .ch__head h2 { margin-top: var(--s4); font-size: var(--d4); font-weight: 700; letter-spacing: var(--tr4); line-height: 1.06; }
   .ch__lbl { color: rgb(255 255 255 / 0.6); }
   .ch__head :global(.brush) { color: var(--green-bright); }
   
@@ -53,9 +53,9 @@ const chapters = [
   .ch__card :global(img) { position: absolute; inset: -6% -12%; width: 124%; height: 112%; object-fit: cover; will-change: transform; }
   .ch__card::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgb(0 0 0 / 0.05) 30%, rgb(0 0 0 / 0.78) 100%); }
   .ch__meta { position: absolute; left: 2.2rem; right: 2.2rem; bottom: 2rem; z-index: 2; display: grid; gap: 0.6rem; }
-  .ch__n { position: absolute; top: 1.2rem; right: 1.8rem; z-index: 2; font-weight: 700; font-size: clamp(3rem, 6vw, 6rem); letter-spacing: -0.05em; line-height: 1; color: transparent; -webkit-text-stroke: 1.5px rgb(255 255 255 / 0.55); }
+  .ch__n { position: absolute; top: 1.2rem; right: 1.8rem; z-index: 2; font-weight: 700; font-size: var(--d2); letter-spacing: var(--tr2); line-height: 1; color: transparent; -webkit-text-stroke: 1.5px rgb(255 255 255 / 0.55); }
   .ch__k { color: var(--green-bright); }
-  .ch__t { font-size: clamp(1.4rem, 2.3vw, 2.1rem); font-weight: 700; letter-spacing: -0.035em; line-height: 1.1; }
+  .ch__t { font-size: var(--d6); font-weight: 700; letter-spacing: var(--tr6); line-height: 1.1; }
   .ch__p { max-width: 36ch; color: rgb(255 255 255 / 0.78); font-size: 0.95rem; line-height: 1.55; }
   .ch__bar { position: absolute; left: var(--gut); right: var(--gut); bottom: 5vh; height: 1px; background: rgb(255 255 255 / 0.12); }
   .ch__bar i { display: block; height: 100%; width: 0; background: var(--green-bright); }

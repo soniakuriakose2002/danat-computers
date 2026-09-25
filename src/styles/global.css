@@ -143,25 +143,25 @@ ol {
 .d1 {
   font-size: var(--d1);
   line-height: 0.96;
-  letter-spacing: -0.035em;
+  letter-spacing: var(--tr1);
   font-weight: 500;
 }
 .d2 {
   font-size: var(--d2);
   line-height: 1.02;
-  letter-spacing: -0.03em;
+  letter-spacing: var(--tr2);
   font-weight: 500;
 }
 .d3 {
   font-size: var(--d3);
   line-height: 1.1;
-  letter-spacing: -0.02em;
+  letter-spacing: var(--tr3);
   font-weight: 500;
 }
 .d4 {
   font-size: var(--d4);
   line-height: 1.25;
-  letter-spacing: -0.015em;
+  letter-spacing: var(--tr4);
   font-weight: 500;
 }
 .lead {

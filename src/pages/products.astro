@@ -665,9 +665,9 @@ const helps = [
 
   .ph__h {
     margin-top: var(--s4);
-    font-size: clamp(2.1rem, 4.6vw, 3.6rem);
+    font-size: var(--d4);
     font-weight: 700;
-    letter-spacing: -0.045em;
+    letter-spacing: var(--tr4);
     line-height: 1.04;
   }
   .ph__h em { font-style: normal; color: var(--green-deep); }
@@ -789,7 +789,7 @@ const helps = [
     box-shadow:
       0 1px 2px rgb(10 30 12 / 0.06),
       0 14px 24px -14px rgb(10 30 12 / 0.4);
-    font-size: clamp(0.5rem, 0.6vw, 0.6875rem);
+    font-size: var(--label);
     font-weight: 700;
     letter-spacing: 0.07em;
     text-transform: uppercase;
@@ -858,9 +858,9 @@ const helps = [
     margin-top: var(--s3);
     /* Deliberately smaller than the hero's — the same size twice in a
        column reads as the same section repeated. */
-    font-size: clamp(1.5rem, 2.7vw, 2.15rem);
+    font-size: var(--d6);
     font-weight: 700;
-    letter-spacing: -0.035em;
+    letter-spacing: var(--tr6);
     line-height: 1.06;
   }
   .pf__sub {
@@ -1040,7 +1040,7 @@ const helps = [
     gap: clamp(0.5rem, 1.6vw, 1.2rem);
     font-style: normal;
     font-family: var(--font-mono);
-    font-size: clamp(0.5rem, 0.75vw, 0.6875rem);
+    font-size: var(--label);
     letter-spacing: 0.18em;
     text-transform: uppercase;
     color: var(--text-3);
@@ -1112,9 +1112,9 @@ const helps = [
   }
   .pf__t {
     margin-top: 0.6rem;
-    font-size: clamp(1.15rem, 2vw, 1.5rem);
+    font-size: var(--d7);
     font-weight: 700;
-    letter-spacing: -0.035em;
+    letter-spacing: var(--tr7);
     line-height: 1.14;
   }
   .pf__blurb {
@@ -1157,9 +1157,9 @@ const helps = [
     gap: 0.5rem clamp(1rem, 3vw, 2.5rem);
   }
   .pb__row li {
-    font-size: clamp(1.05rem, 2vw, 1.5rem);
+    font-size: var(--d7);
     font-weight: 700;
-    letter-spacing: -0.03em;
+    letter-spacing: var(--tr7);
     color: var(--text-2);
   }
   .pb__row li + li {
@@ -1177,9 +1177,9 @@ const helps = [
   .pc__head { display: grid; gap: var(--s4); align-items: end; }
   .pc__h {
     margin-top: var(--s4);
-    font-size: clamp(1.7rem, 3.4vw, 2.5rem);
+    font-size: var(--d5);
     font-weight: 700;
-    letter-spacing: -0.042em;
+    letter-spacing: var(--tr5);
     line-height: 1.08;
   }
   .pc__p { max-width: 44ch; font-size: 0.875rem; line-height: 1.64; color: var(--text-2); }
@@ -1214,9 +1214,9 @@ const helps = [
   .pc__n {
     position: relative;
     z-index: 1;
-    font-size: clamp(1.6rem, 2.6vw, 2.1rem);
+    font-size: var(--d6);
     font-weight: 700;
-    letter-spacing: -0.05em;
+    letter-spacing: var(--tr6);
     line-height: 1;
     color: var(--green-deep);
     font-variant-numeric: tabular-nums;
@@ -1261,9 +1261,9 @@ const helps = [
   .pb__in { display: grid; gap: var(--s5); align-items: center; }
   .pb__h {
     margin-top: var(--s4);
-    font-size: clamp(1.25rem, 2.2vw, 1.6rem);
+    font-size: var(--d7);
     font-weight: 700;
-    letter-spacing: -0.035em;
+    letter-spacing: var(--tr7);
     line-height: 1.16;
   }
   .pb__h em { font-style: normal; color: var(--green-deep); }
@@ -1298,7 +1298,7 @@ const helps = [
   }
   .pb__rails:hover .pb__track { animation-play-state: paused; }
   .pb__track span {
-    font-size: clamp(0.9375rem, 1.6vw, 1.15rem);
+    font-size: var(--lead);
     font-weight: 700;
     letter-spacing: -0.02em;
     white-space: nowrap;
@@ -1332,9 +1332,9 @@ const helps = [
   }
   .pt__in { display: grid; gap: var(--s5); align-items: center; }
   .pt__h {
-    font-size: clamp(1.7rem, 3.4vw, 2.4rem);
+    font-size: var(--d5);
     font-weight: 700;
-    letter-spacing: -0.042em;
+    letter-spacing: var(--tr5);
     line-height: 1.1;
   }
   .pt__p {

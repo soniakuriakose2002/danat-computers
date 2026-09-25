@@ -293,7 +293,7 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
       linear-gradient(90deg, rgb(8 10 9 / 0.75) 0%, transparent 70%); }
   .ah__in { position: relative; z-index: 2; transform-style: preserve-3d; transition: transform 0.6s var(--ease); padding-top: calc(var(--hdr, 88px) + 3rem); padding-bottom: clamp(7rem, 15vh, 10rem); }
   .ah__eb { opacity: 0; animation: ahFade 0.9s var(--ease) 0.2s both; }
-  .ah__h { perspective: 900px; margin-top: var(--s5); font-weight: 700; font-size: clamp(3rem, 8vw, 7.5rem); line-height: 0.95; letter-spacing: -0.05em; }
+  .ah__h { perspective: 900px; margin-top: var(--s5); font-weight: 700; font-size: var(--d1); line-height: 0.95; letter-spacing: var(--tr1); }
   .ah__h em { font-style: normal; color: var(--green-bright); }
   .ah__l { display: block; overflow: hidden; padding-bottom: 0.04em; }
   .ah__l > span { display: block; transform-origin: 50% 100%; transform: translateY(70%) rotateX(-75deg); opacity: 0; animation: ahUp 1.3s var(--ease) both; }
@@ -336,8 +336,8 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
   .af__i { position: absolute; top: 1.3rem; left: 1.4rem; display: grid; place-items: center; width: 42px; height: 42px; border-radius: 12px;
     background: rgb(89 170 84 / 0.14); color: var(--green-deep); transform: translateZ(30px); }
   .af__c--0 .af__i { background: rgb(255 255 255 / 0.1); color: var(--green-bright); }
-  .af__c dt { font-size: clamp(2.6rem, 5vw, 4.6rem); font-weight: 700; letter-spacing: -0.05em; line-height: 1; transform: translateZ(45px); }
-  .af__c--0 dt { font-size: clamp(3.4rem, 7vw, 6rem); color: var(--green-bright); }
+  .af__c dt { font-size: var(--d3); font-weight: 700; letter-spacing: var(--tr3); line-height: 1; transform: translateZ(45px); }
+  .af__c--0 dt { font-size: var(--d2); color: var(--green-bright); }
   .af__c dd { margin: 0.5rem 0 0; font-weight: 700; transform: translateZ(25px); }
   .af__c small { color: var(--text-3); font-size: 0.82rem; transform: translateZ(18px); }
   .af__c--0 small { color: rgb(255 255 255 / 0.6); }
@@ -350,7 +350,7 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
   .aj { background: linear-gradient(180deg, #f3f7f2 0%, #f7f3ed 55%, #f4f1f5 100%);
     padding-block: clamp(5rem, 10vw, 8rem) clamp(3rem, 6vw, 5rem); }
   .aj__intro { max-width: 44rem; margin-bottom: clamp(2.5rem, 6vw, 4rem); }
-  .aj__h { margin-top: var(--s4); font-size: clamp(2rem, 3.6vw, 3.1rem); font-weight: 700; letter-spacing: -0.038em; line-height: 1.06; }
+  .aj__h { margin-top: var(--s4); font-size: var(--d4); font-weight: 700; letter-spacing: var(--tr4); line-height: 1.06; }
   .aj__p { margin-top: var(--s4); max-width: 44ch; color: var(--text-2); line-height: 1.65; }
   .aj__stack { list-style: none; margin: 0; padding: 0; display: grid; gap: 2.5rem; perspective: 1400px; }
   /* each card pins a little lower than the one before; the ones underneath tip back */
@@ -376,8 +376,8 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
      type changes voice. Serif display faces are drawn with their own
      fit, so the negative tracking the grotesk needed comes back off. */
   .aj__yr { display: block; font-family: var(--font-serif); font-style: italic; font-weight: 400;
-    font-size: clamp(3.6rem, 7.4vw, 6.4rem); letter-spacing: -0.012em; line-height: 0.95; color: var(--yr, var(--green-deep)); }
-  .aj__t { max-width: 30ch; font-size: clamp(1.05rem, 1.7vw, 1.4rem); font-weight: 500; letter-spacing: -0.015em; line-height: 1.4; color: var(--text); }
+    font-size: var(--d2); letter-spacing: var(--tr2); line-height: 0.95; color: var(--yr, var(--green-deep)); }
+  .aj__t { max-width: 30ch; font-size: var(--lead); font-weight: 500; letter-spacing: -0.015em; line-height: 1.4; color: var(--text); }
 
   /* ───── 05 difference ───── */
   .ad { position: relative; overflow: hidden; color: #fff; background: var(--ink); min-height: 100svh; display: grid; align-items: center; }
@@ -386,7 +386,7 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
   .ad__shot::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent 20%, rgb(8 10 9 / 0.9) 70%); opacity: var(--co, 0); }
   .ad__in { position: relative; z-index: 1; display: grid; justify-items: end; padding-block: clamp(5rem, 10vw, 8rem); }
   .ad__copy { max-width: 36rem; display: grid; justify-items: start; gap: 0; }
-  .ad__h { margin-top: var(--s4); font-size: clamp(2rem, 3.6vw, 3.1rem); font-weight: 700; letter-spacing: -0.038em; line-height: 1.06; }
+  .ad__h { margin-top: var(--s4); font-size: var(--d4); font-weight: 700; letter-spacing: var(--tr4); line-height: 1.06; }
   .ad__h em { font-style: normal; color: var(--green-bright); }
   .ad__p { margin-top: var(--s4); color: rgb(255 255 255 / 0.78); line-height: 1.65; }
   .ad__proof { list-style: none; margin: 1.6rem 0 1.8rem; padding: 0; display: flex; flex-wrap: wrap; gap: 0.5rem; }
@@ -400,8 +400,8 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
   .pr__grid { display: grid; gap: clamp(1.75rem, 4vw, 2.75rem); align-items: center; }
   .pr__intro { display: grid; justify-items: start; }
   .pr__h {
-    margin-top: var(--s4); font-size: clamp(1.7rem, 3.2vw, 2.4rem);
-    font-weight: 700; letter-spacing: -0.04em; line-height: 1.08;
+    margin-top: var(--s4); font-size: var(--d5);
+    font-weight: 700; letter-spacing: var(--tr5); line-height: 1.08;
   }
   .pr__h em { font-style: normal; color: var(--green-deep); }
   .pr__p {
@@ -473,7 +473,7 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
   /* ───── 07 cta ───── */
   .ac { background: radial-gradient(70% 90% at 80% 50%, #15301a 0%, var(--ink) 65%); color: #fff; padding-block: clamp(5rem, 10vw, 8rem); overflow: hidden; }
   .ac__in { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr); gap: 2rem; align-items: center; }
-  .ac__h { margin-top: var(--s4); font-size: clamp(2.4rem, 5vw, 4.4rem); font-weight: 700; letter-spacing: -0.045em; line-height: 1.02; --brush-size: 1.05; }
+  .ac__h { margin-top: var(--s4); font-size: var(--d3); font-weight: 700; letter-spacing: var(--tr3); line-height: 1.02; --brush-size: 1.05; }
   .ac__h :global(.brush) { color: var(--green-bright); }
   .ac__p { margin-top: var(--s4); color: rgb(255 255 255 / 0.72); }
   .ac__b { display: inline-flex; align-items: center; gap: 0.7rem; margin-top: 2rem; padding: 1.05rem 1.7rem; border-radius: 999px; background: var(--green); color: #fff; font-weight: 700; transition: background 0.25s; }

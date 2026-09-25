@@ -3,6 +3,12 @@
  * BRANCHES — the Oman map with pulsing pins, and a row per branch with
  * WhatsApp and map links. Data comes from site.ts; addresses that have not
  * been confirmed are shown by city only, exactly as elsewhere on the site.
+ *
+ * Pastel restyle: the flat white ground and hairline rows are gone. Each
+ * branch now carries one of the chalky tints used by the about page's
+ * journey cards, so the two sections speak the same colour language, and
+ * hovering a row lights its pin on the map (and the reverse) — the list
+ * and the map were previously two unrelated things sitting side by side.
  */
 import { Image } from 'astro:assets';
 import { branches, whatsappLink } from '@data/site';
@@ -16,20 +22,20 @@ const SPOTS: Record<string, { x: number; y: number }> = {
 };
 const shown = branches.filter((b) => SPOTS[b.slug]);
 ---
-<section class="bm" id="branches" aria-labelledby="bm-title">
+<section class="bm" id="branches" aria-labelledby="bm-title" data-bm>
   <div class="shell bm__grid">
     <div class="bm__map">
       <Image src={omanMap} alt="Map of Oman showing Danat branches" width={900} quality={75} />
       {shown.map((b) => (
-        <span class="bm__pin" style={`--x:${SPOTS[b.slug].x}%;--y:${SPOTS[b.slug].y}%`}><i></i><b>{b.name.replace('Danat ', '')}</b></span>
+        <span class="bm__pin" data-bm-pin={b.slug} style={`--x:${SPOTS[b.slug].x}%;--y:${SPOTS[b.slug].y}%`}><i></i><b>{b.name.replace('Danat ', '')}</b></span>
       ))}
     </div>
     <div>
       <p class="label">Our branches</p>
       <h2 id="bm-title">Across Oman.<br /><em>Closer to you.</em></h2>
       <ul class="bm__list">
-        {shown.map((b) => (
-          <li class="bm__item">
+        {shown.map((b, i) => (
+          <li class:list={['bm__item', `bm__item--${i % 3}`]} data-bm-row={b.slug}>
             <div>
               <h3>{b.name}</h3>
               <p>{b.verified ? b.address.split('\n').slice(0, 2).join(' · ') : b.city}</p>
@@ -47,28 +53,103 @@ const shown = branches.filter((b) => SPOTS[b.slug]);
 </section>
 
 <style>
-  .bm { background: var(--white); color: var(--text); padding-block: clamp(6rem, 12vw, 11rem); }
+  /* Pastel wash rather than flat white, so the map card and the branch
+     cards have something to sit on. Same three hues as the about page. */
+  .bm { background: linear-gradient(180deg, #f4f7f2 0%, #f7f3ed 60%, #f1f4f6 100%);
+    color: var(--text); padding-block: clamp(6rem, 12vw, 11rem); }
   .bm__grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: clamp(2rem, 6vw, 6rem); align-items: center; }
-  .bm h2 { margin-top: var(--s4); font-size: clamp(2rem, 3.6vw, 3.1rem); font-weight: 700; letter-spacing: -0.038em; line-height: 1.06; }
-  .bm h2 em { font-style: normal; color: var(--green); }
-  .bm__map { position: relative; border-radius: 28px; overflow: hidden; background: #e9ece8; }
-  .bm__map :global(img) { display: block; width: 100%; height: auto; filter: grayscale(1) contrast(1.05) brightness(1.04); opacity: 0.8; }
-  .bm__pin { position: absolute; left: var(--x); top: var(--y); transform: translate(-50%, -50%); }
-  .bm__pin i { position: relative; display: block; width: 16px; height: 16px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 6px rgb(89 170 84 / 0.25); }
-  .bm__pin i::after { content: ''; position: absolute; inset: -14px; border-radius: 50%; border: 1.5px solid var(--green); animation: bmPing 2.4s var(--ease) infinite; }
+  .bm h2 { margin-top: var(--s4); font-size: var(--d4); font-weight: 700; letter-spacing: var(--tr4); line-height: 1.06; }
+  /* WAS var(--green) — #59AA54 is 2.88:1 on this ground, which tokens.css
+     marks FILLS ONLY. --green-deep is 6.53:1 on the wash. */
+  .bm h2 em { font-style: normal; color: var(--green-deep); }
+
+  .bm__map { position: relative; border-radius: 28px; overflow: hidden; padding: 0.5rem;
+    background: #eef3ec; border: 1px solid rgb(20 40 25 / 0.06); box-shadow: 0 34px 64px -44px rgb(40 50 45 / 0.4); }
+  /* The old grayscale(1) + opacity 0.8 crushed the render to grey mush.
+     A light sepia rotated onto the section's own green keeps the map
+     legible while still reading as a backdrop rather than a photo. */
+  .bm__map :global(img) { display: block; width: 100%; height: auto; border-radius: 22px;
+    filter: grayscale(0.72) sepia(0.12) hue-rotate(58deg) contrast(1.02) brightness(1.03); }
+
+  .bm__pin { position: absolute; left: var(--x); top: var(--y); transform: translate(-50%, -50%); z-index: 1;
+    transition: transform var(--t2) var(--ease); }
+  .bm__pin i { position: relative; display: block; width: 16px; height: 16px; border-radius: 50%;
+    background: var(--green-deep); box-shadow: 0 0 0 6px rgb(47 100 41 / 0.18);
+    transition: background var(--t2) var(--ease), box-shadow var(--t2) var(--ease); }
+  .bm__pin i::after { content: ''; position: absolute; inset: -14px; border-radius: 50%; border: 1.5px solid var(--green-deep); animation: bmPing 2.4s var(--ease) infinite; }
   .bm__pin b { position: absolute; left: 24px; top: 50%; transform: translateY(-50%); background: #fff; padding: 0.35rem 0.7rem; border-radius: 999px; box-shadow: 0 6px 20px rgb(0 0 0 / 0.12);
-    font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; }
+    font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; white-space: nowrap;
+    transition: background var(--t2) var(--ease), color var(--t2) var(--ease); }
+  /* Set from the row, and from the pin itself — see the script. */
+  .bm__pin[data-hot] { transform: translate(-50%, -50%) scale(1.25); }
+  .bm__pin[data-hot] i { box-shadow: 0 0 0 10px rgb(47 100 41 / 0.22); }
+  .bm__pin[data-hot] b { background: var(--green-deep); color: #fff; }
   @keyframes bmPing { from { transform: scale(0.4); opacity: 1; } to { transform: scale(1.6); opacity: 0; } }
-  .bm__list { list-style: none; margin: 2.6rem 0 0; padding: 0; border-top: 1px solid rgb(0 0 0 / 0.1); }
-  .bm__item { display: grid; grid-template-columns: 1fr auto; gap: 1rem; padding: 1.6rem 0; border-bottom: 1px solid rgb(0 0 0 / 0.1); align-items: center; }
-  .bm__item h3 { font-size: clamp(1.25rem, 1.8vw, 1.6rem); font-weight: 700; letter-spacing: -0.03em; }
+
+  /* Cards on their own tints, not rows divided by hairlines. */
+  .bm__list { list-style: none; margin: 2.6rem 0 0; padding: 0; display: grid; gap: 0.85rem; }
+  .bm__item { display: grid; grid-template-columns: 1fr auto; gap: 1rem; align-items: center;
+    padding: 1.35rem 1.5rem; border-radius: 20px; background: var(--pc, #fff);
+    border: 1px solid rgb(20 40 25 / 0.05); box-shadow: 0 18px 36px -28px rgb(40 50 45 / 0.34);
+    transition: transform var(--t2) var(--ease), box-shadow var(--t2) var(--ease); }
+  /*                     name 15:1 · address 5.3:1 · outline ink 5.9:1 */
+  .bm__item--0 { --pc: #e6f0e4; }
+  .bm__item--1 { --pc: #f3eadc; }
+  .bm__item--2 { --pc: #e3ecef; }
+  .bm__item[data-hot] { transform: translateY(-3px); box-shadow: 0 26px 46px -28px rgb(40 50 45 / 0.42); }
+  .bm__item h3 { font-size: var(--d7); font-weight: 700; letter-spacing: var(--tr7); }
   .bm__item p { color: var(--text-2); margin-top: 0.35rem; line-height: 1.45; }
+
   .bm__acts { display: flex; gap: 0.6rem; }
-  .bm__pill { display: inline-flex; align-items: center; border-radius: 999px; padding: 0.75rem 1.2rem; font-weight: 600; font-size: 0.95rem; border: 1px solid rgb(0 0 0 / 0.18); color: inherit; text-decoration: none; transition: background 0.25s, color 0.25s, border-color 0.25s; }
+  .bm__pill { display: inline-flex; align-items: center; border-radius: 999px; padding: 0.75rem 1.2rem; font-weight: 600; font-size: var(--small); border: 1px solid rgb(20 40 25 / 0.22); color: inherit; text-decoration: none; transition: background 0.25s, color 0.25s, border-color 0.25s; }
   .bm__pill:hover { background: var(--text); color: #fff; border-color: var(--text); }
-  .bm__pill--g { background: var(--green); border-color: var(--green); color: #fff; }
-  .bm__pill--g:hover { background: var(--green-deep); border-color: var(--green-deep); }
-  .bm__hours { margin-top: 1.6rem; color: var(--text-2); font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; }
-  @media (max-width: 56rem) { .bm__grid { grid-template-columns: 1fr; } .bm__item { grid-template-columns: 1fr; } }
-  @media (prefers-reduced-motion: reduce) { .bm__pin i::after { animation: none; } }
+  /* WAS --green: white on #59AA54 is 2.88:1. On --green-deep it is 7.06:1. */
+  .bm__pill--g { background: var(--green-deep); border-color: var(--green-deep); color: #fff; }
+  .bm__pill--g:hover { background: #24501f; border-color: #24501f; }
+
+  .bm__hours { margin-top: 1.6rem; color: var(--text-2); font-family: var(--font-mono); font-size: var(--label); letter-spacing: 0.12em; text-transform: uppercase; }
+
+  @media (max-width: 56rem) {
+    .bm__grid { grid-template-columns: 1fr; }
+    .bm__item { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .bm__pin i::after { animation: none; }
+    .bm__pin, .bm__item { transition: none; }
+  }
 </style>
+
+<script>
+  /* The list and the map were two separate things sitting next to each
+     other — nothing told you which row was which pin. Hovering either
+     side now lights both. Pointer only: on touch there is no hover, and
+     both halves are already independently tappable. */
+  function boot() {
+    const root = document.querySelector<HTMLElement>('[data-bm]');
+    if (!root || root.dataset.wired) return;
+    root.dataset.wired = '1';
+
+    const pins = [...root.querySelectorAll<HTMLElement>('[data-bm-pin]')];
+    const rows = [...root.querySelectorAll<HTMLElement>('[data-bm-row]')];
+
+    const light = (slug: string | null) => {
+      pins.forEach((p) => p.toggleAttribute('data-hot', p.dataset.bmPin === slug));
+      rows.forEach((r) => r.toggleAttribute('data-hot', r.dataset.bmRow === slug));
+    };
+
+    [...pins, ...rows].forEach((el) => {
+      const slug = el.dataset.bmPin ?? el.dataset.bmRow ?? null;
+      el.addEventListener('pointerenter', (e) => {
+        if ((e as PointerEvent).pointerType === 'touch') return;
+        light(slug);
+      });
+      el.addEventListener('pointerleave', () => light(null));
+      /* Keyboard users get the same link via the row's own links. */
+      el.addEventListener('focusin', () => light(slug));
+      el.addEventListener('focusout', () => light(null));
+    });
+  }
+
+  boot();
+  document.addEventListener('astro:page-load', boot);
+</script>

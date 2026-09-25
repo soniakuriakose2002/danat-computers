@@ -58,7 +58,7 @@ const STEP = 360 / cards.length;
      lines share one vertical axis */
   .rg__text { position: absolute; left: 0; right: 0; top: var(--cy); transform: translate(var(--dx, 0), calc(-50% + var(--dy, 0px))); margin: 0; z-index: 1;
     display: flex; flex-direction: column; align-items: center; gap: 0.08em;
-    font-weight: 700; letter-spacing: -0.05em; line-height: 1.05; font-size: clamp(2.2rem, 5.6vw, 5.6rem); --brush-size: 1.05; }
+    font-weight: 700; letter-spacing: var(--tr2); line-height: 1.05; font-size: var(--d2); --brush-size: 1.05; }
   .rg__fix, .rg__since { display: block; }
   .rg__since :global(.brush) { padding: 0.04em 0.22em 0.1em; }
     
