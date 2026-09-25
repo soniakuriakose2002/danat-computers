@@ -11,16 +11,20 @@ import MidCta from '@components/sections/MidCta.astro';
 import AcrossOman from '@components/sections/AcrossOman.astro';
 import BusinessSolutions from '@components/sections/BusinessSolutions.astro';
 import ServiceLayers3D from '@components/sections/ServiceLayers3D.astro';
+import LaptopExperience from '@components/sections/LaptopExperience.astro';
 ---
 
 <PageLayout>
   {/* 01 — What do you actually sell?    */}<Teardown />
   {/* 02 — Are you legitimate?           */}<BrandStrip />
-  {/* 02b — Show me, part by part       */}<ServiceLayers3D show="laptop" />
+  {/* 02b — Show me, part by part       */}<LaptopExperience />
   {/* 03 — Can you fix my problem?       */}<ServiceCoverflow />
   {/* 04 — Why you and not them?         */}<InsideDanat />
   {/* 05 — I'm convinced, now what?      */}<MidCta />
   {/* 06 — Are you near me?              */}<AcrossOman />
+  {/* ServiceLayers3D still renders the IT rack, and is kept rather
+      than deleted: it is the fallback if the new system has to come
+      out, and `show="laptop"` brings the old teardown straight back. */}
   {/* 07b — Can you run my office IT?   */}<ServiceLayers3D show="it" />
   {/* 08 — I'm a business, not a home    */}<BusinessSolutions />
 </PageLayout>

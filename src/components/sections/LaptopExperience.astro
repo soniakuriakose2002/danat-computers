@@ -1,0 +1,314 @@
+---
+/**
+ * THE LAPTOP EXPERIENCE — the production 3D section.
+ *
+ * The same scene as /lab-3d, from the same module, without the lab's
+ * furniture: no drop target, no verdict panel, no part-name dump.
+ *
+ * The difference that matters is the layout. In the lab the canvas is a
+ * box on a page. Here it is PINNED for the height of a tall track, and
+ * the copy scrolls past it — so the machine is not an illustration
+ * beside the text, it is the thing you are reading about.
+ *
+ * ⚠ The model is still the built-in placeholder. Drop a real GLB at
+ * public/models/laptop.glb and it replaces it with no change here.
+ */
+const stages = [
+  { k: 'screen', n: 'Screen', t: 'Cracked, flickering or dim panels, matched to your model.' },
+  { k: 'topcase', n: 'Keyboard and trackpad', t: 'Stuck keys, spills, and trackpads that stop responding.' },
+  { k: 'battery', n: 'Battery', t: 'For laptops that die early or stop charging.' },
+  { k: 'ram', n: 'Memory', t: 'So heavy apps and many tabs stop slowing you down.' },
+  { k: 'ssd', n: 'Storage', t: 'Faster storage, or your files off a drive that failed.' },
+  { k: 'motherboard', n: 'Motherboard', t: 'No power, no display, charging faults, liquid damage.' },
+  { k: 'fan', n: 'Cooling', t: 'Overheating, shutdowns and fans you can hear across the room.' },
+  { k: 'bottomcase', n: 'Body and hinges', t: 'Cracked casing, stiff hinges, broken screw mounts.' },
+];
+---
+
+<section class="lx" data-lx>
+  <div class="lx__track" data-lx-track>
+    <div class="lx__pin">
+      <div class="lx__stage">
+        <canvas data-lx-canvas></canvas>
+        <p class="lx__off" data-lx-off hidden>
+          3D is switched off here — either this browser has no WebGL or the
+          system is set to reduce motion.
+        </p>
+        <div class="lx__tip" data-lx-tip hidden><b></b><i></i></div>
+      </div>
+
+      <div class="lx__copy">
+        <p class="lx__eb">Laptop service</p>
+        <h2 class="lx__h">Every part of<br />your laptop,<br />repaired in&#8209;house.</h2>
+
+        <ol class="lx__ix">
+          {stages.map((s, i) => (
+            <li data-ix={s.k} data-on={i === 0 ? '' : undefined}>
+              <b>{String(i + 1).padStart(2, '0')}</b><span>{s.n}</span>
+            </li>
+          ))}
+        </ol>
+
+        <div class="lx__cards">
+          {stages.map((s, i) => (
+            <article data-card={s.k} data-on={i === 0 ? '' : undefined}>
+              <b>{s.n}</b>
+              <p>{s.t}</p>
+            </article>
+          ))}
+        </div>
+
+        <a class="lx__cta" href="/contact">Book a laptop repair</a>
+        <p class="lx__hint" data-lx-hint><span>Drag to turn</span><span>Scroll to take it apart</span></p>
+      </div>
+
+      <div class="lx__bar" aria-hidden="true"><i data-lx-bar></i></div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* The track is tall; the pin inside it holds still. That is the whole
+     mechanism — everything else follows the scene's own progress. */
+  .lx { background: linear-gradient(180deg, #ffffff 0%, #f3faf4 40%, var(--off) 100%); }
+  .lx__track { height: 520svh; }
+  .lx__pin {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    overflow: hidden;
+    display: grid;
+  }
+
+  .lx__stage { position: absolute; inset: 0; }
+  .lx__stage canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    /* Dragged, so the browser must not also pan the page under the
+       finger on a touch screen. */
+    touch-action: pan-y;
+    cursor: grab;
+  }
+  .lx__stage canvas:active { cursor: grabbing; }
+
+  .lx__copy {
+    position: relative;
+    z-index: 2;
+    align-self: center;
+    justify-self: start;
+    width: min(26rem, 82vw);
+    margin-inline-start: var(--gut, 1.5rem);
+    pointer-events: none;
+  }
+  .lx__copy a { pointer-events: auto; }
+
+  .lx__eb {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--green-deep);
+  }
+  .lx__h {
+    margin-top: var(--s4);
+    font-size: clamp(2rem, 3.6vw, 3.1rem);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1.04;
+    color: var(--text);
+  }
+
+  .lx__ix {
+    display: grid;
+    gap: 0;
+    margin-top: var(--s6);
+    border-top: 1px solid var(--line-light);
+  }
+  .lx__ix li {
+    display: grid;
+    grid-template-columns: 2.2rem minmax(0, 1fr);
+    gap: 0.6rem;
+    padding: 0.42rem 0;
+    border-bottom: 1px solid var(--line-light);
+    font-size: 0.9375rem;
+    color: var(--text-3);
+    transition: color var(--t2) var(--ease);
+  }
+  .lx__ix li[data-on] { color: var(--text); }
+  .lx__ix b {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-3);
+  }
+  .lx__ix li[data-on] b { color: var(--green-deep); }
+
+  /* One card at a time, in the same grid cell so nothing reflows. */
+  .lx__cards { display: grid; margin-top: var(--s5); }
+  .lx__cards article {
+    grid-area: 1 / 1;
+    opacity: 0;
+    translate: 0 10px;
+    transition: opacity 420ms var(--ease), translate 420ms var(--ease);
+  }
+  .lx__cards article[data-on] { opacity: 1; translate: 0 0; }
+  .lx__cards b { font-size: 1.0625rem; font-weight: 700; letter-spacing: -0.02em; }
+  .lx__cards p { margin-top: 0.3rem; font-size: 0.875rem; line-height: 1.55; color: var(--text-2); }
+
+  .lx__cta {
+    display: inline-flex;
+    align-items: center;
+    margin-top: var(--s5);
+    padding: 0.8rem 1.4rem;
+    border-radius: 999px;
+    /* white on #2f6429 is 6.8:1 */
+    background: var(--green-deep);
+    color: #fff;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    transition: transform var(--t2) var(--ease);
+  }
+  .lx__cta:hover { transform: translateY(-2px); }
+
+  .lx__hint {
+    display: flex;
+    gap: 1.1rem;
+    margin-top: var(--s5);
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    transition: opacity 400ms var(--ease);
+  }
+  .lx__hint[data-used] { opacity: 0; }
+
+  .lx__tip {
+    position: absolute;
+    left: var(--x, 50%);
+    top: var(--y, 50%);
+    z-index: 3;
+    translate: 14px -50%;
+    max-width: 16rem;
+    padding: 0.6rem 0.8rem 0.7rem;
+    border-radius: 12px;
+    border: 1px solid var(--line-light);
+    background: rgb(255 255 255 / 0.94);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 14px 30px -18px rgb(10 30 12 / 0.5);
+    pointer-events: none;
+  }
+  .lx__tip b { display: block; font-size: 0.875rem; font-weight: 700; color: var(--green-deep); }
+  .lx__tip i {
+    display: block;
+    margin-top: 0.15rem;
+    font-style: normal;
+    font-size: 0.75rem;
+    line-height: 1.45;
+    color: var(--text-2);
+  }
+
+  .lx__bar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 3;
+    height: 2px;
+    background: var(--line-light);
+  }
+  .lx__bar i { display: block; height: 100%; width: 0; background: var(--green); }
+
+  .lx__off {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-content: center;
+    max-width: 30ch;
+    margin-inline: auto;
+    text-align: center;
+    font-size: var(--small);
+    color: var(--text-2);
+  }
+
+  @media (max-width: 62rem) {
+    /* The copy sits over the machine on a phone rather than beside it,
+       and the track shortens so the whole teardown is still reachable
+       without a very long scroll. */
+    .lx__track { height: 380svh; }
+    .lx__copy {
+      align-self: start;
+      justify-self: stretch;
+      width: auto;
+      margin: calc(var(--hd-h, 5rem) + 1rem) var(--gut, 1.25rem) 0;
+    }
+    .lx__ix { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .lx__cards article { transition: none; }
+  }
+</style>
+
+<script>
+  /* three is ~133 KB gzipped. A STATIC import here puts all of it on
+     the homepage's critical path — which it briefly did, against a
+     45 KB budget for the whole page. Imported dynamically and only once
+     the section is within a screen and a half, so the homepage still
+     ships about 12 KB and the scene arrives before it is reached. */
+  function boot() {
+    const root = document.querySelector<HTMLElement>('[data-lx]');
+    const canvas = root?.querySelector<HTMLCanvasElement>('[data-lx-canvas]');
+    const track = root?.querySelector<HTMLElement>('[data-lx-track]');
+    if (!root || !canvas || !track || root.dataset.wired) return;
+    root.dataset.wired = '1';
+
+    const bar = root.querySelector<HTMLElement>('[data-lx-bar]');
+    const ix = [...root.querySelectorAll<HTMLElement>('[data-ix]')];
+    const cards = [...root.querySelectorAll<HTMLElement>('[data-card]')];
+
+    /* The order the index is written in is the order the scene tears
+       down in, so a part's key is all the page needs to know which row
+       to light. Parts the scene does not report — a model without a
+       separate SSD, say — simply never light, rather than throwing. */
+    let last = '';
+    const show = (key: string | null) => {
+      const k = key ?? '';
+      if (k === last) return;
+      last = k;
+      ix.forEach((el) => el.toggleAttribute('data-on', el.dataset.ix === k));
+      cards.forEach((el) => el.toggleAttribute('data-on', el.dataset.card === k));
+    };
+
+    const start = (mountLaptop: typeof import('@scripts/laptopScene').mountLaptop) =>
+      mountLaptop({
+      canvas,
+      track,
+      off: root.querySelector('[data-lx-off]'),
+      hint: root.querySelector('[data-lx-hint]'),
+      tip: root.querySelector('[data-lx-tip]'),
+      /* No drop target and no verdict panel: this is the customer's
+         page, not the workbench. */
+      allowDrop: false,
+      onProgress: (p: number, part: string | null) => {
+        if (bar) bar.style.width = `${(p * 100).toFixed(1)}%`;
+        show(part);
+      },
+    });
+
+    const io = new IntersectionObserver(
+      (es) => {
+        if (!es.some((e) => e.isIntersecting)) return;
+        io.disconnect();
+        import('@scripts/laptopScene').then((m) => start(m.mountLaptop));
+      },
+      { rootMargin: '150% 0px' }
+    );
+    io.observe(root);
+  }
+
+  boot();
+  document.addEventListener('astro:page-load', boot);
+</script>
