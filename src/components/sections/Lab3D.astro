@@ -263,22 +263,42 @@
        error. */
     const MODEL_URL = '/models/laptop.glb';
 
-    /* Parts the rig separates, in the order a teardown happens.
+    /* WHERE EACH PART GOES, and in what order it leaves.
+       A real exploded diagram does not send everything one way — the
+       screen lifts, the base drops, the fans go out to their own sides.
+       Sending them all straight up is legible but reads as a stack of
+       plates, which is what this replaces.
+
+       x is lateral, y vertical, z front-to-back, in units of the
+       normalised body width. `side` means the offset is mirrored by
+       which half of the machine the part actually sits in, so a pair of
+       fans separates outwards instead of both going the same way.
+
        Matching is loose — letters only, partial — so "Bottom_Case_01"
-       answers to "bottomcase". Anything matching none of these stays
-       put and reads as the body. */
-    const PART_ORDER = [
-      'screen', 'display', 'lid',
-      'keyboard', 'topcase',
-      'battery',
-      'motherboard', 'mainboard', 'logicboard',
-      'fan', 'cooler', 'heatsink',
-      'speaker',
-      'storage', 'ssd', 'drive',
-      'bottomcase', 'base',
+       answers to "bottomcase". Anything matching nothing stays put and
+       reads as the body. */
+    const PARTS: { key: string; v: [number, number, number]; side?: boolean }[] = [
+      { key: 'screen',      v: [0, 1.00, -0.10] },
+      { key: 'display',     v: [0, 1.00, -0.10] },
+      { key: 'lid',         v: [0, 1.00, -0.10] },
+      { key: 'keyboard',    v: [0, 0.58, 0] },
+      { key: 'topcase',     v: [0, 0.58, 0] },
+      { key: 'speaker',     v: [0.62, 0.34, 0.06], side: true },
+      { key: 'fan',         v: [0.58, 0.26, -0.14], side: true },
+      { key: 'cooler',      v: [0.58, 0.26, -0.14], side: true },
+      { key: 'heatsink',    v: [0.58, 0.26, -0.14], side: true },
+      { key: 'motherboard', v: [0, 0.12, 0.46] },
+      { key: 'mainboard',   v: [0, 0.12, 0.46] },
+      { key: 'logicboard',  v: [0, 0.12, 0.46] },
+      { key: 'storage',     v: [0.46, 0.04, 0.30], side: true },
+      { key: 'ssd',         v: [0.46, 0.04, 0.30], side: true },
+      { key: 'drive',       v: [0.46, 0.04, 0.30], side: true },
+      { key: 'battery',     v: [0, -0.34, 0.22] },
+      { key: 'bottomcase',  v: [0, -0.62, 0] },
+      { key: 'base',        v: [0, -0.62, 0] },
     ];
 
-    type Part = { obj: THREE.Object3D; home: THREE.Vector3; lift: number };
+    type Part = { obj: THREE.Object3D; home: THREE.Vector3; move: THREE.Vector3 };
     let parts: Part[] = [];
 
     fetch(MODEL_URL, { method: 'HEAD' })
@@ -320,23 +340,39 @@
              degrades to a solid object that still turns, rather than to
              a broken page. */
           const found: Part[] = [];
+          /* Centre in the model's own space, so `side` can ask which
+             half a part sits in. */
+          const mid = new THREE.Box3().setFromObject(m).getCenter(new THREE.Vector3());
+          const unit = W;
+
           m.traverse((o) => {
             const key = o.name.toLowerCase().replace(/[^a-z]/g, '');
             if (!key) return;
-            const idx = PART_ORDER.findIndex((t) => key.includes(t));
-            if (idx < 0) return;
+            const spec = PARTS.find((t) => key.includes(t.key));
+            if (!spec) return;
             /* Skip anything under a part already taken, or a child and
                its parent separate by different amounts and the piece
                tears itself apart. */
             for (let a: THREE.Object3D | null = o.parent; a; a = a.parent) {
               if (found.some((f) => f.obj === a)) return;
             }
-            found.push({ obj: o, home: o.position.clone(), lift: 0 });
+
+            const here = o.getWorldPosition(new THREE.Vector3());
+            /* Default to the right where a part sits dead on the centre
+               line, so a lone fan still travels somewhere. */
+            const sign = spec.side ? (here.x < mid.x ? -1 : 1) : 1;
+
+            found.push({
+              obj: o,
+              home: o.position.clone(),
+              move: new THREE.Vector3(
+                spec.v[0] * sign * unit,
+                spec.v[1] * unit,
+                spec.v[2] * unit
+              ),
+            });
           });
 
-          /* Straight up, spaced by teardown order. Radial directions
-             read as an explosion; a stack reads as a diagram. */
-          found.forEach((f, i) => (f.lift = (found.length - i) * 0.55));
           parts = found;
 
           laptop.clear();
@@ -442,11 +478,15 @@
       controls.update();
 
       if (parts.length) {
-        /* A real model: every named part rises by its place in the
-           teardown, so the thing comes apart as a diagram rather than
-           opening like a lid. */
+        /* A real model: every named part travels its own way — screen
+           up, base down, fans out to their own sides — scaled by how
+           far through the section you are. */
         for (const f of parts) {
-          f.obj.position.set(f.home.x, f.home.y + f.lift * open, f.home.z);
+          f.obj.position.set(
+            f.home.x + f.move.x * open,
+            f.home.y + f.move.y * open,
+            f.home.z + f.move.z * open
+          );
         }
       } else {
         // Procedural fallback: 0 closed, 1 open at about 115 degrees.
