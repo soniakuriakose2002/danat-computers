@@ -5,18 +5,24 @@
  * the film fills the page; the film ends in the site's two-layer wave.
  * Scrolling back up reverses it.
  *
- * The screen rectangle was measured on the 900x640 photo:
- * glass at x 221–680, y 171–429 (16:9, the same shape as the film).
+ * The photo is a complete laptop at three-quarter view, cleaned up
+ * (edge fringe removed, bezel brand mark removed): laptop-hero.png.
+ * Its glass was measured on the 900x640 photo as a four-corner shape:
+ * TL 139,236.5  TR 518.5,229.5  BR 561,463  BL 187.5,505.
+ * The film is fitted to exactly that shape with a perspective transform,
+ * so it sits in the screen at the same angle as the laptop. Zooming in
+ * moves those four corners out to the edges of the page, which straightens
+ * the screen as the camera flies in.
  * The film's own Get Support button is made clickable while it is on
  * screen (12.4–15.1 s of each loop), measured from the film.
  */
 import { Image } from 'astro:assets';
 import { site, whatsappLink } from '@data/site';
-import laptop from '@assets/products/lenovo.png';
+import laptop from '@assets/products/laptop-hero.png';
 ---
 <section class="hl" data-hl aria-label="Danat Computers">
   <div class="hl__stage">
-    <div class="hl__view">
+    <div class="hl__view" data-hl-rise>
       <div class="hl__dev" data-hl-dev>
         <span class="hl__floor" aria-hidden="true"></span>
         <Image src={laptop} alt="Laptop playing the Danat Computers film" width={900} quality={90} loading="eager" class="hl__img" />
@@ -25,7 +31,10 @@ import laptop from '@assets/products/lenovo.png';
             muted loop playsinline autoplay preload="auto"
             controlslist="nodownload noplaybackrate noremoteplayback" disablepictureinpicture disableremoteplayback
             aria-label="Danat Computers IT support film"></video>
-          <a class="hl__hot" href={whatsappLink()} target="_blank" rel="noopener noreferrer"
+          {/* WhatsApp, not /contact. Every other "Get Support" on the site
+          — the header button this imitates, and the mobile nav —
+          opens WhatsApp on the verified number. */}
+    <a class="hl__hot" href={whatsappLink()} target="_blank" rel="noopener noreferrer"
       data-hl-hot aria-label="Get Support" tabindex="-1"></a>
           <span class="hl__glare" aria-hidden="true"></span>
         </div>
@@ -48,13 +57,17 @@ import laptop from '@assets/products/lenovo.png';
 <style>
   .hl { position: relative; height: 420vh; background: radial-gradient(90% 70% at 70% 40%, #15301a 0%, var(--ink) 60%); color: #fff; }
   .hl__stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
-  .hl__view { position: absolute; inset: 0; perspective: 1400px; }
+  /* the laptop rises in once, on arrival — not tied to scrolling */
+  .hl__view { position: absolute; inset: 0; opacity: 0; transform: translate3d(0, 70px, 0) scale(0.94); transition: opacity 1.2s var(--ease), transform 1.4s var(--ease); }
+  .hl.is-in .hl__view { opacity: 1; transform: none; }
   .hl__dev { position: absolute; left: 0; top: 0; width: min(56vw, 980px); aspect-ratio: 900 / 640; transform-origin: 0 0; will-change: transform; }
   .hl__dev :global(.hl__img) { position: absolute; inset: 0; width: 100%; height: 100%; filter: drop-shadow(0 40px 60px rgb(0 0 0 / 0.6)); }
-  .hl__scr { position: absolute; left: 24.556%; top: 26.719%; width: 51%; height: 40.313%; overflow: hidden; background: #000; }
+  /* 1600x900 box mapped onto the photo's glass by the script */
+  .hl__scr { position: absolute; left: 0; top: 0; width: 1600px; height: 900px; transform-origin: 0 0; overflow: hidden; background: #000; }
   .hl__scr video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; pointer-events: none; }
   .hl__glare { position: absolute; inset: 0; pointer-events: none; opacity: var(--gl, 1);
-    background: linear-gradient(115deg, rgb(255 255 255 / 0.12) 0%, rgb(255 255 255 / 0.03) 28%, transparent 45%); }
+    background: linear-gradient(115deg, rgb(255 255 255 / 0.1) 0%, rgb(255 255 255 / 0.03) 28%, transparent 45%);
+    box-shadow: inset 0 0 60px rgb(0 0 0 / 0.45); }
   .hl__floor { position: absolute; left: 50%; top: 96%; width: 120%; height: 40%; transform: translateX(-50%); z-index: -1; opacity: var(--gl, 1);
     background: radial-gradient(closest-side, rgb(89 170 84 / 0.35), transparent); filter: blur(10px); }
   .hl__hot { position: absolute; left: 6.6%; top: 68.6%; width: 22%; height: 12.4%; z-index: 3; border-radius: 999px; pointer-events: none; }
@@ -92,6 +105,7 @@ import laptop from '@assets/products/lenovo.png';
     .hl__stage { position: relative; }
     .hl__l > span { transform: none; transition: none; }
     .hl__hud { display: none; }
+    .hl__view { opacity: 1; transform: none; transition: none; }
   }
 </style>
 
@@ -99,6 +113,32 @@ import laptop from '@assets/products/lenovo.png';
   const clamp = (v: number, a = 0, b = 1) => Math.min(b, Math.max(a, v));
   const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
   const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+
+  type P = number[];
+  /* glass corners on the 900x640 photo: TL, TR, BR, BL */
+  const GLASS: P[] = [[139, 236.5], [518.5, 229.5], [561, 463], [187.5, 505]];
+  const RECT: P[] = [[0, 0], [1600, 0], [1600, 900], [0, 900]];
+
+  /* 3x3 projective map taking four points onto four points */
+  function homography(src: P[], dst: P[]): number[] {
+    const A: number[][] = [], bb: number[] = [];
+    for (let i = 0; i < 4; i++) {
+      const [x, y] = src[i], [u, v] = dst[i];
+      A.push([x, y, 1, 0, 0, 0, -u * x, -u * y]); bb.push(u);
+      A.push([0, 0, 0, x, y, 1, -v * x, -v * y]); bb.push(v);
+    }
+    for (let c = 0; c < 8; c++) {
+      let piv = c; for (let r = c + 1; r < 8; r++) if (Math.abs(A[r][c]) > Math.abs(A[piv][c])) piv = r;
+      [A[c], A[piv]] = [A[piv], A[c]]; [bb[c], bb[piv]] = [bb[piv], bb[c]];
+      for (let r = 0; r < 8; r++) if (r !== c) {
+        const f = A[r][c] / A[c][c];
+        for (let j = c; j < 8; j++) A[r][j] -= f * A[c][j];
+        bb[r] -= f * bb[c];
+      }
+    }
+    return bb.map((v, i) => v / A[i][i]);
+  }
+  const css = (h: number[]) => `matrix3d(${h[0]},${h[3]},0,${h[6]},${h[1]},${h[4]},0,${h[7]},0,0,1,0,${h[2]},${h[5]},0,1)`;
 
   function start() {
     const sec = document.querySelector<HTMLElement>('[data-hl]');
@@ -109,6 +149,8 @@ import laptop from '@assets/products/lenovo.png';
     fitHdr(); addEventListener('resize', fitHdr, { passive: true });
 
     const dev = sec.querySelector<HTMLElement>('[data-hl-dev]')!;
+    const scr = sec.querySelector<HTMLElement>('.hl__scr')!;
+    let lastK = -1;
     const vid = sec.querySelector<HTMLVideoElement>('video')!;
     const hot = sec.querySelector<HTMLAnchorElement>('[data-hl-hot]')!;
     const title = sec.querySelector<HTMLElement>('[data-hl-title]')!;
@@ -129,19 +171,22 @@ import laptop from '@assets/products/lenovo.png';
       if (!visible || !sec!.isConnected) return;
       const r = sec!.getBoundingClientRect();
       const p = reduced ? 0 : clamp(-r.top / Math.max(1, r.height - innerHeight));
-      const a = ease(clamp(p / 0.22)), d = ease(clamp((p - 0.22) / 0.6)), w = clamp((p - 0.9) / 0.1);
+      const d = ease(clamp((p - 0.08) / 0.72)), w = clamp((p - 0.9) / 0.1);
       title.style.opacity = String(1 - clamp(p / 0.16));
       title.style.transform = `translateY(${-clamp(p / 0.16) * 60}px)`;
       huds.forEach((h) => (h.style.opacity = String(1 - clamp(p / 0.25))));
       wave.style.height = `${w * Math.min(110, Math.max(44, innerWidth * 0.06))}px`;
 
-      const W = innerWidth, H = innerHeight, dw = dev.offsetWidth, dh = dev.offsetHeight;
-      const sx = dw * 0.24556, sy = dh * 0.26719, sw = dw * 0.51, sh = dh * 0.40313;
-      const S = Math.max(W / sw, H / sh) * 1.01;
-      const x0 = W > 900 ? W - dw - W * 0.04 : (W - dw) / 2;
-      const y0 = W > 900 ? (H - dh) / 2 + H * 0.03 : H * 0.2;
-      const x1 = W / 2 - (sx + sw / 2) * S, y1 = H / 2 - (sy + sh / 2) * S;
-      dev.style.transform = `translate3d(${lerp(x0, x1, d)}px,${lerp(y0, y1, d) + (1 - a) * 60}px,0) rotateX(${(1 - a) * 16}deg) scale(${lerp(1, S, d)})`;
+      const W = innerWidth, H = innerHeight, dw = dev.offsetWidth, dh = dev.offsetHeight, k = dw / 900;
+      const Q = GLASS.map(([x, y]) => [x * k, y * k]);
+      const x0 = W > 900 ? W - dw - W * 0.03 : (W - dw) / 2;
+      const y0 = W > 900 ? (H - dh) / 2 + H * 0.06 : H * 0.18;
+      /* where the glass must end up: a 16:9 box covering the whole page */
+      const cw = Math.max(W, H * 16 / 9) * 1.01, ch = cw * 9 / 16, cx = (W - cw) / 2, cy = (H - ch) / 2;
+      const R = [[cx, cy], [cx + cw, cy], [cx + cw, cy + ch], [cx, cy + ch]];
+      const T = Q.map(([x, y], i) => [lerp(x + x0, R[i][0], d), lerp(y + y0, R[i][1], d)]);
+      if (k !== lastK) { scr.style.transform = css(homography(RECT, Q)); lastK = k; }
+      dev.style.transform = css(homography(Q, T));
       dev.style.setProperty('--gl', (1 - d).toFixed(3));
 
       const live = d > 0.85 && vid.currentTime >= 12.3 && vid.currentTime <= 15.3;

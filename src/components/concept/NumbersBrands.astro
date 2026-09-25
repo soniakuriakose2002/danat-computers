@@ -1,14 +1,13 @@
 ---
 /**
- * NUMBERS + BRANDS — the ERP-backed figures set very large, then every
- * brand carried in two moving rows that speed up while the page scrolls.
+ * NUMBERS — the ERP-backed figures. The brands themselves are shown by
+ * the site's own BrandStrip ("What we carry"), placed just before this.
  */
-import { site, brands } from '@data/site';
-const total = brands.flat().length;
+import { site } from '@data/site';
+/* Lines in stock and brands are already shown by the brand strip above. */
 const figs = [
-  { v: site.stats.parts, l: 'Lines in stock' },
   { v: site.stats.categories, l: 'Product categories' },
-  { v: total, l: 'Brands carried' },
+  { v: site.stats.branches, l: 'Branches in Oman' },
   { v: site.stats.since, l: 'Trading since', plain: true },
 ];
 ---
@@ -20,48 +19,15 @@ const figs = [
       ))}
     </div>
   </div>
-  <div class="nb__mq" aria-hidden="true">
-    {brands.map((row, i) => (
-      <div class:list={['nb__row', { 'nb__row--o': i % 2 }]} data-nb-row>
-        {[...row, ...row].map((b) => <span>{b}</span>)}
-      </div>
-    ))}
-  </div>
-  <p class="nb__sr">Brands carried: {brands.flat().join(', ')}.</p>
 </section>
 
 <style>
-  .nb { background: var(--ink); color: #fff; padding-block: clamp(6rem, 11vw, 10rem) clamp(4rem, 7vw, 6rem); overflow: hidden; }
-  .nb__grid { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid rgb(255 255 255 / 0.12); }
+  .nb { background: var(--ink); color: #fff; padding-block: clamp(4rem, 7vw, 6rem); }
+  .nb__grid { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid rgb(255 255 255 / 0.12); }
   .nb__c { padding: 2rem 1.5rem 2rem 0; border-right: 1px solid rgb(255 255 255 / 0.12); }
   .nb__c:last-child { border-right: 0; }
   .nb__v { font-size: clamp(2.2rem, 4.2vw, 4rem); font-weight: 700; letter-spacing: -0.045em; line-height: 1; }
   .nb__l { margin-top: 0.8rem; font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; color: rgb(255 255 255 / 0.55); }
-  .nb__mq { margin-top: clamp(4rem, 8vw, 7rem); display: grid; gap: 0.6rem; }
-  .nb__row { display: flex; white-space: nowrap; will-change: transform; }
-  .nb__row span { font-size: clamp(2.2rem, 4.8vw, 4.8rem); font-weight: 700; letter-spacing: -0.05em; line-height: 1.05; padding-right: 0.6em; }
-  .nb__row--o span { color: transparent; -webkit-text-stroke: 1.3px rgb(255 255 255 / 0.35); }
-  .nb__row span:nth-child(3n) { color: var(--green-bright); -webkit-text-stroke: 0; }
-  .nb__sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
-  @media (max-width: 51.25rem) { .nb__grid { grid-template-columns: 1fr 1fr; } .nb__c:nth-child(2) { border-right: 0; } }
+  @media (max-width: 51.25rem) { .nb__grid { grid-template-columns: 1fr; } .nb__c { border-right: 0; border-bottom: 1px solid rgb(255 255 255 / 0.12); } }
 </style>
 
-<script>
-  function start() {
-    const sec = document.querySelector<HTMLElement>('[data-nb]');
-    if (!sec || sec.dataset.wired) return;
-    sec.dataset.wired = '1';
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const rows = [...sec.querySelectorAll<HTMLElement>('[data-nb-row]')];
-    let x = 0, lastY = scrollY, raf = 0, on = false;
-    const tick = () => {
-      raf = 0; if (!on) return;
-      const v = Math.abs(scrollY - lastY); lastY = scrollY;
-      x += 0.6 + Math.min(v, 80) * 0.35;
-      rows.forEach((r, i) => { const half = r.scrollWidth / 2; const m = x % half; r.style.transform = `translate3d(${i % 2 ? m - half : -m}px,0,0)`; });
-      raf = requestAnimationFrame(tick);
-    };
-    new IntersectionObserver(([e]) => { on = e.isIntersecting; if (on && !raf) raf = requestAnimationFrame(tick); }).observe(sec);
-  }
-  document.addEventListener('astro:page-load', start);
-</script>
