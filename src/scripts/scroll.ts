@@ -167,11 +167,15 @@ export function initCounters(root: ParentNode = document) {
           if (el.dataset.counting) continue;
           el.dataset.counting = '1';
           run(el);
-        } else if (!e.isIntersecting) {
+        } else if (!e.isIntersecting && !REDUCED) {
           delete el.dataset.counting;
           /* Armed again. It used to unobserve after the first run, so
              scrolling back past a figure showed the finished number and
-             never the count — which read as the animation being gone. */
+             never the count — which read as the animation being gone.
+
+             REDUCED is excluded here as well as above: without it, a
+             visitor who has asked for no motion had their figures blanked
+             to 0 the moment they scrolled past, and left that way. */
           el.textContent = '0';
         }
       }
@@ -181,6 +185,25 @@ export function initCounters(root: ParentNode = document) {
        count off-view and you arrive at the finished number. */
     { threshold: [0, 0.25], rootMargin: '0px 0px -33% 0px' }
   );
+  /* ZERO THEM NOW, not when the observer first reports them off-screen.
+     The figures are rendered at their final value on the server, which
+     is right — without JavaScript the numbers should still be correct.
+     But it meant the count only ever appeared if the observer's
+     "not intersecting" branch fired first, and when it did not the
+     figure simply sat there already finished. That is what "counting is
+     not working" was: nothing was animating because nothing had been
+     set back to zero.
+
+     JavaScript is plainly running by this line, so the starting state
+     is ours to set. REDUCED is excluded — someone who has asked for no
+     motion should keep the real number. */
+  if (!REDUCED) {
+    els.forEach((el) => {
+      el.textContent = '0';
+      delete (el as HTMLElement).dataset.counting;
+    });
+  }
+
   els.forEach((el) => io.observe(el));
 }
 
