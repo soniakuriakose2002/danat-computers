@@ -124,7 +124,7 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
       </div>
       <ol class="aj__stack">
         {journey.map((j, i) => (
-          <li class:list={['aj__card', `aj__card--${i % 2}`]} data-aj-card style={`--i:${i}`}>
+          <li class:list={['aj__card', `aj__card--${i % 4}`]} data-aj-card style={`--i:${i}`}>
             <span class="aj__n">{String(i + 1).padStart(2, '0')} / {String(journey.length).padStart(2, '0')}</span>
             <b class="aj__yr">{j.year}</b>
             <p class="aj__t">{j.t}</p>
@@ -343,7 +343,12 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
   .af__c--0 small { color: rgb(255 255 255 / 0.6); }
 
   /* ───── 03 journey ───── */
-  .aj { background: var(--off); padding-block: clamp(5rem, 10vw, 8rem) clamp(3rem, 6vw, 5rem); }
+  /* Pastel, not tonal. Each milestone gets its own soft ground instead of
+     the old white/near-black alternation — four chalky tints that read as
+     one family because they share a low saturation and a high value.
+     Contrast computed, not eyeballed (see the table below each pair). */
+  .aj { background: linear-gradient(180deg, #f3f7f2 0%, #f7f3ed 55%, #f4f1f5 100%);
+    padding-block: clamp(5rem, 10vw, 8rem) clamp(3rem, 6vw, 5rem); }
   .aj__intro { max-width: 44rem; margin-bottom: clamp(2.5rem, 6vw, 4rem); }
   .aj__h { margin-top: var(--s4); font-size: clamp(2rem, 3.6vw, 3.1rem); font-weight: 700; letter-spacing: -0.038em; line-height: 1.06; }
   .aj__p { margin-top: var(--s4); max-width: 44ch; color: var(--text-2); line-height: 1.65; }
@@ -351,18 +356,28 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
   /* each card pins a little lower than the one before; the ones underneath tip back */
   .aj__card { position: sticky; top: calc(var(--hdr, 88px) + 2rem + var(--i) * 22px); min-height: min(58vh, 30rem);
     display: grid; align-content: space-between; padding: clamp(1.6rem, 4vw, 3rem); border-radius: 28px;
-    background: var(--white); border: 1px solid rgb(0 0 0 / 0.06); box-shadow: 0 30px 60px -40px rgb(20 40 25 / 0.4);
+    background: var(--pc, #fff); border: 1px solid rgb(20 40 25 / 0.05); box-shadow: 0 34px 64px -44px rgb(40 50 45 / 0.38);
     transform-origin: 50% 0%; transform: translateZ(0) scale(var(--s, 1)) rotateX(var(--r, 0deg)); filter: brightness(var(--b, 1));
     will-change: transform; }
-  .aj__card--1 { background: radial-gradient(120% 100% at 100% 0%, #1f4f22 0%, var(--ink) 65%); color: #fff; border-color: transparent; }
-  .aj__n { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.18em; color: var(--text-3); }
-  .aj__card--1 .aj__n { color: rgb(255 255 255 / 0.5); }
-  /* On the page's display ladder, not above it. At 11rem/-0.06em this was
-     bigger and tighter than the hero, and a grotesk pushed that far past
-     the rest of the page stops reading as the same typeface. */
-  .aj__yr { display: block; font-size: clamp(3.4rem, 7vw, 6rem); font-weight: 700; letter-spacing: -0.05em; line-height: 0.92; color: var(--green-deep); }
-  .aj__card--1 .aj__yr { color: var(--green-bright); }
-  .aj__t { max-width: 30ch; font-size: clamp(1.1rem, 1.8vw, 1.5rem); font-weight: 600; letter-spacing: -0.02em; line-height: 1.35; }
+  /*                ground     year ink   ── year on ground / body #14171A
+     mint   2003    #E6F0E4    #2F6429       6.03 : 1  /  15.38 : 1
+     sand   2010    #F3EADC    #8A5518       5.19 : 1  /  15.09 : 1
+     blush  2016    #F4E6E3    #9B4A3C       5.02 : 1  /  14.80 : 1
+     mist   Today   #E3ECEF    #2D5866       6.49 : 1  /  15.00 : 1
+     All AA at any size; the years are large text, which needs only 3:1. */
+  .aj__card--0 { --pc: #e6f0e4; --yr: #2f6429; }
+  .aj__card--1 { --pc: #f3eadc; --yr: #8a5518; }
+  .aj__card--2 { --pc: #f4e6e3; --yr: #9b4a3c; }
+  .aj__card--3 { --pc: #e3ecef; --yr: #2d5866; }
+  /* --text-3 drops to 4.15:1 on blush, which small mono text cannot have.
+     --text-2 clears 5.27:1 on the worst of the four. */
+  .aj__n { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.18em; color: var(--text-2); }
+  /* The serif italic, not the grotesk — the one place on this page the
+     type changes voice. Serif display faces are drawn with their own
+     fit, so the negative tracking the grotesk needed comes back off. */
+  .aj__yr { display: block; font-family: var(--font-serif); font-style: italic; font-weight: 400;
+    font-size: clamp(3.6rem, 7.4vw, 6.4rem); letter-spacing: -0.012em; line-height: 0.95; color: var(--yr, var(--green-deep)); }
+  .aj__t { max-width: 30ch; font-size: clamp(1.05rem, 1.7vw, 1.4rem); font-weight: 500; letter-spacing: -0.015em; line-height: 1.4; color: var(--text); }
 
   /* ───── 05 difference ───── */
   .ad { position: relative; overflow: hidden; color: #fff; background: var(--ink); min-height: 100svh; display: grid; align-items: center; }
@@ -522,7 +537,10 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
         const cover = clamp((a.bottom - n.top) / a.height);          // 0 → 1 as the next card slides over
         c.style.setProperty('--s', (1 - 0.07 * cover).toFixed(4));
         c.style.setProperty('--r', `${(8 * cover).toFixed(2)}deg`);
-        c.style.setProperty('--b', (1 - 0.25 * cover).toFixed(3));
+        /* 0.25 was tuned against white and near-black. Pastels have
+           nowhere to go when darkened — they turn grey rather than dim —
+           so the covered card recedes by a tenth, not a quarter. */
+        c.style.setProperty('--b', (1 - 0.1 * cover).toFixed(3));
       });
       /* difference: the framed photo opens out to full width as it arrives */
       if (ad && shot) {
