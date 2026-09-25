@@ -305,12 +305,15 @@
       metalness: 0.5,
       roughness: 0.55,
     });
+    /* Near-black glass with the faintest green in it. The emissive was
+       carrying the whole colour before, which on a pale ground read as
+       a flat olive panel rather than a screen that is switched off. */
     const screenMat = new THREE.MeshStandardMaterial({
-      color: 0x05070a,
-      roughness: 0.12,
-      metalness: 0.2,
+      color: 0x0a0f12,
+      roughness: 0.08,
+      metalness: 0.35,
       emissive: new THREE.Color(GREEN),
-      emissiveIntensity: 0.1,
+      emissiveIntensity: 0.04,
     });
 
     // ── the machine ───────────────────────────────────────────────
@@ -356,12 +359,33 @@
       const g = new THREE.Group();
       const deck = T / 2;
 
-      g.add(name(at(slab(W, T * 0.34, D, shell, 0.06), 0, -T * 0.33, 0), 'BottomCase'));
+      /* A TRAY, not a plate. Four low walls around a floor is the
+         single cheapest thing that stops the exploded view reading as a
+         stack of chopping boards. */
+      const tray = new THREE.Group();
+      tray.add(at(slab(W, 0.04, D, shell, 0.06), 0, -T * 0.42, 0));
+      const wallH = T * 0.42;
+      tray.add(at(slab(W, wallH, 0.05, shell, 0.02), 0, -T * 0.22, -D / 2 + 0.025));
+      tray.add(at(slab(W, wallH, 0.05, shell, 0.02), 0, -T * 0.22, D / 2 - 0.025));
+      tray.add(at(slab(0.05, wallH, D, shell, 0.02), -W / 2 + 0.025, -T * 0.22, 0));
+      tray.add(at(slab(0.05, wallH, D, shell, 0.02), W / 2 - 0.025, -T * 0.22, 0));
+      g.add(name(tray, 'BottomCase'));
       g.add(name(at(slab(W * 0.9, 0.05, D * 0.5, green), 0, -T * 0.08, -D * 0.14), 'Motherboard'));
       g.add(name(at(slab(W * 0.62, 0.09, D * 0.3, dark), 0, -T * 0.08, D * 0.22), 'Battery'));
 
       for (const sx of [-1, 1]) {
-        const fan = new THREE.Mesh(new THREE.CylinderGeometry(D * 0.15, D * 0.15, 0.06, 28), dark);
+        /* Housing, hub and blades. A bare cylinder is a hockey puck. */
+        const fan = new THREE.Group();
+        fan.add(new THREE.Mesh(new THREE.CylinderGeometry(D * 0.15, D * 0.15, 0.05, 30), dark));
+        const hub = new THREE.Mesh(new THREE.CylinderGeometry(D * 0.045, D * 0.045, 0.062, 20), shell);
+        fan.add(hub);
+        for (let i = 0; i < 9; i++) {
+          const blade = new THREE.Mesh(new THREE.BoxGeometry(D * 0.092, 0.012, 0.022), shell);
+          const ang = (i / 9) * Math.PI * 2;
+          blade.position.set(Math.cos(ang) * D * 0.095, 0.02, Math.sin(ang) * D * 0.095);
+          blade.rotation.y = -ang + 0.5;
+          fan.add(blade);
+        }
         fan.position.set(sx * W * 0.3, -T * 0.02, -D * 0.26);
         g.add(name(fan, `Fan_${sx < 0 ? 'L' : 'R'}`));
 
@@ -382,8 +406,33 @@
 
       const top = slab(W, T * 0.3, D, shell, 0.05);
       top.position.set(0, deck - T * 0.15, 0);
-      const kb = slab(W * 0.86, 0.03, D * 0.52, dark);
-      kb.position.set(0, deck + 0.01, -D * 0.16);
+      /* Keycaps. Instanced, because 84 of them as separate meshes is a
+         draw call each for something that is pure texture at this
+         distance — and it is the detail that makes the deck read as a
+         keyboard rather than a black rectangle. */
+      const kb = new THREE.Group();
+      kb.add(at(slab(W * 0.86, 0.02, D * 0.52, dark), 0, deck + 0.005, -D * 0.16));
+      const cols = 14, rows = 5;
+      const cap = new THREE.InstancedMesh(
+        new RoundedBoxGeometry(W * 0.052, 0.016, D * 0.072, 1, 0.006),
+        new THREE.MeshPhysicalMaterial({ color: 0x24282b, roughness: 0.75 }),
+        cols * rows
+      );
+      const mtx = new THREE.Matrix4();
+      let n = 0;
+      for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+          mtx.setPosition(
+            (c - (cols - 1) / 2) * W * 0.06,
+            deck + 0.024,
+            -D * 0.16 + (r - (rows - 1) / 2) * D * 0.088
+          );
+          cap.setMatrixAt(n++, mtx);
+        }
+      }
+      cap.instanceMatrix.needsUpdate = true;
+      cap.castShadow = true;
+      kb.add(cap);
       const pad = slab(W * 0.3, 0.02, D * 0.26, shell);
       pad.position.set(0, deck + 0.009, D * 0.26);
       const topCase = new THREE.Group();
