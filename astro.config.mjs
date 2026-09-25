@@ -15,12 +15,13 @@ export default defineConfig({
     responsiveStyles: true,
   },
   /* The concept page is a standalone file in public/, not an Astro
-     page. `astro dev` serves public/ but does NOT resolve a directory
-     to its index.html the way the built site does — so /concept/ was a
-     404 in dev and a 200 in production. This makes both work. */
+     page. It lives at /concept.html rather than /concept/index.html
+     because `astro dev` does not resolve a directory to its index the
+     way the built site does — and redirecting /concept/ AT that
+     directory collides with the file itself, which Astro warns will
+     become a hard error. A flat file collides with nothing. */
   redirects: {
-    '/concept': '/concept/index.html',
-    '/concept/': '/concept/index.html',
+    '/concept': '/concept.html',
   },
   build: {
     inlineStylesheets: 'auto',
