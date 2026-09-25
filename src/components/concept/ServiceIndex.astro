@@ -1,0 +1,76 @@
+---
+/**
+ * SERVICES — huge service names; hovering one shows its photo following
+ * the pointer. Rows come from the same service list as the rest of the
+ * site, and link to each service page.
+ */
+import { Image } from 'astro:assets';
+import { hubServices } from '@data/services';
+import { serviceMedia, fallbackMedia } from '@data/serviceMedia';
+
+const rows = hubServices.map((s) => {
+  const slug = s.href.split('/').pop() ?? '';
+  return { ...s, media: serviceMedia[slug] ?? fallbackMedia };
+});
+---
+<section class="sx" data-sx id="services" aria-labelledby="sx-title">
+  <div class="shell">
+    <div class="sx__top">
+      <h2 id="sx-title">What do you need help with?</h2>
+      <p>Complete IT solutions for homes and businesses across Oman. Walk in to any branch, or message us first.</p>
+    </div>
+    <ul class="sx__list">
+      {rows.map((s, i) => (
+        <li><a class="sx__row" href={s.href} data-i={i}><span class="sx__n">{s.n}</span><span class="sx__t">{s.title}</span><span class="sx__s">{s.tagline}</span></a></li>
+      ))}
+    </ul>
+  </div>
+  <div class="sx__peek" data-sx-peek aria-hidden="true">
+    {rows.map((s) => <Image src={s.media.img} alt="" width={640} quality={72} />)}
+  </div>
+</section>
+
+<style>
+  .sx { background: var(--off); color: var(--text); padding-block: clamp(6rem, 12vw, 11rem); }
+  .sx__top { display: flex; justify-content: space-between; align-items: end; gap: 2rem; margin-bottom: 3.5rem; }
+  .sx__top h2 { font-size: clamp(2.4rem, 6vw, 6rem); font-weight: 800; letter-spacing: -0.055em; line-height: 0.92; max-width: 12ch; }
+  .sx__top p { max-width: 34ch; color: var(--text-2); line-height: 1.55; }
+  .sx__list { list-style: none; margin: 0; padding: 0; border-top: 1px solid rgb(0 0 0 / 0.12); }
+  .sx__row { display: grid; grid-template-columns: 4rem 1fr auto; align-items: center; gap: 1.5rem; padding: 1.6rem 0; border-bottom: 1px solid rgb(0 0 0 / 0.12);
+    color: inherit; text-decoration: none; transition: padding 0.5s var(--ease), color 0.4s; }
+  .sx__n { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.18em; color: var(--text-2); }
+  .sx__t { font-size: clamp(2rem, 5.4vw, 5.6rem); font-weight: 800; letter-spacing: -0.055em; line-height: 1; }
+  .sx__s { color: var(--text-2); text-align: right; }
+  .sx__list:hover .sx__row { color: rgb(0 0 0 / 0.28); }
+  .sx__list .sx__row:hover, .sx__row:focus-visible { color: var(--text); padding-left: 1.4rem; }
+  .sx__list .sx__row:hover .sx__t { color: var(--green-deep); }
+  .sx__peek { position: fixed; left: 0; top: 0; z-index: 40; width: clamp(220px, 22vw, 380px); aspect-ratio: 4 / 5; border-radius: 20px; overflow: hidden;
+    pointer-events: none; opacity: 0; transform: translate(-50%, -50%) scale(0.6); transition: opacity 0.35s var(--ease), transform 0.5s var(--ease); }
+  .sx__peek.on { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  .sx__peek :global(img) { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.3s; }
+  .sx__peek :global(img.on) { opacity: 1; }
+  @media (max-width: 51.25rem) { .sx__row { grid-template-columns: 2.5rem 1fr; } .sx__s { display: none; } .sx__top { flex-direction: column; align-items: start; } }
+  @media (hover: none) { .sx__peek { display: none; } }
+</style>
+
+<script>
+  function start() {
+    const sec = document.querySelector<HTMLElement>('[data-sx]');
+    if (!sec || sec.dataset.wired) return;
+    sec.dataset.wired = '1';
+    if (!matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+    const peek = sec.querySelector<HTMLElement>('[data-sx-peek]')!;
+    const imgs = [...peek.querySelectorAll('img')];
+    let mx = 0, my = 0, qx = 0, qy = 0, raf = 0, active = false;
+    const tick = () => { qx += (mx - qx) * 0.12; qy += (my - qy) * 0.12; peek.style.left = `${qx}px`; peek.style.top = `${qy}px`; raf = active || Math.abs(mx - qx) > 0.5 ? requestAnimationFrame(tick) : 0; };
+    sec.addEventListener('pointermove', (e) => { mx = e.clientX; my = e.clientY; if (!raf) raf = requestAnimationFrame(tick); });
+    sec.querySelectorAll<HTMLElement>('.sx__row').forEach((row) => {
+      row.addEventListener('pointerenter', (e) => {
+        if (!active) { qx = mx = e.clientX; qy = my = e.clientY; }
+        active = true; peek.classList.add('on'); imgs.forEach((im, i) => im.classList.toggle('on', i === Number(row.dataset.i)));
+      });
+      row.addEventListener('pointerleave', () => { active = false; peek.classList.remove('on'); });
+    });
+  }
+  document.addEventListener('astro:page-load', start);
+</script>

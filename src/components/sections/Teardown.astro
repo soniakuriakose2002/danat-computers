@@ -19,7 +19,6 @@ import { site } from '@data/site';
 <section class="td td--full" data-tone="light">
   <h1 class="td__sr">{site.nameFull}: more than just a laptop. Complete technology solutions to power your work, study and business.</h1>
   <div class="td__hero">
-    <span class="td__echo" aria-hidden="true"></span>
     {/*
       No controls and nothing to click. pointer-events are off the video,
       so there is no context menu; controlsList and
@@ -34,14 +33,24 @@ import { site } from '@data/site';
         disablepictureinpicture disableremoteplayback
         aria-label="Danat Computers IT support: hardware scans, chip-level repair, testing, upgrades and printers"></video>
     </div>
+    {/* The film ends on its own "Get Support" button. This invisible link
+        sits exactly over it and only becomes clickable while that button
+        is on screen (about 12.4 s to 15.1 s of each loop). The numbers are
+        measured from the film; re-measure if the film is re-cut. */}
+    <a class="td__hot" href="/contact" data-hot aria-label="Get Support" tabindex="-1"></a>
+    {/* The same two-layer wave the brand strip used, turned over so the
+        film sits above it: pale green band, then white. It swells slowly,
+        exactly like the original. */}
+    <div class="td__wave" aria-hidden="true">
+      <svg viewBox="0 0 1440 130" preserveAspectRatio="none">
+        <path class="td__wave-b" d="M0,38 C106,6 214,42 336,76 C524,130 712,80 908,38 C1104,-4 1276,116 1440,14 L1440,134 L0,134 Z"></path>
+        <path class="td__wave-f" d="M0,58 C118,22 248,64 380,98 C570,146 760,100 950,52 C1140,4 1300,132 1440,34 L1440,134 L0,134 Z"></path>
+      </svg>
+    </div>
   </div>
 </section>
 
 <style>
-  /* Animatable so the wave can breathe; browsers without @property
-     simply show it still. */
-  @property --wh { syntax: '<length>'; inherits: true; initial-value: 0px; }
-
   .td {
     position: relative;
     background: var(--white);
@@ -57,46 +66,16 @@ import { site } from '@data/site';
     clip-path: inset(50%);
     white-space: nowrap;
   }
+  /* Full width and the whole 16:9 frame, never cropped: the film's own
+     captions and its Get Support button sit near the edges. */
   .td__hero {
     position: relative;
     width: 100%;
     aspect-ratio: 16 / 9;
-    /* never taller than the screen below the header */
-    max-height: calc(100svh - var(--hdr, 5.5rem) + 7vw);
-    --wh: 7vw;
-    --wave-front: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 100' preserveAspectRatio='none'%3E%3Cpath d='M0 58 C150 78 300 92 470 80 C700 62 820 30 1020 34 C1200 38 1330 18 1440 6 L1440 0 L0 0 Z'/%3E%3C/svg%3E");
-    --wave-back: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 100' preserveAspectRatio='none'%3E%3Cpath d='M0 72 C180 96 360 100 560 86 C760 72 900 48 1100 52 C1260 55 1360 40 1440 30 L1440 0 L0 0 Z'/%3E%3C/svg%3E");
-    animation: td-breathe 7s ease-in-out infinite alternate;
-  }
-  @keyframes td-breathe {
-    from { --wh: 6.4vw; }
-    to   { --wh: 7.4vw; }
-  }
-
-  /* Shared mask recipe: solid above, wave-shaped strip at the bottom. */
-  .td__media,
-  .td__echo {
-    position: absolute;
-    inset: 0;
-    -webkit-mask:
-      linear-gradient(#000 0 0) top / 100% calc(100% - var(--wh) + 1px) no-repeat,
-      var(--wave) bottom / 100% var(--wh) no-repeat;
-    mask:
-      linear-gradient(#000 0 0) top / 100% calc(100% - var(--wh) + 1px) no-repeat,
-      var(--wave) bottom / 100% var(--wh) no-repeat;
-  }
-  .td__media {
-    --wave: var(--wave-front);
-    z-index: 1;
     overflow: hidden;
     background: var(--ink);
   }
-  /* The green echo reaches a little further down than the film. */
-  .td__echo {
-    --wave: var(--wave-back);
-    inset: 0 0 calc(var(--wh) * -0.35) 0;
-    background: color-mix(in oklab, var(--white) 82%, var(--green));
-  }
+  .td__media { position: absolute; inset: 0; }
   .td__media video {
     display: block;
     width: 100%;
@@ -106,13 +85,59 @@ import { site } from '@data/site';
     -webkit-user-select: none;
     user-select: none;
   }
+  .td__hot {
+    position: absolute;
+    z-index: 3;
+    left: 7.4%;
+    top: 69.9%;
+    width: 20.4%;
+    height: 9.8%;
+    border-radius: 999px;
+    pointer-events: none;
+    transition: box-shadow var(--t1) var(--ease);
+  }
+  .td__hot.is-live { pointer-events: auto; cursor: pointer; }
+  .td__hot.is-live:hover,
+  .td__hot.is-live:focus-visible {
+    box-shadow: 0 0 0 3px rgb(255 255 255 / 0.85), 0 0 34px rgb(89 170 84 / 0.7);
+    outline: none;
+  }
+  .td__wave {
+    position: absolute;
+    /* wider than the frame so the swell never uncovers an edge */
+    left: -4%;
+    right: -4%;
+    bottom: -1px;
+    height: clamp(44px, 6vw, 110px);
+    z-index: 2;
+    pointer-events: none;
+  }
+  .td__wave svg { display: block; width: 100%; height: 100%; }
+  .td__wave-b {
+    transform-origin: center bottom;
+    fill: color-mix(in oklab, var(--white) 88%, var(--green));
+    animation: td-swell-b 13s ease-in-out infinite alternate;
+  }
+  .td__wave-f {
+    transform-origin: center bottom;
+    fill: var(--white);
+    animation: td-swell-f 9s ease-in-out infinite alternate;
+  }
+  @keyframes td-swell-b {
+    from { transform: translate3d(-1.5%, -2px, 0) scaleY(1); }
+    to   { transform: translate3d(1.5%, 3px, 0) scaleY(1.06); }
+  }
+  @keyframes td-swell-f {
+    from { transform: translate3d(1.2%, 2px, 0) scaleY(1.04); }
+    to   { transform: translate3d(-1.2%, -3px, 0) scaleY(1); }
+  }
 
   /* The film now draws the boundary into the brand strip. */
   :global(body:has(.td--full) .bs__wave) { display: none; }
   :global(body:has(.td--full) .bs) { padding-top: clamp(2.5rem, 5vw, 4rem); }
 
   @media (prefers-reduced-motion: reduce) {
-    .td__hero { animation: none; }
+    .td__wave-b, .td__wave-f { animation: none; }
   }
 </style>
 
@@ -137,6 +162,18 @@ import { site } from '@data/site';
       const armed = ['pointerdown', 'touchstart', 'keydown', 'scroll'];
       const once = () => { nudge(); armed.forEach((t) => removeEventListener(t, once)); };
       if (v.paused) armed.forEach((t) => addEventListener(t, once, { passive: true }));
+
+      /* Make the film's own Get Support button clickable while it shows. */
+      const hot = document.querySelector('[data-hot]');
+      if (hot) {
+        const sync = () => {
+          const live = v.currentTime >= 12.4 && v.currentTime <= 15.1;
+          hot.classList.toggle('is-live', live);
+          hot.tabIndex = live ? 0 : -1;
+        };
+        v.addEventListener('timeupdate', sync);
+        v.addEventListener('seeked', sync);
+      }
 
       /* Rest off screen, pick straight back up on return. */
       new IntersectionObserver(([e]) => (e.isIntersecting ? nudge() : v.pause()), { threshold: 0.15 }).observe(box);

@@ -1,0 +1,73 @@
+---
+/**
+ * BRANCHES — the Oman map with pulsing pins, and a row per branch with
+ * WhatsApp and map links. Data comes from site.ts; addresses that have not
+ * been confirmed are shown by city only, exactly as elsewhere on the site.
+ */
+import { Image } from 'astro:assets';
+import { branches, whatsappLink } from '@data/site';
+import omanMap from '@assets/photos/oman-map.png';
+
+/* Pin positions on this map image (same values as AcrossOman.astro). */
+const SPOTS: Record<string, { x: number; y: number }> = {
+  ruwi: { x: 77.19, y: 32.8 },
+  sohar: { x: 57.54, y: 26.03 },
+  salalah: { x: 29.67, y: 90.42 },
+};
+const shown = branches.filter((b) => SPOTS[b.slug]);
+---
+<section class="bm" id="branches" aria-labelledby="bm-title">
+  <div class="shell bm__grid">
+    <div class="bm__map">
+      <Image src={omanMap} alt="Map of Oman showing Danat branches" width={900} quality={75} />
+      {shown.map((b) => (
+        <span class="bm__pin" style={`--x:${SPOTS[b.slug].x}%;--y:${SPOTS[b.slug].y}%`}><i></i><b>{b.name.replace('Danat ', '')}</b></span>
+      ))}
+    </div>
+    <div>
+      <h2 id="bm-title">{shown.length} branches.<br /><em>Closer to you.</em></h2>
+      <ul class="bm__list">
+        {shown.map((b) => (
+          <li class="bm__item">
+            <div>
+              <h3>{b.name}</h3>
+              <p>{b.verified ? b.address.split('\n').slice(0, 2).join(' · ') : b.city}</p>
+            </div>
+            <div class="bm__acts">
+              <a class="bm__pill bm__pill--g" href={whatsappLink(`Hello Danat — I'd like to contact your ${b.name} branch about`)} target="_blank" rel="noopener noreferrer">WhatsApp</a>
+              <a class="bm__pill" href={`https://www.openstreetmap.org/?mlat=${b.geo.lat}&mlon=${b.geo.lon}#map=${b.geo.precise ? 17 : 13}/${b.geo.lat}/${b.geo.lon}`} target="_blank" rel="noopener noreferrer">Map</a>
+            </div>
+          </li>
+        ))}
+      </ul>
+      <p class="bm__hours">{shown[0].hours.join(' · ').replace(/\s+/g, ' ')}</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .bm { background: var(--white); color: var(--text); padding-block: clamp(6rem, 12vw, 11rem); }
+  .bm__grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: clamp(2rem, 6vw, 6rem); align-items: center; }
+  .bm h2 { font-size: clamp(2.4rem, 6vw, 6rem); font-weight: 800; letter-spacing: -0.055em; line-height: 0.92; }
+  .bm h2 em { font-style: normal; color: var(--green-deep); }
+  .bm__map { position: relative; border-radius: 28px; overflow: hidden; background: #e9ece8; }
+  .bm__map :global(img) { display: block; width: 100%; height: auto; filter: grayscale(1) contrast(1.05) brightness(1.04); opacity: 0.8; }
+  .bm__pin { position: absolute; left: var(--x); top: var(--y); transform: translate(-50%, -50%); }
+  .bm__pin i { position: relative; display: block; width: 16px; height: 16px; border-radius: 50%; background: var(--green); box-shadow: 0 0 0 6px rgb(89 170 84 / 0.25); }
+  .bm__pin i::after { content: ''; position: absolute; inset: -14px; border-radius: 50%; border: 1.5px solid var(--green); animation: bmPing 2.4s var(--ease) infinite; }
+  .bm__pin b { position: absolute; left: 24px; top: 50%; transform: translateY(-50%); background: #fff; padding: 0.35rem 0.7rem; border-radius: 999px; box-shadow: 0 6px 20px rgb(0 0 0 / 0.12);
+    font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.14em; text-transform: uppercase; }
+  @keyframes bmPing { from { transform: scale(0.4); opacity: 1; } to { transform: scale(1.6); opacity: 0; } }
+  .bm__list { list-style: none; margin: 2.6rem 0 0; padding: 0; border-top: 1px solid rgb(0 0 0 / 0.1); }
+  .bm__item { display: grid; grid-template-columns: 1fr auto; gap: 1rem; padding: 1.6rem 0; border-bottom: 1px solid rgb(0 0 0 / 0.1); align-items: center; }
+  .bm__item h3 { font-size: clamp(1.6rem, 2.8vw, 2.6rem); font-weight: 800; letter-spacing: -0.045em; }
+  .bm__item p { color: var(--text-2); margin-top: 0.35rem; line-height: 1.45; }
+  .bm__acts { display: flex; gap: 0.6rem; }
+  .bm__pill { display: inline-flex; align-items: center; border-radius: 999px; padding: 0.75rem 1.2rem; font-weight: 600; font-size: 0.95rem; border: 1px solid rgb(0 0 0 / 0.18); color: inherit; text-decoration: none; transition: background 0.25s, color 0.25s, border-color 0.25s; }
+  .bm__pill:hover { background: var(--text); color: #fff; border-color: var(--text); }
+  .bm__pill--g { background: var(--green); border-color: var(--green); color: #fff; }
+  .bm__pill--g:hover { background: var(--green-deep); border-color: var(--green-deep); }
+  .bm__hours { margin-top: 1.6rem; color: var(--text-2); font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; }
+  @media (max-width: 56rem) { .bm__grid { grid-template-columns: 1fr; } .bm__item { grid-template-columns: 1fr; } }
+  @media (prefers-reduced-motion: reduce) { .bm__pin i::after { animation: none; } }
+</style>

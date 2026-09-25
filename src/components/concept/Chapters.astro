@@ -1,0 +1,94 @@
+---
+/**
+ * CHAPTERS — five large photo cards that slide sideways while the page
+ * scrolls down. On phones they stack vertically instead.
+ */
+import { Image } from 'astro:assets';
+import supportDesk from '@assets/photos/support-desk.jpg';
+import repairSolder from '@assets/photos/repair-solder.jpg';
+import cctvPair from '@assets/photos/cctv-pair.jpg';
+import networkPatch from '@assets/photos/network-patch.jpg';
+import driveOpen from '@assets/photos/datarecovery-drive.jpg';
+
+const chapters = [
+  { img: supportDesk, k: 'Diagnose', t: 'Free, before anything is quoted.', p: 'We find what failed, what it costs and how long it takes, before you agree to anything.', alt: 'Technicians at the Danat service desk' },
+  { img: repairSolder, k: 'Repair', t: 'To the component, not the whole board.', p: 'Board-level repair for laptops and desktops, by skilled technicians.', alt: 'Component-level repair on a laptop board' },
+  { img: cctvPair, k: 'Protect', t: 'CCTV, surveyed and installed.', p: 'Cameras surveyed, installed and maintained for homes and businesses.', alt: 'CCTV cameras on a wall' },
+  { img: networkPatch, k: 'Connect', t: 'Cabling, switching and Wi-Fi.', p: 'Structured networks set up and supported across sites.', alt: 'Network patch panel' },
+  { img: driveOpen, k: 'Recover', t: "Know what's recoverable before you pay.", p: 'Transparent assessment and professional data recovery.', alt: 'Opened hard drive for data recovery' },
+];
+---
+<section class="ch" data-ch id="chapters" aria-label="What we do">
+  <div class="ch__stage">
+    <div class="ch__head">
+      <h2>From the bench,<br /><em>not the brochure.</em></h2>
+      <span class="ch__count">05 chapters</span>
+    </div>
+    <div class="ch__track" data-ch-track>
+      {chapters.map((c, i) => (
+        <article class="ch__card">
+          <Image src={c.img} alt={c.alt} width={1400} quality={72} />
+          <span class="ch__n" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+          <div class="ch__meta"><span class="ch__k">{c.k}</span><h3 class="ch__t">{c.t}</h3><p class="ch__p">{c.p}</p></div>
+        </article>
+      ))}
+    </div>
+    <div class="ch__bar"><i data-ch-bar></i></div>
+  </div>
+</section>
+
+<style>
+  .ch { position: relative; background: var(--ink); color: #fff; }
+  .ch__stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; display: grid; align-content: center; }
+  .ch__head { position: absolute; top: calc(var(--hdr, 88px) + 24px); left: var(--gut); right: var(--gut); display: flex; justify-content: space-between; align-items: end; gap: 2rem; z-index: 2; }
+  .ch__head h2 { font-size: clamp(2rem, 4.4vw, 4.4rem); font-weight: 800; letter-spacing: -0.05em; line-height: 0.95; }
+  .ch__head em { font-style: normal; color: var(--green-bright); }
+  .ch__count, .ch__k { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; }
+  .ch__count { color: rgb(255 255 255 / 0.55); }
+  .ch__track { display: flex; gap: 2.2vw; padding-inline: var(--gut); margin-top: 9vh; will-change: transform; }
+  .ch__card { position: relative; flex: none; width: min(62vw, 980px); height: 62vh; border-radius: 28px; overflow: hidden; background: #111; }
+  .ch__card :global(img) { position: absolute; inset: -6% -12%; width: 124%; height: 112%; object-fit: cover; will-change: transform; }
+  .ch__card::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgb(0 0 0 / 0.05) 30%, rgb(0 0 0 / 0.78) 100%); }
+  .ch__meta { position: absolute; left: 2.2rem; right: 2.2rem; bottom: 2rem; z-index: 2; display: grid; gap: 0.6rem; }
+  .ch__n { position: absolute; top: 1.2rem; right: 1.8rem; z-index: 2; font-weight: 800; font-size: clamp(4rem, 9vw, 9rem); letter-spacing: -0.06em; line-height: 1; color: transparent; -webkit-text-stroke: 1.5px rgb(255 255 255 / 0.55); }
+  .ch__k { color: var(--green-bright); }
+  .ch__t { font-size: clamp(2rem, 4vw, 3.8rem); font-weight: 800; letter-spacing: -0.05em; line-height: 0.95; }
+  .ch__p { max-width: 36ch; color: rgb(255 255 255 / 0.78); font-size: 1.05rem; line-height: 1.5; }
+  .ch__bar { position: absolute; left: var(--gut); right: var(--gut); bottom: 5vh; height: 1px; background: rgb(255 255 255 / 0.12); }
+  .ch__bar i { display: block; height: 100%; width: 0; background: var(--green-bright); }
+  @media (max-width: 51.25rem), (prefers-reduced-motion: reduce) {
+    .ch { height: auto !important; }
+    .ch__stage { position: relative; height: auto; padding: 110px 0 70px; }
+    .ch__head { position: relative; top: 0; left: 0; right: 0; padding-inline: var(--gut); margin-bottom: 2rem; }
+    .ch__track { flex-direction: column; transform: none !important; margin-top: 0; }
+    .ch__card { width: 100%; height: 62vh; }
+    .ch__bar { display: none; }
+  }
+</style>
+
+<script>
+  function start() {
+    const sec = document.querySelector<HTMLElement>('[data-ch]');
+    if (!sec || sec.dataset.wired) return;
+    sec.dataset.wired = '1';
+    const track = sec.querySelector<HTMLElement>('[data-ch-track]')!;
+    const bar = sec.querySelector<HTMLElement>('[data-ch-bar]')!;
+    const cards = [...track.children] as HTMLElement[];
+    const wide = () => innerWidth > 820 && !matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const size = () => { sec.style.height = wide() ? `${track.scrollWidth - innerWidth + innerHeight * 1.15}px` : ''; };
+    size(); addEventListener('resize', size); addEventListener('load', size);
+    let raf = 0, on = false;
+    const tick = () => {
+      raf = 0; if (!on || !wide()) return;
+      const r = sec.getBoundingClientRect();
+      const p = Math.min(1, Math.max(0, -r.top / Math.max(1, r.height - innerHeight)));
+      track.style.transform = `translate3d(${-p * (track.scrollWidth - innerWidth)}px,0,0)`;
+      bar.style.width = `${p * 100}%`;
+      cards.forEach((c) => { const cr = c.getBoundingClientRect(); const k = (cr.left + cr.width / 2 - innerWidth / 2) / innerWidth; (c.firstElementChild as HTMLElement).style.transform = `translate3d(${k * -8}%,0,0)`; });
+    };
+    const req = () => { if (!raf) raf = requestAnimationFrame(tick); };
+    new IntersectionObserver(([e]) => { on = e.isIntersecting; req(); }).observe(sec);
+    addEventListener('scroll', req, { passive: true });
+  }
+  document.addEventListener('astro:page-load', start);
+</script>

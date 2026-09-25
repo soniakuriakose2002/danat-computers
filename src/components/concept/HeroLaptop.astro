@@ -1,0 +1,148 @@
+---
+/**
+ * HERO — a real laptop photograph with the Danat film playing inside its
+ * screen. Scrolling tilts it into place, then zooms into the screen until
+ * the film fills the page; the film ends in the site's two-layer wave.
+ * Scrolling back up reverses it.
+ *
+ * The screen rectangle was measured on the 900x640 photo:
+ * glass at x 221–680, y 171–429 (16:9, the same shape as the film).
+ * The film's own Get Support button is made clickable while it is on
+ * screen (12.4–15.1 s of each loop), measured from the film.
+ */
+import { Image } from 'astro:assets';
+import { site } from '@data/site';
+import laptop from '@assets/products/lenovo.png';
+---
+<section class="hl" data-hl aria-label="Danat Computers">
+  <div class="hl__stage">
+    <div class="hl__view">
+      <div class="hl__dev" data-hl-dev>
+        <span class="hl__floor" aria-hidden="true"></span>
+        <Image src={laptop} alt="Laptop playing the Danat Computers film" width={900} quality={90} loading="eager" class="hl__img" />
+        <div class="hl__scr">
+          <video src="/film/danat-it-support.mp4" poster="/film/danat-it-support.jpg"
+            muted loop playsinline autoplay preload="auto"
+            controlslist="nodownload noplaybackrate noremoteplayback" disablepictureinpicture disableremoteplayback
+            aria-label="Danat Computers IT support film"></video>
+          <a class="hl__hot" href="/contact" data-hl-hot aria-label="Get Support" tabindex="-1"></a>
+          <span class="hl__glare" aria-hidden="true"></span>
+        </div>
+      </div>
+    </div>
+    <h1 class="hl__title" data-hl-title><span class="hl__l"><span>More than</span></span><span class="hl__l"><span>just a <em>laptop.</em></span></span></h1>
+    <div class="hl__hud hl__hud--tr mono-label" data-hl-hud><span>{site.nameFull}</span><span>Ruwi · Sohar · Salalah</span><span>23.59° N  58.55° E</span></div>
+    <div class="hl__hud hl__hud--br mono-label" data-hl-hud><span class="hl__line"></span><span>Scroll to step inside</span></div>
+    <div class="hl__hud hl__hud--bl mono-label" data-hl-hud>Since {site.stats.since}</div>
+    <div class="hl__wave" data-hl-wave aria-hidden="true">
+      <svg viewBox="0 0 1440 130" preserveAspectRatio="none"><path class="b" d="M0,38 C106,6 214,42 336,76 C524,130 712,80 908,38 C1104,-4 1276,116 1440,14 L1440,134 L0,134 Z"/><path class="f" d="M0,58 C118,22 248,64 380,98 C570,146 760,100 950,52 C1140,4 1300,132 1440,34 L1440,134 L0,134 Z"/></svg>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hl { position: relative; height: 420vh; background: radial-gradient(90% 70% at 70% 40%, #15301a 0%, var(--ink) 60%); color: #fff; }
+  .hl__stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
+  .hl__view { position: absolute; inset: 0; perspective: 1400px; }
+  .hl__dev { position: absolute; left: 0; top: 0; width: min(56vw, 980px); aspect-ratio: 900 / 640; transform-origin: 0 0; will-change: transform; }
+  .hl__dev :global(.hl__img) { position: absolute; inset: 0; width: 100%; height: 100%; filter: drop-shadow(0 40px 60px rgb(0 0 0 / 0.6)); }
+  .hl__scr { position: absolute; left: 24.556%; top: 26.719%; width: 51%; height: 40.313%; overflow: hidden; background: #000; }
+  .hl__scr video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; pointer-events: none; }
+  .hl__glare { position: absolute; inset: 0; pointer-events: none; opacity: var(--gl, 1);
+    background: linear-gradient(115deg, rgb(255 255 255 / 0.12) 0%, rgb(255 255 255 / 0.03) 28%, transparent 45%); }
+  .hl__floor { position: absolute; left: 50%; top: 96%; width: 120%; height: 40%; transform: translateX(-50%); z-index: -1; opacity: var(--gl, 1);
+    background: radial-gradient(closest-side, rgb(89 170 84 / 0.35), transparent); filter: blur(10px); }
+  .hl__hot { position: absolute; left: 7.4%; top: 69.9%; width: 20.4%; height: 9.8%; z-index: 3; border-radius: 999px; pointer-events: none; }
+  .hl__hot.is-live { pointer-events: auto; cursor: pointer; }
+  .hl__hot.is-live:hover, .hl__hot.is-live:focus-visible { box-shadow: 0 0 0 3px rgb(255 255 255 / 0.85), 0 0 40px rgb(122 211 116 / 0.75); outline: none; }
+
+  .hl__title { position: absolute; left: var(--gut); bottom: 12vh; z-index: 3; font-weight: 800; font-size: clamp(3.2rem, 10.5vw, 11.5rem);
+    line-height: 0.86; letter-spacing: -0.065em; will-change: transform, opacity; }
+  .hl__l { display: block; overflow: hidden; }
+  .hl__l > span { display: block; transform: translateY(105%); transition: transform 1.3s var(--ease); }
+  .hl__l:nth-child(2) > span { transition-delay: 0.1s; }
+  .hl.is-in .hl__l > span { transform: none; }
+  .hl__title em { font-style: normal; color: var(--green-bright); }
+  .mono-label { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.18em; text-transform: uppercase; }
+  .hl__hud { position: absolute; z-index: 3; color: rgb(255 255 255 / 0.62); }
+  .hl__hud--tr { top: calc(var(--hdr, 88px) + 24px); right: var(--gut); text-align: right; display: grid; gap: 0.4rem; }
+  .hl__hud--br { right: var(--gut); bottom: 12vh; display: flex; align-items: center; gap: 0.8rem; }
+  .hl__line { width: 46px; height: 1px; background: currentColor; }
+  .hl__hud--bl { left: var(--gut); bottom: 5vh; }
+  .hl__wave { position: absolute; left: -4%; right: -4%; bottom: -1px; z-index: 6; height: 0; pointer-events: none; }
+  .hl__wave svg { display: block; width: 100%; height: 100%; }
+  .hl__wave .b { fill: color-mix(in oklab, var(--white) 88%, var(--green)); }
+  .hl__wave .f { fill: var(--white); }
+
+  @media (max-width: 51.25rem) {
+    .hl__dev { width: 94vw; }
+    .hl__hud--br { display: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hl { height: auto; }
+    .hl__stage { position: relative; }
+    .hl__l > span { transform: none; transition: none; }
+    .hl__hud { display: none; }
+  }
+</style>
+
+<script>
+  const clamp = (v: number, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+  const ease = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+  const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+
+  function start() {
+    const sec = document.querySelector<HTMLElement>('[data-hl]');
+    if (!sec || sec.dataset.wired) return;
+    sec.dataset.wired = '1';
+    const header = document.querySelector('header');
+    const fitHdr = () => header && document.documentElement.style.setProperty('--hdr', `${header.offsetHeight}px`);
+    fitHdr(); addEventListener('resize', fitHdr, { passive: true });
+
+    const dev = sec.querySelector<HTMLElement>('[data-hl-dev]')!;
+    const vid = sec.querySelector<HTMLVideoElement>('video')!;
+    const hot = sec.querySelector<HTMLAnchorElement>('[data-hl-hot]')!;
+    const title = sec.querySelector<HTMLElement>('[data-hl-title]')!;
+    const huds = [...sec.querySelectorAll<HTMLElement>('[data-hl-hud]')];
+    const wave = sec.querySelector<HTMLElement>('[data-hl-wave]')!;
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const play = () => vid.play().catch(() => {});
+    play();
+    ['pointerdown', 'touchstart', 'keydown', 'wheel'].forEach((t) => addEventListener(t, play, { once: true, passive: true }));
+    requestAnimationFrame(() => sec.classList.add('is-in'));
+
+    let visible = true, raf = 0;
+    new IntersectionObserver(([e]) => { visible = e.isIntersecting; visible ? (play(), loop()) : vid.pause(); }).observe(sec);
+
+    function frame() {
+      raf = 0;
+      if (!visible || !sec!.isConnected) return;
+      const r = sec!.getBoundingClientRect();
+      const p = reduced ? 0 : clamp(-r.top / Math.max(1, r.height - innerHeight));
+      const a = ease(clamp(p / 0.22)), d = ease(clamp((p - 0.22) / 0.6)), w = clamp((p - 0.9) / 0.1);
+      title.style.opacity = String(1 - clamp(p / 0.16));
+      title.style.transform = `translateY(${-clamp(p / 0.16) * 60}px)`;
+      huds.forEach((h) => (h.style.opacity = String(1 - clamp(p / 0.25))));
+      wave.style.height = `${w * Math.min(110, Math.max(44, innerWidth * 0.06))}px`;
+
+      const W = innerWidth, H = innerHeight, dw = dev.offsetWidth, dh = dev.offsetHeight;
+      const sx = dw * 0.24556, sy = dh * 0.26719, sw = dw * 0.51, sh = dh * 0.40313;
+      const S = Math.max(W / sw, H / sh) * 1.01;
+      const x0 = W > 900 ? W - dw - W * 0.04 : (W - dw) / 2;
+      const y0 = W > 900 ? (H - dh) / 2 + H * 0.03 : H * 0.2;
+      const x1 = W / 2 - (sx + sw / 2) * S, y1 = H / 2 - (sy + sh / 2) * S;
+      dev.style.transform = `translate3d(${lerp(x0, x1, d)}px,${lerp(y0, y1, d) + (1 - a) * 60}px,0) rotateX(${(1 - a) * 16}deg) scale(${lerp(1, S, d)})`;
+      dev.style.setProperty('--gl', (1 - d).toFixed(3));
+
+      const live = d > 0.97 && vid.currentTime >= 12.4 && vid.currentTime <= 15.1;
+      hot.classList.toggle('is-live', live);
+      hot.tabIndex = live ? 0 : -1;
+      loop();
+    }
+    function loop() { if (!raf) raf = requestAnimationFrame(frame); }
+    addEventListener('resize', loop);
+    loop();
+  }
+  document.addEventListener('astro:page-load', start);
+</script>

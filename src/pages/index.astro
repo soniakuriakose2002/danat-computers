@@ -1,35 +1,40 @@
 ---
 import PageLayout from '@layouts/PageLayout.astro';
-import Teardown from '@components/sections/Teardown.astro';
-// Hero.astro and Descent.astro are kept, not deleted — restoring the
-// old opening is a one-line import swap.
-// import Hero from '@components/sections/Hero.astro';
-import BrandStrip from '@components/sections/BrandStrip.astro';
-import ServiceCoverflow from '@components/sections/ServiceCoverflow.astro';
-import InsideDanat from '@components/sections/InsideDanat.astro';
-import MidCta from '@components/sections/MidCta.astro';
-import AcrossOman from '@components/sections/AcrossOman.astro';
-import BusinessSolutions from '@components/sections/BusinessSolutions.astro';
-import ServiceLayers3D from '@components/sections/ServiceLayers3D.astro';
+/*
+ * The homepage now follows the approved design concept (Scout-style).
+ * Nothing was deleted: the previous sections are still in
+ * src/components/sections/ and the old running order is kept, commented,
+ * at the bottom of this file, so switching back is a copy-paste.
+ */
+import HeroLaptop from '@components/concept/HeroLaptop.astro';
 import Statement from '@components/sections/Statement.astro';
-import LaptopSequence from '@components/sections/LaptopSequence.astro';
+import PhotoRing from '@components/concept/PhotoRing.astro';
+import Chapters from '@components/concept/Chapters.astro';
+import ServiceIndex from '@components/concept/ServiceIndex.astro';
+import NumbersBrands from '@components/concept/NumbersBrands.astro';
+import BranchesMap from '@components/concept/BranchesMap.astro';
 ---
 
 <PageLayout>
-  {/* 01 — What do you actually sell?    */}<Teardown />
-  {/* 01b — What is Danat, in one line? */}<Statement />
-  {/* 02 — Are you legitimate?           */}<BrandStrip />
-  {/* 02b — Show me, part by part       */}
-  {/* LaptopSequence, NOT ServiceLayers3D, for the laptop. The package
-      reverted this because it was built before the photographic version
-      existed — but the client's instruction was "place the image into
-      real", and this is that: his own teardown render, scrubbed on
-      scroll. ServiceLayers3D still draws the IT rack below. */}
-  <LaptopSequence />
-  {/* 03 — Can you fix my problem?       */}<ServiceCoverflow />
-  {/* 04 — Why you and not them?         */}<InsideDanat />
-  {/* 05 — I'm convinced, now what?      */}<MidCta />
-  {/* 06 — Are you near me?              */}<AcrossOman />
-  {/* 07b — Can you run my office IT?   */}<ServiceLayers3D show="it" />
-  {/* 08 — I'm a business, not a home    */}<BusinessSolutions />
+  {/* 01 — Real laptop; the film fills the page */}<HeroLaptop />
+  {/* 02 — What is Danat, in one line       */}<Statement />
+  {/* 03 — Fixing Oman since 2003 (ring)     */}<PhotoRing />
+  {/* 04 — From the bench (sliding cards)    */}<Chapters />
+  {/* 05 — What do you need help with?       */}<ServiceIndex />
+  {/* 06 — Numbers and brands                */}<NumbersBrands />
+  {/* 07 — Three branches                    */}<BranchesMap />
+  {/* The footer carries "Something broken? Bring it in." */}
+
+  {/* ⚠ LaptopSequence — the photographic teardown scrubbed on scroll,
+      built from the client's own reference sheet — is NOT mounted by
+      this concept running order. The file is intact at
+      components/sections/LaptopSequence.astro and drops back in with
+      one line if the teardown is wanted alongside the new hero. */}
 </PageLayout>
+
+{/*
+  Previous running order, for reference:
+  <Teardown />  <Statement />  <BrandStrip />  <ServiceLayers3D show="laptop" />
+  <ServiceCoverflow />  <InsideDanat />  <MidCta />  <AcrossOman />
+  <ServiceLayers3D show="it" />  <BusinessSolutions />
+*/}
