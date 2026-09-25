@@ -1,10 +1,10 @@
 ---
 import { Image } from 'astro:assets';
 
-import fOpen from '@assets/teardown/laptop-open.jpg';
-import fScreen from '@assets/teardown/laptop-screen.jpg';
-import fTop from '@assets/teardown/laptop-topcase.jpg';
-import fExploded from '@assets/teardown/laptop-exploded.jpg';
+import fOpen from '@assets/teardown/laptop-open.png';
+import fScreen from '@assets/teardown/laptop-screen.png';
+import fTop from '@assets/teardown/laptop-topcase.png';
+import fExploded from '@assets/teardown/laptop-exploded.png';
 
 /**
  * LAPTOP SERVICE — the client's layout, with real photographs in it.
@@ -167,9 +167,14 @@ const total = String(frames.length).padStart(2, '0');
   .sq__f :global(img) {
     width: 100%;
     height: 100%;
-    /* Contained, so the whole machine is always visible with space
-       around it. The pin is painted the frame's own backdrop colour, so
-       that space cannot be told from the photograph. */
+    /* Contained, so the whole machine is always visible with room
+       around it.
+
+       The frames are RGBA with their outer 110px feathered to
+       transparent, because a flat page colour can never match them:
+       each panel's own background is a GRADIENT, so any single colour
+       meets it as a visible rectangle — which is exactly what it did.
+       Dissolving the rim into the page is the only join that holds. */
     object-fit: contain;
     /* A slow push across each frame's turn, tied to scroll rather than a
        timer, so a still never sits completely dead. */
