@@ -26,8 +26,15 @@
 
     <p class="lb__hint" data-lab-hint>
       <span>Drag to turn</span>
-      <span>Scroll to open</span>
+      <span>Wheel to zoom</span>
+      <span>Scroll to explode</span>
     </p>
+
+    {/* The verdict on whatever model is loaded. Empty until there is
+        one, so an untested page says nothing rather than "0 parts". */}
+    <div class="lb__out" data-lab-out hidden></div>
+
+    <p class="lb__drop" aria-hidden="true">Drop a .glb here to test it</p>
 
     {/* Shown instead of the canvas where WebGL is unavailable or the
         visitor has asked for reduced motion. */}
@@ -87,6 +94,68 @@
   /* Once they have worked out that it moves, stop telling them. */
   .lb__hint[data-used] { opacity: 0; }
 
+  /* The drop target and its verdict. */
+  .lb__drop {
+    position: absolute;
+    left: 50%;
+    top: 1.25rem;
+    translate: -50% 0;
+    padding: 0.4rem 0.9rem;
+    border: 1px dashed var(--line-light);
+    border-radius: 999px;
+    background: rgb(255 255 255 / 0.8);
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    pointer-events: none;
+    transition: border-color var(--t2) var(--ease), color var(--t2) var(--ease);
+  }
+  .lb__stage[data-over] .lb__drop { border-color: var(--green); color: var(--green-deep); }
+  .lb__stage[data-over]::after {
+    content: '';
+    position: absolute;
+    inset: 0.75rem;
+    border: 2px dashed var(--green);
+    border-radius: 18px;
+    pointer-events: none;
+  }
+
+  .lb__out {
+    position: absolute;
+    left: 1rem;
+    bottom: 1rem;
+    z-index: 3;
+    max-width: min(30rem, calc(100% - 2rem));
+    padding: 0.9rem 1rem 1rem;
+    border-radius: 14px;
+    border: 1px solid var(--line-light);
+    background: rgb(255 255 255 / 0.9);
+    backdrop-filter: blur(12px);
+  }
+  .lb__v { font-size: 0.9375rem; font-weight: 700; letter-spacing: -0.01em; }
+  /* Green for a model worth using, amber for thin, red for one that
+     cannot come apart — the whole point of the page in one line. */
+  .lb__out[data-verdict='good'] .lb__v { color: var(--green-deep); }
+  .lb__out[data-verdict='thin'] .lb__v { color: #8a6100; }
+  .lb__out[data-verdict='bad'] .lb__v { color: #a3271f; }
+  .lb__f {
+    margin-top: 0.15rem;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.08em;
+    color: var(--text-3);
+    overflow-wrap: anywhere;
+  }
+  .lb__l {
+    margin-top: 0.55rem;
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: var(--text-2);
+    overflow-wrap: anywhere;
+  }
+
   .lb__off,
   .lb__fallback {
     position: absolute;
@@ -120,6 +189,7 @@
 
     const off = document.querySelector<HTMLElement>('[data-lab-off]');
     const hint = document.querySelector<HTMLElement>('[data-lab-hint]');
+    const out = document.querySelector<HTMLElement>('[data-lab-out]');
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     /* Neither of these is a failure worth a broken page: say so and
@@ -316,99 +386,159 @@
     type Part = { obj: THREE.Object3D; home: THREE.Vector3; move: THREE.Vector3 };
     let parts: Part[] = [];
 
+    const gltf = new GLTFLoader()
+      .setDRACOLoader(new DRACOLoader().setDecoderPath('/draco/'))
+      .setMeshoptDecoder(MeshoptDecoder);
+
+    /* One installer for both routes: the file committed to
+       public/models, and a file dropped onto the page. Dropping is how
+       you judge a model you have not bought yet — it needs no rebuild
+       and nothing is written to the repo. */
+    function install(m: THREE.Object3D, label: string) {
+      /* Exports arrive at wildly different scales and origins — a
+         Blender default is metres, a CAD export often millimetres.
+         Normalise to the box the procedural machine occupies, or the
+         camera framing means nothing. */
+      const box = new THREE.Box3().setFromObject(m);
+      const size = box.getSize(new THREE.Vector3());
+      const centre = box.getCenter(new THREE.Vector3());
+      const scale = W / Math.max(size.x, 0.0001);
+      m.scale.setScalar(scale);
+      m.position.sub(centre.multiplyScalar(scale));
+      m.position.y += (size.y * scale) / 2 - T / 2;
+
+      m.traverse((o) => {
+        const mesh = o as THREE.Mesh;
+        if (!mesh.isMesh) return;
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+      });
+
+      /* THE WHOLE THING TURNS ON THIS.
+         A teardown needs the file to hold its parts as separate, named
+         objects. Most models sold as "laptop" are one welded shell with
+         no interior — they render beautifully and they cannot come
+         apart. Collecting by name means such a model degrades to a
+         solid object that still turns, rather than to a broken page. */
+      const found: Part[] = [];
+      const missed: string[] = [];
+      /* Centre in the model's own space, so `side` can ask which half a
+         part sits in. */
+      const mid = new THREE.Box3().setFromObject(m).getCenter(new THREE.Vector3());
+      const unit = W;
+
+      m.traverse((o) => {
+        const raw = o.name.toLowerCase();
+        const key = raw.replace(/[^a-z]/g, '');
+        if (!key) return;
+        /* Whole-word matching needs the separators, which `key` has
+           thrown away — so the split happens on the raw name. */
+        const words = raw.split(/[^a-z]+/).filter(Boolean);
+        const spec = PARTS.find((t) =>
+          t.whole ? words.includes(t.key) : key.includes(t.key)
+        );
+        if (!spec) {
+          if ((o as THREE.Mesh).isMesh) missed.push(o.name);
+          return;
+        }
+        /* Skip anything under a part already taken, or a child and its
+           parent separate by different amounts and the piece tears
+           itself apart. */
+        for (let p: THREE.Object3D | null = o.parent; p; p = p.parent) {
+          if (found.some((f) => f.obj === p)) return;
+        }
+
+        const here = o.getWorldPosition(new THREE.Vector3());
+        /* Default to the right where a part sits dead on the centre
+           line, so a lone fan still travels somewhere. */
+        const sign = spec.side ? (here.x < mid.x ? -1 : 1) : 1;
+
+        found.push({
+          obj: o,
+          home: o.position.clone(),
+          move: new THREE.Vector3(spec.v[0] * sign * unit, spec.v[1] * unit, spec.v[2] * unit),
+        });
+      });
+
+      parts = found;
+      laptop.clear();
+      laptop.add(m);
+      controls.autoRotate = false;
+
+      canvas.dataset.model = 'glb';
+      canvas.dataset.parts = String(found.length);
+      canvas.dataset.partNames = found.map((f) => f.obj.name).join(',');
+
+      report(label, found.map((f) => f.obj.name), missed);
+    }
+
+    /* The verdict, on the page rather than in the inspector. A model is
+       judged on two things: how many parts the rig recognised, and what
+       it could not place — a file full of Object_001 reads as a long
+       "not matched" list and no matches at all, which is the answer. */
+    function report(label: string, hit: string[], missed: string[]) {
+      if (!out) return;
+      out.hidden = false;
+      const verdict = hit.length >= 5 ? 'good' : hit.length ? 'thin' : 'bad';
+      out.dataset.verdict = verdict;
+      out.innerHTML = '';
+
+      const h = document.createElement('p');
+      h.className = 'lb__v';
+      h.textContent =
+        verdict === 'good'
+          ? `${hit.length} parts recognised — usable`
+          : verdict === 'thin'
+            ? `Only ${hit.length} parts recognised — thin`
+            : 'No parts recognised — not usable';
+      out.append(h);
+
+      const f = document.createElement('p');
+      f.className = 'lb__f';
+      f.textContent = label;
+      out.append(f);
+
+      const list = (title: string, names: string[]) => {
+        if (!names.length) return;
+        const d = document.createElement('p');
+        d.className = 'lb__l';
+        /* textContent, not innerHTML: these strings come out of a file
+           somebody downloaded from the internet. */
+        d.textContent = `${title}: ${names.slice(0, 24).join(', ')}${names.length > 24 ? ` +${names.length - 24} more` : ''}`;
+        out.append(d);
+      };
+      list('Matched', hit);
+      list('Not matched', missed);
+    }
+
+    /* The committed model, if there is one. A 404 is the normal state
+       while none exists, so it is handled quietly. */
     fetch(MODEL_URL, { method: 'HEAD' })
       .then((r) => {
         if (!r.ok) return;
-
-        const draco = new DRACOLoader().setDecoderPath('/draco/');
-        const loader = new GLTFLoader()
-          .setDRACOLoader(draco)
-          .setMeshoptDecoder(MeshoptDecoder);
-
-        loader.load(MODEL_URL, (gltf) => {
-          const m = gltf.scene;
-
-          /* Exports arrive at wildly different scales and origins — a
-             Blender default is metres, a CAD export often millimetres.
-             Normalise to the box the procedural machine occupies, or the
-             camera framing means nothing. */
-          const box = new THREE.Box3().setFromObject(m);
-          const size = box.getSize(new THREE.Vector3());
-          const centre = box.getCenter(new THREE.Vector3());
-          const scale = W / Math.max(size.x, 0.0001);
-          m.scale.setScalar(scale);
-          m.position.sub(centre.multiplyScalar(scale));
-          m.position.y += (size.y * scale) / 2 - T / 2;
-
-          m.traverse((o) => {
-            const mesh = o as THREE.Mesh;
-            if (!mesh.isMesh) return;
-            mesh.castShadow = true;
-            mesh.receiveShadow = true;
-          });
-
-          /* THE WHOLE THING TURNS ON THIS.
-             A teardown needs the file to hold its parts as separate,
-             named objects. Most models sold as "laptop" are one welded
-             shell with no interior — they render beautifully and they
-             cannot come apart. Collecting by name means such a model
-             degrades to a solid object that still turns, rather than to
-             a broken page. */
-          const found: Part[] = [];
-          /* Centre in the model's own space, so `side` can ask which
-             half a part sits in. */
-          const mid = new THREE.Box3().setFromObject(m).getCenter(new THREE.Vector3());
-          const unit = W;
-
-          m.traverse((o) => {
-            const raw = o.name.toLowerCase();
-            const key = raw.replace(/[^a-z]/g, '');
-            if (!key) return;
-            /* Whole-word matching needs the separators, which `key` has
-               thrown away — so the split happens on the raw name. */
-            const words = raw.split(/[^a-z]+/).filter(Boolean);
-            const spec = PARTS.find((t) =>
-              t.whole ? words.includes(t.key) : key.includes(t.key)
-            );
-            if (!spec) return;
-            /* Skip anything under a part already taken, or a child and
-               its parent separate by different amounts and the piece
-               tears itself apart. */
-            for (let a: THREE.Object3D | null = o.parent; a; a = a.parent) {
-              if (found.some((f) => f.obj === a)) return;
-            }
-
-            const here = o.getWorldPosition(new THREE.Vector3());
-            /* Default to the right where a part sits dead on the centre
-               line, so a lone fan still travels somewhere. */
-            const sign = spec.side ? (here.x < mid.x ? -1 : 1) : 1;
-
-            found.push({
-              obj: o,
-              home: o.position.clone(),
-              move: new THREE.Vector3(
-                spec.v[0] * sign * unit,
-                spec.v[1] * unit,
-                spec.v[2] * unit
-              ),
-            });
-          });
-
-          parts = found;
-
-          laptop.clear();
-          laptop.add(m);
-          canvas.dataset.model = 'glb';
-          canvas.dataset.parts = String(found.length);
-          /* On the DOM deliberately: it is how you check that a bought
-             model actually separates, before building anything on it. */
-          canvas.dataset.partNames = found.map((f) => f.obj.name).join(',');
-        });
+        gltf.load(MODEL_URL, (g) => install(g.scene, MODEL_URL));
       })
-      .catch(() => {
-        /* Offline, or no file. The procedural machine is the fallback
-           and it is already on screen. */
+      .catch(() => {});
+
+    /* Drop any .glb or .gltf onto the page to try it. */
+    const stop = (e: DragEvent) => { e.preventDefault(); e.stopPropagation(); };
+    const host = canvas.closest('.lb__stage') as HTMLElement;
+    host.addEventListener('dragover', (e) => { stop(e); host.dataset.over = ''; });
+    host.addEventListener('dragleave', (e) => { stop(e); delete host.dataset.over; });
+    host.addEventListener('drop', (e) => {
+      stop(e);
+      delete host.dataset.over;
+      const file = e.dataTransfer?.files?.[0];
+      if (!file || !/\.(glb|gltf)$/i.test(file.name)) return;
+      file.arrayBuffer().then((buf) => {
+        gltf.parse(
+          buf,
+          '',
+          (g) => install(g.scene, file.name),
+          () => report(file.name, [], ['file could not be read as glTF'])
+        );
       });
+    });
 
     /* The shadow the machine sits on. A plane that takes shadow only —
        invisible itself, so the section's own background shows through
