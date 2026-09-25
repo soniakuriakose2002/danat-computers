@@ -11,27 +11,25 @@ import MidCta from '@components/sections/MidCta.astro';
 import AcrossOman from '@components/sections/AcrossOman.astro';
 import BusinessSolutions from '@components/sections/BusinessSolutions.astro';
 import ServiceLayers3D from '@components/sections/ServiceLayers3D.astro';
+import Statement from '@components/sections/Statement.astro';
 import LaptopSequence from '@components/sections/LaptopSequence.astro';
 ---
 
 <PageLayout>
   {/* 01 — What do you actually sell?    */}<Teardown />
+  {/* 01b — What is Danat, in one line? */}<Statement />
   {/* 02 — Are you legitimate?           */}<BrandStrip />
-  {/* 02b — Show me, part by part       */}<LaptopSequence />
+  {/* 02b — Show me, part by part       */}
+  {/* LaptopSequence, NOT ServiceLayers3D, for the laptop. The package
+      reverted this because it was built before the photographic version
+      existed — but the client's instruction was "place the image into
+      real", and this is that: his own teardown render, scrubbed on
+      scroll. ServiceLayers3D still draws the IT rack below. */}
+  <LaptopSequence />
   {/* 03 — Can you fix my problem?       */}<ServiceCoverflow />
   {/* 04 — Why you and not them?         */}<InsideDanat />
   {/* 05 — I'm convinced, now what?      */}<MidCta />
   {/* 06 — Are you near me?              */}<AcrossOman />
-  {/* ⚠ THE LAPTOP TEARDOWN HERE IS ServiceLayers3D, NOT LaptopExperience.
-      The new engine — GLB loader, staged explosion, raycaster — was on
-      this page briefly and came straight off again: with only the
-      placeholder geometry to render, it looked worse than what it
-      replaced. Primitives cannot reach the reference, and a customer
-      should not be shown the test rig.
-
-      LaptopExperience is finished and waiting at /lab-experience. The
-      moment public/models/laptop.glb exists, swap the line above back
-      and the homepage has the real thing. */}
   {/* 07b — Can you run my office IT?   */}<ServiceLayers3D show="it" />
   {/* 08 — I'm a business, not a home    */}<BusinessSolutions />
 </PageLayout>

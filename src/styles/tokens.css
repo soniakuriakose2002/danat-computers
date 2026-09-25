@@ -63,8 +63,8 @@
      treatment around it assumes a slanted, connected face. */
   --font-script: 'Kaushan Script', 'Segoe Script', 'Brush Script MT', cursive;
 
-  --d1: clamp(2.75rem, 7.4vw, 7.5rem); /* hero */
-  --d2: clamp(2.25rem, 5vw, 4.5rem); /* section heads */
+  --d1: clamp(3rem, 8.4vw, 9rem); /* hero */
+  --d2: clamp(2.5rem, 6vw, 5.75rem); /* section heads */
   --d3: clamp(1.75rem, 3.2vw, 2.75rem);
   --d4: clamp(1.25rem, 2vw, 1.625rem);
   --lead: clamp(1.0625rem, 1.25vw, 1.25rem);
@@ -84,7 +84,7 @@
   --s9: 6rem;
   --s10: 8rem;
 
-  --pad-y: clamp(5rem, 9vw, 9rem);
+  --pad-y: clamp(5.5rem, 11vw, 11rem);
   --gut: clamp(1.25rem, 4.5vw, 4.5rem);
   --maxw: 96rem;
 

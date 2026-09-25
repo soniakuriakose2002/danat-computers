@@ -1,0 +1,85 @@
+---
+/**
+ * STATEMENT — one sentence, set very large, that fills in word by word
+ * as the visitor scrolls (the Scout Motors move). The stage pins while
+ * it reads, so the scroll feels deliberate rather than fast.
+ * Every claim in it is already made elsewhere on the site.
+ * With JS off or reduced motion the sentence is simply shown in full.
+ */
+const lines = [
+  { t: 'Laptops, printers, networks and CCTV.' },
+  { t: 'Diagnosed, quoted and repaired', hi: true },
+  { t: 'by one team, in Ruwi, Sohar and Salalah.' },
+];
+const words = lines.flatMap((l, li) =>
+  l.t.split(' ').map((w, wi, arr) => ({ w, hi: !!l.hi, br: wi === arr.length - 1 && li < lines.length - 1 }))
+);
+---
+<section class="stm" data-stm aria-label="Danat Computers in one sentence">
+  <div class="stm__stage">
+    <div class="shell">
+      <p class="label stm__label">Why Danat</p>
+      <p class="stm__text">
+        {words.map((x) => (
+          <>
+            <span class:list={['stm__w', { 'stm__w--hi': x.hi }]}>{x.w}</span>{' '}
+            {x.br && <br class="stm__br" />}
+          </>
+        ))}
+      </p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .stm { position: relative; background: var(--white); }
+  .stm[data-on] { height: 240vh; }
+  .stm__stage { padding-block: var(--pad-y); }
+  .stm[data-on] .stm__stage {
+    position: sticky;
+    top: 0;
+    min-height: 100svh;
+    display: grid;
+    align-content: center;
+    padding-block: 0;
+  }
+  .stm__label { margin-bottom: var(--s6); }
+  .stm__text {
+    max-width: 26ch;
+    font-size: clamp(2.3rem, 5.6vw, 6rem);
+    line-height: 1.02;
+    letter-spacing: -0.05em;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .stm__w { transition: color 280ms var(--ease), opacity 280ms var(--ease); }
+  .stm__w--hi { color: var(--green-deep); }
+  /* Before a word is reached it is a faint ghost of itself. */
+  .stm[data-on] .stm__w:not(.is-on) { color: color-mix(in oklab, var(--text) 14%, var(--white)); }
+  @media (max-width: 47.99rem) { .stm__br { display: none; } }
+</style>
+
+<script>
+  const start = () => {
+    const sec = document.querySelector<HTMLElement>('[data-stm]');
+    if (!sec || sec.dataset.wired) return;
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    sec.dataset.wired = '1';
+    sec.setAttribute('data-on', '');
+    const ws = [...sec.querySelectorAll<HTMLElement>('.stm__w')];
+    let raf = 0;
+    const tick = () => {
+      raf = 0;
+      const r = sec.getBoundingClientRect();
+      const p = Math.min(1, Math.max(0, -r.top / Math.max(1, r.height - innerHeight)));
+      /* the sentence completes at 80% so it rests, finished, before leaving */
+      const upto = Math.floor((p / 0.8) * (ws.length + 1));
+      ws.forEach((w, i) => w.classList.toggle('is-on', i < upto));
+    };
+    const req = () => { if (!raf) raf = requestAnimationFrame(tick); };
+    addEventListener('scroll', req, { passive: true });
+    addEventListener('resize', req);
+    tick();
+  };
+  document.addEventListener('astro:page-load', start);
+</script>

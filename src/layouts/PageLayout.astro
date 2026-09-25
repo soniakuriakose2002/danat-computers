@@ -31,6 +31,8 @@ const { title, description, overlayHeader = false } = Astro.props;
 
 <script>
   import { boot } from '@scripts/scroll';
+  import { initSmooth } from '@scripts/smooth';
+  initSmooth();
   boot();
   document.addEventListener('astro:after-swap', boot);
 </script>

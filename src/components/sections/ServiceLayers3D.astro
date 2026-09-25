@@ -24,7 +24,7 @@ interface Props {
 const { show = 'both', bookLink = '/contact', businessLink = '/business', imageFolder = '' } = Astro.props;
 ---
 <div class="d3-root" data-images={imageFolder}>
-  {show !== 'it' && <section class="d3-product d3-light" id="laptop" data-tone="off" data-product="0" aria-label="Laptop service" data-link={bookLink}><div class="d3-stage"></div></section>}
+  {show !== 'it' && <section class="d3-product d3-dark" id="laptop" data-tone="ink" data-product="0" aria-label="Laptop service" data-link={bookLink}><div class="d3-stage"></div></section>}
   {show !== 'laptop' && <section class="d3-product d3-light" id="it" data-tone="off" data-product="1" aria-label="IT support" data-link={businessLink}><div class="d3-stage"></div></section>}
 </div>
 
@@ -69,11 +69,6 @@ const { show = 'both', bookLink = '/contact', businessLink = '/business', imageF
   .d3-bar{flex:1;height:2px;background:var(--line);border-radius:2px;overflow:hidden}
   .d3-bar i{display:block;height:100%;width:0;background:var(--accent)}
 
-  /* UNUSED. The laptop teardown was the only thing on this palette and
-     it is light now, at the client's instruction: the Danat direction
-     is light and clean, and this was the largest dark surface on the
-     site. Left here because restoring it is a single class swap on the
-     section above. */
   .d3-dark{--bg:var(--d3-ink);--fg:#eef2f7;--muted:#93a699;--line:#233328;--card:rgba(24,40,30,.78);--accent:var(--green-bright,#6fc96a);--tagbg:rgba(89,170,84,.2);--shadow:rgba(0,0,0,.6)}
   .d3-light{--bg:var(--d3-mist);--fg:#111a14;--muted:#5d6b61;--line:#d5ded6;--card:rgba(255,255,255,.7);--accent:var(--green-deep,#2f6429);--tagbg:rgba(76,170,79,.14);--shadow:rgba(20,40,25,.22)}
 
@@ -92,7 +87,58 @@ const { show = 'both', bookLink = '/contact', businessLink = '/business', imageF
 <script>
 let rafId = 0;
 const live = [];
-function init(THREE) {
+const videos = [];
+/* ================= REAL LAPTOP MODEL (GLB) =================
+   Drop a laptop model with SEPARATE parts at public/models/laptop.glb.
+   Each mesh is sorted into one of the eight services by its name,
+   using the first rule that matches (order matters). Anything that
+   matches nothing is treated as body. With no file present, the
+   built-in laptop is used, so the page never breaks.
+   Open the page with ?d3debug to print every mesh name and where it
+   went, then adjust these patterns to the names in your model.      */
+const MODEL_URL = '/models/laptop.glb';
+const MODEL_PARTS = {
+  'Battery':               /batt|cell/i,
+  'Storage':               /ssd|nvme|m\.?2|storage|hdd|drive/i,
+  'Memory':                /ram|memory|dimm/i,
+  'Cooling fan':           /fan|cool|heat.?(sink|pipe)|thermal|fin/i,
+  'Motherboard':           /mother|mainboard|logic|pcb|board|cpu|gpu|chip/i,
+  'Keyboard and trackpad': /key|trackpad|touchpad|palm|top.?case|deck/i,
+  'Screen':                /screen|display|lid|bezel|panel|lcd|camera|webcam/i,
+  'Body and hinges':       /./,
+};
+async function loadModel(THREE, GLTFLoader) {
+  try {
+    const head = await fetch(MODEL_URL, {method: 'HEAD'});
+    if (!head.ok) return null;
+    const gltf = await new GLTFLoader().loadAsync(MODEL_URL);
+    const src = gltf.scene;
+    /* normalise: 3.2 units wide, centred, resting on y = 0 */
+    const box = new THREE.Box3().setFromObject(src), size = box.getSize(new THREE.Vector3());
+    const holder = new THREE.Group(); holder.add(src);
+    holder.scale.setScalar(3.2 / Math.max(size.x, size.z));
+    holder.updateMatrixWorld(true);
+    const b2 = new THREE.Box3().setFromObject(holder), c = b2.getCenter(new THREE.Vector3());
+    holder.position.set(-c.x, -b2.min.y, -c.z); holder.updateMatrixWorld(true);
+    const groups = {}, log = [];
+    Object.keys(MODEL_PARTS).forEach(k => groups[k] = new THREE.Group());
+    const meshes = []; holder.traverse(o => o.isMesh && meshes.push(o));
+    meshes.forEach(m => {
+      /* a mesh's own name, or its nearest named parent */
+      const rules = Object.keys(MODEL_PARTS).slice(0, -1);
+      let key = null;
+      for (let o = m; o && o !== holder && !key; o = o.parent) key = rules.find(k => o.name && MODEL_PARTS[k].test(o.name));
+      key = key || 'Body and hinges';
+      m.castShadow = m.receiveShadow = false;
+      if (m.material) m.material = m.material.clone(); // own copy, so the highlight is per part
+      groups[key].attach(m); log.push({mesh: m.name, part: key});
+    });
+    if (location.search.includes('d3debug')) console.table(log);
+    return groups;
+  } catch (err) { console.warn('laptop.glb could not be used, keeping the built-in laptop', err); return null; }
+}
+
+async function init(THREE, RoomEnvironment, GLTFLoader) {
   const roots = [...document.querySelectorAll('.d3-root')];
   if (!roots.length || roots[0].dataset.wired) return;
   roots.forEach(r => r.dataset.wired = '1');
@@ -129,6 +175,42 @@ function init(THREE) {
     return im;
   };
 
+  const phys = (color, roughness = .5, metalness = 0, extra = {}) =>
+    new THREE.MeshPhysicalMaterial(Object.assign({roughness, metalness}, extra, {color: lin(color)}));
+  const alu = (r = .34) => phys('#aeb3b8', r, 1, {clearcoat: .1});
+  const canvasTex = (w, h, draw) => {
+    const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h);
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 8; return t;
+  };
+  let _pcb;
+  const pcbTex = () => _pcb || (_pcb = canvasTex(512, 256, (x, w, h) => {
+    x.fillStyle = '#1b5a3c'; x.fillRect(0, 0, w, h);
+    x.strokeStyle = 'rgba(180,220,160,.28)'; x.lineWidth = 1.2;
+    for (let i = 0; i < 90; i++) { let px = Math.random() * w, py = Math.random() * h; x.beginPath(); x.moveTo(px, py);
+      for (let k = 0; k < 4; k++) { Math.random() < .5 ? px += (Math.random() - .5) * 120 : py += (Math.random() - .5) * 80; x.lineTo(px, py); } x.stroke(); }
+    x.fillStyle = 'rgba(217,180,74,.8)'; for (let i = 0; i < 140; i++) { x.beginPath(); x.arc(Math.random() * w, Math.random() * h, 1.6, 0, 7); x.fill(); }
+  }));
+  const labelTex = (text, bg = '#0f1113') => canvasTex(512, 160, (x, w, h) => {
+    x.fillStyle = bg; x.fillRect(0, 0, w, h);
+    x.fillStyle = '#59aa54'; x.fillRect(24, 24, 10, h - 48);
+    x.fillStyle = '#e9ecef'; x.font = '600 44px sans-serif'; x.fillText(text, 56, h / 2 + 15);
+  });
+  function screenMap() {
+    const v = document.createElement('video');
+    Object.assign(v, {src: '/film/ecosystem.mp4', muted: true, loop: true, playsInline: true, autoplay: true, crossOrigin: 'anonymous'});
+    v.setAttribute('muted', ''); v.setAttribute('playsinline', '');
+    videos.push(v); v.play().catch(() => {});
+    /* the poster shows until the film actually plays */
+    const poster = new THREE.TextureLoader().load('/film/ecosystem.jpg'); poster.colorSpace = THREE.SRGBColorSpace;
+    const m = new THREE.MeshBasicMaterial({map: poster, toneMapped: false});
+    v.addEventListener('playing', () => { const t = new THREE.VideoTexture(v); t.colorSpace = THREE.SRGBColorSpace; m.map = t; m.needsUpdate = true; }, {once: true});
+    return m;
+  }
+  function logoDecal() {
+    const t = new THREE.TextureLoader().load('/brand/danat-logo.png'); t.colorSpace = THREE.SRGBColorSpace;
+    const m = mesh(new THREE.PlaneGeometry(.62, .45).rotateX(-Math.PI / 2), new THREE.MeshStandardMaterial({map: t, transparent: true, roughness: .2, metalness: .6}));
+    return m;
+  }
   function screenTexture() {
     const c = document.createElement('canvas'); c.width = 1024; c.height = 640;
     const x = c.getContext('2d');
@@ -157,74 +239,95 @@ function init(THREE) {
       key: 'laptop', meta: 'Laptop service', headline: 'Every part of your laptop, repaired in-house.',
       intro: 'All brands: HP, Dell, Lenovo, Asus, Acer, Apple and more. Keep scrolling to see what we fix, part by part.',
       foot: '<a class="d3-btn" href="{LINK}">Book a laptop repair</a>',
-      spacing: .32, dist: 10.2, lookY: .75, rotY: -.55, tilt: .1,
+      spacing: .42, rotY: -.32, rotRange: .6, tilt: .12, elev: .42,
       parts: [
         {name: 'Body and hinges', desc: 'Cracked casing, stiff or loose hinges and broken screw mounts, repaired or replaced.', tag: 'Body and hinge repair', build() {
-          return group(0, mesh(rbox(3.2, .09, 2.2, .14), mat('#9aa3ad', .38, .8)));
+          const g = group(0, mesh(rbox(3.2, .07, 2.2, .2), alu()));
+          const rubber = phys('#1a1c1f', .9, 0);
+          [[-1.3, -.8], [1.3, -.8], [-1.3, .85], [1.3, .85]].forEach(([x, z]) => g.add(mesh(rbox(.34, .02, .08, .04), rubber, x, -.043, z)));
+          const vent = phys('#0d0e10', .8, 0);
+          for (let i = 0; i < 16; i++) g.add(mesh(new THREE.BoxGeometry(.06, .005, .34), vent, -.5 + i * .09, .037, -.7));
+          [-1.2, 1.2].forEach(x => { const h = mesh(new THREE.CylinderGeometry(.045, .045, .5, 24), alu(.35)); h.rotation.z = Math.PI / 2; h.position.set(x, .05, -1.07); g.add(h); });
+          return g;
         }},
         {name: 'Cooling fan', desc: 'Overheating, shutdowns and loud fans fixed with a deep clean and fresh thermal paste.', tag: 'Cleaning and thermal service', build() {
-          const g = group(.08);
-          const ring = mesh(new THREE.CylinderGeometry(.36, .36, .06, 40, 1, true), mat('#2a2f36', .6, .3, {side: THREE.DoubleSide}), .95, 0, -.35);
-          const blades = new THREE.Group(); blades.position.set(.95, 0, -.35);
-          const bm = mat('#3a4049', .5, .2);
-          blades.add(mesh(new THREE.CylinderGeometry(.1, .1, .05, 24), bm));
-          for (let i = 0; i < 9; i++) { const b = mesh(new THREE.BoxGeometry(.24, .012, .09), bm); b.position.x = .19; const h = new THREE.Group(); h.rotation.y = i / 9 * Math.PI * 2; b.rotation.x = .5; h.add(b); blades.add(h); }
-          const cu = mat('#c27a42', .3, 1);
-          const pipe = mesh(new THREE.BoxGeometry(1.1, .03, .12), cu, .2, .02, -.25);
-          const fins = mesh(new THREE.BoxGeometry(.2, .06, .7), cu, 1.42, 0, -.35);
-          g.add(ring, blades, pipe, fins);
-          g.userData.tick = t => blades.rotation.y = t * .012;
+          const g = group(.07);
+          const plastic = phys('#1c1f23', .45, 0, {clearcoat: .3});
+          const housing = mesh(rbox(.86, .07, .86, .16), plastic, .95, 0, -.3);
+          const hole = mesh(new THREE.CylinderGeometry(.34, .34, .075, 48), phys('#0a0b0c', .9, 0), .95, .001, -.3);
+          const blades = new THREE.Group(); blades.position.set(.95, .01, -.3);
+          const bm = phys('#2a2e33', .35, 0);
+          blades.add(mesh(new THREE.CylinderGeometry(.11, .11, .05, 32), phys('#34393f', .3, .4)));
+          for (let i = 0; i < 13; i++) { const b = mesh(new THREE.BoxGeometry(.22, .008, .06), bm); b.position.x = .19; b.rotation.x = .55; const h = new THREE.Group(); h.rotation.y = i / 13 * Math.PI * 2; h.add(b); blades.add(h); }
+          const cu = phys('#c8834d', .22, 1);
+          const pipe1 = mesh(rbox(1.3, .025, .09, .04), cu, .15, .03, -.18);
+          const pipe2 = mesh(rbox(1.3, .025, .09, .04), cu, .15, .03, -.34);
+          const fins = new THREE.Group();
+          for (let i = 0; i < 18; i++) fins.add(mesh(new THREE.BoxGeometry(.008, .06, .7), cu, 1.45 + i * .02, 0, -.3));
+          g.add(housing, hole, blades, pipe1, pipe2, fins);
+          g.userData.tick = t => blades.rotation.y = t * .014;
           return g;
         }},
         {name: 'Motherboard', desc: 'Chip-level diagnosis for no power, no display, charging faults and liquid damage.', tag: 'Board-level repair', build() {
-          const g = group(.09, mesh(rbox(2.7, .04, 1.15, .1), mat('#1f5a45', .5, .1)));
+          const g = group(.1, mesh(rbox(2.7, .03, 1.1, .08), phys('#ffffff', .45, .1, {map: pcbTex()})));
           g.position.z = -.35;
-          const chip = mat('#15181c', .4, .3);
-          g.add(mesh(new THREE.BoxGeometry(.4, .05, .4), chip, -.1, .04, .05));
-          g.add(mesh(new THREE.BoxGeometry(.3, .03, .3), mat('#c8ccd0', .25, .9), -.1, .075, .05));
-          [[-.8, .3], [-.6, -.3], [.55, .35], [.4, -.35]].forEach(([x, z]) => g.add(mesh(new THREE.BoxGeometry(.16, .03, .12), chip, x, .03, z)));
+          const sub = mesh(rbox(.5, .02, .5, .03), phys('#1d4d35', .5, .1), -.1, .025, .05);
+          const die = mesh(rbox(.3, .025, .3, .02), phys('#c9ccd0', .12, 1), -.1, .045, .05);
+          const chip = phys('#101214', .28, .2, {clearcoat: .6});
+          [[-.85, .28, .22, .16], [-.62, -.3, .18, .18], [.55, .33, .26, .14], [.38, -.32, .2, .12], [.9, 0, .14, .14]].forEach(([x, z, w, d]) => g.add(mesh(rbox(w, .03, d, .015), chip, x, .03, z)));
+          const gold = phys('#d9b44a', .25, 1);
+          g.add(mesh(new THREE.BoxGeometry(.5, .012, .05), gold, 1.05, .02, -.45));
+          const caps = []; for (let i = 0; i < 10; i++) caps.push([.2 + (i % 5) * .08, .035, .15 + Math.floor(i / 5) * .08]);
+          g.add(instanced(new THREE.CylinderGeometry(.022, .022, .05, 12), phys('#8d9398', .3, .9), caps));
+          g.add(sub, die);
           return g;
         }},
         {name: 'Memory', desc: 'More RAM so heavy apps, spreadsheets and many tabs stop slowing you down.', tag: 'RAM upgrades', build() {
           const g = group(.15);
-          const pcb = mat('#26634b', .5, .1), chip = mat('#15181c', .4, .3);
-          [-.1, .12].forEach(z => {
-            g.add(mesh(new THREE.BoxGeometry(1.0, .02, .2), pcb, -.75, 0, z - .4));
-            for (let i = 0; i < 4; i++) g.add(mesh(new THREE.BoxGeometry(.16, .02, .12), chip, -1.1 + i * .23, .02, z - .4));
+          const pcb = phys('#ffffff', .45, .1, {map: pcbTex()}), chip = phys('#101214', .28, .2, {clearcoat: .6}), gold = phys('#d9b44a', .25, 1);
+          [-.12, .14].forEach(z => {
+            g.add(mesh(rbox(1.0, .018, .22, .02), pcb, -.75, 0, z - .4));
+            g.add(mesh(new THREE.BoxGeometry(.98, .02, .03), gold, -.75, 0, z - .4 + .11));
+            for (let i = 0; i < 4; i++) g.add(mesh(rbox(.17, .018, .12, .01), chip, -1.1 + i * .235, .018, z - .41));
           });
           return g;
         }},
         {name: 'Storage', desc: 'Switch to a fast SSD, move your files across, or recover data from a failed drive.', tag: 'SSD upgrade and data recovery', build() {
-          const g = group(.13, mesh(new THREE.BoxGeometry(.8, .02, .22), mat('#1b2026', .5, .2)));
-          g.add(mesh(new THREE.BoxGeometry(.28, .025, .16), mat('#2d333b', .4, .3), -.15, .02, 0));
-          g.add(mesh(new THREE.BoxGeometry(.18, .025, .16), mat('#2d333b', .4, .3), .2, .02, 0));
-          g.add(mesh(new THREE.BoxGeometry(.06, .022, .2), mat('#d4af37', .3, 1), .42, 0, 0));
-          g.position.set(.55, g.position.y, .15);
+          const g = group(.13, mesh(rbox(.9, .018, .24, .02), phys('#15181b', .5, .1)));
+          g.add(mesh(new THREE.PlaneGeometry(.62, .2).rotateX(-Math.PI / 2), phys('#ffffff', .6, 0, {map: labelTex('NVMe SSD  1 TB')}), -.08, .011, 0));
+          g.add(mesh(new THREE.BoxGeometry(.07, .02, .22), phys('#d9b44a', .25, 1), .45, 0, 0));
+          g.position.set(.6, g.position.y, .15);
           return g;
         }},
         {name: 'Battery', desc: 'Quality replacement batteries for laptops that die early or stop charging.', tag: 'Battery replacement', build() {
-          const g = group(.1, mesh(rbox(2.5, .1, .7, .08), mat('#2b3038', .45, .2)));
-          g.add(mesh(new THREE.BoxGeometry(1.2, .005, .3), mat('#4caa4f', .6), 0, .053, 0));
-          g.position.z = .6; return g;
+          const g = group(.1);
+          const cell = phys('#ffffff', .55, .1, {map: labelTex('Li-ion  54 Wh', '#26292e')});
+          [-.84, 0, .84].forEach(x => g.add(mesh(rbox(.8, .08, .62, .06), cell, x, 0, 0)));
+          g.add(mesh(new THREE.BoxGeometry(2.5, .02, .05), phys('#101214', .5, 0), 0, 0, -.34));
+          g.position.z = .55; return g;
         }},
         {name: 'Keyboard and trackpad', desc: 'Stuck or missing keys, liquid spills and trackpads that stop responding.', tag: 'Keyboard and trackpad repair', build() {
-          const g = group(.2, mesh(rbox(3.2, .06, 2.2, .14), mat('#b4bcc5', .35, .8)));
+          const g = group(.2, mesh(rbox(3.2, .05, 2.2, .2), alu()));
+          g.add(mesh(rbox(2.86, .006, 1.16, .05), phys('#0c0d0f', .8, 0), 0, .024, -.36));
           const keys = [];
-          for (let r = 0; r < 5; r++) for (let c = 0; c < 14; c++) keys.push([(c - 6.5) * .19, .04, -.85 + r * .18]);
-          g.add(instanced(rbox(.16, .03, .15, .03), mat('#1e232a', .7), keys));
-          g.add(mesh(rbox(1.0, .01, .56, .06), mat('#a8b0b9', .3, .7), 0, .033, .6));
+          for (let c = 0; c < 14; c++) keys.push([(c - 6.5) * .195, .035, -.86]);
+          for (let r = 0; r < 4; r++) for (let c = 0; c < 14; c++) keys.push([(c - 6.5) * .195, .035, -.66 + r * .19]);
+          const keyCap = phys('#141518', .6, 0, {clearcoat: .15});
+          g.add(instanced(rbox(.17, .022, .17, .035), keyCap, keys));
+          g.add(mesh(rbox(.95, .022, .17, .035), keyCap, 0, .035, .1));
+          g.add(mesh(rbox(1.3, .004, .78, .06), phys('#b8bcc0', .22, .6, {clearcoat: .8, clearcoatRoughness: .2}), 0, .026, .63));
           return g;
         }},
         {name: 'Screen', desc: 'Cracked, flickering or dim screens replaced with a panel matched to your model.', tag: 'Screen replacement', build() {
           const lid = new THREE.Group();
-          lid.add(mesh(rbox(3.2, .06, 2.1, .14), mat('#9aa3ad', .38, .8), 0, 0, 1.05));
-          lid.add(mesh(new THREE.PlaneGeometry(2.95, 1.8).rotateX(Math.PI/2), mat('#000', .1), 0, -.031, 1.05));
-          const screen = mesh(new THREE.PlaneGeometry(2.85, 1.72).rotateX(Math.PI/2), new THREE.MeshBasicMaterial({map: screenTexture()}), 0, -.033, 1.05);
-          lid.add(screen);
-          lid.rotation.x = -1.92;
+          lid.add(mesh(rbox(3.2, .045, 2.12, .2), alu(), 0, 0, 1.06));
+          lid.add(mesh(new THREE.PlaneGeometry(3.12, 2.04).rotateX(Math.PI / 2), phys('#050607', .08, 0, {clearcoat: 1, clearcoatRoughness: .05}), 0, -.024, 1.06));
+          lid.add(mesh(new THREE.PlaneGeometry(2.92, 1.72).rotateX(Math.PI / 2), screenMap(), 0, -.026, 1.1));
+          const logo = logoDecal(); if (logo) { logo.position.set(0, .024, 1.06); lid.add(logo); }
+          lid.rotation.x = -1.95;
           const hinge = group(.24, lid); hinge.position.z = -1.07;
           const g = new THREE.Group(); g.add(hinge);
-          g.userData.dir = new THREE.Vector3(0, 1, -.35);
+          g.userData.dir = new THREE.Vector3(0, 1, -.3);
           return g;
         }},
       ]
@@ -233,7 +336,7 @@ function init(THREE) {
       key: 'it', meta: 'IT support for business', headline: 'IT support for offices that can\u2019t afford to stop.',
       intro: 'We design, install and look after the whole setup, from the power supply to the Wi-Fi. Keep scrolling.',
       foot: '<a class="d3-btn" href="{LINK}">Talk to our business team</a>',
-      spacing: .42, dist: 7.8, lookY: .35, rotY: -.5, tilt: .08,
+      spacing: .4, rotY: -.45, rotRange: .7, tilt: .08, elev: .3,
       parts: [
         {name: 'Power backup', desc: 'UPS systems sized for your servers and network, so a power cut isn\u2019t an outage.', tag: 'UPS supply and installation', build() {
           const g = group(0, mesh(rbox(2.4, .36, 1.4, .05), mat('#262b33', .5, .4)));
@@ -276,24 +379,24 @@ function init(THREE) {
   ];
 
   /* ---------- engine ---------- */
-  /* How much of the section is spent opening before the parts start
-     leaving. .22 of a 600vh section was over a screen of scrolling on
-     the lid alone. */
-  const START = .14;
+  const START = .22;
   const sections = [];
   let pointerX = 0, pointerY = 0;
   addEventListener('pointermove', e => { pointerX = e.clientX / innerWidth - .5; pointerY = e.clientY / innerHeight - .5; }, {passive: true});
 
+  const modelGroups = document.querySelector('#laptop') ? await loadModel(THREE, GLTFLoader) : null;
+  if (modelGroups) {
+    const lap = products.find(p => p.key === 'laptop');
+    lap.parts.forEach(p => {
+      const g = modelGroups[p.name];
+      p.build = () => { if (p.name === 'Screen') g.userData.dir = new THREE.Vector3(0, 1, -.3); return g; };
+    });
+    lap.spacing = .5;
+  }
   document.querySelectorAll('.d3-root .d3-product').forEach(el => {
     const def = products[+el.dataset.product];
     const n = def.parts.length;
-    /* SCROLL LENGTH. Was 160 + 55/part — the laptop's eight parts made
-       a 600vh section, six screens of scrolling to see one teardown,
-       which read as sluggish rather than cinematic. 110 + 34/part puts
-       the laptop at 382vh and the rack at 280vh: still enough travel
-       for each part to land, roughly a third less scrolling to get
-       there. */
-    el.style.height = (110 + n * 34) + 'vh';
+    el.style.height = (160 + n * 55) + 'vh';
     const display = def.parts.map((p, i) => ({...p, idx: i})).reverse();
     const stage = el.querySelector('.d3-stage');
     stage.innerHTML = `
@@ -317,14 +420,17 @@ function init(THREE) {
 
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(28, 1, .1, 100);
-    scene.add(new THREE.HemisphereLight(0xffffff, 0x2a3446, .9 * Math.PI));
-    const key = new THREE.DirectionalLight(0xffffff, 1.2 * Math.PI); key.position.set(4, 8, 5); scene.add(key);
-    const rim = new THREE.DirectionalLight(0xffe2c8, .7 * Math.PI); rim.position.set(-6, 3, -5); scene.add(rim);
-    const fill = new THREE.DirectionalLight(0xdfe8ff, .35 * Math.PI); fill.position.set(-3, -2, 6); scene.add(fill);
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    scene.environment = pmrem.fromScene(new RoomEnvironment(), .04).texture;
+    scene.environmentIntensity = .7;
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x2a3446, .35 * Math.PI));
+    const key = new THREE.DirectionalLight(0xffffff, .9 * Math.PI); key.position.set(4, 8, 5); scene.add(key);
+    const rim = new THREE.DirectionalLight(0xd8ffd4, .6 * Math.PI); rim.position.set(-6, 3, -5); scene.add(rim);
 
     const pivot = new THREE.Group(); scene.add(pivot);
     const accent = lin(getComputedStyle(el).getPropertyValue('--accent').trim() || '#4caa4f');
     const up = new THREE.Vector3(0, 1, 0);
+    const v0 = videos.length;
     const parts = def.parts.map(p => {
       const g = p.build(); pivot.add(g);
       const mats = new Set(); g.traverse(o => o.material && o.material.isMeshStandardMaterial && mats.add(o.material));
@@ -332,6 +438,15 @@ function init(THREE) {
       return {g, mats: [...mats], base: g.position.clone(), dir: g.userData.dir || up, tick: g.userData.tick};
     });
 
+    /* frame the model from its real size, assembled and fully apart */
+    const fitAt = e => {
+      const lift = (def.parts.length - 1) * def.spacing * e / 2;
+      parts.forEach((pt, i) => { pt.g.position.copy(pt.base).addScaledVector(pt.dir, i * def.spacing * e); pt.g.position.y -= lift; });
+      const sph = new THREE.Box3().setFromObject(pivot).getBoundingSphere(new THREE.Sphere());
+      return sph;
+    };
+    const fit0 = fitAt(0), fit1 = fitAt(1);
+    const vids = videos.slice(v0);
     let aspect = 1;
     const resize = () => { const w = wrap.clientWidth, h = wrap.clientHeight; renderer.setSize(w, h, false); aspect = w / h; camera.aspect = aspect; camera.updateProjectionMatrix(); };
     new ResizeObserver(resize).observe(wrap); resize();
@@ -355,11 +470,11 @@ function init(THREE) {
       im.className = 'd3-ph'; im.alt = j ? display[j - 1].name : def.meta; im.decoding = 'async';
       photos[j] = im; photoBox.appendChild(im); wrap.classList.add('d3-photo-mode'); s.lastPhoto = null;
     }));
-    const s = {el, def, n, display, photos, lastPhoto: null, renderer, scene, camera, pivot, parts, visible: false, smooth: null,
+    const s = {el, def, n, display, photos, fit0, fit1, vids, lastPhoto: null, renderer, scene, camera, pivot, parts, visible: false, smooth: null,
       card: stage.querySelector('.d3-card .d3-inner'), bar: stage.querySelector('.d3-bar i'), label: stage.querySelector('.d3-progress .d3-label'),
       buttons, lastK: null, aspect: () => aspect, spin: () => spin,
-      decay() { if (drag === null) { spinVel *= .92; spin += spinVel; } }};
-    new IntersectionObserver(([en]) => s.visible = en.isIntersecting, {rootMargin: '100px'}).observe(el);
+      decay() { if (drag === null) { spinVel *= .92; spin += spinVel; spin *= .985; } }};
+    new IntersectionObserver(([en]) => { s.visible = en.isIntersecting; s.vids.forEach(v => en.isIntersecting ? v.play().catch(() => {}) : v.pause()); }, {rootMargin: '100px'}).observe(el);
     sections.push(s);
     setCard(s, -1);
   });
@@ -380,10 +495,7 @@ function init(THREE) {
       if (!s.visible) return;
       const r = s.el.getBoundingClientRect();
       const target = clamp(-r.top / (r.height - innerHeight));
-      /* Smoothing was .12, which trails the wheel by enough to feel
-         like the machine is catching up with you rather than answering.
-         .2 keeps the easing but shortens the lag. */
-      const p = reduced || s.smooth === null ? target : s.smooth + (target - s.smooth) * .2;
+      const p = reduced || s.smooth === null ? target : s.smooth + (target - s.smooth) * .12;
       s.smooth = p;
 
       const e = ease(clamp(p / START));
@@ -402,15 +514,18 @@ function init(THREE) {
       });
 
       s.decay();
-      const idle = reduced ? 0 : t * .00005;
-      s.pivot.rotation.y = s.def.rotY + p * 1.0 + idle + s.spin() + pointerX * .22;
+      const idle = reduced ? 0 : Math.sin(t * .0004) * .08;
+      s.pivot.rotation.y = s.def.rotY + p * s.def.rotRange + idle + s.spin() + pointerX * .18;
       s.pivot.rotation.x = s.def.tilt * e + pointerY * .07;
 
       const a = s.aspect();
-      const portrait = a < 1 ? Math.pow(1 / a, .9) : 1;
-      const dist = s.def.dist * (1 + .3 * e) * portrait;
-      s.camera.position.set(0, dist * .45 + s.def.lookY, dist);
-      s.camera.lookAt(0, s.def.lookY, 0);
+      const R = s.fit0.radius + (s.fit1.radius - s.fit0.radius) * e;
+      const cy = s.fit0.center.y + (s.fit1.center.y - s.fit0.center.y) * e;
+      const vf = THREE.MathUtils.degToRad(s.camera.fov) / 2, hf = Math.atan(Math.tan(vf) * a);
+      const dist = R / Math.sin(Math.min(vf, hf)) * 1.1;
+      const ox = a > 1.2 ? R * .32 : 0; // keep the model clear of the info card
+      s.camera.position.set(ox, cy + dist * s.def.elev, dist);
+      s.camera.lookAt(ox, cy, 0);
 
       s.bar.style.width = (p * 100).toFixed(1) + '%';
       setCard(s, k);
@@ -430,7 +545,8 @@ function boot() {
   const io = new IntersectionObserver(es => {
     if (!es.some(e => e.isIntersecting)) return;
     io.disconnect();
-    import('three').then(init);
+    Promise.all([import('three'), import('three/examples/jsm/environments/RoomEnvironment.js'), import('three/examples/jsm/loaders/GLTFLoader.js')])
+      .then(([T, R, G]) => init(T, R.RoomEnvironment, G.GLTFLoader));
   }, {rootMargin: '1200px 0px'});
   roots.forEach(r => io.observe(r));
 }
@@ -438,5 +554,6 @@ document.addEventListener('astro:page-load', boot);
 document.addEventListener('astro:before-swap', () => {
   cancelAnimationFrame(rafId);
   live.splice(0).forEach(r => { r.dispose(); r.forceContextLoss(); });
+  videos.splice(0).forEach(v => { v.pause(); v.removeAttribute('src'); v.load(); });
 });
 </script>
