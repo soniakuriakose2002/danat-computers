@@ -132,13 +132,17 @@ const frames = [
   .sq__f :global(img) {
     width: 100%;
     height: 100%;
-    /* CONTAIN, not cover. These are 16:9; a 100svh pin is 1.6 on a
-       desktop and about 0.46 on a phone, so cover crops three quarters
-       of the width away on a handset and shows a fragment of a laptop.
-       Contain shows the whole machine at every size — and because the
-       page is the same colour the frames are, the bands it leaves are
-       invisible. That is what the sampled backdrop buys. */
-    object-fit: contain;
+    /* COVER by default. The frames are 16:9 and a desktop pin is about
+       1.6, so cover trims a little off the sides and the picture fills
+       the screen with no band at any edge — which is what "larger"
+       means here. The sampled page colour is still the safety net for
+       the sliver cover cannot reach.
+
+       Below 1.2 the viewport is taller than it is wide and cover stops
+       being a trim and starts being a crop: on a phone at 0.46 it would
+       throw away three quarters of the width and show a fragment of a
+       laptop. There, contain wins — see the media query below. */
+    object-fit: cover;
     /* A slow push across each frame's turn, so a still never sits dead
        still. Scroll-linked, not a timed loop. */
     scale: calc(1.02 + var(--z, 0) * 0.05);
@@ -238,6 +242,13 @@ const frames = [
     background: rgb(255 255 255 / 0.18);
   }
   .sq__bar i { display: block; height: 100%; width: 0; background: var(--green-bright); }
+
+  /* Keyed on the SHAPE of the viewport, not its width: a short landscape
+     window and a tall phone need opposite things, and only the ratio
+     tells them apart. */
+  @media (max-aspect-ratio: 6 / 5) {
+    .sq__f :global(img) { object-fit: contain; }
+  }
 
   @media (max-width: 48rem) {
     .sq__copy { top: auto; bottom: 6.5rem; translate: 0 0; width: auto; right: var(--gut, 1.25rem); }
