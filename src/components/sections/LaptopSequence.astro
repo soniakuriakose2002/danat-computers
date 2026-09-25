@@ -7,118 +7,134 @@ import fTop from '@assets/teardown/laptop-topcase.jpg';
 import fExploded from '@assets/teardown/laptop-exploded.jpg';
 
 /**
- * THE LAPTOP, TAKEN APART — photographs, scrubbed on scroll.
+ * LAPTOP SERVICE — the client's layout, with real photographs in it.
  *
- * The manager's note was that the 3D version read as "a box with an
- * image placed inside": a framed panel on a page rather than a product
- * you are looking at. Three things cause that, and all three are fixed
- * here rather than tuned.
+ * The layout is the one he sent: a rail down the left carrying the
+ * headline and a numbered index, the picture filling the rest, a card
+ * bottom-right reading "02 of 04", and a labelled progress bar along
+ * the foot. The accent is Danat green, not that file's orange.
  *
- * It is FULL BLEED. No card, no border, no shadow, no container — the
- * picture is the section, edge to edge, and the copy sits on it.
+ * What differs is what is being shown. His version draws its laptop
+ * from primitives; this scrubs the photographic teardown he supplied,
+ * so the machine is real.
  *
- * The backdrop is sampled from the photographs themselves, so the frame
- * has no visible edge against the page. That single colour is what
- * stops it reading as an image on a background.
+ * FRAMES. Sliced from his reference sheet and each FITTED onto a shared
+ * 1600x900 canvas rather than cropped to it — the open shot is 888x304,
+ * nearly 3:1, and cropping that to 16:9 turned it into a close-up of a
+ * keyboard, which is what "why is this so large" was. Each is padded
+ * with its own border colour, measured from its edge ring, and the
+ * stage takes that same colour so the padding cannot be seen.
  *
- * And it answers the wheel DIRECTLY. No smoothing, no lerp: scroll
- * position maps straight to frame position, so the machine comes apart
- * exactly as fast as you scroll.
+ * ⚠ Panel 1 of that sheet — the closed lid — is deliberately unused: it
+ * carries an HP logo, and Danat sells HP rather than speaks for it.
  *
- * ⚠ SOURCE. These are the client's own reference render, sliced into
- * frames. Panel 1 of that sheet — the closed lid — is deliberately NOT
- * used: it carries an HP logo, and Danat sells HP rather than speaking
- * for it. The sequence therefore starts open.
- *
- * They are ~600px originals upscaled to 1280, so they are soft at full
- * width. Real photography or a rendered sequence replaces them here
- * with no change to this file.
+ * ⚠ The panels are ~600px originals. Re-export the sheet larger and
+ * re-slice; nothing in this file changes.
  */
 const frames = [
   {
     img: fOpen,
+    bg: '#426d7e',
     n: 'Open',
     t: 'Free diagnosis',
     p: 'We tell you what failed, what it costs and how long it takes — before you agree to anything.',
+    tag: 'Free diagnosis',
     alt: 'A laptop open on a bench',
   },
   {
     img: fScreen,
+    bg: '#396175',
     n: 'Screen',
     t: 'Screen replacement',
-    p: 'Cracked, flickering or dim panels, matched to your model.',
+    p: 'Cracked, flickering or dim panels, replaced with one matched to your model.',
+    tag: 'Screen replacement',
     alt: 'The screen separated from the body of a laptop',
   },
   {
     img: fTop,
+    bg: '#446d7e',
     n: 'Keyboard',
     t: 'Keyboard and trackpad',
-    p: 'Stuck keys, spills, and trackpads that stop responding.',
+    p: 'Stuck or missing keys, liquid spills, and trackpads that stop responding.',
+    tag: 'Keyboard and trackpad repair',
     alt: 'The keyboard and top case lifted away from a laptop',
   },
   {
     img: fExploded,
+    bg: '#3d606e',
     n: 'Inside',
     t: 'Board-level repair',
-    p: 'Battery, memory, storage, cooling and the board itself. Most shops replace it. We fix it.',
+    p: 'Battery, memory, storage, cooling and the board itself. Most shops replace it. We repair it.',
+    tag: 'Chip-level diagnosis',
     alt: 'A laptop fully exploded into its components',
   },
 ];
+const total = String(frames.length).padStart(2, '0');
 ---
 
 <section class="sq" data-sq style={`--n:${frames.length}`}>
   <div class="sq__track" data-sq-track>
     <div class="sq__pin">
       {frames.map((f, i) => (
-        <figure class="sq__f" data-f={i} data-on={i === 0 ? '' : undefined}>
-          <Image src={f.img} alt={f.alt} widths={[900, 1280]} sizes="100vw"
+        <figure class="sq__f" data-f={i} data-bg={f.bg} data-on={i === 0 ? '' : undefined}>
+          <Image src={f.img} alt={f.alt} widths={[1100, 1600]} sizes="100vw"
             quality={86} format="webp" loading={i === 0 ? 'eager' : 'lazy'} />
         </figure>
       ))}
 
-      <div class="sq__veil" aria-hidden="true"></div>
+      {/* Under the rail only. The right of the picture is the product
+          and is left alone. */}
+      <span class="sq__veil" aria-hidden="true"></span>
 
-      <div class="sq__copy">
+      <aside class="sq__rail">
         <p class="sq__eb">Laptop service</p>
-        <div class="sq__cards">
+        <h2 class="sq__h">Every part of<br />your laptop,<br />repaired in&#8209;house.</h2>
+
+        <ol class="sq__ix">
           {frames.map((f, i) => (
-            <article data-c={i} data-on={i === 0 ? '' : undefined}>
-              <h2>{f.t}</h2>
-              <p>{f.p}</p>
-            </article>
+            <li data-i={i} data-on={i === 0 ? '' : undefined}>
+              <b>{String(i + 1).padStart(2, '0')}</b><span>{f.n}</span>
+            </li>
           ))}
-        </div>
+        </ol>
+
         <a class="sq__cta" href="/contact">Book a laptop repair</a>
+      </aside>
+
+      <div class="sq__cards" aria-live="polite">
+        {frames.map((f, i) => (
+          <article data-c={i} data-on={i === 0 ? '' : undefined}>
+            <p class="sq__of">{String(i + 1).padStart(2, '0')} of {total}</p>
+            <h3>{f.t}</h3>
+            <p class="sq__d">{f.p}</p>
+            <span class="sq__tag">{f.tag}</span>
+          </article>
+        ))}
       </div>
 
-      <ol class="sq__ix">
-        {frames.map((f, i) => (
-          <li data-i={i} data-on={i === 0 ? '' : undefined}>
-            <b>{String(i + 1).padStart(2, '0')}</b><span>{f.n}</span>
-          </li>
-        ))}
-      </ol>
-
-      <div class="sq__bar" aria-hidden="true"><i data-sq-bar></i></div>
+      <div class="sq__foot">
+        <span class="sq__now" data-sq-now>{frames[0].n}</span>
+        <span class="sq__bar"><i data-sq-bar></i></span>
+      </div>
     </div>
   </div>
 </section>
 
 <style>
-  /* 88svh per frame. Short on purpose: the note was that the scrolling
+  /* 88svh a frame. Short deliberately: the note was that the scrolling
      is too slow, and a frame that needs a screen and a half to change
-     is what makes a teardown feel like homework. */
-  .sq { --pane: 88svh; background: #67868f; }
+     is what makes a teardown feel like work. */
+  .sq { --pane: 88svh; --rail: clamp(19rem, 27vw, 26rem); background: #426d7e; }
   .sq__track { height: calc(var(--n) * var(--pane)); }
   .sq__pin {
     position: sticky;
     top: 0;
     height: 100svh;
     overflow: hidden;
-    /* Sampled from the photographs. With the page the same colour as
-       the frames, there is no edge — which is the whole difference
-       between a product filling the screen and a picture in a box. */
-    background: #67868f;
+    /* Takes the active frame's own padding colour, so the area around
+       the photograph cannot be told from the photograph. */
+    background: var(--bg, #426d7e);
+    transition: background-color 380ms linear;
   }
 
   .sq__f {
@@ -126,141 +142,190 @@ const frames = [
     inset: 0;
     margin: 0;
     opacity: 0;
-    transition: opacity 340ms linear;
+    transition: opacity 360ms linear;
   }
   .sq__f[data-on] { opacity: 1; }
   .sq__f :global(img) {
     width: 100%;
     height: 100%;
-    /* COVER by default. The frames are 16:9 and a desktop pin is about
-       1.6, so cover trims a little off the sides and the picture fills
-       the screen with no band at any edge — which is what "larger"
-       means here. The sampled page colour is still the safety net for
-       the sliver cover cannot reach.
-
-       Below 1.2 the viewport is taller than it is wide and cover stops
-       being a trim and starts being a crop: on a phone at 0.46 it would
-       throw away three quarters of the width and show a fragment of a
-       laptop. There, contain wins — see the media query below. */
+    /* Every frame is already 16:9, so cover has almost nothing to trim
+       and the machine is never cropped. */
     object-fit: cover;
-    /* A slow push across each frame's turn, so a still never sits dead
-       still. Scroll-linked, not a timed loop. */
-    scale: calc(1.02 + var(--z, 0) * 0.05);
-    transform-origin: 58% 45%;
+    /* A slow push across each frame's turn, tied to scroll rather than a
+       timer, so a still never sits completely dead. */
+    scale: calc(1.01 + var(--z, 0) * 0.045);
+    transform-origin: 62% 50%;
   }
 
-  /* Readability over an ungraded photograph, on the side the copy is. */
   .sq__veil {
     position: absolute;
     inset: 0;
     background: linear-gradient(
       100deg,
-      rgb(10 22 26 / 0.86) 0%,
-      rgb(10 22 26 / 0.62) 32%,
-      rgb(10 22 26 / 0.06) 62%
+      rgb(7 18 24 / 0.9) 0%,
+      rgb(7 18 24 / 0.78) calc(var(--rail) - 6rem),
+      rgb(7 18 24 / 0.1) calc(var(--rail) + 11rem),
+      rgb(7 18 24 / 0) 70%
     );
   }
 
-  .sq__copy {
+  .sq__rail {
     position: absolute;
-    left: var(--gut, 1.5rem);
-    top: 50%;
-    translate: 0 -50%;
+    left: 0;
+    top: 0;
+    bottom: 0;
     z-index: 2;
-    width: min(27rem, 78vw);
+    width: var(--rail);
+    display: flex;
+    flex-direction: column;
+    padding: calc(var(--hd-h, 5.4rem) + 2.2rem) 1.6rem 2.2rem var(--gut, 1.6rem);
   }
 
   .sq__eb {
-    font-family: var(--font-mono);
-    font-size: 0.6875rem;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
+    font-size: 0.9375rem;
+    font-weight: 600;
     /* --green-bright is built for near-black; on this ground it reads. */
     color: var(--green-bright);
   }
-
-  .sq__cards { display: grid; margin-top: var(--s5); }
-  .sq__cards article {
-    grid-area: 1 / 1;
-    opacity: 0;
-    translate: 0 14px;
-    transition: opacity 300ms var(--ease), translate 300ms var(--ease);
-  }
-  .sq__cards article[data-on] { opacity: 1; translate: 0 0; }
-  .sq__cards h2 {
-    font-size: clamp(1.9rem, 3.4vw, 3rem);
-    font-weight: 800;
-    letter-spacing: -0.04em;
+  .sq__h {
+    margin-top: var(--s4);
+    font-size: clamp(1.8rem, 2.7vw, 2.6rem);
+    font-weight: 700;
+    letter-spacing: -0.035em;
     line-height: 1.04;
     color: #fff;
   }
-  .sq__cards p {
-    margin-top: var(--s4);
-    max-width: 30ch;
-    font-size: var(--small);
-    line-height: 1.62;
-    color: rgb(255 255 255 / 0.84);
+
+  .sq__ix {
+    margin-top: var(--s6);
+    border-top: 1px solid rgb(255 255 255 / 0.16);
   }
+  .sq__ix li {
+    display: grid;
+    grid-template-columns: 2.4rem minmax(0, 1fr);
+    gap: 0.5rem;
+    padding: 0.55rem 0;
+    border-bottom: 1px solid rgb(255 255 255 / 0.16);
+    font-size: 0.9375rem;
+    color: rgb(255 255 255 / 0.55);
+    transition: color 300ms var(--ease);
+  }
+  .sq__ix li[data-on] { color: #fff; }
+  .sq__ix b {
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    font-variant-numeric: tabular-nums;
+    color: rgb(255 255 255 / 0.5);
+  }
+  .sq__ix li[data-on] b { color: var(--green-bright); }
 
   .sq__cta {
-    display: inline-flex;
-    align-items: center;
-    margin-top: var(--s5);
-    padding: 0.8rem 1.4rem;
+    align-self: start;
+    margin-top: auto;
+    padding: 0.85rem 1.5rem;
     border-radius: 999px;
-    background: var(--green);
+    /* white on #2f6429 is 6.8:1 */
+    background: var(--green-deep);
     color: #fff;
     font-size: 0.9375rem;
     font-weight: 600;
-    transition: transform var(--t2) var(--ease), background-color var(--t2) var(--ease);
+    transition: background-color var(--t2) var(--ease), transform var(--t2) var(--ease);
   }
-  .sq__cta:hover { transform: translateY(-2px); background: var(--green-deep); }
+  .sq__cta:hover { background: var(--green); transform: translateY(-2px); }
 
-  .sq__ix {
+  /* One card at a time, in one grid cell so nothing reflows. */
+  .sq__cards {
     position: absolute;
-    left: var(--gut, 1.5rem);
-    bottom: 2.6rem;
+    right: clamp(1.25rem, 3vw, 3rem);
+    bottom: 5.5rem;
+    z-index: 2;
+    display: grid;
+    width: min(24rem, calc(100% - var(--rail) - 4rem));
+  }
+  .sq__cards article {
+    grid-area: 1 / 1;
+    padding: 1.35rem 1.5rem 1.5rem;
+    border-radius: 18px;
+    border: 1px solid rgb(255 255 255 / 0.14);
+    background: rgb(10 22 28 / 0.72);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    opacity: 0;
+    translate: 0 12px;
+    transition: opacity 320ms var(--ease), translate 320ms var(--ease);
+  }
+  .sq__cards article[data-on] { opacity: 1; translate: 0 0; }
+  .sq__of {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: var(--green-bright);
+  }
+  .sq__cards h3 {
+    margin-top: 0.35rem;
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    color: #fff;
+  }
+  .sq__d {
+    margin-top: 0.5rem;
+    font-size: 0.9375rem;
+    line-height: 1.55;
+    color: rgb(255 255 255 / 0.78);
+  }
+  .sq__tag {
+    display: inline-block;
+    margin-top: 1rem;
+    padding: 0.42rem 0.9rem;
+    border-radius: 999px;
+    background: rgb(89 170 84 / 0.22);
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #fff;
+  }
+
+  .sq__foot {
+    position: absolute;
+    left: var(--rail);
+    right: clamp(1.25rem, 3vw, 3rem);
+    bottom: 2rem;
     z-index: 2;
     display: flex;
-    gap: 1.3rem;
-    font-family: var(--font-mono);
-    font-size: 0.625rem;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
+    align-items: center;
+    gap: 1rem;
+    font-size: 0.9375rem;
+    color: rgb(255 255 255 / 0.72);
   }
-  .sq__ix li { display: flex; gap: 0.45rem; color: rgb(255 255 255 / 0.45); transition: color 300ms var(--ease); }
-  .sq__ix li[data-on] { color: #fff; }
-  .sq__ix b { color: var(--green-bright); font-weight: 500; }
-
   .sq__bar {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 3;
+    flex: 1;
     height: 2px;
-    background: rgb(255 255 255 / 0.18);
+    border-radius: 2px;
+    background: rgb(255 255 255 / 0.2);
+    overflow: hidden;
   }
   .sq__bar i { display: block; height: 100%; width: 0; background: var(--green-bright); }
 
-  /* Keyed on the SHAPE of the viewport, not its width: a short landscape
-     window and a tall phone need opposite things, and only the ratio
-     tells them apart. */
-  @media (max-aspect-ratio: 6 / 5) {
-    .sq__f :global(img) { object-fit: contain; }
-  }
-
-  @media (max-width: 48rem) {
-    .sq__copy { top: auto; bottom: 6.5rem; translate: 0 0; width: auto; right: var(--gut, 1.25rem); }
-    .sq__veil {
-      background: linear-gradient(0deg, rgb(10 22 26 / 0.9) 0%, rgb(10 22 26 / 0.5) 42%, rgb(10 22 26 / 0.05) 72%);
+  @media (max-width: 62rem) {
+    /* No room for a rail beside the picture: the copy goes over it, the
+       index goes, and the card sits below. */
+    .sq { --rail: 0px; }
+    .sq__rail {
+      width: 100%;
+      padding: calc(var(--hd-h, 5rem) + 1.25rem) var(--gut, 1.25rem) 0;
     }
-    .sq__ix { display: none; }
+    .sq__ix, .sq__cta { display: none; }
+    .sq__veil {
+      background: linear-gradient(0deg, rgb(7 18 24 / 0.92) 0%, rgb(7 18 24 / 0.5) 46%, rgb(7 18 24 / 0.2) 100%);
+    }
+    .sq__cards { left: var(--gut, 1.25rem); right: var(--gut, 1.25rem); width: auto; bottom: 4.6rem; }
+    .sq__foot { left: var(--gut, 1.25rem); bottom: 1.4rem; }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .sq__f, .sq__cards article { transition: none; }
-    .sq__f :global(img) { scale: 1.02; }
+    .sq__f, .sq__cards article, .sq__pin { transition: none; }
+    .sq__f :global(img) { scale: 1.01; }
   }
 </style>
 
@@ -271,29 +336,29 @@ const frames = [
     if (!root || !track || root.dataset.wired) return;
     root.dataset.wired = '1';
 
+    const pin = root.querySelector<HTMLElement>('.sq__pin')!;
     const figs = [...root.querySelectorAll<HTMLElement>('[data-f]')];
     const cards = [...root.querySelectorAll<HTMLElement>('[data-c]')];
     const ix = [...root.querySelectorAll<HTMLElement>('[data-i]')];
     const bar = root.querySelector<HTMLElement>('[data-sq-bar]');
+    const now = root.querySelector<HTMLElement>('[data-sq-now]');
     const n = figs.length;
     let active = -1;
 
     const paint = () => {
       const r = track.getBoundingClientRect();
       const span = r.height - innerHeight;
-      /* Straight from scroll position. No smoothing and no easing on
-         the value itself — the note was that the machine lags the
-         wheel, and any lerp here is exactly that lag. */
+      /* Straight from scroll position — no smoothing. Any lerp here is
+         exactly the lag the client asked to be rid of. */
       const p = span > 0 ? Math.min(1, Math.max(0, -r.top / span)) : 0;
       if (bar) bar.style.width = `${(p * 100).toFixed(1)}%`;
 
       /* Each frame's own 0-1 progress drives its push, so the picture
-         keeps moving between changes rather than holding still. */
+         keeps moving between changes instead of holding still. */
       const at = p * n;
-      figs.forEach((el, i) => {
-        const z = Math.min(1, Math.max(0, at - i));
-        el.style.setProperty('--z', z.toFixed(3));
-      });
+      figs.forEach((el, i) =>
+        el.style.setProperty('--z', Math.min(1, Math.max(0, at - i)).toFixed(3))
+      );
 
       const k = Math.min(n - 1, Math.floor(p * n * 0.999));
       if (k === active) return;
@@ -301,6 +366,10 @@ const frames = [
       figs.forEach((el, i) => el.toggleAttribute('data-on', i === k));
       cards.forEach((el, i) => el.toggleAttribute('data-on', i === k));
       ix.forEach((el, i) => el.toggleAttribute('data-on', i === k));
+
+      const bg = figs[k].dataset.bg;
+      if (bg) pin.style.setProperty('--bg', bg);
+      if (now) now.textContent = ix[k]?.querySelector('span')?.textContent ?? '';
     };
 
     addEventListener('scroll', paint, { passive: true });
