@@ -276,7 +276,10 @@ function init(THREE) {
   ];
 
   /* ---------- engine ---------- */
-  const START = .22;
+  /* How much of the section is spent opening before the parts start
+     leaving. .22 of a 600vh section was over a screen of scrolling on
+     the lid alone. */
+  const START = .14;
   const sections = [];
   let pointerX = 0, pointerY = 0;
   addEventListener('pointermove', e => { pointerX = e.clientX / innerWidth - .5; pointerY = e.clientY / innerHeight - .5; }, {passive: true});
@@ -284,7 +287,13 @@ function init(THREE) {
   document.querySelectorAll('.d3-root .d3-product').forEach(el => {
     const def = products[+el.dataset.product];
     const n = def.parts.length;
-    el.style.height = (160 + n * 55) + 'vh';
+    /* SCROLL LENGTH. Was 160 + 55/part — the laptop's eight parts made
+       a 600vh section, six screens of scrolling to see one teardown,
+       which read as sluggish rather than cinematic. 110 + 34/part puts
+       the laptop at 382vh and the rack at 280vh: still enough travel
+       for each part to land, roughly a third less scrolling to get
+       there. */
+    el.style.height = (110 + n * 34) + 'vh';
     const display = def.parts.map((p, i) => ({...p, idx: i})).reverse();
     const stage = el.querySelector('.d3-stage');
     stage.innerHTML = `
@@ -371,7 +380,10 @@ function init(THREE) {
       if (!s.visible) return;
       const r = s.el.getBoundingClientRect();
       const target = clamp(-r.top / (r.height - innerHeight));
-      const p = reduced || s.smooth === null ? target : s.smooth + (target - s.smooth) * .12;
+      /* Smoothing was .12, which trails the wheel by enough to feel
+         like the machine is catching up with you rather than answering.
+         .2 keeps the easing but shortens the lag. */
+      const p = reduced || s.smooth === null ? target : s.smooth + (target - s.smooth) * .2;
       s.smooth = p;
 
       const e = ease(clamp(p / START));

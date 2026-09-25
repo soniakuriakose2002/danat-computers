@@ -156,13 +156,12 @@ const frames = [
     width: 100%;
     height: 100%;
     object-fit: cover;
-    /* A slow push, so a still photograph does not read as a dead slide.
-       Kept small: these are 4:3 shots in a 16:9 stage, so object-fit is
-       already cropping hard before any scale is added. */
-    scale: 1.01;
-    transition: scale 9s linear;
+    /* Parallax: the picture drifts against the scroll the whole time it
+       is on screen. Scale is held small because these are 4:3 shots in
+       a 16:9 stage and object-fit is already cropping hard. */
+    translate: 0 calc(var(--t, 0) * -6%);
+    scale: 1.045;
   }
-  .ed__frame[data-on] :global(img) { scale: 1.06; }
 
   /* Type has to stay legible over a photograph nobody has graded, so
      each frame declares whether its picture is light or dark and the
@@ -190,11 +189,13 @@ const frames = [
   .ed__line {
     grid-area: 1 / 1;
     opacity: 0;
-    translate: 0 18px;
-    transition: opacity 600ms var(--ease), translate 600ms var(--ease);
+    /* Travels up through its whole turn on screen and keeps going as it
+       leaves, rather than easing in and then sitting still. */
+    translate: 0 calc(var(--t, 0) * -5rem + 1.2rem);
+    transition: opacity 520ms var(--ease);
   }
   .ed__type { display: grid; }
-  .ed__line[data-on] { opacity: 1; translate: 0 0; }
+  .ed__line[data-on] { opacity: 1; }
 
   .ed__kick {
     font-family: var(--font-mono);
@@ -217,6 +218,10 @@ const frames = [
   .ed__cards { position: absolute; right: var(--gut, 1.5rem); bottom: 6.5rem; z-index: 3; display: grid; }
   .ed__card {
     grid-area: 1 / 1;
+    /* Slides in from the right as its frame arrives and carries on out,
+       against the headline's direction so the two do not move as one
+       block. */
+    translate: calc(var(--t, 0) * 3.2rem) 0;
     width: min(21rem, 78vw);
     padding: 1.15rem 1.25rem 1.3rem;
     border-radius: 16px;
@@ -225,11 +230,10 @@ const frames = [
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     opacity: 0;
-    translate: 0 14px;
-    transition: opacity 600ms var(--ease), translate 600ms var(--ease);
+    transition: opacity 520ms var(--ease);
   }
   .ed__stage[data-dark] .ed__card { background: rgb(14 18 20 / 0.62); }
-  .ed__card[data-on] { opacity: 1; translate: 0 0; }
+  .ed__card[data-on] { opacity: 1; }
 
   .ed__part { font-size: 1.0625rem; font-weight: 700; letter-spacing: -0.02em; color: var(--fg); }
   .ed__body { margin-top: 0.5rem; font-size: 0.875rem; line-height: 1.6; color: var(--fg2); }
@@ -291,9 +295,12 @@ const frames = [
     .ed__index { display: none; }
   }
 
+  /* Scroll-linked travel is motion the visitor is driving, but it is
+     still motion — all of it is dropped, and the frames simply swap. */
   @media (prefers-reduced-motion: reduce) {
     .ed__frame, .ed__line, .ed__card { transition: none; }
-    .ed__frame :global(img), .ed__frame[data-on] :global(img) { scale: 1; transition: none; }
+    .ed__frame :global(img) { scale: 1; translate: 0; }
+    .ed__line, .ed__card { translate: 0; }
   }
 </style>
 
@@ -315,6 +322,22 @@ const frames = [
 
     const paint = (k: number, p: number) => {
       bar.style.width = (p * 100).toFixed(2) + '%';
+
+      /* CONTINUOUS, not four static slides.
+         Each frame publishes its own -1..1 position: -1 is a frame
+         still coming, 0 is centred, 1 is one that has gone. Everything
+         that moves reads that number, so the picture, the headline and
+         the card travel the whole way down the scroll instead of
+         snapping between states. Cross-fading four stills is what made
+         it read as a slideshow. */
+      const at = p * n;
+      frames.forEach((el, i) => {
+        const t = Math.max(-1.6, Math.min(1.6, at - i - 0.5));
+        el.style.setProperty('--t', t.toFixed(3));
+        lines[i]?.style.setProperty('--t', t.toFixed(3));
+        cards[i]?.style.setProperty('--t', t.toFixed(3));
+      });
+
       if (k === active) return;
       active = k;
 
