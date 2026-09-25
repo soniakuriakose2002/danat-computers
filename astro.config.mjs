@@ -14,6 +14,14 @@ export default defineConfig({
     // AVIF/WebP generation happens at build time via sharp.
     responsiveStyles: true,
   },
+  /* The concept page is a standalone file in public/, not an Astro
+     page. `astro dev` serves public/ but does NOT resolve a directory
+     to its index.html the way the built site does — so /concept/ was a
+     404 in dev and a 200 in production. This makes both work. */
+  redirects: {
+    '/concept': '/concept/index.html',
+    '/concept/': '/concept/index.html',
+  },
   build: {
     inlineStylesheets: 'auto',
   },
