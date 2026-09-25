@@ -1,0 +1,172 @@
+---
+import PageLayout from '@layouts/PageLayout.astro';
+import Lab3D from '@components/sections/Lab3D.astro';
+
+/**
+ * A PROTOTYPE, NOT A PAGE OF THE SITE.
+ *
+ * Not in the nav, not in the sitemap, noindex. It exists so the real
+ * thing can be looked at and argued about before anyone decides
+ * whether to put WebGL on the homepage.
+ */
+---
+
+<PageLayout
+  title="3D prototype — Danat Computers"
+  description="Internal prototype. Live WebGL, not video."
+>
+  <section class="lx section">
+    <div class="shell">
+      <p class="label" data-rise>Prototype &middot; not live</p>
+      <h1 class="lx__h" data-rise style="--d:70ms">
+        This is real 3D.<br /><em>Drag it.</em>
+      </h1>
+      <p class="lx__p" data-rise style="--d:130ms">
+        Nothing below is a video. The machine is built from geometry and
+        drawn fresh every frame, which is why it answers the pointer.
+        Turn it, and scroll to open the lid.
+      </p>
+    </div>
+  </section>
+
+  <Lab3D />
+
+  <section class="lx lx__notes section">
+    <div class="shell">
+      <h2 class="lx__h2">What this costs, honestly</h2>
+
+      <dl class="lx__facts">
+        <div>
+          <dt>Weight</dt>
+          <dd>
+            <b>133 KB</b>
+            <i>
+              Three.js, gzipped, on this page only. The rest of the site
+              ships about 12&nbsp;KB. The homepage budget is 45&nbsp;KB.
+            </i>
+          </dd>
+        </div>
+        <div>
+          <dt>Model</dt>
+          <dd>
+            <b>None</b>
+            <i>
+              Every shape here is a primitive written in code. A shipping
+              version would load a real GLB of the actual product, which
+              is a purchase or a commission &mdash; and typically
+              2&ndash;10&nbsp;MB before compression.
+            </i>
+          </dd>
+        </div>
+        <div>
+          <dt>Mobile</dt>
+          <dd>
+            <b>The real question</b>
+            <i>
+              This runs at capped resolution and stops rendering when
+              scrolled past. A mid-range Android in Oman will still work
+              harder for this than for anything else on the site.
+            </i>
+          </dd>
+        </div>
+        <div>
+          <dt>Reversing it</dt>
+          <dd>
+            <b>Two files</b>
+            <i>
+              Nothing else in the project imports three. Delete this page
+              and its section, run <code>npm uninstall three</code>, and
+              the site is exactly as it was.
+            </i>
+          </dd>
+        </div>
+      </dl>
+
+      <p class="lx__ps">
+        The lighting, the metal and the reflections are the whole trick
+        here &mdash; not the shapes. A generated room is used for the
+        reflections, so no HDR file is downloaded, and the one coloured
+        light in the scene is the brand green, thrown from behind.
+      </p>
+    </div>
+  </section>
+</PageLayout>
+
+<style>
+  .lx { background: var(--white); }
+  .lx__h {
+    margin-top: var(--s4);
+    font-size: clamp(2rem, 4.4vw, 3.4rem);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1.08;
+  }
+  .lx__h em { font-style: normal; color: var(--green-deep); }
+  .lx__p {
+    margin-top: var(--s5);
+    max-width: 52ch;
+    font-size: var(--lead);
+    line-height: 1.62;
+    color: var(--text-2);
+  }
+
+  .lx__notes { background: linear-gradient(180deg, #ffffff, var(--off)); }
+  .lx__h2 {
+    font-size: clamp(1.4rem, 2.4vw, 2rem);
+    font-weight: 700;
+    letter-spacing: -0.03em;
+  }
+
+  .lx__facts {
+    display: grid;
+    gap: var(--s5);
+    margin-top: var(--s6);
+  }
+  .lx__facts > div {
+    display: grid;
+    grid-template-columns: minmax(0, 8rem) minmax(0, 1fr);
+    gap: var(--s4);
+    padding-top: var(--s5);
+    border-top: 1px solid var(--line-light);
+  }
+  .lx__facts dt {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--green-deep);
+  }
+  .lx__facts b {
+    display: block;
+    font-size: 1.125rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .lx__facts i {
+    display: block;
+    margin-top: 0.4rem;
+    font-style: normal;
+    font-size: var(--small);
+    line-height: 1.6;
+    color: var(--text-2);
+  }
+  .lx__facts code {
+    font-family: var(--font-mono);
+    font-size: 0.8125em;
+    padding: 0.1em 0.35em;
+    border-radius: 4px;
+    background: var(--off-2);
+  }
+
+  .lx__ps {
+    margin-top: var(--s6);
+    max-width: 60ch;
+    font-size: var(--small);
+    line-height: 1.7;
+    color: var(--text-3);
+  }
+
+  @media (min-width: 48rem) {
+    .lx__facts { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s6); }
+  }
+</style>

@@ -6,7 +6,10 @@ import sitemap from '@astrojs/sitemap';
 export default defineConfig({
   site: 'https://danatcomputers.com',
   output: 'static',
-  integrations: [sitemap()],
+  integrations: [
+    // /lab-3d is an internal prototype, not a page of the site.
+    sitemap({ filter: (page) => !page.includes('/lab-3d') }),
+  ],
   image: {
     // AVIF/WebP generation happens at build time via sharp.
     responsiveStyles: true,

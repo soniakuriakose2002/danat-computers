@@ -1,0 +1,363 @@
+---
+/**
+ * PROTOTYPE — a real 3D scene, not a video.
+ *
+ * Live WebGL: the geometry is built in code and rendered every frame,
+ * so it responds to the pointer and to scroll. Nothing here is footage.
+ *
+ * It is deliberately PROCEDURAL — every shape is made from primitives.
+ * That means it costs nothing to look at and needs no purchased model,
+ * which is the point of a prototype. A shipping version would load a
+ * real GLB of the product; see the notes at the foot of the page.
+ *
+ * ⚠ This page is the only thing in the project that imports three. It
+ * is not mounted on the homepage and nothing else depends on it, so
+ * deleting this file and `npm uninstall three` reverses it completely.
+ */
+---
+
+<section class="lb">
+  <div class="lb__stage">
+    <canvas data-lab3d></canvas>
+
+    <noscript>
+      <p class="lb__fallback">This demonstration needs JavaScript.</p>
+    </noscript>
+
+    <p class="lb__hint" data-lab-hint>
+      <span>Drag to turn</span>
+      <span>Scroll to open</span>
+    </p>
+
+    {/* Shown instead of the canvas where WebGL is unavailable or the
+        visitor has asked for reduced motion. */}
+    <p class="lb__off" data-lab-off hidden>
+      3D is switched off here — either this browser has no WebGL or the
+      system is set to reduce motion.
+    </p>
+  </div>
+</section>
+
+<style>
+  .lb {
+    position: relative;
+    background: radial-gradient(120% 90% at 50% 0%, #ffffff 0%, #f2f6f3 60%, #e9f1eb 100%);
+  }
+
+  .lb__stage {
+    position: relative;
+    height: min(78svh, 46rem);
+    min-height: 24rem;
+  }
+
+  .lb__stage canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    /* The scene is dragged, so the browser must not also pan the page
+       under the finger on a touch screen. */
+    touch-action: pan-y;
+    cursor: grab;
+  }
+  .lb__stage canvas:active { cursor: grabbing; }
+
+  .lb__hint {
+    position: absolute;
+    left: 50%;
+    bottom: 1.5rem;
+    translate: -50% 0;
+    display: flex;
+    gap: 1.25rem;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-3);
+    pointer-events: none;
+    transition: opacity 400ms var(--ease);
+  }
+  .lb__hint span { display: flex; align-items: center; gap: 0.5rem; }
+  .lb__hint span + span::before {
+    content: '';
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: var(--green);
+  }
+  /* Once they have worked out that it moves, stop telling them. */
+  .lb__hint[data-used] { opacity: 0; }
+
+  .lb__off,
+  .lb__fallback {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-content: center;
+    padding: var(--s6);
+    max-width: 30ch;
+    margin-inline: auto;
+    text-align: center;
+    font-size: var(--small);
+    line-height: 1.6;
+    color: var(--text-2);
+  }
+</style>
+
+<script>
+  import * as THREE from 'three';
+  import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
+  import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
+
+  const GREEN = 0x59aa54;
+
+  function boot() {
+    const canvas = document.querySelector<HTMLCanvasElement>('[data-lab3d]');
+    if (!canvas || canvas.dataset.wired) return;
+
+    const off = document.querySelector<HTMLElement>('[data-lab-off]');
+    const hint = document.querySelector<HTMLElement>('[data-lab-hint]');
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    /* Neither of these is a failure worth a broken page: say so and
+       leave the section as a quiet panel. */
+    let renderer: THREE.WebGLRenderer;
+    try {
+      renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    } catch {
+      canvas.hidden = true;
+      if (off) off.hidden = false;
+      return;
+    }
+    if (reduced) {
+      // Still render — once, held still. The object is the content.
+    }
+    canvas.dataset.wired = '1';
+
+    renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.05;
+
+    const scene = new THREE.Scene();
+
+    /* A room, generated in code, used only for reflections. This is what
+       makes the metal look like metal — without it the body reads as
+       flat grey plastic. No HDR file to download. */
+    const pmrem = new THREE.PMREMGenerator(renderer);
+    scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+
+    const camera = new THREE.PerspectiveCamera(32, 1, 0.1, 100);
+    camera.position.set(0, 2.0, 7.4);
+    /* Without this the camera stares along -Z from its own height and
+       the machine sits low and uncentred: a camera that is raised must
+       also be aimed. */
+    camera.lookAt(0, 0.1, 0);
+
+    // ── lights ────────────────────────────────────────────────────
+    const key = new THREE.DirectionalLight(0xffffff, 2.2);
+    key.position.set(3.5, 6, 4.5);
+    key.castShadow = true;
+    key.shadow.mapSize.set(1024, 1024);
+    key.shadow.camera.near = 1;
+    key.shadow.camera.far = 20;
+    key.shadow.camera.left = -5;
+    key.shadow.camera.right = 5;
+    key.shadow.camera.top = 5;
+    key.shadow.camera.bottom = -5;
+    key.shadow.bias = -0.0008;
+    key.shadow.radius = 4;
+    scene.add(key);
+
+    /* The brand green, used as a rim from behind — the one place the
+       colour appears, and what stops this looking like every other
+       laptop render. */
+    const rim = new THREE.DirectionalLight(GREEN, 2.6);
+    rim.position.set(-4, 2, -3.5);
+    scene.add(rim);
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.35));
+
+    // ── materials ─────────────────────────────────────────────────
+    const shell = new THREE.MeshPhysicalMaterial({
+      color: 0xb9bfc2,
+      metalness: 0.95,
+      roughness: 0.28,
+      clearcoat: 0.6,
+      clearcoatRoughness: 0.3,
+    });
+    const dark = new THREE.MeshPhysicalMaterial({
+      color: 0x16191b,
+      metalness: 0.5,
+      roughness: 0.55,
+    });
+    const screenMat = new THREE.MeshStandardMaterial({
+      color: 0x05070a,
+      roughness: 0.12,
+      metalness: 0.2,
+      emissive: new THREE.Color(GREEN),
+      emissiveIntensity: 0.1,
+    });
+
+    // ── the machine ───────────────────────────────────────────────
+    const laptop = new THREE.Group();
+    scene.add(laptop);
+
+    const W = 3.4, D = 2.3, T = 0.16;
+
+    const base = new THREE.Mesh(new RoundedBoxGeometry(W, T, D, 4, 0.07), shell);
+    base.castShadow = true;
+    base.receiveShadow = true;
+    laptop.add(base);
+
+    // Keyboard well and trackpad, inset into the deck.
+    const well = new THREE.Mesh(new RoundedBoxGeometry(W * 0.86, 0.03, D * 0.52, 3, 0.02), dark);
+    well.position.set(0, T / 2 + 0.005, -D * 0.16);
+    laptop.add(well);
+
+    const pad = new THREE.Mesh(new RoundedBoxGeometry(W * 0.3, 0.02, D * 0.26, 3, 0.02), shell);
+    pad.position.set(0, T / 2 + 0.004, D * 0.26);
+    laptop.add(pad);
+
+    /* The lid pivots at the hinge, so the group's origin has to sit on
+       the hinge line rather than in the middle of the panel. */
+    const hinge = new THREE.Group();
+    hinge.position.set(0, T / 2, -D / 2);
+    laptop.add(hinge);
+
+    const lid = new THREE.Mesh(new RoundedBoxGeometry(W, T * 0.72, D, 4, 0.06), shell);
+    lid.position.set(0, 0, -D / 2);
+    lid.castShadow = true;
+    hinge.add(lid);
+
+    /* A PlaneGeometry faces +Z. The lid's screen face is its +Y side
+       before the hinge rotates, so the panel has to be laid flat onto
+       it — without this it stands edge-on and shows through the lid. */
+    const display = new THREE.Mesh(
+      new THREE.PlaneGeometry(W * 0.9, D * 0.86),
+      screenMat
+    );
+    display.rotation.x = -Math.PI / 2;
+    display.position.set(0, T * 0.37, -D / 2);
+    hinge.add(display);
+
+    // Closed to start; the scroll opens it.
+    hinge.rotation.x = -0.02;
+
+    /* The shadow the machine sits on. A plane that takes shadow only —
+       invisible itself, so the section's own background shows through
+       and the object is not stuck on a grey card. */
+    const floor = new THREE.Mesh(
+      new THREE.PlaneGeometry(40, 40),
+      /* 0.18 vanished against this near-white ground and the machine
+         read as floating. */
+      new THREE.ShadowMaterial({ opacity: 0.34 })
+    );
+    floor.rotation.x = -Math.PI / 2;
+    floor.position.y = -T / 2 - 0.01;
+    floor.receiveShadow = true;
+    scene.add(floor);
+
+    // ── input ─────────────────────────────────────────────────────
+    let targetYaw = -0.5;
+    let yaw = -0.5;
+    let targetPitch = 0.12;
+    let pitch = 0.12;
+    let openTarget = 0;
+    let open = 0;
+
+    let dragging = false;
+    let lastX = 0;
+    let lastY = 0;
+    const used = () => hint?.setAttribute('data-used', '');
+
+    canvas.addEventListener('pointerdown', (e) => {
+      dragging = true;
+      lastX = e.clientX;
+      lastY = e.clientY;
+      canvas.setPointerCapture(e.pointerId);
+      used();
+    });
+    canvas.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      targetYaw += (e.clientX - lastX) * 0.006;
+      targetPitch = Math.max(-0.15, Math.min(0.6, targetPitch + (e.clientY - lastY) * 0.003));
+      lastX = e.clientX;
+      lastY = e.clientY;
+    });
+    const release = () => (dragging = false);
+    canvas.addEventListener('pointerup', release);
+    canvas.addEventListener('pointercancel', release);
+
+    /* Scroll through the section opens the lid. 0 when the section
+       arrives at the bottom of the viewport, 1 when it leaves the top. */
+    const stage = canvas.parentElement!;
+    const onScroll = () => {
+      const r = stage.getBoundingClientRect();
+      /* Shut until the section has properly arrived, then open over
+         about three quarters of a viewport. The earlier mapping counted
+         from the section's BOTTOM, so the lid was already half up
+         before the machine was even on screen. */
+      const p = (innerHeight * 0.45 - r.top) / (innerHeight * 0.7);
+      openTarget = Math.max(0, Math.min(1, p));
+      if (openTarget > 0.02) used();
+    };
+    addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+
+    // ── size ──────────────────────────────────────────────────────
+    const resize = () => {
+      const w = stage.clientWidth;
+      const h = stage.clientHeight;
+      if (!w || !h) return;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      /* Narrow viewports need the camera further back or the machine
+         runs off both sides. */
+      camera.position.z = w < 640 ? 10.5 : 7.4;
+      camera.lookAt(0, 0.1, 0);
+      camera.updateProjectionMatrix();
+    };
+    new ResizeObserver(resize).observe(stage);
+    resize();
+
+    // ── loop ──────────────────────────────────────────────────────
+    let visible = true;
+    new IntersectionObserver(([e]) => (visible = e.isIntersecting), { threshold: 0.01 }).observe(stage);
+
+    const clock = new THREE.Clock();
+    const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+
+    const frame = () => {
+      requestAnimationFrame(frame);
+      /* Rendering a scene nobody is looking at is the single biggest
+         waste WebGL makes on a long page. */
+      if (!visible) return;
+
+      const t = clock.getElapsedTime();
+
+      if (!dragging && !reduced) targetYaw += 0.0016;   // a slow turn at rest
+      yaw = lerp(yaw, targetYaw, 0.08);
+      pitch = lerp(pitch, targetPitch, 0.08);
+      open = lerp(open, openTarget, 0.07);
+
+      laptop.rotation.y = yaw;
+      laptop.rotation.x = pitch;
+      if (!reduced) laptop.position.y = Math.sin(t * 0.7) * 0.035;
+
+      // 0 closed, 1 open at about 115 degrees.
+      hinge.rotation.x = -0.02 - open * 2.0;
+      screenMat.emissiveIntensity = 0.04 + open * 0.3;
+
+      renderer.render(scene, camera);
+      canvas.dataset.frames = String((+(canvas.dataset.frames || 0)) + 1);
+    };
+    frame();
+  }
+
+  /* Bundled module scripts evaluate once. ClientRouter replaces the
+     body on every client-side navigation, so this has to run again
+     after each swap or the canvas arrives dead. */
+  boot();
+  document.addEventListener('astro:page-load', boot);
+</script>
