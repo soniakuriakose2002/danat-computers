@@ -1,6 +1,5 @@
 ---
 import { Image } from 'astro:assets';
-import { site } from '@data/site';
 
 import imgDrive from '@assets/photos/drive-macro.jpg';
 import imgPatch from '@assets/photos/network-patch.jpg';
@@ -27,10 +26,8 @@ import imgCctv from '@assets/photos/cctv-white.jpg';
  * that. The gap between this and the reference is a day with a
  * photographer, not a line of code.
  *
- * Every figure below is from the ERP. Nothing here is rounded up.
+ * Nothing here is rounded up or invented.
  */
-const years = new Date().getFullYear() - site.stats.since;
-
 const frames = [
   {
     kicker: 'Diagnosis',
@@ -39,21 +36,21 @@ const frames = [
     body: 'Before anything is quoted, and before you agree to anything. If it is not worth repairing we say so.',
     specs: [['Cost', 'Free'], ['Quote', 'Fixed'], ['Agreed', 'First']],
     img: imgDrive,
-    alt: 'A laptop drive controller board, photographed close',
+    alt: 'A drive controller board, photographed close',
     tone: 'light',
   },
   {
-    kicker: 'Stock depth',
-    line: 'On the shelf,<br />not on order.',
-    part: `${site.stats.parts.toLocaleString('en-US')} lines`,
-    body: `Across ${site.stats.categories} categories in three branches. When a repair needs a part it is usually already in the building.`,
-    specs: [['Lines', site.stats.parts.toLocaleString('en-US')], ['Categories', String(site.stats.categories)], ['Branches', String(site.stats.branches)]],
+    kicker: 'Networking',
+    line: 'Labelled.<br />Documented.',
+    part: 'Structured cabling',
+    body: 'Patch panels, switches and runs that the next person can read. Firewalls configured and kept current.',
+    specs: [['Sites', 'Any size'], ['Racks', 'Supplied'], ['Support', 'Ongoing']],
     img: imgPatch,
     alt: 'A network patch panel with dense cabling',
     tone: 'dark',
   },
   {
-    kicker: 'Consumables',
+    kicker: 'Printers',
     line: 'Serviced,<br />not replaced.',
     part: 'Printer service',
     body: 'Rollers glaze, fusers wear, heads clog. All of it is serviceable, and most of it costs far less than the machine.',
@@ -63,16 +60,32 @@ const frames = [
     tone: 'light',
   },
   {
-    kicker: 'Across Oman',
-    line: `${years} years on<br />Computer Street.`,
-    part: 'Ruwi · Sohar · Salalah',
-    body: 'Three branches, one bench standard. The same team that sells you the machine is the team that repairs it.',
-    specs: [['Since', String(site.stats.since)], ['Branches', String(site.stats.branches)], ['Head office', 'Ruwi']],
+    kicker: 'CCTV',
+    line: 'Installed<br />where it sees.',
+    part: 'Cameras and recorders',
+    body: 'Surveyed, mounted and set up so the footage is usable — not four cameras pointed at a car park.',
+    specs: [['Survey', 'On site'], ['Install', 'In-house'], ['Brands', 'Stocked']],
     img: imgCctv,
-    alt: 'A security camera against a pale wall',
+    alt: 'A security camera mounted against a pale wall',
     tone: 'light',
   },
 ];
+
+/*
+ * ⚠ TWO FRAMES ARE MISSING, DELIBERATELY.
+ *
+ * The strongest two facts Danat has are the ERP figures — 5,430
+ * lines across 249 categories, and the years on Computer Street — and
+ * neither has a photograph. There is no stockroom shot and no
+ * shopfront shot in the library.
+ *
+ * They were in here, illustrated by whatever was left over: the years
+ * line ran over a CCTV camera on a corrugated wall. A pinned frame is
+ * a photograph and a sentence agreeing with each other, so a sentence
+ * over an unrelated picture is worse than no frame at all. They come
+ * back when the shoot happens.
+ */
+
 ---
 
 <section class="ed" data-ed style={`--n:${frames.length}`}>
