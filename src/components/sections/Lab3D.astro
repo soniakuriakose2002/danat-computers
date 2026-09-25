@@ -36,6 +36,13 @@
 
     <p class="lb__drop" aria-hidden="true">Drop a .glb here to test it</p>
 
+    {/* Named on hover, once the machine is open enough for the parts to
+        be distinguishable. */}
+    <div class="lb__tip" data-lab-tip hidden>
+      <b></b>
+      <i></i>
+    </div>
+
     {/* Shown instead of the canvas where WebGL is unavailable or the
         visitor has asked for reduced motion. */}
     <p class="lb__off" data-lab-off hidden>
@@ -122,6 +129,31 @@
     pointer-events: none;
   }
 
+  .lb__tip {
+    position: absolute;
+    left: var(--x, 50%);
+    top: var(--y, 50%);
+    z-index: 4;
+    translate: 14px -50%;
+    max-width: 17rem;
+    padding: 0.65rem 0.85rem 0.75rem;
+    border-radius: 12px;
+    border: 1px solid var(--line-light);
+    background: rgb(255 255 255 / 0.94);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 14px 30px -18px rgb(10 30 12 / 0.5);
+    pointer-events: none;
+  }
+  .lb__tip b { display: block; font-size: 0.9375rem; font-weight: 700; color: var(--green-deep); }
+  .lb__tip i {
+    display: block;
+    margin-top: 0.2rem;
+    font-style: normal;
+    font-size: 0.8125rem;
+    line-height: 1.45;
+    color: var(--text-2);
+  }
+
   .lb__out {
     position: absolute;
     left: 1rem;
@@ -194,6 +226,7 @@
     const off = document.querySelector<HTMLElement>('[data-lab-off]');
     const hint = document.querySelector<HTMLElement>('[data-lab-hint]');
     const out = document.querySelector<HTMLElement>('[data-lab-out]');
+    const tip = document.querySelector<HTMLElement>('[data-lab-tip]');
     const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     /* Neither of these is a failure worth a broken page: say so and
@@ -458,8 +491,56 @@
       /* The slice of the scroll during which this piece leaves. */
       a: number;
       b: number;
+      /* Which entry in PARTS matched, so the label knows what to say. */
+      key: string;
+      /* Eased hover lift, 1 at rest. */
+      pull?: number;
     };
     let parts: Part[] = [];
+
+    /* WHAT EACH PART SELLS.
+       The point of the scene: an exploded laptop that names Danat's
+       services as you touch it.
+
+       Keyed on the PARTS entry that matched, not on the object's own
+       name, so it is model-agnostic — a file calling its battery
+       "Bat_01_geo" still lands on 'battery' and still says the right
+       thing. Only the matcher needs touching when a model names things
+       oddly; this table does not.
+
+       Every line maps to a service the project documents — computer
+       repair, hardware troubleshooting, data recovery. Nothing here is
+       offered that the content does not already claim. */
+    const SELLS: Record<string, [string, string]> = {
+      screen:      ['Screen replacement', 'Cracked, flickering or dim panels, matched to your model'],
+      bezel:       ['Screen replacement', 'Cracked, flickering or dim panels, matched to your model'],
+      display:     ['Screen replacement', 'Cracked, flickering or dim panels, matched to your model'],
+      lid:         ['Screen replacement', 'Cracked, flickering or dim panels, matched to your model'],
+      topcase:     ['Keyboard and trackpad', 'Stuck keys, spills, and trackpads that stop responding'],
+      keyboard:    ['Keyboard and trackpad', 'Stuck keys, spills, and trackpads that stop responding'],
+      trackpad:    ['Keyboard and trackpad', 'Stuck keys, spills, and trackpads that stop responding'],
+      touchpad:    ['Keyboard and trackpad', 'Stuck keys, spills, and trackpads that stop responding'],
+      palmrest:    ['Body and hinges', 'Cracked casing and broken screw mounts'],
+      hinge:       ['Body and hinges', 'Stiff or loose hinges, repaired or replaced'],
+      battery:     ['Battery replacement', 'For laptops that die early or stop charging'],
+      motherboard: ['Board-level repair', 'No power, no display, charging faults, liquid damage'],
+      mainboard:   ['Board-level repair', 'No power, no display, charging faults, liquid damage'],
+      logicboard:  ['Board-level repair', 'No power, no display, charging faults, liquid damage'],
+      fan:         ['Cleaning and thermal service', 'Overheating, shutdowns and loud fans'],
+      cooler:      ['Cleaning and thermal service', 'Overheating, shutdowns and loud fans'],
+      heatsink:    ['Cleaning and thermal service', 'Overheating, shutdowns and loud fans'],
+      ram:         ['Memory upgrade', 'So heavy apps and many tabs stop slowing you down'],
+      memory:      ['Memory upgrade', 'So heavy apps and many tabs stop slowing you down'],
+      dimm:        ['Memory upgrade', 'So heavy apps and many tabs stop slowing you down'],
+      ssd:         ['SSD upgrade and data recovery', 'Faster storage, or files off a failed drive'],
+      storage:     ['SSD upgrade and data recovery', 'Faster storage, or files off a failed drive'],
+      drive:       ['SSD upgrade and data recovery', 'Faster storage, or files off a failed drive'],
+      speaker:     ['Hardware troubleshooting', 'Audio faults traced to the component'],
+      wifi:        ['Hardware troubleshooting', 'Wireless cards tested and replaced'],
+      wlan:        ['Hardware troubleshooting', 'Wireless cards tested and replaced'],
+      bottomcase:  ['Body and hinges', 'Cracked casing and broken screw mounts'],
+      base:        ['Body and hinges', 'Cracked casing and broken screw mounts'],
+    };
 
     const gltf = new GLTFLoader()
       .setDRACOLoader(new DRACOLoader().setDecoderPath('/draco/'))
@@ -538,6 +619,7 @@
           ),
           a: 0,
           b: 1,
+          key: spec.key,
           order: PARTS.indexOf(spec),
         } as Part & { order: number });
       });
@@ -742,6 +824,64 @@
     new ResizeObserver(resize).observe(stage);
     resize();
 
+    /* ── hover: which part is this, and what does Danat do to it ──
+       Raycast against the whole model, then WALK UP from whatever mesh
+       was hit until an ancestor is one of the collected parts. A real
+       GLB nests its geometry — a battery can be three meshes under a
+       group under an armature — so testing the hit object's own name
+       would miss almost everything. This way the hierarchy does the
+       work and hundreds of meshes cost nothing extra. */
+    const ray = new THREE.Raycaster();
+    const ndc = new THREE.Vector2();
+    let hover: Part | null = null;
+    let hoverAt = 0;
+
+    const owner = (o: THREE.Object3D | null): Part | null => {
+      for (let n = o; n; n = n.parent) {
+        const hit = parts.find((f) => f.obj === n);
+        if (hit) return hit;
+      }
+      return null;
+    };
+
+    canvas.addEventListener('pointermove', (e) => {
+      const r = canvas.getBoundingClientRect();
+      ndc.x = ((e.clientX - r.left) / r.width) * 2 - 1;
+      ndc.y = -((e.clientY - r.top) / r.height) * 2 + 1;
+      hoverAt = e.clientY - r.top;
+
+      /* Shut, the parts are stacked inside each other and whatever is
+         on top wins every time — which reads as random. */
+      if (open < 0.3 || !parts.length) {
+        hover = null;
+        if (tip) tip.hidden = true;
+        return;
+      }
+
+      ray.setFromCamera(ndc, camera);
+      const hits = ray.intersectObject(laptop, true);
+      const found = hits.length ? owner(hits[0].object) : null;
+      if (found === hover) return;
+      hover = found;
+
+      if (!tip) return;
+      const sell = found ? SELLS[found.key] : null;
+      if (!sell) {
+        tip.hidden = true;
+        return;
+      }
+      tip.hidden = false;
+      tip.querySelector('b')!.textContent = sell[0];
+      tip.querySelector('i')!.textContent = sell[1];
+      tip.style.setProperty('--x', `${e.clientX - r.left}px`);
+      tip.style.setProperty('--y', `${hoverAt}px`);
+    });
+
+    canvas.addEventListener('pointerleave', () => {
+      hover = null;
+      if (tip) tip.hidden = true;
+    });
+
     /* The stand-in goes through the installer too, so what is on screen
        before any model arrives is the real sequence.
 
@@ -791,10 +931,18 @@
            its own slice of the scroll, so they leave in sequence. */
         for (const f of parts) {
           const t = ease(f.a, f.b, open);
+          /* Hovered parts lift a little further along the way they were
+             already going. A transform, not a material change: the
+             materials belong to a file we did not write, and several
+             parts routinely share one — recolouring a battery would
+             recolour the speakers with it. */
+          const want = f === hover ? 1.12 : 1;
+          f.pull = lerp(f.pull ?? 1, want, 0.18);
+          const k = t * f.pull;
           f.obj.position.set(
-            f.home.x + f.move.x * t,
-            f.home.y + f.move.y * t,
-            f.home.z + f.move.z * t
+            f.home.x + f.move.x * k,
+            f.home.y + f.move.y * k,
+            f.home.z + f.move.z * k
           );
         }
       }
