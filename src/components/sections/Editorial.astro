@@ -1,0 +1,337 @@
+---
+import { Image } from 'astro:assets';
+import { site } from '@data/site';
+
+import imgDrive from '@assets/photos/drive-macro.jpg';
+import imgPatch from '@assets/photos/network-patch.jpg';
+import imgPrinter from '@assets/photos/printer-machine.jpg';
+import imgCctv from '@assets/photos/cctv-white.jpg';
+
+/**
+ * THE LOOK THE CLIENT POINTED AT — built in this project's own stack.
+ *
+ * The reference is a paid template tagged NEXT.JS + FRAMER. It has no
+ * 3D in it. What it actually is:
+ *
+ *   a pinned section, one full-bleed product photograph per frame,
+ *   one very large editorial line, a frosted card naming the part,
+ *   a spec row in mono, and an index down the side tracking position.
+ *
+ * All of that is CSS and about sixty lines of script. No Three.js, no
+ * React, no Framer Motion, no new dependency of any kind — the whole
+ * thing costs less than a single 3D model would.
+ *
+ * ⚠ The one thing it cannot supply is the photography. Every frame in
+ * the reference is a studio product shot on a seamless sweep with one
+ * hard light. These four are the best in the library and they are not
+ * that. The gap between this and the reference is a day with a
+ * photographer, not a line of code.
+ *
+ * Every figure below is from the ERP. Nothing here is rounded up.
+ */
+const years = new Date().getFullYear() - site.stats.since;
+
+const frames = [
+  {
+    kicker: 'Diagnosis',
+    line: 'We tell you<br />what failed.',
+    part: 'Free diagnosis',
+    body: 'Before anything is quoted, and before you agree to anything. If it is not worth repairing we say so.',
+    specs: [['Cost', 'Free'], ['Quote', 'Fixed'], ['Agreed', 'First']],
+    img: imgDrive,
+    alt: 'A laptop drive controller board, photographed close',
+    tone: 'light',
+  },
+  {
+    kicker: 'Stock depth',
+    line: 'On the shelf,<br />not on order.',
+    part: `${site.stats.parts.toLocaleString('en-US')} lines`,
+    body: `Across ${site.stats.categories} categories in three branches. When a repair needs a part it is usually already in the building.`,
+    specs: [['Lines', site.stats.parts.toLocaleString('en-US')], ['Categories', String(site.stats.categories)], ['Branches', String(site.stats.branches)]],
+    img: imgPatch,
+    alt: 'A network patch panel with dense cabling',
+    tone: 'dark',
+  },
+  {
+    kicker: 'Consumables',
+    line: 'Serviced,<br />not replaced.',
+    part: 'Printer service',
+    body: 'Rollers glaze, fusers wear, heads clog. All of it is serviceable, and most of it costs far less than the machine.',
+    specs: [['Toner', 'Stocked'], ['Drums', 'Stocked'], ['Service', 'In-house']],
+    img: imgPrinter,
+    alt: 'The internal rollers of a printing machine',
+    tone: 'light',
+  },
+  {
+    kicker: 'Across Oman',
+    line: `${years} years on<br />Computer Street.`,
+    part: 'Ruwi · Sohar · Salalah',
+    body: 'Three branches, one bench standard. The same team that sells you the machine is the team that repairs it.',
+    specs: [['Since', String(site.stats.since)], ['Branches', String(site.stats.branches)], ['Head office', 'Ruwi']],
+    img: imgCctv,
+    alt: 'A security camera against a pale wall',
+    tone: 'light',
+  },
+];
+---
+
+<section class="ed" data-ed style={`--n:${frames.length}`}>
+  <div class="ed__stage">
+    {frames.map((f, i) => (
+      <figure class="ed__frame" data-frame={i} data-on={i === 0 ? '' : undefined} data-tone={f.tone}>
+        <Image src={f.img} alt={f.alt} widths={[900, 1400, 1920]} sizes="100vw"
+          quality={80} format="webp" loading={i === 0 ? 'eager' : 'lazy'} />
+        <span class="ed__veil" aria-hidden="true"></span>
+      </figure>
+    ))}
+
+    {/* One line at a time, swapped as the frame changes. */}
+    <div class="ed__type">
+      {frames.map((f, i) => (
+        <div class="ed__line" data-line={i} data-on={i === 0 ? '' : undefined}>
+          <p class="ed__kick">{f.kicker}</p>
+          <h2 set:html={f.line}></h2>
+        </div>
+      ))}
+    </div>
+
+    {/* The frosted card the reference puts over its footage. */}
+    <div class="ed__cards">
+      {frames.map((f, i) => (
+        <article class="ed__card" data-card={i} data-on={i === 0 ? '' : undefined}>
+          <p class="ed__part">{f.part}</p>
+          <p class="ed__body">{f.body}</p>
+          <dl class="ed__specs">
+            {f.specs.map(([k, v]) => (
+              <div><dt>{k}</dt><dd>{v}</dd></div>
+            ))}
+          </dl>
+        </article>
+      ))}
+    </div>
+
+    {/* The component index, tracking position. */}
+    <ol class="ed__index">
+      {frames.map((f, i) => (
+        <li data-ix={i} data-on={i === 0 ? '' : undefined}>
+          <b>{String(i + 1).padStart(2, '0')}</b>
+          <span>{f.kicker}</span>
+        </li>
+      ))}
+    </ol>
+
+    <div class="ed__bar" aria-hidden="true"><i data-ed-bar></i></div>
+  </div>
+</section>
+
+<style>
+  /* The section is tall; the stage inside it is pinned. That is the
+     whole mechanism — everything else is a cross-fade driven by how far
+     through the tall section you are. */
+  .ed { position: relative; height: calc(var(--n) * 100svh); background: #0a0d0e; }
+  .ed__stage { position: sticky; top: 0; height: 100svh; overflow: hidden; }
+
+  .ed__frame {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    opacity: 0;
+    transition: opacity 900ms var(--ease);
+  }
+  .ed__frame[data-on] { opacity: 1; }
+  .ed__frame :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    /* A slow push, so a still photograph does not read as a dead slide.
+       Kept small: these are 4:3 shots in a 16:9 stage, so object-fit is
+       already cropping hard before any scale is added. */
+    scale: 1.01;
+    transition: scale 9s linear;
+  }
+  .ed__frame[data-on] :global(img) { scale: 1.06; }
+
+  /* Type has to stay legible over a photograph nobody has graded, so
+     each frame declares whether its picture is light or dark and the
+     veil is built for that, rather than one scrim hoping to cover both. */
+  .ed__veil { position: absolute; inset: 0; }
+  .ed__frame[data-tone='light'] .ed__veil {
+    background: linear-gradient(100deg, rgb(255 255 255 / 0.93) 0%, rgb(255 255 255 / 0.72) 38%, rgb(255 255 255 / 0.1) 70%);
+  }
+  .ed__frame[data-tone='dark'] .ed__veil {
+    background: linear-gradient(100deg, rgb(8 11 12 / 0.9) 0%, rgb(8 11 12 / 0.66) 38%, rgb(8 11 12 / 0.08) 70%);
+  }
+
+  /* Both palettes live here; the stage picks one from the active frame. */
+  .ed__stage { --fg: #0c1012; --fg2: #4b5a51; --hair: rgb(12 16 18 / 0.16); }
+  .ed__stage[data-dark] { --fg: #f2f6f3; --fg2: #9db0a3; --hair: rgb(255 255 255 / 0.2); }
+
+  .ed__type {
+    position: absolute;
+    left: var(--gut, 1.5rem);
+    top: 50%;
+    translate: 0 -50%;
+    max-width: min(46rem, 62vw);
+    z-index: 2;
+  }
+  .ed__line {
+    grid-area: 1 / 1;
+    opacity: 0;
+    translate: 0 18px;
+    transition: opacity 600ms var(--ease), translate 600ms var(--ease);
+  }
+  .ed__type { display: grid; }
+  .ed__line[data-on] { opacity: 1; translate: 0 0; }
+
+  .ed__kick {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--green);
+  }
+  .ed__line h2 {
+    margin-top: 0.9rem;
+    /* The reference's one real typographic move: very large, very
+       tight, and short enough to read in a glance. */
+    font-size: clamp(2.6rem, 7vw, 6rem);
+    font-weight: 800;
+    letter-spacing: -0.05em;
+    line-height: 0.96;
+    color: var(--fg);
+  }
+
+  .ed__cards { position: absolute; right: var(--gut, 1.5rem); bottom: 6.5rem; z-index: 3; display: grid; }
+  .ed__card {
+    grid-area: 1 / 1;
+    width: min(21rem, 78vw);
+    padding: 1.15rem 1.25rem 1.3rem;
+    border-radius: 16px;
+    border: 1px solid var(--hair);
+    background: rgb(255 255 255 / 0.72);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    opacity: 0;
+    translate: 0 14px;
+    transition: opacity 600ms var(--ease), translate 600ms var(--ease);
+  }
+  .ed__stage[data-dark] .ed__card { background: rgb(14 18 20 / 0.62); }
+  .ed__card[data-on] { opacity: 1; translate: 0 0; }
+
+  .ed__part { font-size: 1.0625rem; font-weight: 700; letter-spacing: -0.02em; color: var(--fg); }
+  .ed__body { margin-top: 0.5rem; font-size: 0.875rem; line-height: 1.6; color: var(--fg2); }
+
+  .ed__specs {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.6rem;
+    margin-top: 1.1rem;
+    padding-top: 0.9rem;
+    border-top: 1px solid var(--hair);
+  }
+  .ed__specs dt {
+    font-family: var(--font-mono);
+    font-size: 0.5625rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--fg2);
+  }
+  .ed__specs dd {
+    margin-top: 0.25rem;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--fg);
+  }
+
+  .ed__index {
+    position: absolute;
+    left: var(--gut, 1.5rem);
+    bottom: 3.5rem;
+    z-index: 3;
+    display: flex;
+    gap: 1.4rem;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .ed__index li { display: flex; gap: 0.5rem; color: var(--fg2); opacity: 0.55; transition: opacity 400ms var(--ease); }
+  .ed__index li[data-on] { opacity: 1; color: var(--fg); }
+  .ed__index b { color: var(--green); font-weight: 500; }
+
+  .ed__bar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    z-index: 4;
+    background: var(--hair);
+  }
+  .ed__bar i { display: block; height: 100%; width: 0; background: var(--green); }
+
+  @media (max-width: 48rem) {
+    .ed__type { max-width: none; right: var(--gut, 1.25rem); top: 22%; translate: 0 0; }
+    .ed__cards { left: var(--gut, 1.25rem); right: var(--gut, 1.25rem); bottom: 4.5rem; }
+    .ed__card { width: auto; }
+    .ed__index { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ed__frame, .ed__line, .ed__card { transition: none; }
+    .ed__frame :global(img), .ed__frame[data-on] :global(img) { scale: 1; transition: none; }
+  }
+</style>
+
+<script>
+  function boot() {
+    const root = document.querySelector<HTMLElement>('[data-ed]');
+    if (!root || root.dataset.wired) return;
+    root.dataset.wired = '1';
+
+    const stage = root.querySelector<HTMLElement>('.ed__stage')!;
+    const bar = root.querySelector<HTMLElement>('[data-ed-bar]')!;
+    const frames = [...root.querySelectorAll<HTMLElement>('[data-frame]')];
+    const lines = [...root.querySelectorAll<HTMLElement>('[data-line]')];
+    const cards = [...root.querySelectorAll<HTMLElement>('[data-card]')];
+    const index = [...root.querySelectorAll<HTMLElement>('[data-ix]')];
+    const n = frames.length;
+
+    let active = -1;
+
+    const paint = (k: number, p: number) => {
+      bar.style.width = (p * 100).toFixed(2) + '%';
+      if (k === active) return;
+      active = k;
+
+      const on = (els: HTMLElement[]) =>
+        els.forEach((el, i) => el.toggleAttribute('data-on', i === k));
+      on(frames);
+      on(lines);
+      on(cards);
+      on(index);
+
+      /* The palette follows the picture, not the section. Reading the
+         tone off the active frame means one flag drives the type, the
+         card and the rules together. */
+      stage.toggleAttribute('data-dark', frames[k].dataset.tone === 'dark');
+    };
+
+    const onScroll = () => {
+      const r = root.getBoundingClientRect();
+      const span = r.height - innerHeight;
+      const p = span > 0 ? Math.min(1, Math.max(0, -r.top / span)) : 0;
+      /* Nudged off the boundary so the last frame is reachable without
+         landing exactly on p === 1. */
+      paint(Math.min(n - 1, Math.floor(p * n * 0.999)), p);
+    };
+
+    addEventListener('scroll', onScroll, { passive: true });
+    addEventListener('resize', onScroll, { passive: true });
+    onScroll();
+  }
+
+  boot();
+  document.addEventListener('astro:page-load', boot);
+</script>

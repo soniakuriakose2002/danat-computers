@@ -7,8 +7,8 @@ export default defineConfig({
   site: 'https://danatcomputers.com',
   output: 'static',
   integrations: [
-    // /lab-3d is an internal prototype, not a page of the site.
-    sitemap({ filter: (page) => !page.includes('/lab-3d') }),
+    // The /lab-* routes are internal prototypes, not pages of the site.
+    sitemap({ filter: (page) => !page.includes('/lab-') }),
   ],
   image: {
     // AVIF/WebP generation happens at build time via sharp.

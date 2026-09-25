@@ -1,0 +1,110 @@
+---
+import PageLayout from '@layouts/PageLayout.astro';
+import Editorial from '@components/sections/Editorial.astro';
+
+/**
+ * PROTOTYPE — the look from the reference video, in this stack.
+ *
+ * Sits next to /lab-3d so the two routes the client is choosing
+ * between can be opened in adjacent tabs. Not in the nav, not in the
+ * sitemap.
+ */
+---
+
+<PageLayout
+  title="Editorial prototype — Danat Computers"
+  description="Internal prototype. The reference look, no new dependencies."
+>
+  <section class="le section">
+    <div class="shell">
+      <p class="label">Prototype &middot; not live</p>
+      <h1 class="le__h">
+        The reference look.<br /><em>No 3D in it.</em>
+      </h1>
+      <p class="le__p">
+        The template in the video is tagged <b>Next.js + Framer</b>, and its
+        own description calls its product shots <b>footage</b>. What makes it
+        look expensive is the photography and the typography, not the
+        rendering. Scroll on.
+      </p>
+    </div>
+  </section>
+
+  <Editorial />
+
+  <section class="le le__notes section">
+    <div class="shell">
+      <h2 class="le__h2">What this cost</h2>
+      <dl class="le__facts">
+        <div>
+          <dt>New dependencies</dt>
+          <dd><b>None</b><i>No Three.js, no React, no Framer Motion. CSS and about sixty lines of script.</i></dd>
+        </div>
+        <div>
+          <dt>Added JavaScript</dt>
+          <dd><b>~1 KB</b><i>Against 133 KB gzipped for the Three.js route.</i></dd>
+        </div>
+        <div>
+          <dt>Mobile</dt>
+          <dd><b>Free</b><i>Cross-fading images costs a phone nothing. WebGL is the only thing here that would.</i></dd>
+        </div>
+        <div>
+          <dt>What is missing</dt>
+          <dd>
+            <b>The photographs</b>
+            <i>
+              Every frame in the reference is a studio product shot on a
+              seamless sweep under one hard light. These four are the best
+              in the library and they are ordinary stock. That gap is a day
+              with a photographer, not a line of code.
+            </i>
+          </dd>
+        </div>
+      </dl>
+      <p class="le__ps">
+        Compare with <a href="/lab-3d">/lab-3d</a>, which is real WebGL.
+        Both are prototypes; neither is on the live site.
+      </p>
+    </div>
+  </section>
+</PageLayout>
+
+<style>
+  .le { background: var(--white); }
+  .le__h {
+    margin-top: var(--s4);
+    font-size: clamp(2rem, 4.4vw, 3.4rem);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1.08;
+  }
+  .le__h em { font-style: normal; color: var(--green-deep); }
+  .le__p { margin-top: var(--s5); max-width: 56ch; font-size: var(--lead); line-height: 1.62; color: var(--text-2); }
+  .le__p b { color: var(--text); font-weight: 600; }
+
+  .le__notes { background: linear-gradient(180deg, #ffffff, var(--off)); }
+  .le__h2 { font-size: clamp(1.4rem, 2.4vw, 2rem); font-weight: 700; letter-spacing: -0.03em; }
+  .le__facts { display: grid; gap: var(--s5); margin-top: var(--s6); }
+  .le__facts > div {
+    display: grid;
+    grid-template-columns: minmax(0, 9rem) minmax(0, 1fr);
+    gap: var(--s4);
+    padding-top: var(--s5);
+    border-top: 1px solid var(--line-light);
+  }
+  .le__facts dt {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--green-deep);
+  }
+  .le__facts b { display: block; font-size: 1.125rem; font-weight: 700; letter-spacing: -0.02em; }
+  .le__facts i { display: block; margin-top: 0.4rem; font-style: normal; font-size: var(--small); line-height: 1.6; color: var(--text-2); }
+  .le__ps { margin-top: var(--s6); font-size: var(--small); color: var(--text-3); }
+  .le__ps a { color: var(--green-deep); border-bottom: 1px solid currentColor; }
+
+  @media (min-width: 48rem) {
+    .le__facts { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--s6); }
+  }
+</style>
