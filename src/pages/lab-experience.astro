@@ -1,0 +1,22 @@
+---
+import PageLayout from '@layouts/PageLayout.astro';
+import LaptopExperience from '@components/sections/LaptopExperience.astro';
+
+/**
+ * The production laptop section, parked.
+ *
+ * It is built and working; it is off the homepage only because the
+ * placeholder geometry is not good enough to show a customer. When a
+ * real GLB lands at public/models/laptop.glb, this is what goes back
+ * on the homepage — one line in index.astro.
+ *
+ * Not in the nav, not in the sitemap.
+ */
+---
+
+<PageLayout
+  title="Laptop experience — Danat Computers"
+  description="Internal prototype. The production 3D section, waiting on its model."
+>
+  <LaptopExperience />
+</PageLayout>
