@@ -286,44 +286,97 @@
 
     const W = 3.4, D = 2.3, T = 0.16;
 
-    const base = new THREE.Mesh(new RoundedBoxGeometry(W, T, D, 4, 0.07), shell);
-    base.castShadow = true;
-    base.receiveShadow = true;
-    laptop.add(base);
+    /* A STAND-IN THAT ACTUALLY COMES APART.
+       This used to be a base, a keyboard well and a hinged lid — it
+       could open, so the staged teardown had nothing to demonstrate
+       until a real GLB arrived.
 
-    // Keyboard well and trackpad, inset into the deck.
-    const well = new THREE.Mesh(new RoundedBoxGeometry(W * 0.86, 0.03, D * 0.52, 3, 0.02), dark);
-    well.position.set(0, T / 2 + 0.005, -D * 0.16);
-    laptop.add(well);
+       It is built as named parts now, with the same names a bought
+       model would use, and it is handed to the SAME installer the GLB
+       goes through. So the sequence on screen is the real one, and the
+       rig gets exercised end to end before any money is spent.
 
-    const pad = new THREE.Mesh(new RoundedBoxGeometry(W * 0.3, 0.02, D * 0.26, 3, 0.02), shell);
-    pad.position.set(0, T / 2 + 0.004, D * 0.26);
-    laptop.add(pad);
+       Still a stand-in: these are primitives, not a product. */
+    const green = new THREE.MeshPhysicalMaterial({ color: 0x2f6429, metalness: 0.25, roughness: 0.6 });
+    const copper = new THREE.MeshPhysicalMaterial({ color: 0xb87333, metalness: 0.9, roughness: 0.35 });
 
-    /* The lid pivots at the hinge, so the group's origin has to sit on
-       the hinge line rather than in the middle of the panel. */
-    const hinge = new THREE.Group();
-    hinge.position.set(0, T / 2, -D / 2);
-    laptop.add(hinge);
+    const name = (o: THREE.Object3D, n: string) => { o.name = n; return o; };
+    /* position is READ-ONLY on Object3D — three defines it once and the
+       matrix code holds that same Vector3. Object.assign silently
+       replaces nothing and throws in strict mode, so it is set. */
+    const at = (o: THREE.Object3D, x: number, y: number, z: number) => {
+      o.position.set(x, y, z);
+      return o;
+    };
+    /* RoundedBoxGeometry cannot build a corner larger than half the
+       smallest side, and several of these parts are 3 cm thick against
+       a 2 cm radius. Unclamped it throws and takes the whole scene with
+       it — the canvas sizes, nothing draws, and there is no error on
+       the page to explain why. */
+    const slab = (w: number, h: number, d: number, m: THREE.Material, r = 0.02) =>
+      new THREE.Mesh(
+        new RoundedBoxGeometry(w, h, d, 2, Math.min(r, Math.min(w, h, d) / 2 - 0.001)),
+        m
+      );
 
-    const lid = new THREE.Mesh(new RoundedBoxGeometry(W, T * 0.72, D, 4, 0.06), shell);
-    lid.position.set(0, 0, -D / 2);
-    lid.castShadow = true;
-    hinge.add(lid);
+    const build = () => {
+      const g = new THREE.Group();
+      const deck = T / 2;
 
-    /* A PlaneGeometry faces +Z. The lid's screen face is its +Y side
-       before the hinge rotates, so the panel has to be laid flat onto
-       it — without this it stands edge-on and shows through the lid. */
-    const display = new THREE.Mesh(
-      new THREE.PlaneGeometry(W * 0.9, D * 0.86),
-      screenMat
-    );
-    display.rotation.x = -Math.PI / 2;
-    display.position.set(0, T * 0.37, -D / 2);
-    hinge.add(display);
+      g.add(name(at(slab(W, T * 0.34, D, shell, 0.06), 0, -T * 0.33, 0), 'BottomCase'));
+      g.add(name(at(slab(W * 0.9, 0.05, D * 0.5, green), 0, -T * 0.08, -D * 0.14), 'Motherboard'));
+      g.add(name(at(slab(W * 0.62, 0.09, D * 0.3, dark), 0, -T * 0.08, D * 0.22), 'Battery'));
 
-    // Closed to start; the scroll opens it.
-    hinge.rotation.x = -0.02;
+      for (const sx of [-1, 1]) {
+        const fan = new THREE.Mesh(new THREE.CylinderGeometry(D * 0.15, D * 0.15, 0.06, 28), dark);
+        fan.position.set(sx * W * 0.3, -T * 0.02, -D * 0.26);
+        g.add(name(fan, `Fan_${sx < 0 ? 'L' : 'R'}`));
+
+        const pipe = new THREE.Mesh(new THREE.BoxGeometry(W * 0.22, 0.035, 0.09), copper);
+        pipe.position.set(sx * W * 0.14, -T * 0.02, -D * 0.26);
+        g.add(name(pipe, `Heatsink_${sx < 0 ? 'L' : 'R'}`));
+
+        const stick = slab(W * 0.2, 0.035, D * 0.07, dark);
+        stick.position.set(sx * W * 0.2, -T * 0.01, D * 0.02);
+        g.add(name(stick, `RAM_${sx < 0 ? '1' : '2'}`));
+
+        const spk = slab(W * 0.14, 0.05, D * 0.08, dark);
+        spk.position.set(sx * W * 0.38, -T * 0.06, D * 0.3);
+        g.add(name(spk, `Speaker_${sx < 0 ? 'L' : 'R'}`));
+      }
+
+      g.add(name(at(slab(W * 0.24, 0.03, D * 0.16, green), W * 0.3, -T * 0.02, D * 0.06), 'SSD'));
+
+      const top = slab(W, T * 0.3, D, shell, 0.05);
+      top.position.set(0, deck - T * 0.15, 0);
+      const kb = slab(W * 0.86, 0.03, D * 0.52, dark);
+      kb.position.set(0, deck + 0.01, -D * 0.16);
+      const pad = slab(W * 0.3, 0.02, D * 0.26, shell);
+      pad.position.set(0, deck + 0.009, D * 0.26);
+      const topCase = new THREE.Group();
+      topCase.add(top, kb, pad);
+      g.add(name(topCase, 'TopCase'));
+
+      /* The lid, flat on the deck. The installer takes it apart by
+         translation, so it starts shut rather than hinged. */
+      const lid = slab(W, T * 0.72, D, shell, 0.06);
+      lid.position.set(0, deck + T * 0.5, 0);
+      const display = new THREE.Mesh(new THREE.PlaneGeometry(W * 0.9, D * 0.86), screenMat);
+      display.rotation.x = -Math.PI / 2;
+      display.position.set(0, deck + T * 0.87, 0);
+      const screenGrp = new THREE.Group();
+      screenGrp.add(lid, display);
+      g.add(name(screenGrp, 'Screen'));
+
+      g.traverse((o) => {
+        const m = o as THREE.Mesh;
+        if (!m.isMesh) return;
+        m.castShadow = true;
+        m.receiveShadow = true;
+      });
+      return g;
+    };
+
 
     /* ── a real model, if one has been supplied ──────────────────
        Drop a file at public/models/laptop.glb and it replaces
@@ -665,6 +718,26 @@
     new ResizeObserver(resize).observe(stage);
     resize();
 
+    /* The stand-in goes through the installer too, so what is on screen
+       before any model arrives is the real sequence.
+
+       It has to happen HERE, not beside the loader: install() touches
+       `controls`, and called any earlier it runs in that const's
+       temporal dead zone and throws the whole boot away. The GLB paths
+       get away with it because they are asynchronous. */
+    /* Surfaced, not swallowed. A scene that throws leaves a sized
+       canvas and nothing drawn, which looks identical to "WebGL is
+       fine, the model is just invisible" — and costs an hour. */
+    try {
+      install(build(), 'built-in placeholder');
+    } catch (err) {
+      if (out) {
+        out.hidden = false;
+        out.dataset.verdict = 'bad';
+        out.textContent = `Scene error: ${(err as Error)?.message ?? err}`;
+      }
+    }
+
     // ── loop ──────────────────────────────────────────────────────
     let visible = true;
     new IntersectionObserver(([e]) => (visible = e.isIntersecting), { threshold: 0.01 }).observe(stage);
@@ -700,11 +773,8 @@
             f.home.z + f.move.z * t
           );
         }
-      } else {
-        // Procedural fallback: 0 closed, 1 open at about 115 degrees.
-        hinge.rotation.x = -0.02 - open * 2.0;
-        screenMat.emissiveIntensity = 0.04 + open * 0.3;
       }
+      screenMat.emissiveIntensity = 0.04 + open * 0.3;
 
       renderer.render(scene, camera);
       canvas.dataset.frames = String((+(canvas.dataset.frames || 0)) + 1);
