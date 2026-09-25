@@ -110,6 +110,7 @@
   import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
   import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
   import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
+  import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
   const GREEN = 0x59aa54;
 
@@ -261,7 +262,24 @@
        quietly: the procedural machine stays and nothing is logged as an
        error. */
     const MODEL_URL = '/models/laptop.glb';
-    let modelHinge: THREE.Object3D | null = null;
+
+    /* Parts the rig separates, in the order a teardown happens.
+       Matching is loose — letters only, partial — so "Bottom_Case_01"
+       answers to "bottomcase". Anything matching none of these stays
+       put and reads as the body. */
+    const PART_ORDER = [
+      'screen', 'display', 'lid',
+      'keyboard', 'topcase',
+      'battery',
+      'motherboard', 'mainboard', 'logicboard',
+      'fan', 'cooler', 'heatsink',
+      'speaker',
+      'storage', 'ssd', 'drive',
+      'bottomcase', 'base',
+    ];
+
+    type Part = { obj: THREE.Object3D; home: THREE.Vector3; lift: number };
+    let parts: Part[] = [];
 
     fetch(MODEL_URL, { method: 'HEAD' })
       .then((r) => {
@@ -276,9 +294,9 @@
           const m = gltf.scene;
 
           /* Exports arrive at wildly different scales and origins — a
-             Blender default is metres, a CAD export is often
-             millimetres. Normalise to the same box the procedural
-             machine occupies, or the camera framing is meaningless. */
+             Blender default is metres, a CAD export often millimetres.
+             Normalise to the box the procedural machine occupies, or the
+             camera framing means nothing. */
           const box = new THREE.Box3().setFromObject(m);
           const size = box.getSize(new THREE.Vector3());
           const centre = box.getCenter(new THREE.Vector3());
@@ -294,18 +312,40 @@
             mesh.receiveShadow = true;
           });
 
-          /* If the artist named the lid, it can still be hinged. Most
-             bought models are one welded mesh and simply will not open
-             — which is worth knowing before paying for one. */
-          modelHinge =
-            m.getObjectByName('lid') ??
-            m.getObjectByName('Lid') ??
-            m.getObjectByName('screen') ??
-            null;
+          /* THE WHOLE THING TURNS ON THIS.
+             A teardown needs the file to hold its parts as separate,
+             named objects. Most models sold as "laptop" are one welded
+             shell with no interior — they render beautifully and they
+             cannot come apart. Collecting by name means such a model
+             degrades to a solid object that still turns, rather than to
+             a broken page. */
+          const found: Part[] = [];
+          m.traverse((o) => {
+            const key = o.name.toLowerCase().replace(/[^a-z]/g, '');
+            if (!key) return;
+            const idx = PART_ORDER.findIndex((t) => key.includes(t));
+            if (idx < 0) return;
+            /* Skip anything under a part already taken, or a child and
+               its parent separate by different amounts and the piece
+               tears itself apart. */
+            for (let a: THREE.Object3D | null = o.parent; a; a = a.parent) {
+              if (found.some((f) => f.obj === a)) return;
+            }
+            found.push({ obj: o, home: o.position.clone(), lift: 0 });
+          });
+
+          /* Straight up, spaced by teardown order. Radial directions
+             read as an explosion; a stack reads as a diagram. */
+          found.forEach((f, i) => (f.lift = (found.length - i) * 0.55));
+          parts = found;
 
           laptop.clear();
           laptop.add(m);
           canvas.dataset.model = 'glb';
+          canvas.dataset.parts = String(found.length);
+          /* On the DOM deliberately: it is how you check that a bought
+             model actually separates, before building anything on it. */
+          canvas.dataset.partNames = found.map((f) => f.obj.name).join(',');
         });
       })
       .catch(() => {
@@ -328,35 +368,30 @@
     scene.add(floor);
 
     // ── input ─────────────────────────────────────────────────────
-    let targetYaw = -0.5;
-    let yaw = -0.5;
-    let targetPitch = 0.12;
-    let pitch = 0.12;
     let openTarget = 0;
     let open = 0;
-
-    let dragging = false;
-    let lastX = 0;
-    let lastY = 0;
     const used = () => hint?.setAttribute('data-used', '');
 
-    canvas.addEventListener('pointerdown', (e) => {
-      dragging = true;
-      lastX = e.clientX;
-      lastY = e.clientY;
-      canvas.setPointerCapture(e.pointerId);
+    /* Drag, zoom and pinch from three's own controls rather than the
+       pointer maths this replaces. The plan asks for zoom, and
+       OrbitControls already has wheel, pinch and inertia. */
+    const controls = new OrbitControls(camera, canvas);
+    controls.target.set(0, 0.1, 0);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.075;
+    controls.enablePan = false;
+    controls.minDistance = 4;
+    controls.maxDistance = 16;
+    /* Stopped short of both poles: under a laptop there is nothing, and
+       straight down loses the object against its own shadow. */
+    controls.minPolarAngle = 0.3;
+    controls.maxPolarAngle = Math.PI / 2 - 0.04;
+    controls.autoRotate = !reduced;
+    controls.autoRotateSpeed = 0.55;
+    controls.addEventListener('start', () => {
+      controls.autoRotate = false;
       used();
     });
-    canvas.addEventListener('pointermove', (e) => {
-      if (!dragging) return;
-      targetYaw += (e.clientX - lastX) * 0.006;
-      targetPitch = Math.max(-0.15, Math.min(0.6, targetPitch + (e.clientY - lastY) * 0.003));
-      lastX = e.clientX;
-      lastY = e.clientY;
-    });
-    const release = () => (dragging = false);
-    canvas.addEventListener('pointerup', release);
-    canvas.addEventListener('pointercancel', release);
 
     /* Scroll through the section opens the lid. 0 when the section
        arrives at the bottom of the viewport, 1 when it leaves the top. */
@@ -403,20 +438,18 @@
          waste WebGL makes on a long page. */
       if (!visible) return;
 
-      const t = clock.getElapsedTime();
-
-      if (!dragging && !reduced) targetYaw += 0.0016;   // a slow turn at rest
-      yaw = lerp(yaw, targetYaw, 0.08);
-      pitch = lerp(pitch, targetPitch, 0.08);
       open = lerp(open, openTarget, 0.07);
+      controls.update();
 
-      laptop.rotation.y = yaw;
-      laptop.rotation.x = pitch;
-      if (!reduced) laptop.position.y = Math.sin(t * 0.7) * 0.035;
-
-      // 0 closed, 1 open at about 115 degrees.
-      if (modelHinge) modelHinge.rotation.x = -open * 2.0;
-      else {
+      if (parts.length) {
+        /* A real model: every named part rises by its place in the
+           teardown, so the thing comes apart as a diagram rather than
+           opening like a lid. */
+        for (const f of parts) {
+          f.obj.position.set(f.home.x, f.home.y + f.lift * open, f.home.z);
+        }
+      } else {
+        // Procedural fallback: 0 closed, 1 open at about 115 degrees.
         hinge.rotation.x = -0.02 - open * 2.0;
         screenMat.emissiveIntensity = 0.04 + open * 0.3;
       }
