@@ -277,16 +277,31 @@
        Matching is loose — letters only, partial — so "Bottom_Case_01"
        answers to "bottomcase". Anything matching nothing stays put and
        reads as the body. */
-    const PARTS: { key: string; v: [number, number, number]; side?: boolean }[] = [
+    const PARTS: { key: string; v: [number, number, number]; side?: boolean; whole?: boolean }[] = [
+      { key: 'bezel',       v: [0, 1.14, -0.12] },
       { key: 'screen',      v: [0, 1.00, -0.10] },
       { key: 'display',     v: [0, 1.00, -0.10] },
       { key: 'lid',         v: [0, 1.00, -0.10] },
+      { key: 'hinge',       v: [0.30, 0.66, -0.34], side: true },
       { key: 'keyboard',    v: [0, 0.58, 0] },
+      { key: 'palmrest',    v: [0, 0.54, 0.10] },
       { key: 'topcase',     v: [0, 0.58, 0] },
+      { key: 'trackpad',    v: [0, 0.48, 0.36] },
+      { key: 'touchpad',    v: [0, 0.48, 0.36] },
       { key: 'speaker',     v: [0.62, 0.34, 0.06], side: true },
       { key: 'fan',         v: [0.58, 0.26, -0.14], side: true },
       { key: 'cooler',      v: [0.58, 0.26, -0.14], side: true },
       { key: 'heatsink',    v: [0.58, 0.26, -0.14], side: true },
+      /* RAM and Wi-Fi card sit ON the board, so they leave just above
+         it and slightly out — otherwise they travel through it. */
+      { key: 'memory',      v: [0.34, 0.30, 0.30], side: true },
+      { key: 'dimm',        v: [0.34, 0.30, 0.30], side: true },
+      /* 'ram' must match a WHOLE word. As a substring it is inside
+         "frame", and a chassis frame would fly off as a memory
+         module. */
+      { key: 'ram',         v: [0.34, 0.30, 0.30], side: true, whole: true },
+      { key: 'wifi',        v: [0.40, 0.24, -0.28], side: true },
+      { key: 'wlan',        v: [0.40, 0.24, -0.28], side: true },
       { key: 'motherboard', v: [0, 0.12, 0.46] },
       { key: 'mainboard',   v: [0, 0.12, 0.46] },
       { key: 'logicboard',  v: [0, 0.12, 0.46] },
@@ -346,9 +361,15 @@
           const unit = W;
 
           m.traverse((o) => {
-            const key = o.name.toLowerCase().replace(/[^a-z]/g, '');
+            const raw = o.name.toLowerCase();
+            const key = raw.replace(/[^a-z]/g, '');
             if (!key) return;
-            const spec = PARTS.find((t) => key.includes(t.key));
+            /* Whole-word matching needs the separators, which `key` has
+               thrown away — so the split happens on the raw name. */
+            const words = raw.split(/[^a-z]+/).filter(Boolean);
+            const spec = PARTS.find((t) =>
+              t.whole ? words.includes(t.key) : key.includes(t.key)
+            );
             if (!spec) return;
             /* Skip anything under a part already taken, or a child and
                its parent separate by different amounts and the piece
