@@ -337,7 +337,7 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
     background: rgb(89 170 84 / 0.14); color: var(--green-deep); transform: translateZ(30px); }
   .af__c--0 .af__i { background: rgb(255 255 255 / 0.1); color: var(--green-bright); }
   .af__c dt { font-size: clamp(2.6rem, 5vw, 4.6rem); font-weight: 700; letter-spacing: -0.05em; line-height: 1; transform: translateZ(45px); }
-  .af__c--0 dt { font-size: clamp(4rem, 9vw, 8rem); color: var(--green-bright); }
+  .af__c--0 dt { font-size: clamp(3.4rem, 7vw, 6rem); color: var(--green-bright); }
   .af__c dd { margin: 0.5rem 0 0; font-weight: 700; transform: translateZ(25px); }
   .af__c small { color: var(--text-3); font-size: 0.82rem; transform: translateZ(18px); }
   .af__c--0 small { color: rgb(255 255 255 / 0.6); }
@@ -357,7 +357,10 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
   .aj__card--1 { background: radial-gradient(120% 100% at 100% 0%, #1f4f22 0%, var(--ink) 65%); color: #fff; border-color: transparent; }
   .aj__n { font-family: var(--font-mono); font-size: 0.72rem; letter-spacing: 0.18em; color: var(--text-3); }
   .aj__card--1 .aj__n { color: rgb(255 255 255 / 0.5); }
-  .aj__yr { display: block; font-size: clamp(4rem, 13vw, 11rem); font-weight: 700; letter-spacing: -0.06em; line-height: 0.9; color: var(--green-deep); }
+  /* On the page's display ladder, not above it. At 11rem/-0.06em this was
+     bigger and tighter than the hero, and a grotesk pushed that far past
+     the rest of the page stops reading as the same typeface. */
+  .aj__yr { display: block; font-size: clamp(3.4rem, 7vw, 6rem); font-weight: 700; letter-spacing: -0.05em; line-height: 0.92; color: var(--green-deep); }
   .aj__card--1 .aj__yr { color: var(--green-bright); }
   .aj__t { max-width: 30ch; font-size: clamp(1.1rem, 1.8vw, 1.5rem); font-weight: 600; letter-spacing: -0.02em; line-height: 1.35; }
 
