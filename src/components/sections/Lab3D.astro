@@ -443,6 +443,14 @@
       { key: 'base',        v: [0, -0.62, 0] },
     ];
 
+    /* How far the teardown throws its parts, against the offsets in
+       PARTS. At 1 the stack runs about 1.6 body-widths tall, which does
+       not fit the frame — the screen leaves the top and the base leaves
+       the bottom. 0.62 keeps the whole exploded assembly inside the
+       viewport at the distance below, which is the point of an exploded
+       diagram: you have to be able to see all of it at once. */
+    const SPREAD = 0.62;
+
     type Part = {
       obj: THREE.Object3D;
       home: THREE.Vector3;
@@ -523,7 +531,11 @@
         found.push({
           obj: o,
           home: o.position.clone(),
-          move: new THREE.Vector3(spec.v[0] * sign * unit, spec.v[1] * unit, spec.v[2] * unit),
+          move: new THREE.Vector3(
+            spec.v[0] * sign * unit * SPREAD,
+            spec.v[1] * unit * SPREAD,
+            spec.v[2] * unit * SPREAD
+          ),
           a: 0,
           b: 1,
           order: PARTS.indexOf(spec),
@@ -661,7 +673,10 @@
     controls.dampingFactor = 0.075;
     controls.enablePan = false;
     controls.minDistance = 4;
-    controls.maxDistance = 22;
+    /* A portrait phone needs about 18.7 to fit the exploded stack, so
+       the ceiling has to clear that or resize() is clamped and the
+       parts go off-screen anyway. */
+    controls.maxDistance = 30;
     /* Stopped short of both poles: under a laptop there is nothing, and
        straight down loses the object against its own shadow. */
     controls.minPolarAngle = 0.3;
@@ -707,9 +722,18 @@
          Framed for the exploded state, not the closed one: the screen
          travels a full body-width up, so a distance that suits the shut
          laptop loses the top of the stack the moment you scroll. */
+      /* Framed on the EXPLODED assembly, in BOTH axes.
+         Height alone is not enough: the speakers and fans throw the
+         stack about 6 body-units wide, and on a portrait phone the
+         viewport is barely 3 units across — so a height-only fit sends
+         them off both sides of the screen. Fit each axis, take the
+         larger. */
+      const k = 2 * Math.tan((camera.fov * Math.PI) / 360);
+      const tall = W * 1.62 * SPREAD + T * 4;
+      const wide = W + 2 * (0.62 * W * SPREAD);
       const want = Math.max(
-        8.2,
-        (W * 2.35) / Math.min(1.9, Math.max(0.7, camera.aspect))
+        (tall / k) * 1.18,
+        wide / (k * Math.max(0.35, camera.aspect)) * 1.12
       );
       const dir = camera.position.clone().sub(controls.target).normalize();
       camera.position.copy(controls.target).addScaledVector(dir, want);
