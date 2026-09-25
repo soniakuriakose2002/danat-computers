@@ -58,13 +58,21 @@ const STEP = 360 / cards.length;
     background: #ece9e4 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
   .rg__stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; }
   .rg__guides { position: absolute; inset: 0; pointer-events: none; }
-  .rg__guides::before { content: ''; position: absolute; left: 50%; top: 68%; width: min(120vmin, 1200px); aspect-ratio: 1; border: 1px solid rgb(18 32 24 / 0.14); border-radius: 50%; transform: translate(-50%, -50%); }
+  .rg__guides::before { content: ''; position: absolute; left: 50%; top: 50%; width: min(72vmin, 800px); aspect-ratio: 1; border: 1px solid rgb(18 32 24 / 0.14); border-radius: 50%; transform: translate(-50%, -50%); }
   .rg__guides::after { content: ''; position: absolute; left: 0; right: 0; top: 36%; border-top: 1px solid rgb(18 32 24 / 0.1); box-shadow: 0 30vh 0 -0.5px rgb(18 32 24 / 0.1); }
-  .rg__text { position: absolute; left: 0; right: 0; top: 47%; transform: translateY(-50%); z-index: 1; text-align: center;
+  /* The headline and the ring share one centre, and that centre is the
+     middle of the stage. They were at 47% and 68% — two different
+     centres, which is why neither looked centred and the type sat high
+     inside a circle it was supposed to be inside. */
+  .rg__text { position: absolute; left: 0; right: 0; top: 50%; transform: translateY(-50%); z-index: 1; text-align: center;
     font-weight: 700; letter-spacing: -0.05em; line-height: 1.05; font-size: clamp(2.6rem, 7vw, 7rem); --brush-size: 1.05; }
   .rg__text span { display: block; }
   
-  .rg__wheel { position: absolute; left: 50%; top: 68%; width: 0; height: 0; z-index: 2; --R: min(60vmin, 600px); transform: rotate(var(--rot, 0deg)); }
+  /* Radius pulled in from 60vmin so the whole wheel is on screen at
+     this centre — at 60 its lower cards fell past the fold, and even
+     42 clipped them top and bottom. 36 is the largest that clears a
+     card's full height at 1366x768, 1440x900, 1600x900 and 1920x1080. */
+  .rg__wheel { position: absolute; left: 50%; top: 50%; width: 0; height: 0; z-index: 2; --R: min(36vmin, 400px); transform: rotate(var(--rot, 0deg)); }
   .rg__card { position: absolute; left: 0; top: 0; margin: 0; width: clamp(96px, 10.5vw, 190px); aspect-ratio: 4 / 5; background: #fff;
     padding: clamp(6px, 0.7vw, 11px); box-shadow: 0 18px 40px rgb(20 30 24 / 0.18);
     transform: translate(-50%, -50%) rotate(var(--a)) translateY(calc(var(--R) * -1)) rotate(var(--tilt, 0deg)) scale(var(--sc, 1)); }
