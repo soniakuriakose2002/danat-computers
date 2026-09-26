@@ -131,7 +131,8 @@ import laptop from '@assets/products/laptop-original.png';   // the original pho
 
   type P = number[];
   /* glass corners on the 900x640 photo: TL, TR, BR, BL */
-  const GLASS: P[] = [[139, 236.5], [518.5, 229.5], [561, 463], [187.5, 505]];
+  /* glass corners, pushed ~1.5px outward so the film meets the bezel with no gap */
+  const GLASS: P[] = [[137.8, 235.3], [519.9, 228.2], [562.6, 464.4], [186.3, 506.6]];
   const RECT: P[] = [[0, 0], [1600, 0], [1600, 900], [0, 900]];
 
   /* 3x3 projective map taking four points onto four points */
@@ -217,12 +218,13 @@ import laptop from '@assets/products/laptop-original.png';   // the original pho
       title.style.opacity = String(1 - clamp(p / 0.16));
       title.style.transform = `translateY(${-clamp(p / 0.16) * 60}px)`;
       huds.forEach((h) => (h.style.opacity = String(1 - clamp(p / 0.25))));
-      /* The film carries its own burnt-in captions in the lower left
-         ("04 · TEST — Hands-on diagnosis" and the rest of the sequence).
-         At 110px this wave rose straight through them: its crest is
-         highest at the left, which is exactly where that text sits.
-         Halved so it clears the caption band. The text is video pixels,
-         so it cannot be moved — only the wave can give way. */
+      /* Kept from 45f85bf, NOT from the package. The film carries its own
+         burnt-in captions in the lower left ("04 · TEST — Hands-on
+         diagnosis" and the rest of the sequence), and at the package's
+         110px this wave rises straight through them — its crest is
+         highest at the left, exactly where that text sits. The text is
+         video pixels, so only the wave can give way. Restore the 110/44/
+         0.06 line if the captions ever move out of that band. */
       wave.style.height = `${w * Math.min(62, Math.max(30, innerWidth * 0.034))}px`;
 
       const W = innerWidth, H = innerHeight, dw = dev.offsetWidth, dh = dev.offsetHeight, k = dw / 900;

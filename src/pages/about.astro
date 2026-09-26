@@ -675,10 +675,9 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
   @keyframes dcIn { from { opacity: 0; translate: 0 40px; rotate: -3deg; } to { opacity: 1; translate: 0 0; rotate: 0deg; } }
   @keyframes dcFloat { from { translate: 0 -4px; } to { translate: 0 6px; } }
   /* .adm__photo / .adm__tag / .adm__back are dead — the director block is
-     built from .dpc__* markup and none of those three appears in it. Two
-     had also lost their selector lines, leaving bare declarations at
-     stylesheet top level, which is the css-syntax-error esbuild reports.
-     Every package so far has shipped them; they get deleted every time. */
+     .dpc__* markup and none of those three appears in it. Two had also
+     lost their selector lines, leaving bare declarations at stylesheet
+     top level, which is what esbuild reports as a css-syntax-error. */
   .adm__copy { position: relative; }
   .adm__h { margin-top: var(--s4); font-size: var(--d5); font-weight: 700; letter-spacing: var(--tr5); line-height: 1.1; }
   .adm__q { position: absolute; right: 0; top: -0.6rem; font-family: Georgia, serif; font-size: 9rem; line-height: 1; color: var(--p-mint); pointer-events: none; }

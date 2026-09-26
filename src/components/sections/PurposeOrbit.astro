@@ -2,11 +2,10 @@
 import { Image } from 'astro:assets';
 import Icon from '@components/ui/Icon.astro';
 import shotTech from '@assets/photos/repair-solder.jpg';
-/* NOT retail-display.jpg — that file was deleted as unusable and every
-   package keeps importing it, which fails the build outright (500 on
-   /about). This card reads "Rooted in Oman"; an engineer on site is the
-   closest thing in the library. A real Ruwi shop-floor photograph is
-   still the asset that would fill it properly. */
+/* NOT retail-display.jpg — deleted as unusable, and every package keeps
+   importing it. Rollup cannot resolve it and the whole build fails, so
+   this is not optional. This card reads "Rooted in Oman"; an engineer on
+   site is the closest thing in the library. */
 import shotShop from '@assets/photos/network-eng.jpg';
 
 /**
