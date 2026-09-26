@@ -1,0 +1,93 @@
+---
+/**
+ * IN DANAT'S OWN WORDS — the four statements from the company's live
+ * about page, together in one place, reproduced verbatim.
+ *
+ * Their own layout sets the first word of each heading in an accent
+ * colour and pairs the blocks two up: About beside the Director's
+ * message, Mission beside the Vision. Both kept. The accent is a Danat
+ * pastel rather than their template orange, since nothing else here
+ * uses orange.
+ *
+ * The copy lives in src/data/statements.ts and must not be edited here.
+ */
+import { statements } from '@data/statements';
+
+/** First word takes the accent, exactly as their own page does. */
+const split = (t: string): [string, string] => {
+  const i = t.indexOf(' ');
+  return i === -1 ? [t, ''] : [t.slice(0, i), t.slice(i + 1)];
+};
+---
+
+<section class="st" id="in-our-words" aria-labelledby="st-title">
+  <div class="shell">
+    <p class="eb" data-rise><i class="eb__r" aria-hidden="true"></i>In our own words</p>
+    <h2 class="st__title" id="st-title" data-rise style="--d:70ms">
+      Who we are, <em>as Danat tells it.</em>
+    </h2>
+
+    <div class="st__grid">
+      {statements.map((s, i) => {
+        const [first, rest] = split(s.title);
+        return (
+          <article class:list={['st__c', `st__c--${s.tone}`]} data-rise style={`--d:${120 + i * 70}ms`}>
+            <h3 class="st__h"><em>{first}</em>{rest && ` ${rest}`}</h3>
+            <p class="st__p">{s.body}</p>
+          </article>
+        );
+      })}
+    </div>
+  </div>
+</section>
+
+<style>
+  .st { background: var(--white); padding-block: clamp(4.5rem, 9vw, 7rem); }
+
+  .st__title { margin-top: var(--s4); font-size: var(--d5); font-weight: 700; letter-spacing: var(--tr5); line-height: 1.1; }
+  /* --green-deep is 7.06:1 on white; raw --green is 2.88:1 and is
+     fills-only per tokens.css. */
+  .st__title em { font-style: normal; color: var(--green-deep); }
+
+  .st__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(1rem, 2.4vw, 1.6rem);
+    margin-top: clamp(2rem, 4vw, 3rem);
+  }
+
+  .st__c {
+    padding: clamp(1.4rem, 2.6vw, 2rem);
+    border-radius: 22px;
+    background: var(--t);
+    border: 1px solid rgb(20 40 25 / 0.05);
+  }
+  /* The page's --p-*-ink pairs are tuned for chips and large type: on
+     their own tint they run 3.13:1 (butter) to 4.69:1 (lilac), so three
+     of the four fail the 4.5 a heading at this size needs. These are the
+     same hues pushed dark enough, measured on the tint they sit on.
+              tint       ink        ink:tint   body #14171A:tint */
+  .st__c--mint   { --t: #e3f3e6; --i: #2f6429; }  /* 6.13 · 15.62 */
+  .st__c--sky    { --t: #e4edfa; --i: #2a5cae; }  /* 5.49 · 15.24 */
+  .st__c--butter { --t: #fbf0dc; --i: #8a5518; }  /* 5.48 · 15.93 */
+  .st__c--lilac  { --t: #efe8f8; --i: #5b43a8; }  /* 6.25 · 15.05 */
+
+  .st__h { font-size: var(--d6); font-weight: 700; letter-spacing: var(--tr6); line-height: 1.15; }
+  .st__h em { font-style: normal; color: var(--i); }
+  .st__p {
+    margin-top: 0.8rem;
+    /* Wider than the 34ch the rest of the page uses: these are five- and
+       nine-sentence paragraphs, and a narrow measure turns them into a
+       column of slivers. */
+    max-width: 54ch;
+    font-size: 0.95rem;
+    line-height: 1.72;
+    color: var(--text-2);
+  }
+
+  /* Collapses at 62rem rather than the usual 56: two columns of
+     nine-sentence prose are already too narrow before that. */
+  @media (max-width: 62rem) {
+    .st__grid { grid-template-columns: 1fr; }
+  }
+</style>
