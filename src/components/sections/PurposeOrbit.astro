@@ -716,7 +716,10 @@ const promises = [
        under 76rem   it caps at 42rem and loses the most     (-68px)
      Order matters — the 76rem rule must come second to win. */
   @media (max-width: 84rem) {
-    .po__stage { aspect-ratio: 1 / 0.85; }
+    /* 0.85 cleared 1280 with 37px to spare but left only 7px at 1220,
+       the narrowest point before the 76rem cap takes over. 0.88 turns
+       that into ~20px, which is the margin the rest of the range has. */
+    .po__stage { aspect-ratio: 1 / 0.88; }
   }
 
   @media (max-width: 75.99rem) {
