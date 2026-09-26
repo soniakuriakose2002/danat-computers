@@ -39,3 +39,23 @@ export const OMAN_SPOKES: [string, string][] = [
   ['ruwi', 'sohar'],
   ['ruwi', 'salalah'],
 ];
+
+/**
+ * Where each branch falls on oman-map.png, as a percentage of that image.
+ *
+ * NOT eyeballed. The image is an OSM tile render cropped to
+ * lon 51.3–60.7, lat 15.9–27.2 at zoom 7, and these come out of the same
+ * Web Mercator projection that produced the crop. If the map is ever
+ * re-rendered at different bounds these must be recomputed with it — a
+ * linear guess is wrong, because Mercator is not linear in latitude.
+ *
+ * Lives here because three components draw the same map: the homepage
+ * BranchesMap, AcrossOman, and the about page's presence section. They
+ * each held their own copy of these numbers, which is exactly how the
+ * three drift apart the first time the render changes.
+ */
+export const OMAN_SPOTS: Record<string, { x: number; y: number }> = {
+  ruwi: { x: 77.19, y: 32.8 },
+  sohar: { x: 57.54, y: 26.03 },
+  salalah: { x: 29.67, y: 90.42 },
+};

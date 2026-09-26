@@ -6,10 +6,11 @@ import PurposeOrbit from '@components/sections/PurposeOrbit.astro';
 import VideoModal from '@components/global/VideoModal.astro';
 import StoryCard from '@components/global/StoryCard.astro';
 import { site, branches, brands } from '@data/site';
-import { OMAN_PATH, OMAN_VIEWBOX, OMAN_PINS } from '@data/omanMap';
+import { OMAN_SPOTS } from '@data/omanMap';
 import imgTech from '@assets/photos/repair-solder.jpg';
 import imgFilm from '@assets/photos/film-poster.jpg';
 import imgHero from '@assets/photos/support-desk.jpg';
+import omanMap from '@assets/photos/oman-map.png';
 import imgDirector from '@assets/photos/director.jpg';
 import teamDesk from '@assets/photos/support-agent.jpg';
 import teamBench from '@assets/photos/repair-solder.jpg';
@@ -90,9 +91,6 @@ const quotes = [
 const cols = [0, 1, 2].map((c) => quotes.filter((_, i) => i % 3 === c));
 const mapOrder = ['sohar', 'ruwi', 'salalah'];
 const mapList = mapOrder.map((s) => branches.find((b) => b.slug === s)!);
-const W = 1000;
-const H = 1342;
-const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%', salalah: '0%' };
 
 ---
 <PageLayout
@@ -334,26 +332,23 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
         </a>
       </div>
 
-      <div class="pr__map" data-rise style="--d:90ms">
-        <svg viewBox={OMAN_VIEWBOX} width="280" height="376" role="img"
-          aria-label="Map of Oman showing Danat branches in Sohar, Ruwi and Salalah">
-          <path class="pr__land" d={OMAN_PATH} fill="#e4efe3" />
-          <text class="pr__wm" x="420" y="900" aria-hidden="true">OMAN</text>
-          {mapList.map((b, i) => (
-            <g class="pr__pin" style={`--i:${i}`}
-              transform={`translate(${OMAN_PINS[b.slug].x} ${OMAN_PINS[b.slug].y}) scale(1.4)`}>
-              <path fill="#2f6429" d="M0,0 C-8,-11 -14,-18 -14,-25 A14,14 0 1 1 14,-25 C14,-18 8,-11 0,0 Z" />
-              <circle cx="0" cy="-25" r="5" fill="#ffffff"></circle>
-            </g>
-          ))}
-        </svg>
+      {/* The real map, not the stylised silhouette this replaced: an OSM
+          tile render of Oman, stitched once at build time and served as
+          our own image, so there is no key, no per-visitor tile request
+          and no cookie banner. The pins come from the same Web Mercator
+          maths that produced the crop, shared via OMAN_SPOTS so this and
+          the two homepage maps cannot drift apart. */}
+      <figure class="pr__map" data-rise style="--d:90ms">
+        <Image src={omanMap} alt="Map of Oman showing the Danat branches in Sohar, Ruwi and Salalah"
+          widths={[428, 856]} sizes="(min-width: 62rem) 21rem, 62vw"
+          quality={80} format="webp" loading="lazy" />
         {mapList.map((b, i) => (
-          <a class="pr__chip" href={`/branches#${b.slug}`}
-            style={`--i:${i}; --x:${((OMAN_PINS[b.slug].x / W) * 100).toFixed(2)}%; --y:${((OMAN_PINS[b.slug].y / H) * 100).toFixed(2)}%; --dy:${nudge[b.slug]}`}>
-            {b.city.split(',')[0]}
+          <a class="pr__pin" href={`/branches#${b.slug}`}
+            style={`--i:${i}; --x:${OMAN_SPOTS[b.slug].x}%; --y:${OMAN_SPOTS[b.slug].y}%`}>
+            <i aria-hidden="true"></i><span>{b.city.split(',')[0]}</span>
           </a>
         ))}
-      </div>
+      </figure>
 
       <ul class="pr__list">
         {branches.map((b, i) => (
@@ -800,33 +795,50 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
     font-size: 0.875rem; line-height: 1.62; color: var(--text-2);
   }
 
-  .pr__map { position: relative; width: 100%; max-width: 16rem; justify-self: center; }
-  .pr__map svg { display: block; width: 100%; height: auto; overflow: visible; }
-  /* Decorative, aria-hidden — but 3.0:1 so it is a watermark, not invisible. */
-  .pr__wm { fill: #72906f; font-size: 74px; font-weight: 600; letter-spacing: 12px; }
+  /* 21rem rather than the silhouette's 16rem: a real tile render carries
+     coastline, borders and place names, and at 16rem none of that is
+     legible — the whole point of using the real map. */
+  .pr__map { position: relative; width: 100%; max-width: 21rem; justify-self: center; margin: 0;
+    padding: 0.4rem; border-radius: 22px; background: #eef3ec; border: 1px solid rgb(20 40 25 / 0.06);
+    box-shadow: 0 26px 50px -38px rgb(40 50 45 / 0.4);
+    opacity: 0; transition: opacity 760ms var(--ease) 100ms; }
+  .pr__map[data-in] { opacity: 1; }
+  /* Same treatment as the homepage map: a light sepia rotated onto the
+     section's green, which keeps the render readable while letting it
+     sit back as a backdrop. Plain grayscale(1) crushed it to mush. */
+  .pr__map :global(img) { display: block; width: 100%; height: auto; border-radius: 18px;
+    filter: grayscale(0.72) sepia(0.12) hue-rotate(58deg) contrast(1.02) brightness(1.03); }
 
-  .pr__land { opacity: 0; transition: opacity 760ms var(--ease) 100ms; }
-  .pr__map[data-in] .pr__land { opacity: 1; }
+  /* One element per branch now: the dot and its label travel together, so
+     the label cannot drift off its pin the way the old separate chip
+     could — that is what the per-city `nudge` table was compensating for. */
   .pr__pin {
     --pd: calc(700ms + var(--i) * 130ms);
-    opacity: 0; scale: 0.3;
-    transform-box: fill-box; transform-origin: bottom center;
+    position: absolute; left: var(--x); top: var(--y);
+    display: flex; align-items: center; gap: 0.45rem;
+    translate: -50% -50%;
+    opacity: 0; scale: 0.4;
     transition: opacity 320ms var(--ease) var(--pd),
       scale 540ms cubic-bezier(0.3, 1.6, 0.5, 1) var(--pd);
   }
   .pr__map[data-in] .pr__pin { opacity: 1; scale: 1; }
-  .pr__chip {
-    position: absolute; top: calc(var(--y) + var(--dy, 0%)); left: var(--x);
-    translate: 1.2rem -145%;
+  .pr__pin i {
+    width: 13px; height: 13px; flex: none; border-radius: 50%;
+    background: var(--green-deep); box-shadow: 0 0 0 5px rgb(47 100 41 / 0.18);
+    transition: box-shadow var(--t2) var(--ease);
+  }
+  .pr__pin span {
     padding: 0.2rem 0.55rem; border-radius: 999px; background: #fff;
     box-shadow: 0 6px 16px -9px rgb(10 30 12 / 0.5);
     font-size: 0.6875rem; font-weight: 600; white-space: nowrap; color: var(--text);
-    opacity: 0;
-    transition: opacity 320ms var(--ease) calc(860ms + var(--i) * 130ms),
-      color var(--t2) var(--ease), background-color var(--t2) var(--ease);
+    transition: color var(--t2) var(--ease), background-color var(--t2) var(--ease);
   }
-  .pr__map[data-in] .pr__chip { opacity: 1; }
-  .pr__chip:hover { background: var(--green-deep); color: #fff; }
+  /* white on --green-deep is 7.06:1 */
+  .pr__pin:hover span { background: var(--green-deep); color: #fff; }
+  .pr__pin:hover i { box-shadow: 0 0 0 9px rgb(47 100 41 / 0.22); }
+  /* Salalah sits at the bottom-left corner; its label would run off the
+     image, so that one hangs to the left of its dot instead. */
+  .pr__pin:last-child { flex-direction: row-reverse; }
 
   .pr__list { display: grid; gap: 0.6rem; }
   .br {
@@ -982,7 +994,7 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
     .adm__back, .adm__photo, .adm__photo :global(img), .adm__tag, .adm__msg p { opacity: 1; transform: none; clip-path: none; transition: none; }
     .af__c { transform: none; }
     .ad__shot { clip-path: none; }
-    .pr__map :is(.pr__land, .pr__pin, .pr__chip) { opacity: 1; scale: 1; transition: none; }
+    .pr__map, .pr__map .pr__pin { opacity: 1; scale: 1; transition: none; }
     .btn, .btn:hover, .br, .br:hover { transform: none; transition: none; }
   }
 </style>
