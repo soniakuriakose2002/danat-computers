@@ -7,6 +7,7 @@ import Statements from '@components/sections/Statements.astro';
 import VideoModal from '@components/global/VideoModal.astro';
 import StoryCard from '@components/global/StoryCard.astro';
 import { site, branches, brands } from '@data/site';
+import { reviews, hasReviews } from '@data/reviews';
 import { OMAN_SPOTS } from '@data/omanMap';
 import imgTech from '@assets/photos/repair-solder.jpg';
 import imgFilm from '@assets/photos/film-poster.jpg';
@@ -59,13 +60,16 @@ const proof = [
  * are not presented as named Danat staff, so no names are shown. Swap in
  * real staff photos (and add names) whenever they are available.
  *
- * ⚠ DRAFT — the review cards in "Trusted by" are placeholders. Replace
- * them with real customer reviews before going live, or set
- * SHOW_REVIEWS to false to hide just the reviews.
+ * The "Trusted by" review wall renders from src/data/reviews.ts, which
+ * is empty, so it is hidden. Add real reviews there and it appears.
  */
 /** Add the Director's name here to show it beside the message. */
 const director = { name: '' };
-const SHOW_REVIEWS = false;   // turn on once real customer reviews are in `quotes`
+/* Was a hand-flipped flag beside six invented placeholder quotes. It is
+   now derived: the wall shows when src/data/reviews.ts holds real
+   reviews and stays hidden when it does not, so the page cannot ship
+   fabricated testimonials by someone forgetting to flip a boolean. */
+const SHOW_REVIEWS = hasReviews;
 const whatWeDo = [
   { t: 'Computer & laptop sales', icon: 'laptop', href: '/services/computer-sales', tone: 'mint' },
   { t: 'Repairs & maintenance', icon: 'wrench', href: '/services/computer-repair', tone: 'sky' },
@@ -80,16 +84,8 @@ const team = [
   { img: teamNet, role: 'Networks & CCTV', note: 'Surveys, cabling and installation' },
   { img: teamBiz, role: 'Business support', note: 'Contracts, supply and on-site visits' },
 ];
-const quotes = [
-  { who: 'Customer name', where: 'Ruwi', kind: 'Laptop repair' },
-  { who: 'Business name', where: 'Ruwi', kind: 'Office network' },
-  { who: 'Customer name', where: 'Sohar', kind: 'Data recovery' },
-  { who: 'Customer name', where: 'Sohar', kind: 'Printer service' },
-  { who: 'Business name', where: 'Salalah', kind: 'CCTV installation' },
-  { who: 'Customer name', where: 'Salalah', kind: 'Laptop upgrade' },
-];
 /* three columns for the moving "wall" of reviews */
-const cols = [0, 1, 2].map((c) => quotes.filter((_, i) => i % 3 === c));
+const cols = [0, 1, 2].map((c) => reviews.filter((_, i) => i % 3 === c));
 const mapOrder = ['sohar', 'ruwi', 'salalah'];
 const mapList = mapOrder.map((s) => branches.find((b) => b.slug === s)!);
 
@@ -307,19 +303,26 @@ const mapList = mapOrder.map((s) => branches.find((b) => b.slug === s)!);
                       <figure class="aq__q" aria-hidden={dup ? 'true' : undefined}>
                         <span class="aq__mark" aria-hidden="true">“</span>
                         <div class="aq__top">
-                          <span class="aq__av" aria-hidden="true">{q.who.charAt(0)}</span>
-                          <span class="aq__who"><b>{q.who}</b><small>{q.kind} · Danat {q.where}</small></span>
-                          <span class="aq__g" aria-hidden="true">G</span>
+                          <span class="aq__av" aria-hidden="true">{q.name.charAt(0)}</span>
+                          <span class="aq__who">
+                            <b>{q.name}</b>
+                            {/* Only what we actually know: no branch or
+                                service invented to fill the line. */}
+                            <small>{[q.service, q.branch && `Danat ${q.branch}`].filter(Boolean).join(' · ')}</small>
+                          </span>
+                          {/* The badge names the real source. It used to
+                              say "G" on every card regardless. */}
+                          <span class="aq__g" aria-hidden="true">{q.source === 'google' ? 'G' : q.source === 'facebook' ? 'f' : '★'}</span>
                         </div>
-                        <span class="aq__stars" aria-label="5 out of 5">★★★★★</span>
-                        <blockquote>Customer review goes here — one or two sentences about the repair, the price or the service.</blockquote>
+                        {/* The stars they gave, not five by default. */}
+                        <span class="aq__stars" aria-label={`${q.rating} out of 5`}>{'★'.repeat(q.rating)}<i>{'★'.repeat(5 - q.rating)}</i></span>
+                        <blockquote>{q.text}</blockquote>
                       </figure>
                     )))}
                   </div>
                 </div>
               ))}
             </div>
-            <p class="aq__draft">Draft — the reviews are placeholders. Replace them with real customer reviews (for example from Google) before going live.</p>
           </div>
         )}
       </section>
@@ -942,8 +945,11 @@ const mapList = mapOrder.map((s) => branches.find((b) => b.slug === s)!);
   .aq__who small { color: var(--text-3); font-size: 0.78rem; }
   .aq__g { margin-left: auto; display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; border: 1px solid rgb(0 0 0 / 0.1); font-weight: 700; font-size: 0.8rem; color: #4285f4; }
   .aq__stars { color: #f5b400; letter-spacing: 0.12em; font-size: 0.85rem; }
+  /* The stars a reviewer did NOT give, so a 4-star review reads as four
+     and not as five. Grey rather than absent, which keeps the row the
+     same width on every card. */
+  .aq__stars i { font-style: normal; color: rgb(0 0 0 / 0.16); }
   .aq__q blockquote { margin: 0; font-size: 0.95rem; line-height: 1.6; color: var(--text-3); }
-  .aq__draft { margin-top: 1.2rem; text-align: center; font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.08em; color: #b26a00; }
   @media (max-width: 56rem) {
     .dr { grid-template-columns: 1fr; }
     .dr__fig { width: min(80%, 18rem); }
