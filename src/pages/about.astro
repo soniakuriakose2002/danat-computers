@@ -3,7 +3,6 @@ import { Image } from 'astro:assets';
 import PageLayout from '@layouts/PageLayout.astro';
 import Icon from '@components/ui/Icon.astro';
 import PurposeOrbit from '@components/sections/PurposeOrbit.astro';
-import MeetTeam from '@components/sections/MeetTeam.astro';
 import VideoModal from '@components/global/VideoModal.astro';
 import StoryCard from '@components/global/StoryCard.astro';
 import { site, branches, brands } from '@data/site';
@@ -11,6 +10,7 @@ import { OMAN_PATH, OMAN_VIEWBOX, OMAN_PINS } from '@data/omanMap';
 import imgTech from '@assets/photos/repair-solder.jpg';
 import imgFilm from '@assets/photos/film-poster.jpg';
 import imgHero from '@assets/photos/support-desk.jpg';
+import imgDirector from '@assets/photos/director.jpg';
 import teamDesk from '@assets/photos/support-agent.jpg';
 import teamBench from '@assets/photos/repair-solder.jpg';
 import teamNet from '@assets/photos/network-eng.jpg';
@@ -120,12 +120,12 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
     </div>
   </section>
 
-  {/* ══════ view switch: Who we are / Meet our team ══════ */}
+  {/* ══════ view switch: Who we are / Director's message ══════ */}
   <div class="av" data-av>
     <div class="av__bar" role="tablist" aria-label="About Danat">
       <span class="av__pill" data-av-pill aria-hidden="true"></span>
       <button class="av__tab" role="tab" type="button" id="av-tab-who" aria-controls="av-who" aria-selected="true" data-av-tab="who">Who we are</button>
-      <button class="av__tab" role="tab" type="button" id="av-tab-team" aria-controls="av-team" aria-selected="false" tabindex="-1" data-av-tab="team">Meet our team</button>
+      <button class="av__tab" role="tab" type="button" id="av-tab-dir" aria-controls="av-dir" aria-selected="false" tabindex="-1" data-av-tab="dir">Director's message</button>
     </div>
   </div>
 
@@ -144,6 +144,7 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
       ))}
     </dl>
   </section>
+
 
   {/* ══════ 03 · journey — milestone cards stack up in 3D as you scroll ══════ */}
   <section class="aj" id="journey">
@@ -297,8 +298,45 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
 
   </div>
 
-  <div class="av__view" id="av-team" role="tabpanel" aria-labelledby="av-tab-team" data-av-view="team" hidden>
-    <MeetTeam />
+  <div class="av__view" id="av-dir" role="tabpanel" aria-labelledby="av-tab-dir" data-av-view="dir" hidden>
+  {/* ══════ 02b · director's message ══════ */}
+  <section class="adm" data-adm>
+    <div class="shell adm__in">
+      <div class="dwrap">
+        <article class="dpc" data-tilt>
+          <span class="dpc__ring" aria-hidden="true"></span>
+          <div class="dpc__in">
+            <div class="dpc__photo">
+              <span class="dpc__mesh" aria-hidden="true"></span>
+              <Image src={imgDirector} alt="The Director of Danat Computers" width={500} quality={90} format="webp" loading="lazy" />
+            </div>
+            <span class="dpc__badge" aria-hidden="true">“</span>
+            <div class="dpc__plate">
+              <span class="dpc__chip">Director</span>
+              <b>The Director</b>
+              <em>Danat Computers · Aster Trading LLC</em>
+            </div>
+            <ul class="dpc__tags" aria-label="Areas">
+              <li>Sales</li><li>Service</li><li>Solutions</li>
+            </ul>
+          </div>
+        </article>
+      </div>
+      <div class="adm__copy">
+        <p class="eb"><i class="eb__r" aria-hidden="true"></i>Director's message</p>
+        <h2 class="adm__h">Our promise to <Mark as="highlight" tone="mint">every customer.</Mark></h2>
+        <span class="adm__q" aria-hidden="true">“</span>
+        <blockquote class="adm__msg">
+          <p>At Danat Computer Sales and Service Center, we're dedicated to providing top-tier assistance in computer sales, printer servicing, CCTV installation, computer networking, and data recovery. With a team passionate about technology, we ensure your devices function flawlessly. Whether finding the perfect computer, securing your premises with cutting-edge CCTV systems, or recovering vital data, we're here for you.</p>
+          <p class="adm__key">Our commitment lies in delivering excellence, prompt service, and innovative solutions tailored to your needs. Trust us as your reliable tech partner, where your satisfaction is our utmost priority.</p>
+        </blockquote>
+        <ul class="adm__chips">
+          {['Computer sales', 'Printer servicing', 'CCTV installation', 'Networking', 'Data recovery'].map((c) => <li>{c}</li>)}
+        </ul>
+        <p class="adm__sign"><span>— The Director</span><small>Danat Computers · Aster Trading LLC</small></p>
+      </div>
+    </div>
+  </section>
   </div>
 
   {/* ══════ 07 · cta ══════ */}
@@ -409,19 +447,6 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
   @keyframes ahReveal { from { opacity: 0; transform: scale(1.06); } to { opacity: 1; transform: none; } }
   .ah__bg :global(img) { width: 100%; height: 112%; object-fit: cover; object-position: 60% 30%; }
 
-  /* ───── view switch ───── */
-  .av { position: relative; z-index: 20; display: flex; justify-content: center; margin-top: -1.9rem; pointer-events: none; }
-  .av__bar { position: relative; display: inline-flex; padding: 6px; border-radius: 999px; pointer-events: auto;
-    background: rgb(255 255 255 / 0.82); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
-    border: 1px solid rgb(0 0 0 / 0.08); box-shadow: 0 18px 40px -22px rgb(20 40 25 / 0.45); }
-  .av__pill { position: absolute; top: 6px; bottom: 6px; left: 0; width: 0; border-radius: 999px; background: var(--green-deep);
-    box-shadow: 0 8px 20px -10px rgb(20 60 25 / 0.6); transition: transform 0.5s var(--ease), width 0.5s var(--ease); }
-  .av__tab { position: relative; z-index: 1; padding: 0.8rem 1.6rem; border: 0; border-radius: 999px; background: none; cursor: pointer;
-    font-weight: 700; font-size: 1rem; letter-spacing: -0.01em; color: var(--text-2); transition: color 0.3s; }
-  .av__tab[aria-selected='true'] { color: #fff; }
-  .av__view.is-on { animation: avIn 0.6s var(--ease) both; }
-  @keyframes avIn { from { opacity: 0; transform: translateY(18px); } }
-
   /* ───── 02 figures ───── */
   .af { background: #fff; padding-block: clamp(3.5rem, 7vw, 6rem); }
   .af__grid { display: grid; grid-template-columns: 1.3fr 1fr 1fr; grid-template-rows: auto auto; gap: 1rem; margin: 0; perspective: 1200px; }
@@ -448,6 +473,101 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
   .af__c dd { margin: 0.5rem 0 0; font-weight: 700; transform: translateZ(25px); }
   .af__c small { color: var(--text-3); font-size: 0.82rem; transform: translateZ(18px); }
   
+
+  /* ───── view switch ───── */
+  .av { position: relative; z-index: 20; display: flex; justify-content: center; margin-top: -1.9rem; pointer-events: none; }
+  .av__bar { position: relative; display: inline-flex; padding: 6px; border-radius: 999px; pointer-events: auto; background: rgb(255 255 255 / 0.9);
+    backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border: 1px solid rgb(0 0 0 / 0.08); box-shadow: 0 18px 40px -22px rgb(20 40 25 / 0.45); }
+  .av__pill { position: absolute; top: 6px; bottom: 6px; left: 0; width: 0; border-radius: 999px; background: var(--green-deep); transition: transform 0.5s var(--ease), width 0.5s var(--ease); }
+  .av__tab { position: relative; z-index: 1; padding: 0.8rem 1.6rem; border: 0; border-radius: 999px; background: none; cursor: pointer; font-weight: 700; font-size: 1rem; color: var(--text-2); transition: color 0.3s; }
+  .av__tab[aria-selected='true'] { color: #fff; }
+  .av__view.is-on { animation: avIn 0.6s var(--ease) both; }
+  @keyframes avIn { from { opacity: 0; transform: translateY(18px); } }
+
+  /* ───── 02c mission & vision ───── */
+  .mv { background: #fff; padding-block: clamp(4.5rem, 9vw, 7rem); }
+  .mv__head { display: grid; justify-items: center; text-align: center; margin-bottom: 2.6rem; }
+  .mv__h { margin-top: var(--s4); font-size: var(--d5); font-weight: 700; letter-spacing: var(--tr5); line-height: 1.1; }
+  .mv__grid { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: 1.4rem; align-items: stretch; }
+  .mv__card { position: relative; display: grid; align-content: start; gap: 0.7rem; padding: clamp(1.6rem, 3.5vw, 2.4rem); border-radius: 24px; overflow: hidden;
+    background: #fff; border: 1px solid rgb(0 0 0 / 0.06); box-shadow: 0 24px 50px -36px rgb(20 40 25 / 0.4);
+    opacity: 0; transform: translateY(26px); transition: opacity 0.7s var(--ease), transform 0.8s var(--ease), box-shadow 0.4s; }
+  .mv__card--v { transition-delay: 0.12s; }
+  .mv__card.is-in { opacity: 1; transform: none; }
+  .mv__card:hover { box-shadow: 0 30px 60px -32px rgb(20 40 25 / 0.5); }
+  .mv__card::before { content: ''; position: absolute; top: -30%; right: -20%; width: 60%; aspect-ratio: 1; border-radius: 50%; opacity: 0.7; transition: transform 0.8s var(--ease); }
+  .mv__card--m::before { background: radial-gradient(closest-side, var(--p-mint), transparent); }
+  .mv__card--v::before { background: radial-gradient(closest-side, var(--p-sky), transparent); }
+  .mv__card:hover::before { transform: scale(1.2); }
+  .mv__ic { position: relative; display: grid; place-items: center; width: 54px; height: 54px; border-radius: 16px; }
+  .mv__card--m .mv__ic { background: var(--p-mint); color: var(--p-mint-ink); }
+  .mv__card--v .mv__ic { background: var(--p-sky); color: var(--p-sky-ink); }
+  .mv__card:hover .mv__ic { animation: mvWobble 0.7s ease; }
+  @keyframes mvWobble { 30% { transform: rotate(-10deg) scale(1.08); } 60% { transform: rotate(6deg); } }
+  .mv__k { position: relative; margin-top: 0.4rem; font-size: 1.3rem; font-weight: 700; letter-spacing: -0.03em; }
+  .mv__card--m .mv__k { color: var(--p-mint-ink); }
+  .mv__card--v .mv__k { color: var(--p-sky-ink); }
+  .mv__t { position: relative; font-size: 0.95rem; line-height: 1.75; color: var(--text-2); }
+
+  /* ───── 02b director's message ───── */
+  .adm { background: linear-gradient(180deg, #fff 0%, #f7f9fc 100%); padding-block: clamp(5rem, 10vw, 8rem); overflow: hidden; }
+  .adm__in { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: clamp(2.5rem, 6vw, 6rem); align-items: center; }
+  /* Director card: a spinning gradient frame, the portrait in an arch on a soft mesh,
+     a glass name plate and a floating quote badge; tilts toward the pointer */
+  .dpc { position: relative; border-radius: 30px; padding: 3px; isolation: isolate;
+    transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg)); transform-style: preserve-3d; transition: transform 0.5s var(--ease); }
+  .dpc__ring { position: absolute; inset: 0; z-index: -1; border-radius: inherit; overflow: hidden; }
+  .dpc__ring::before { content: ''; position: absolute; inset: -60%; background: conic-gradient(from 0deg, #59aa54, #6aa9d8, #b39ce8, #f2b35c, #59aa54);
+    animation: dpcSpin 7s linear infinite; }
+  .dpc:hover .dpc__ring::before { animation-duration: 2.5s; }
+  @keyframes dpcSpin { to { transform: rotate(360deg); } }
+  .dpc__in { position: relative; border-radius: 27px; background: #fff; padding: 1rem 1rem 1.2rem; box-shadow: 0 40px 70px -40px rgb(20 40 25 / 0.5); }
+  .dpc__photo { position: relative; aspect-ratio: 4 / 4.4; border-radius: 180px 180px 22px 22px; overflow: hidden; background: #eef4ef; transform: translateZ(20px); }
+  .dpc__mesh { position: absolute; inset: 0; z-index: 0;
+    background: radial-gradient(60% 50% at 20% 20%, rgb(227 243 230 / 0.9), transparent 70%), radial-gradient(60% 50% at 85% 30%, rgb(228 237 250 / 0.9), transparent 70%), radial-gradient(60% 60% at 50% 100%, rgb(239 232 248 / 0.9), transparent 70%); }
+  .dpc__photo :global(img) { position: relative; z-index: 1; width: 100%; height: 100%; object-fit: cover; object-position: 50% 28%; transition: transform 0.8s var(--ease); }
+  .dpc:hover .dpc__photo :global(img) { transform: scale(1.06); }
+  .dpc__badge { position: absolute; top: 1.4rem; right: 1.4rem; z-index: 3; display: grid; place-items: center; width: 52px; height: 52px; border-radius: 50%;
+    background: #fff; color: var(--green); font-family: Georgia, serif; font-size: 2.2rem; line-height: 1; padding-top: 0.5rem;
+    box-shadow: 0 12px 28px -12px rgb(20 40 25 / 0.45); animation: dpcBob 4s ease-in-out infinite alternate; transform: translateZ(40px); }
+  @keyframes dpcBob { from { translate: 0 -4px; rotate: -6deg; } to { translate: 0 5px; rotate: 4deg; } }
+  .dpc__plate { position: relative; z-index: 2; display: grid; gap: 0.15rem; margin: -3.4rem 0.8rem 0; padding: 1rem 1.1rem; border-radius: 18px;
+    background: rgb(255 255 255 / 0.82); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgb(255 255 255 / 0.9);
+    box-shadow: 0 18px 36px -20px rgb(20 40 25 / 0.45); transform: translateZ(50px); }
+  .dpc__chip { justify-self: start; padding: 0.22rem 0.65rem; border-radius: 999px; background: var(--p-mint); color: var(--p-mint-ink); font-size: 0.68rem; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; }
+  .dpc__plate b { margin-top: 0.3rem; font-size: 1.2rem; letter-spacing: -0.02em; }
+  .dpc__plate em { font-style: normal; font-size: 0.8rem; color: var(--text-3); }
+  .dpc__tags { list-style: none; margin: 0.9rem 0.8rem 0; padding: 0; display: flex; gap: 0.4rem; }
+  .dpc__tags li { padding: 0.3rem 0.7rem; border-radius: 999px; font-size: 0.72rem; font-weight: 600; }
+  .dpc__tags li:nth-child(1) { background: var(--p-mint); color: var(--p-mint-ink); }
+  .dpc__tags li:nth-child(2) { background: var(--p-sky); color: var(--p-sky-ink); }
+  .dpc__tags li:nth-child(3) { background: var(--p-lilac); color: var(--p-lilac-ink); }
+  .dwrap { justify-self: center; width: min(100%, 23rem); animation: dcIn 1s cubic-bezier(0.2, 0.9, 0.25, 1) both, dcFloat 6s ease-in-out 1.2s infinite alternate; animation-play-state: paused; }
+  .adm.is-in .dwrap { animation-play-state: running; }
+  @keyframes dcIn { from { opacity: 0; translate: 0 40px; rotate: -3deg; } to { opacity: 1; translate: 0 0; rotate: 0deg; } }
+  @keyframes dcFloat { from { translate: 0 -4px; } to { translate: 0 6px; } }
+  /* The .adm__photo / .adm__tag / .adm__back rules that stood here were
+     dead: the director block is built from .dpc__* markup and none of
+     those three classes appears in it. Two of them had also lost their
+     selector lines, leaving bare declarations at stylesheet top level —
+     that is what esbuild was reporting as a css-syntax-error. */
+  .adm__copy { position: relative; }
+  .adm__h { margin-top: var(--s4); font-size: var(--d5); font-weight: 700; letter-spacing: var(--tr5); line-height: 1.1; }
+  .adm__q { position: absolute; right: 0; top: -0.6rem; font-family: Georgia, serif; font-size: 9rem; line-height: 1; color: var(--p-mint); pointer-events: none; }
+  .adm__msg { margin: 1.4rem 0 0; padding: 0 0 0 1.2rem; border-left: 3px solid var(--p-mint); display: grid; gap: 0.8rem; }
+  .adm__msg p { font-size: 0.98rem; line-height: 1.72; color: var(--text-2); opacity: 0; transform: translateY(14px); transition: opacity 0.7s var(--ease), transform 0.7s var(--ease); }
+  .adm__msg p:nth-child(2) { transition-delay: 0.15s; } .adm__msg p:nth-child(3) { transition-delay: 0.3s; }
+  .adm.is-in .adm__msg p { opacity: 1; transform: none; }
+  .adm__key { color: var(--text) !important; font-weight: 600; }
+  .adm__chips { list-style: none; margin: 1.4rem 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 0.45rem; }
+  .adm__chips li { padding: 0.4rem 0.8rem; border-radius: 999px; font-size: 0.8rem; font-weight: 600; background: var(--p-mint); color: var(--p-mint-ink); }
+  .adm__chips li:nth-child(2) { background: var(--p-sky); color: var(--p-sky-ink); }
+  .adm__chips li:nth-child(3) { background: var(--p-blush); color: var(--p-blush-ink); }
+  .adm__chips li:nth-child(4) { background: var(--p-lilac); color: var(--p-lilac-ink); }
+  .adm__chips li:nth-child(5) { background: var(--p-butter); color: var(--p-butter-ink); }
+  .adm__sign { margin-top: 1.6rem; display: grid; }
+  .adm__sign span { font-family: var(--font-script); font-size: 1.5rem; color: var(--green-deep); }
+  .adm__sign small { font-size: 0.8rem; color: var(--text-3); }
 
   /* ───── 03 journey ───── */
   .aj { background: #fff; padding-block: clamp(5rem, 10vw, 8rem); }
@@ -644,12 +764,18 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
   .aq__q blockquote { margin: 0; font-size: 0.95rem; line-height: 1.6; color: var(--text-3); }
   .aq__draft { margin-top: 1.2rem; text-align: center; font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.08em; color: #b26a00; }
   @media (max-width: 56rem) {
-    .aq__wall { grid-template-columns: 1fr; height: auto; -webkit-mask: none; mask: none; }
+    .mv__grid { grid-template-columns: 1fr; }
+    .adm__in { grid-template-columns: 1fr; }
+      .aq__wall { grid-template-columns: 1fr; height: auto; -webkit-mask: none; mask: none; }
     .aq__col:not(:first-child) { display: none; }
     .aq__run { animation: none; }
     .aq__run > [aria-hidden='true'] { display: none; }
   }
   @media (prefers-reduced-motion: reduce) {
+    .dwrap { animation: none; }
+    .dpc__ring::before, .dpc__badge { animation: none; }
+    .mv__card { opacity: 1; transform: none; transition: none; }
+    .av__view.is-on { animation: none; }
     .aq__track, .aq__run { animation: none; }
     .aq__wall { height: auto; -webkit-mask: none; mask: none; }
   }
@@ -684,8 +810,9 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
     .ah__bg, .ah__l > span, .ah__eb, .ah__p, .ah__acts, .ah__mantra, .ah__play::after{ animation: none; opacity: 1; transform: none; clip-path: none; }
     .aj__m, .aj__dot, .aj__rail i { opacity: 1; transform: none; transition: none; }
     .aj__spark { display: none; }
-    .av__view.is-on { animation: none; }
-    .av__pill { transition: none; }
+    /* .dwrap runs dcIn + an infinite dcFloat, so it needs animation:none,
+       not just transform:none — the float would otherwise keep going. */
+    .adm__msg p, .dwrap, .dpc__photo :global(img) { animation: none; opacity: 1; transform: none; translate: none; rotate: none; clip-path: none; transition: none; }
     .af__c { transform: none; }
     .ad__shot { clip-path: none; }
     .pr__map :is(.pr__land, .pr__pin, .pr__chip) { opacity: 1; scale: 1; transition: none; }
@@ -701,7 +828,7 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
     hero.dataset.wired = '1';
     const header = document.querySelector('header');
     if (header) document.documentElement.style.setProperty('--hdr', `${header.offsetHeight}px`);
-    /* Who we are / Meet our team */
+    /* Who we are / Director's message */
     const av = document.querySelector<HTMLElement>('[data-av]');
     if (av) {
       const tabs = [...av.querySelectorAll<HTMLButtonElement>('[data-av-tab]')];
@@ -715,7 +842,7 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
           v.hidden = !on; v.classList.remove('is-on'); if (on) { void v.offsetWidth; v.classList.add('is-on'); }
         });
         place(t);
-        history.replaceState(null, '', t.dataset.avTab === 'team' ? '#team' : location.pathname);
+        history.replaceState(null, '', t.dataset.avTab === 'dir' ? '#director' : location.pathname);
         if (scroll) {
           const y = av.getBoundingClientRect().top + scrollY - (header?.offsetHeight ?? 0) - 12;
           const l = (window as any).__lenis; l ? l.scrollTo(y, { duration: 0.8 }) : scrollTo({ top: y, behavior: 'smooth' });
@@ -729,10 +856,9 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
           if (!d) return; const n = tabs[(i + d + tabs.length) % tabs.length]; n.focus(); show(n.dataset.avTab!, false);
         });
       });
-      requestAnimationFrame(() => show(location.hash === '#team' ? 'team' : 'who', false));
+      requestAnimationFrame(() => show(location.hash === '#director' ? 'dir' : 'who', false));
       addEventListener('resize', () => place(tabs.find((t) => t.getAttribute('aria-selected') === 'true')!));
     }
-
     /* hero: rotate the handwritten phrase */
     const rot = document.querySelector<HTMLElement>('[data-rot]');
     if (rot && !reduced) {
@@ -753,6 +879,8 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
     if (reduced) return;
 
     const bg = hero.querySelector<HTMLElement>('[data-ah-bg]')!;
+    const adm = document.querySelector<HTMLElement>('[data-adm]');
+    if (adm) new IntersectionObserver((es, o) => { if (es[0].isIntersecting) { adm.classList.add('is-in'); o.disconnect(); } }, { threshold: 0.25 }).observe(adm);
     const line = document.querySelector<HTMLElement>('[data-aj]');
     if (line) new IntersectionObserver((es, o) => {
       if (!es[0].isIntersecting) return;

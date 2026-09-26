@@ -2,10 +2,14 @@
 import { Image } from 'astro:assets';
 import Icon from '@components/ui/Icon.astro';
 import shotTech from '@assets/photos/repair-solder.jpg';
-/* Was retail-display.jpg — an art and craft shop, captioned "Rooted in
-   Oman". The map is the honest version of that caption, and it is the
-   same OSM render the branches section uses. */
-import shotShop from '@assets/photos/oman-map.png';
+/* The package imported @assets/photos/retail-display.jpg, which does not
+   exist — it was deleted earlier as unusable, and the missing import
+   failed the build outright (500 on /about). This card is captioned
+   "Rooted in Oman", so an engineer working on site is the closest thing
+   in the library. A real Ruwi shop-floor photograph is still the asset
+   that would fill this properly, along with the 6th InsideDanat card and
+   the computer-sales service image. */
+import shotShop from '@assets/photos/network-eng.jpg';
 
 /**
  * OUR PURPOSE — three panes on a 3D stage.
@@ -19,9 +23,9 @@ import shotShop from '@assets/photos/oman-map.png';
  * The orbital rings are SVG ellipses tipped in X and turning slowly,
  * which is what gives the depth something to read against.
  *
- * ⚠ The mission, vision and values wording is a DRAFT. Danat has never
- * published any of the three. The mission text is the client's own from
- * their mockup; the other two are written to match. The page says so.
+ * The Mission and Vision texts are Danat's own, word for word from the
+ * old danatcomputers.com About page. ⚠ The Values wording is still a
+ * draft written to match.
  */
 const faces = [
   {
@@ -29,18 +33,20 @@ const faces = [
     key: 'Mission',
     kicker: 'Our mission',
     lead: 'A more connected tomorrow',
-    h: ['Make technology', 'work better', 'for people.'],
-    accent: [1, 2],
-    p: 'We provide genuine products, expert service and practical technology solutions that help individuals, businesses and communities work smarter.',
+    h: ['Excellence and', 'customer satisfaction.'],
+    accent: [1],
+    long: true,
+    p: 'At Danat Computer Supermarket, we take pride in our unwavering commitment to excellence and customer satisfaction. With a team of passionate and skilled professionals, we are dedicated to providing top-tier assistance in various areas, including computer sales, printer servicing, CCTV installation, computer networking, and data recovery.',
   },
   {
     no: '02',
     key: 'Vision',
     kicker: 'Our vision',
     lead: 'A more connected tomorrow',
-    h: ['An Oman that', 'repairs, not', 'replaces.'],
+    h: ['A global leader in', 'technological solutions.'],
     accent: [1],
-    p: 'Where a failed machine is worth mending, and the skill to mend it lives here rather than being shipped abroad with the hardware.',
+    long: true,
+    p: 'Our vision at Danat Group is to be a global leader in providing comprehensive and advanced technological solutions. We aspire to create a future where technology seamlessly integrates into every aspect of life, making it more efficient and enjoyable. By consistently innovating and adapting to emerging trends, we envision ourselves as pioneers in shaping the digital landscape. We are dedicated to fostering a culture of continuous improvement, pushing boundaries, and exceeding customer expectations. Through our global presence, we aim to be recognized as a symbol of trust and reliability, making a positive impact on societies and contributing to the progress of the world.',
   },
   {
     no: '03',
@@ -129,7 +135,7 @@ const promises = [
       {/* the three panes */}
       <div class="deck">
         {faces.map((f, i) => (
-          <article class="pane" data-pos={i === 0 ? 'c' : i === 1 ? 'r' : 'l'} data-i={i}>
+          <article class:list={['pane', { 'pane--long': (f as any).long }]} data-pos={i === 0 ? 'c' : i === 1 ? 'r' : 'l'} data-i={i}>
             <button class="pane__hit" type="button" aria-label={`Show ${f.key}`}></button>
 
             <span class="pane__face" aria-hidden="true">
@@ -581,6 +587,17 @@ const promises = [
     line-height: 1.16;
   }
   .pane__h em { font-style: normal; color: var(--green-deep); }
+  /* the longer, original Mission and Vision texts: wider, a touch smaller */
+  .pane--long .pane__h { font-size: var(--lead); }
+  /* Danat's published vision is 103 words and the mission 46, against
+     the ~20 these panes were drawn for, and the stage is a fixed-ratio
+     box that cannot grow with its content. Measured overflow before this
+     rule: vision by 9px at 1440 and 68px at 1200.
+     46ch left a third of the card unused, so the text goes sideways
+     instead of down — full width here, and the stage gets taller at the
+     narrow end (see the 75.99rem query). */
+  .pane--long .pane__p { max-width: 100%; font-size: var(--label); line-height: 1.5; margin-top: 0.55rem; }
+  .pane--long .pane__cta { margin-top: 0.8rem; padding: 0.55rem 1.2rem; }
   .pane__p {
     margin-top: 0.7rem;
     max-width: 28ch;
@@ -692,8 +709,18 @@ const promises = [
      of the viewport empty. Split it in two so it fills the width, and
      stop the stage growing to the whole row — at 1180px the 1/0.74 box
      was over 800px tall on its own. */
+  /* The stage is a fixed-ratio box, so as the viewport narrows the panes
+     lose height while Danat's 103-word vision statement does not. Two
+     steps, both measured, both sized to the shortfall they close:
+       under 84rem   the stage narrows but is not yet capped  (-8px)
+       under 76rem   it caps at 42rem and loses the most     (-68px)
+     Order matters — the 76rem rule must come second to win. */
+  @media (max-width: 84rem) {
+    .po__stage { aspect-ratio: 1 / 0.85; }
+  }
+
   @media (max-width: 75.99rem) {
-    .po__stage { max-width: 42rem; margin-inline: auto; }
+    .po__stage { max-width: 42rem; margin-inline: auto; aspect-ratio: 1 / 0.95; }
   }
 
   @media (min-width: 34rem) and (max-width: 75.99rem) {

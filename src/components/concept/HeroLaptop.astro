@@ -237,7 +237,13 @@ import laptop from '@assets/products/laptop-hero.png';
       title.style.opacity = latched ? '0' : String(1 - clamp(p / 0.16));
       title.style.transform = `translateY(${-clamp(p / 0.16) * 60}px)`;
       huds.forEach((h) => (h.style.opacity = latched ? '0' : String(1 - clamp(p / 0.25))));
-      wave.style.height = `${w * Math.min(110, Math.max(44, innerWidth * 0.06))}px`;
+      /* The film carries its own burnt-in captions in the lower-left
+         ("04 · TEST — Hands-on diagnosis" and the rest of the sequence),
+         and at 110px this wave rose straight through them — the crest is
+         highest at the left, which is exactly where that text sits.
+         Halved so the wave clears the caption band instead of eating it.
+         Cannot be solved by moving the text: it is video pixels. */
+      wave.style.height = `${w * Math.min(62, Math.max(30, innerWidth * 0.034))}px`;
 
       const W = innerWidth, H = innerHeight, dw = dev.offsetWidth, dh = dev.offsetHeight, k = dw / 900;
       const Q = GLASS.map(([x, y]) => [x * k, y * k]);
