@@ -30,7 +30,7 @@ const toneVar = tone ? `--mk: var(--mk-${tone})` : '';
 
 <style>
   .mk { --mk-mint: #bfe6c7; --mk-butter: #ffd98a; --mk-sky: #bcd6f6; --mk-green: #3fa34d; --mk-blue: #2d7ff0;
-    position: relative; display: inline-block; white-space: nowrap; }
+    position: relative; display: inline-flex; white-space: nowrap; }  /* flex: no stray spaces from the markup */
   .mk__t { position: relative; z-index: 1; }
   .mk__s { position: absolute; pointer-events: none; overflow: visible; }
 

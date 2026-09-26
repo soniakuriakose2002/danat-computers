@@ -44,6 +44,15 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? site.url).href;
     <meta property="og:locale" content="en_OM" />
     <meta name="twitter:card" content="summary_large_image" />
 
+    {/* Registered BEFORE the router so it runs first: when a modal is closed
+        we rewind the history entry we pushed for it (ModalHistory), and that
+        popstate must never reach the router — otherwise it re-renders the page
+        and the visitor is thrown back to the top. */}
+    <script is:inline>
+      window.addEventListener('popstate', function (e) {
+        if (window.__danatPopGuard && window.__danatPopGuard(e)) e.stopImmediatePropagation();
+      }, true);
+    </script>
     <ClientRouter />
   </head>
 

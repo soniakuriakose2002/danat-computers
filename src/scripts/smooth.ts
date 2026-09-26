@@ -36,5 +36,9 @@ export function initSmooth() {
     requestAnimationFrame(frame);
   };
   requestAnimationFrame(frame);
-  document.addEventListener('astro:after-swap', () => lenis?.scrollTo(0, { immediate: true, force: true }));
+  /* New page: start at the top. Back/Forward: the router restores the
+     visitor's place, so leave it alone. */
+  let navType = 'push';
+  document.addEventListener('astro:before-preparation', (e: any) => { navType = e.navigationType; });
+  document.addEventListener('astro:after-swap', () => { if (navType !== 'traverse') lenis?.scrollTo(0, { immediate: true, force: true }); });
 }

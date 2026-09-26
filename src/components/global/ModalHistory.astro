@@ -51,29 +51,25 @@
         history.back();
       };
 
-      window.addEventListener(
-        'popstate',
-        (e) => {
-          if (selfPop) {
-            /* Ours. Consume it so the router does not act on it. */
-            selfPop = false;
-            e.stopImmediatePropagation();
-            return;
-          }
-          const open = openDialogs();
-          if (!open.length || depth === 0) return;
-
-          depth -= 1;
-          e.stopImmediatePropagation();
-          fromPop = true;
-          /* Topmost first — a card can open the film over itself. */
-          const d = open[open.length - 1];
-          if (typeof d.close === 'function') d.close();
-          else d.removeAttribute('open');
-          fromPop = false;
-        },
-        true
-      );
+      /* Runs from the popstate listener installed in <head> before the router
+         (BaseLayout), so returning true really does keep the router out of it. */
+      window.__danatPopGuard = () => {
+        if (selfPop) {
+          /* Ours. Consume it so the router does not act on it. */
+          selfPop = false;
+          return true;
+        }
+        const open = openDialogs();
+        if (!open.length || depth === 0) return false;
+        depth -= 1;
+        fromPop = true;
+        /* Topmost first — a card can open the film over itself. */
+        const d = open[open.length - 1];
+        if (typeof d.close === 'function') d.close();
+        else d.removeAttribute('open');
+        fromPop = false;
+        return true;
+      };
 
       const obs = new MutationObserver((muts) => {
         for (const m of muts) {

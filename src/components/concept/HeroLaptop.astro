@@ -24,22 +24,21 @@
  * laptop again.
  */
 import { Image } from 'astro:assets';
-import { site, whatsappLink } from '@data/site';
-import laptop from '@assets/products/laptop-hero.png';
+import { site } from '@data/site';
+import laptop from '@assets/products/laptop-original.png';   // the original photo, 2x, with a clean smooth outline
 ---
 <section class="hl" data-hl aria-label="Danat Computers">
   <div class="hl__stage">
     <div class="hl__view" data-hl-rise>
       <div class="hl__dev" data-hl-dev>
         <span class="hl__floor" aria-hidden="true"></span>
-        <Image src={laptop} alt="Laptop playing the Danat Computers film" width={900} format="png" loading="eager" class="hl__img" />
+        <Image src={laptop} alt="Laptop playing the Danat Computers film" width={1800} format="png" loading="eager" class="hl__img" />
         <div class="hl__scr">
           <video src="/film/danat-it-support.mp4" poster="/film/danat-it-support.jpg"
             muted loop playsinline autoplay preload="auto"
             controlslist="nodownload noplaybackrate noremoteplayback" disablepictureinpicture disableremoteplayback
             aria-label="Danat Computers IT support film"></video>
-          <a class="hl__hot" href={whatsappLink()} data-support-open target="_blank" rel="noopener noreferrer"
-      data-hl-hot aria-label="Get Support" tabindex="-1"></a>
+          <a class="hl__hot" href="/contact" data-hl-hot aria-label="Get Support" tabindex="-1"></a>
           <span class="hl__glare" aria-hidden="true"></span>
         </div>
       </div>
@@ -64,7 +63,7 @@ import laptop from '@assets/products/laptop-hero.png';
   /* the laptop rises in once, on arrival — not tied to scrolling */
   .hl__view { position: absolute; inset: 0; opacity: 0; transform: translate3d(0, 70px, 0) scale(0.94); transition: opacity 1.2s var(--ease), transform 1.4s var(--ease); }
   .hl.is-in .hl__view { opacity: 1; transform: none; }
-  .hl__dev { position: absolute; left: 0; top: 0; width: min(56vw, 900px); aspect-ratio: 900 / 640; transform-origin: 0 0; will-change: transform; }
+  .hl__dev { position: absolute; left: 0; top: 0; width: min(52vw, 880px); aspect-ratio: 900 / 640; transform-origin: 0 0; will-change: transform; }
   .hl__dev :global(.hl__img) { position: absolute; inset: 0; width: 100%; height: 100%; filter: drop-shadow(0 30px 40px rgb(0 0 0 / 0.45)); }
   /* 1600x900 box mapped onto the photo's glass by the script */
   .hl__scr { position: absolute; left: 0; top: 0; width: 1600px; height: 900px; transform-origin: 0 0; overflow: hidden; background: #000; }
@@ -179,75 +178,58 @@ import laptop from '@assets/products/laptop-hero.png';
     ['pointerdown', 'touchstart', 'keydown', 'wheel'].forEach((t) => addEventListener(t, play, { once: true, passive: true }));
     requestAnimationFrame(() => sec.classList.add('is-in'));
 
+    /* The zoom is tied to the scroll both ways: down flies into the screen,
+       up flies back out to the laptop — like every other scroll effect.
+       It ends exactly where the section ends, so once the film fills the
+       page the next scroll simply carries on to the content below.
+       Coming back from Get Support lands at the end of the zoom (the film,
+       full screen); a reload starts from the laptop again. */
     const KEY = 'danat-hero-done';
-    const stored = () => { try { return sessionStorage.getItem(KEY) === '1'; } catch { return false; } };
-    /* FLY_IN = false: no zoom at all. The IT Support film simply appears in
-       place, full width with the wave, and the page scrolls on normally.
-       Set it to true to bring back the laptop fly-in. */
-    const FLY_IN = true;
-    let latched = !FLY_IN || stored(), done = false;
-    let visible = true, raf = 0, seen = false;
+    let visible = true, raf = 0;
     const lenis = () => (window as any).__lenis;
     const jump = (y: number) => { const l = lenis(); l ? l.scrollTo(y, { immediate: true, force: true }) : scrollTo(0, y); };
-    /* collapse the fly-in track to one screen without the page jumping */
-    function settle() {
-      if (done && sec!.dataset.settled) return;
-      sec!.dataset.settled = '1';
-      const before = sec!.offsetHeight, top = sec!.getBoundingClientRect().top + scrollY, y = scrollY;
-      sec!.classList.add('is-done'); done = true;
-      const after = sec!.offsetHeight, track = before - innerHeight;
-      if (y > top + track) jump(y - (before - after));      // below the hero: keep what is on screen
-      else if (y > top) jump(top);                           // inside the old track: show the film
-      loop();
-    }
-    /* reaching the full film latches it for this page view only; coming back
-       from Get Support (remembered) arrives settled. A fresh visit or a
-       reload shows the laptop again. */
-    function latch() { latched = true; }
-    hot.addEventListener('click', () => { latch(); try { sessionStorage.setItem(KEY, '1'); } catch {} });
-    /* a reload is a fresh look: forget the Get Support return */
+    hot.addEventListener('click', () => { try { sessionStorage.setItem(KEY, '1'); } catch {} });
     const nav = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined;
-    const w = window as any;
-    if (!w.__hlLoadChecked) {                       // only for the real page load, not in-site navigation
-      w.__hlLoadChecked = true;
-      if (FLY_IN && nav && nav.type === 'reload') { try { sessionStorage.removeItem(KEY); } catch {} latched = false; }
+    const w0 = window as any;
+    if (!w0.__hlLoadChecked) {                          // only for the real page load, not in-site navigation
+      w0.__hlLoadChecked = true;
+      if (nav && nav.type === 'reload') { try { sessionStorage.removeItem(KEY); } catch {} }
     }
-    if (latched) settle();
+    let back = false;
+    try { back = sessionStorage.getItem(KEY) === '1'; sessionStorage.removeItem(KEY); } catch {}
+    if (back) requestAnimationFrame(() => {
+      const top = sec!.getBoundingClientRect().top + scrollY;
+      jump(top + sec!.offsetHeight - innerHeight);       // the film, filling the screen
+      loop();
+    });
 
     new IntersectionObserver(([e]) => {
       visible = e.isIntersecting;
-      if (visible) {
-        play(); loop();
-        if (done && !seen) { seen = true; sec!.classList.add('is-seen'); }
-      } else {
-        vid.pause();
-        if (latched && !done && sec!.getBoundingClientRect().bottom <= 0) settle();
-      }
-    }, { threshold: 0.12 }).observe(sec);
+      if (visible) { play(); loop(); } else vid.pause();
+    }, { threshold: 0.01 }).observe(sec);
 
     function frame() {
       raf = 0;
       if (!visible || !sec!.isConnected) return;
       const r = sec!.getBoundingClientRect();
       const p = reduced ? 0 : clamp(-r.top / Math.max(1, r.height - innerHeight));
-      let d = ease(clamp((p - 0.08) / 0.72)), w = clamp((p - 0.9) / 0.1);
-      if (d > 0.97 && !latched) latch();
-      if (latched && !done) { settle(); return; }
-      if (latched) { d = 1; w = 1; }                    // once filled, never zoom back out
-      title.style.opacity = latched ? '0' : String(1 - clamp(p / 0.16));
+      const d = ease(clamp((p - 0.08) / 0.92)), w = clamp((p - 0.86) / 0.14);
+      title.style.opacity = String(1 - clamp(p / 0.16));
       title.style.transform = `translateY(${-clamp(p / 0.16) * 60}px)`;
-      huds.forEach((h) => (h.style.opacity = latched ? '0' : String(1 - clamp(p / 0.25))));
-      /* The film carries its own burnt-in captions in the lower-left
-         ("04 · TEST — Hands-on diagnosis" and the rest of the sequence),
-         and at 110px this wave rose straight through them — the crest is
+      huds.forEach((h) => (h.style.opacity = String(1 - clamp(p / 0.25))));
+      /* The film carries its own burnt-in captions in the lower left
+         ("04 · TEST — Hands-on diagnosis" and the rest of the sequence).
+         At 110px this wave rose straight through them: its crest is
          highest at the left, which is exactly where that text sits.
-         Halved so the wave clears the caption band instead of eating it.
-         Cannot be solved by moving the text: it is video pixels. */
+         Halved so it clears the caption band. The text is video pixels,
+         so it cannot be moved — only the wave can give way. */
       wave.style.height = `${w * Math.min(62, Math.max(30, innerWidth * 0.034))}px`;
 
       const W = innerWidth, H = innerHeight, dw = dev.offsetWidth, dh = dev.offsetHeight, k = dw / 900;
       const Q = GLASS.map(([x, y]) => [x * k, y * k]);
-      const x0 = W > 900 ? W - dw - W * 0.03 : (W - dw) / 2;
+      /* never let the laptop cover the headline: start it clear of the text */
+      const copyRight = W > 900 ? title.getBoundingClientRect().right - (parseFloat(getComputedStyle(title).transform.split(',')[4] || '0') || 0) : 0;
+      const x0 = W > 900 ? Math.max(W - dw - W * 0.03, copyRight + 24 - dw * 0.1) : (W - dw) / 2;
       const y0 = W > 900 ? (H - dh) / 2 + H * 0.06 : H * 0.18;
       /* where the glass must end up: a 16:9 box covering the whole page */
       const cw = Math.max(W, H * 16 / 9) * 1.01, ch = cw * 9 / 16, cx = (W - cw) / 2, cy = (H - ch) / 2;
