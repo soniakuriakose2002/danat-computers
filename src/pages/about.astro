@@ -6,7 +6,7 @@ import PurposeOrbit from '@components/sections/PurposeOrbit.astro';
 import VideoModal from '@components/global/VideoModal.astro';
 import StoryCard from '@components/global/StoryCard.astro';
 import { site, branches, brands } from '@data/site';
-import { reviews, hasReviews } from '@data/reviews';
+import { reviews, hasReviews, type Review } from '@data/reviews';
 import { OMAN_SPOTS } from '@data/omanMap';
 import imgTech from '@assets/photos/repair-solder.jpg';
 import imgFilm from '@assets/photos/film-poster.jpg';
@@ -59,16 +59,29 @@ const proof = [
  * are not presented as named Danat staff, so no names are shown. Swap in
  * real staff photos (and add names) whenever they are available.
  *
- * The "Trusted by" review wall renders from src/data/reviews.ts, which
- * is empty, so it is hidden. Add real reviews there and it appears.
+ * ⚠ DRAFT — until src/data/reviews.ts holds real reviews, the "Trusted
+ * by" wall shows obvious placeholder cards with a draft note under them.
+ * Add real reviews there and they replace the placeholders.
  */
 /** Add the Director's name here to show it beside the message. */
 const director = { name: '' };
-/* Was a hand-flipped flag beside six invented placeholder quotes. It is
-   now derived: the wall shows when src/data/reviews.ts holds real
-   reviews and stays hidden when it does not, so the page cannot ship
-   fabricated testimonials by someone forgetting to flip a boolean. */
-const SHOW_REVIEWS = hasReviews;
+const SHOW_REVIEWS = true;
+/* Placeholder cards, visibly generic ("Customer name", "Customer review
+   goes here"), used only while there are no real reviews. */
+const placeholders: Review[] = [
+  { name: 'Customer name', branch: 'Ruwi', service: 'Laptop repair' },
+  { name: 'Business name', branch: 'Ruwi', service: 'Office network' },
+  { name: 'Customer name', branch: 'Sohar', service: 'Data recovery' },
+  { name: 'Customer name', branch: 'Sohar', service: 'Printer service' },
+  { name: 'Business name', branch: 'Salalah', service: 'CCTV installation' },
+  { name: 'Customer name', branch: 'Salalah', service: 'Laptop upgrade' },
+].map((p) => ({
+  ...p,
+  rating: 5,
+  source: 'google',
+  text: 'Customer review goes here — one or two sentences about the repair, the price or the service.',
+} as Review));
+const wallReviews = hasReviews ? reviews : placeholders;
 const whatWeDo = [
   { t: 'Computer & laptop sales', icon: 'laptop', href: '/services/computer-sales', tone: 'mint' },
   { t: 'Repairs & maintenance', icon: 'wrench', href: '/services/computer-repair', tone: 'sky' },
@@ -84,7 +97,7 @@ const team = [
   { img: teamBiz, role: 'Business support', note: 'Contracts, supply and on-site visits' },
 ];
 /* three columns for the moving "wall" of reviews */
-const cols = [0, 1, 2].map((c) => reviews.filter((_, i) => i % 3 === c));
+const cols = [0, 1, 2].map((c) => wallReviews.filter((_, i) => i % 3 === c));
 const mapOrder = ['sohar', 'ruwi', 'salalah'];
 const mapList = mapOrder.map((s) => branches.find((b) => b.slug === s)!);
 
@@ -287,6 +300,10 @@ const mapList = mapOrder.map((s) => branches.find((b) => b.slug === s)!);
         </div>
         {SHOW_REVIEWS && (
           <div class="shell">
+            <header class="aq__rh">
+              <p class="eb"><i class="eb__r" aria-hidden="true"></i>Customer reviews</p>
+              <h2 class="aq__h">What our <Mark as="highlight" tone="butter">customers say.</Mark></h2>
+            </header>
             <div class="aq__wall">
               {cols.map((col, c) => (
                 <div class="aq__col" style={`--dur:${[38, 46, 42][c]}s`}>
@@ -315,6 +332,7 @@ const mapList = mapOrder.map((s) => branches.find((b) => b.slug === s)!);
                 </div>
               ))}
             </div>
+            {!hasReviews && <p class="aq__draft">Draft — the reviews are placeholders. Replace them with real customer reviews (for example from Google) before going live.</p>}
           </div>
         )}
       </section>
@@ -941,6 +959,8 @@ const mapList = mapOrder.map((s) => branches.find((b) => b.slug === s)!);
      and not as five. Grey rather than absent, which keeps the row the
      same width on every card. */
   .aq__stars i { font-style: normal; color: rgb(0 0 0 / 0.16); }
+  .aq__rh { display: grid; justify-items: center; text-align: center; margin: 1rem 0 2.2rem; }
+  .aq__draft { margin-top: 1.2rem; text-align: center; font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.08em; color: #b26a00; }
   .aq__q blockquote { margin: 0; font-size: 0.95rem; line-height: 1.6; color: var(--text-3); }
   @media (max-width: 56rem) {
     .dr { grid-template-columns: 1fr; }
