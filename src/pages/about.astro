@@ -106,10 +106,22 @@ const mapList = mapOrder.map((s) => branches.find((b) => b.slug === s)!);
           <span class="ah__l"><span>Technology that keeps</span></span>
           <span class="ah__l"><span><Brush>businesses running.</Brush></span></span>
         </h1>
+        {/* VERBATIM — Danat's own "About Danat Computers" text from
+            danatcomputers.com/page/about. What stood here before was our
+            paraphrase of it. Do not edit the prose, and do not change
+            "Danat Computer Supermarket" to match the "Danat Computers"
+            used elsewhere on this site: that inconsistency is theirs to
+            settle, not ours to paper over. */}
         <p class="ah__p">
-          For over two decades, Danat Computers has been a trusted name in
-          computer products, services and business solutions across Oman. We
-          don't just sell technology — we keep it running.
+          For decades, Danat Computer Supermarket has been dedicated to
+          serving the computer repair and sales needs of Oman customers. Our
+          extensive experience in technology, coupled with a deep
+          understanding of our community, sets us apart. With tenacity and
+          passion, we handle everything. There&rsquo;s no problem we
+          can&rsquo;t solve. Choose us for prompt, correct, and
+          comprehensive solutions. At Danat Computer Supermarket, we pride
+          ourselves on our commitment to excellence and customer
+          satisfaction.
         </p>
         <div class="ah__acts">
           <button class="btn" type="button" data-story-open>
@@ -342,8 +354,16 @@ const mapList = mapOrder.map((s) => branches.find((b) => b.slug === s)!);
         <Image src={omanMap} alt="Map of Oman showing the Danat branches in Sohar, Ruwi and Salalah"
           widths={[428, 856]} sizes="(min-width: 62rem) 21rem, 62vw"
           quality={80} format="webp" loading="lazy" />
+        {/* A pin on a map should open that place on a map. These used to
+            go to /branches#slug, which is the branch's text entry, not its
+            location. Same OpenStreetMap link the homepage uses, and the
+            same zoom rule: 17 for Ruwi, whose street address is confirmed,
+            13 for Sohar and Salalah, where only the city is known —
+            zooming to a street we cannot vouch for would be inventing a
+            location. */}
         {mapList.map((b, i) => (
-          <a class="pr__pin" href={`/branches#${b.slug}`}
+          <a class="pr__pin" target="_blank" rel="noopener noreferrer"
+            href={`https://www.openstreetmap.org/?mlat=${b.geo.lat}&mlon=${b.geo.lon}#map=${b.geo.precise ? 17 : 13}/${b.geo.lat}/${b.geo.lon}`}
             style={`--i:${i}; --x:${OMAN_SPOTS[b.slug].x}%; --y:${OMAN_SPOTS[b.slug].y}%`}>
             <i aria-hidden="true"></i><span>{b.city.split(',')[0]}</span>
           </a>
