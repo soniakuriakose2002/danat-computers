@@ -46,7 +46,7 @@ const faces = [
     lead: 'A more connected tomorrow',
     h: ['A global leader in', 'technological solutions.'],
     accent: [1],
-    icon: 'eye', tone: 'sky',
+    icon: 'eye', tone: 'mint',
     summary: 'Our vision at Danat Group is to be a global leader in providing comprehensive and advanced technological solutions.',
     quote: 'A future where technology seamlessly integrates into every aspect of life, making it more efficient and enjoyable.',
     points: ['Consistently innovating and adapting to emerging trends', 'Fostering a culture of continuous improvement', 'Pushing boundaries and exceeding customer expectations', 'Recognised as a symbol of trust and reliability'],
@@ -60,7 +60,7 @@ const faces = [
     lead: 'What guides us always',
     h: ['Diagnose first.', 'Repair deeper.', 'Stand behind it.'],
     accent: [1],
-    icon: 'heart', tone: 'lilac',
+    icon: 'heart', tone: 'mint',
     summary: 'Free diagnosis before any quote. Faults traced to the component, not the board.',
     quote: 'Diagnose first. Repair deeper. Stand behind it.',
     points: ['Free diagnosis before any quote', 'Faults traced to the component rather than the board', 'Genuine parts from the same stock we sell', 'The same standard at every branch'],
@@ -662,7 +662,20 @@ const promises = [
   @keyframes podIn { from { opacity: 0; transform: translateY(24px) scale(0.96); } }
   @keyframes podOut { to { opacity: 0; transform: translateY(12px) scale(0.98); } }
   @keyframes podFade { from { opacity: 0; } }
-  .pod--mint { --t: #e3f3e6; --c: #1f8a4c; } .pod--sky { --t: #e4edfa; --c: #2d6fd0; } .pod--lilac { --t: #efe8f8; --c: #6f52c9; }
+  /* --c carries the display uses (headline accent, drop cap, quote mark,
+     icons) which are large or graphic and need only 3:1. --ci is the same
+     hue pushed dark enough for SMALL text: the 0.7rem mono kicker, the
+     nav and the current tab. --c alone was 3.8:1 on its own panel and
+     4.38:1 on white, both under the 4.5 those need.
+              tint      display   small-text ink (panel / white)
+     mint   #e3f3e6   #1f8a4c   #2f6429   6.13 / 7.06
+     sky    #e4edfa   #2d6fd0   #2a5cae   5.49 / 6.48
+     lilac  #efe8f8   #6f52c9   #5b43a8   6.25 / 7.47
+     All three faces currently use mint; sky and lilac are kept wired so
+     a per-face colour is one word in the faces array. */
+  .pod--mint { --t: #e3f3e6; --c: #1f8a4c; --ci: #2f6429; }
+  .pod--sky { --t: #e4edfa; --c: #2d6fd0; --ci: #2a5cae; }
+  .pod--lilac { --t: #efe8f8; --c: #6f52c9; --ci: #5b43a8; }
   .pod__x { position: absolute; top: 1rem; right: 1rem; z-index: 5; width: 40px; height: 40px; border: 0; border-radius: 50%; background: #fff; box-shadow: 0 6px 18px -8px rgb(0 0 0 / 0.3);
     font-size: 1.5rem; line-height: 1; cursor: pointer; transition: transform 0.3s var(--ease); }
   .pod__x:hover { transform: rotate(90deg); }
@@ -670,7 +683,7 @@ const promises = [
   .pod__side { position: relative; overflow: hidden; display: flex; flex-direction: column; padding: clamp(1.8rem, 4vw, 2.8rem); background: radial-gradient(120% 90% at 0% 0%, #fff 0%, var(--t) 65%); }
   .pod__big { position: absolute; right: -0.5rem; bottom: -2.5rem; font-size: var(--d1); font-weight: 800; letter-spacing: var(--tr1); line-height: 1; color: var(--c); opacity: 0.09; }
   .pod__ic { display: grid; place-items: center; width: 60px; height: 60px; border-radius: 18px; background: #fff; color: var(--c); box-shadow: 0 14px 30px -16px var(--c); }
-  .pod__k { margin-top: 1.4rem; font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--c); }
+  .pod__k { margin-top: 1.4rem; font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase; color: var(--ci); }
   .pod__h { margin-top: 0.6rem; font-size: var(--d5); font-weight: 700; letter-spacing: var(--tr5); line-height: 1.08; }
   .pod__h em { font-style: normal; color: var(--c); }
   .pod__tabs { position: relative; margin-top: auto; padding-top: 2rem; display: grid; gap: 0.35rem; }
@@ -678,7 +691,7 @@ const promises = [
     font-weight: 600; font-size: 0.95rem; color: var(--text-2); transition: background 0.25s, color 0.25s; }
   .pod__tabs button b { font-family: var(--font-mono); font-size: 0.72rem; color: var(--text-3); }
   .pod__tabs button:hover { background: rgb(255 255 255 / 0.6); }
-  .pod__tabs button[aria-current] { background: #fff; color: var(--c); box-shadow: 0 8px 20px -14px rgb(0 0 0 / 0.3); }
+  .pod__tabs button[aria-current] { background: #fff; color: var(--ci); box-shadow: 0 8px 20px -14px rgb(0 0 0 / 0.3); }
   .pod__main { overflow-y: auto; padding: clamp(1.8rem, 4vw, 3rem) clamp(1.6rem, 4vw, 3rem); }
   .pod__lead { font-size: 1rem; line-height: 1.8; color: var(--text-2); }
   .pod__lead::first-letter { float: left; margin: 0.35rem 0.5rem 0 0; font-size: 3.4rem; line-height: 0.8; font-weight: 800; color: var(--c); }
@@ -689,7 +702,7 @@ const promises = [
   .pod__list li { display: flex; align-items: center; gap: 0.7rem; padding: 0.75rem 1rem; border-radius: 14px; border: 1px solid rgb(0 0 0 / 0.07); font-size: 0.93rem; }
   .pod__list :global(svg) { flex: none; width: 26px; height: 26px; padding: 6px; border-radius: 50%; background: var(--t); color: var(--c); }
   .pod__nav { display: flex; justify-content: space-between; gap: 1rem; margin-top: 2rem; padding-top: 1.2rem; border-top: 1px solid rgb(0 0 0 / 0.07); }
-  .pod__nav button { border: 0; background: none; cursor: pointer; font-weight: 700; font-size: 0.9rem; color: var(--c); }
+  .pod__nav button { border: 0; background: none; cursor: pointer; font-weight: 700; font-size: 0.9rem; color: var(--ci); }
   .pod__nav button:hover span { display: inline-block; transform: translateX(3px); }
   /* content steps in each time a page opens */
   .pod__page.is-in :is(.pod__ic, .pod__k, .pod__h, .pod__lead, .pod__quote, .pod__pt) { animation: podUp 0.6s var(--ease) both; }
