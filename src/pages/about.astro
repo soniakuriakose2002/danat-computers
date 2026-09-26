@@ -4,7 +4,6 @@ import PageLayout from '@layouts/PageLayout.astro';
 import Icon from '@components/ui/Icon.astro';
 import PurposeOrbit from '@components/sections/PurposeOrbit.astro';
 import MeetTeam from '@components/sections/MeetTeam.astro';
-import Statements from '@components/sections/Statements.astro';
 import VideoModal from '@components/global/VideoModal.astro';
 import StoryCard from '@components/global/StoryCard.astro';
 import { site, branches, brands } from '@data/site';
@@ -145,9 +144,6 @@ const nudge: Record<string, string> = { sohar: '0%', hail: '-3.4%', ruwi: '2.8%'
       ))}
     </dl>
   </section>
-
-  {/* ══════ 02b · Danat's own words, verbatim from their live about page ══════ */}
-  <Statements />
 
   {/* ══════ 03 · journey — milestone cards stack up in 3D as you scroll ══════ */}
   <section class="aj" id="journey">

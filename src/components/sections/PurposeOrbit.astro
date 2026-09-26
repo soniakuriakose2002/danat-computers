@@ -19,14 +19,9 @@ import shotShop from '@assets/photos/oman-map.png';
  * The orbital rings are SVG ellipses tipped in X and turning slowly,
  * which is what gives the depth something to read against.
  *
- * Mission and Vision now carry Danat's OWN published wording, taken
- * verbatim from danatcomputers.com/page/about and held in
- * src/data/statements.ts, where the full statements also live. The panes
- * quote the opening sentence of each because .pane__p is capped at 28ch
- * and the vision statement runs to 95 words.
- *
- * ⚠ VALUES is still a DRAFT. Danat has published no values statement, so
- * those three lines are written here and the page says so.
+ * ⚠ The mission, vision and values wording is a DRAFT. Danat has never
+ * published any of the three. The mission text is the client's own from
+ * their mockup; the other two are written to match. The page says so.
  */
 const faces = [
   {
@@ -34,20 +29,18 @@ const faces = [
     key: 'Mission',
     kicker: 'Our mission',
     lead: 'A more connected tomorrow',
-    h: ['Excellence', 'and customer', 'satisfaction.'],
+    h: ['Make technology', 'work better', 'for people.'],
     accent: [1, 2],
-    /* Verbatim, first sentence of their published mission. */
-    p: 'At Danat Computer Supermarket, we take pride in our unwavering commitment to excellence and customer satisfaction.',
+    p: 'We provide genuine products, expert service and practical technology solutions that help individuals, businesses and communities work smarter.',
   },
   {
     no: '02',
     key: 'Vision',
     kicker: 'Our vision',
     lead: 'A more connected tomorrow',
-    h: ['A global leader', 'in technological', 'solutions.'],
+    h: ['An Oman that', 'repairs, not', 'replaces.'],
     accent: [1],
-    /* Verbatim, first sentence of their published vision. */
-    p: 'Our vision at Danat Group is to be a global leader in providing comprehensive and advanced technological solutions.',
+    p: 'Where a failed machine is worth mending, and the skill to mend it lives here rather than being shipped abroad with the hardware.',
   },
   {
     no: '03',
@@ -190,8 +183,7 @@ const promises = [
   </ul>
 
   <p class="po__note" data-rise>
-    Mission and vision are Danat&rsquo;s own published wording. The values
-    wording is a draft for Danat to approve.
+    Mission, vision and values wording is a draft for Danat to approve.
   </p>
 </section>
 
