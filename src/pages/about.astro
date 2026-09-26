@@ -66,21 +66,24 @@ const proof = [
 /** Add the Director's name here to show it beside the message. */
 const director = { name: '' };
 const SHOW_REVIEWS = true;
-/* Placeholder cards, visibly generic ("Customer name", "Customer review
-   goes here"), used only while there are no real reviews. */
+/* ⚠ SAMPLE REVIEWS — written for the design preview, not by customers.
+   The names are invented and none of these people exist. They show only
+   while src/data/reviews.ts is empty, and the draft note under the wall
+   says so. Replace them with real reviews before going live. */
 const placeholders: Review[] = [
-  { name: 'Customer name', branch: 'Ruwi', service: 'Laptop repair' },
-  { name: 'Business name', branch: 'Ruwi', service: 'Office network' },
-  { name: 'Customer name', branch: 'Sohar', service: 'Data recovery' },
-  { name: 'Customer name', branch: 'Sohar', service: 'Printer service' },
-  { name: 'Business name', branch: 'Salalah', service: 'CCTV installation' },
-  { name: 'Customer name', branch: 'Salalah', service: 'Laptop upgrade' },
-].map((p) => ({
-  ...p,
-  rating: 5,
-  source: 'google',
-  text: 'Customer review goes here — one or two sentences about the repair, the price or the service.',
-} as Review));
+  { name: 'Salim R.', branch: 'Ruwi', service: 'Laptop repair', rating: 5,
+    text: 'My laptop stopped charging and they found the fault the same afternoon. Clear price before starting, and it has worked perfectly since.' },
+  { name: 'Al Noor Trading', branch: 'Ruwi', service: 'Office network', rating: 5,
+    text: 'They cabled our whole office and set up the Wi-Fi without stopping our work. Very professional team.' },
+  { name: 'Fatma H.', branch: 'Sohar', service: 'Data recovery', rating: 5,
+    text: 'I thought all my photos were gone after my hard disk failed. They recovered almost everything. Thank you Danat!' },
+  { name: 'Ahmed K.', branch: 'Sohar', service: 'Printer service', rating: 4,
+    text: 'Printer was serviced and working well again. Took one day longer than expected but they kept me informed.' },
+  { name: 'Dhofar Star Services', branch: 'Salalah', service: 'CCTV installation', rating: 5,
+    text: 'Good advice on camera placement and a neat installation. We can now check the shop from our phones.' },
+  { name: 'Maryam S.', branch: 'Salalah', service: 'Laptop upgrade', rating: 5,
+    text: 'They added an SSD and more memory to my old laptop. It feels like a new machine, for much less than buying one.' },
+].map((p) => ({ ...p, source: 'google' } as Review));
 const wallReviews = hasReviews ? reviews : placeholders;
 const whatWeDo = [
   { t: 'Computer & laptop sales', icon: 'laptop', href: '/services/computer-sales', tone: 'mint' },
@@ -332,7 +335,7 @@ const mapList = mapOrder.map((s) => branches.find((b) => b.slug === s)!);
                 </div>
               ))}
             </div>
-            {!hasReviews && <p class="aq__draft">Draft — the reviews are placeholders. Replace them with real customer reviews (for example from Google) before going live.</p>}
+            {!hasReviews && <p class="aq__draft">Draft — these are sample reviews, not real customers. Replace them with real customer reviews (for example from Google) before going live.</p>}
           </div>
         )}
       </section>
