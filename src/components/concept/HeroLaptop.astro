@@ -218,14 +218,15 @@ import laptop from '@assets/products/laptop-original.png';   // the original pho
       title.style.opacity = String(1 - clamp(p / 0.16));
       title.style.transform = `translateY(${-clamp(p / 0.16) * 60}px)`;
       huds.forEach((h) => (h.style.opacity = String(1 - clamp(p / 0.25))));
-      /* Kept from 45f85bf, NOT from the package. The film carries its own
-         burnt-in captions in the lower left ("04 · TEST — Hands-on
-         diagnosis" and the rest of the sequence), and at the package's
-         110px this wave rises straight through them — its crest is
-         highest at the left, exactly where that text sits. The text is
-         video pixels, so only the wave can give way. Restore the 110/44/
-         0.06 line if the captions ever move out of that band. */
-      wave.style.height = `${w * Math.min(62, Math.max(30, innerWidth * 0.034))}px`;
+      /* The film carries its own burnt-in captions in the lower left
+         ("01 · DIAGNOSE — Full hardware scan" and the rest of the
+         sequence) and the wave's crest is highest on the left, exactly
+         where they sit. Shrinking the wave alone could not fix it:
+         anything short enough to clear the text was too short to see.
+         The film is lifted instead — see waveH below. */
+      const waveMax = Math.min(62, Math.max(30, innerWidth * 0.034));
+      const waveH = w * waveMax;
+      wave.style.height = `${waveH}px`;
 
       const W = innerWidth, H = innerHeight, dw = dev.offsetWidth, dh = dev.offsetHeight, k = dw / 900;
       const Q = GLASS.map(([x, y]) => [x * k, y * k]);
@@ -234,7 +235,20 @@ import laptop from '@assets/products/laptop-original.png';   // the original pho
       const x0 = W > 900 ? Math.max(W - dw - W * 0.03, copyRight + 24 - dw * 0.1) : (W - dw) / 2;
       const y0 = W > 900 ? (H - dh) / 2 + H * 0.06 : H * 0.18;
       /* where the glass must end up: a 16:9 box covering the whole page */
-      const cw = Math.max(W, H * 16 / 9) * 1.01, ch = cw * 9 / 16, cx = (W - cw) / 2, cy = (H - ch) / 2;
+      /* Sized so the vertical crop is ALWAYS at least the wave's full
+         height on each side. The old `max(W, H*16/9) * 1.01` gave only
+         1% of slack — 3px at 1024x650 — so lifting the film to clear the
+         wave simply had nowhere to go and the captions stayed covered.
+         Asking for H + 2*waveMax of film height guarantees the room.
+         waveMax, not the ramped waveH, so the film's size is fixed and
+         only its offset moves as the wave grows. */
+      const cw = Math.max(W, (H + 2 * waveMax) * 16 / 9) * 1.01;
+      const ch = cw * 9 / 16, cx = (W - cw) / 2;
+      /* Spend the bottom crop: the burnt-in captions rise out of the band
+         the wave covers, and the extra crop comes off the top, where the
+         film has nothing but background. */
+      const lift = Math.min(waveH, Math.max(0, (ch - H) / 2));
+      const cy = (H - ch) / 2 - lift;
       const R = [[cx, cy], [cx + cw, cy], [cx + cw, cy + ch], [cx, cy + ch]];
       const T = Q.map(([x, y], i) => [lerp(x + x0, R[i][0], d), lerp(y + y0, R[i][1], d)]);
       if (k !== lastK) { scr.style.transform = css(homography(RECT, Q)); lastK = k; }
