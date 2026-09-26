@@ -3,7 +3,6 @@ import { Image } from 'astro:assets';
 import PageLayout from '@layouts/PageLayout.astro';
 import Icon from '@components/ui/Icon.astro';
 import PurposeOrbit from '@components/sections/PurposeOrbit.astro';
-import Statements from '@components/sections/Statements.astro';
 import VideoModal from '@components/global/VideoModal.astro';
 import StoryCard from '@components/global/StoryCard.astro';
 import { site, branches, brands } from '@data/site';
@@ -103,10 +102,6 @@ const mapList = mapOrder.map((s) => branches.find((b) => b.slug === s)!);
           <span class="ah__l"><span>Technology that keeps</span></span>
           <span class="ah__l"><span><Brush>businesses running.</Brush></span></span>
         </h1>
-        {/* A short lead, deliberately. Danat's own "About Danat
-            Computers" text sat here for one commit while there was no
-            section carrying it; it is four sentences longer than this
-            space wants, and it now runs in full in <Statements />. */}
         <p class="ah__p">
           For over two decades, Danat Computers has been a trusted name in
           computer products, services and business solutions across Oman. We
@@ -178,9 +173,6 @@ const mapList = mapOrder.map((s) => branches.find((b) => b.slug === s)!);
       <p class="dmd__sig">— The Director, Danat Computers</p>
     </dialog>
   </section>
-
-  {/* ══════ 03b · in Danat's own words — the four statements, verbatim ══════ */}
-  <Statements />
 
   {/* ══════ 03 · journey — milestone cards stack up in 3D as you scroll ══════ */}
   <section class="aj" id="journey">
