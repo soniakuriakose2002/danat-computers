@@ -86,12 +86,12 @@ const placeholders: Review[] = [
 ].map((p) => ({ ...p, source: 'google' } as Review));
 const wallReviews = hasReviews ? reviews : placeholders;
 const whatWeDo = [
-  { t: 'Computer & laptop sales', icon: 'laptop', href: '/services/computer-sales', tone: 'mint' },
-  { t: 'Repairs & maintenance', icon: 'wrench', href: '/services/computer-repair', tone: 'sky' },
-  { t: 'Printers', icon: 'printer', href: '/services/printer-services', tone: 'butter' },
-  { t: 'CCTV & security', icon: 'camera', href: '/services/cctv-services', tone: 'blush' },
-  { t: 'Networking', icon: 'network', href: '/services/networking', tone: 'teal' },
-  { t: 'Business IT solutions', icon: 'building', href: '/business', tone: 'lilac' },
+  { t: 'Computer & laptop sales', d: 'Laptops, desktops, parts and accessories.', icon: 'laptop', href: '/services/computer-sales', tone: 'mint' },
+  { t: 'Repairs & maintenance', d: 'Laptops, desktops and MacBooks, down to the board.', icon: 'wrench', href: '/services/computer-repair', tone: 'sky' },
+  { t: 'Printers', d: 'Printer sales, servicing and repair.', icon: 'printer', href: '/services/printer-services', tone: 'butter' },
+  { t: 'CCTV & security', d: 'Camera systems for homes, shops and offices.', icon: 'camera', href: '/services/cctv-services', tone: 'blush' },
+  { t: 'Networking', d: 'Cabling, Wi-Fi and office networks.', icon: 'network', href: '/services/networking', tone: 'teal' },
+  { t: 'Business IT solutions', d: 'Supply and support for companies.', icon: 'building', href: '/business', tone: 'lilac' },
 ];
 const team = [
   { img: teamDesk, role: 'Service desk', note: 'First contact, diagnosis booking and quotes' },
@@ -259,10 +259,12 @@ const mapList = mapOrder.map((s) => branches.find((b) => b.slug === s)!);
       <ul class="wd__grid">
         {whatWeDo.map((w, i) => (
           <li data-rise style={`--d:${i * 60}ms`}>
-            <a class={`wd__i wd--${w.tone}`} href={w.href}>
-              <span class="wd__ic" aria-hidden="true"><Icon name={w.icon} size={22} /></span>
-              <b>{w.t}</b>
-              <span class="wd__go" aria-hidden="true"><Icon name="arrow" size={14} /></span>
+            <a class={`wd__i wd--${w.tone}`} href={w.href} style={`--k:${i}`}>
+              <span class="wd__bg" aria-hidden="true"><Icon name={w.icon} size={150} /></span>
+              <span class="wd__n" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+              <span class="wd__ic" aria-hidden="true"><Icon name={w.icon} size={26} /></span>
+              <span class="wd__txt"><b>{w.t}</b><small>{w.d}</small></span>
+              <span class="wd__go" aria-hidden="true"><Icon name="arrow" size={16} /></span>
             </a>
           </li>
         ))}
@@ -638,16 +640,35 @@ const mapList = mapOrder.map((s) => branches.find((b) => b.slug === s)!);
   .wd__head { display: grid; justify-items: center; text-align: center; margin-bottom: 2.4rem; }
   .wd__h { margin-top: var(--s4); font-size: var(--d5); font-weight: 700; letter-spacing: var(--tr5); line-height: 1.1; }
   .wd__grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
-  .wd__i { display: flex; align-items: center; gap: 1rem; padding: 1.2rem 1.3rem; border-radius: 18px; background: #fff; border: 1px solid rgb(0 0 0 / 0.07);
-    box-shadow: 0 16px 34px -28px rgb(20 40 25 / 0.4); color: inherit; text-decoration: none; transition: transform 0.35s var(--ease), box-shadow 0.35s, border-color 0.35s; }
-  .wd__i:hover { transform: translateY(-4px); box-shadow: 0 24px 46px -28px rgb(20 40 25 / 0.5); border-color: transparent; }
+  /* Tall tinted tiles: number top-left, icon top-right, text at the foot.
+     On hover a darker fill rises from the bottom, the text turns white
+     and the watermark icon slowly turns. */
+  .wd__i { position: relative; isolation: isolate; overflow: hidden; display: grid; grid-template-columns: 1fr auto; grid-template-rows: auto 1fr auto;
+    gap: 0.4rem 1rem; min-height: 15.5rem; padding: 1.5rem; border-radius: 24px; background: var(--t); color: var(--text); text-decoration: none;
+    transition: transform 0.45s var(--ease), box-shadow 0.45s var(--ease), color 0.35s; }
+  .wd__i::before { content: ''; position: absolute; inset: 0; z-index: -1; background: color-mix(in srgb, var(--c) 82%, #000);
+    clip-path: circle(0% at 90% 100%); transition: clip-path 0.6s cubic-bezier(0.7, 0, 0.2, 1); }
+  .wd__i:hover, .wd__i:focus-visible { transform: translateY(-6px); box-shadow: 0 30px 50px -30px color-mix(in srgb, var(--c) 70%, #000); color: #fff; }
+  .wd__i:hover::before, .wd__i:focus-visible::before { clip-path: circle(150% at 90% 100%); }
   .wd--mint { --t: var(--p-mint); --c: var(--p-mint-ink); } .wd--sky { --t: var(--p-sky); --c: var(--p-sky-ink); } .wd--butter { --t: var(--p-butter); --c: var(--p-butter-ink); }
   .wd--blush { --t: var(--p-blush); --c: var(--p-blush-ink); } .wd--teal { --t: #dff2f1; --c: #14878a; } .wd--lilac { --t: var(--p-lilac); --c: var(--p-lilac-ink); }
-  .wd__ic { display: grid; place-items: center; width: 48px; height: 48px; flex: none; border-radius: 14px; background: var(--t); color: var(--c); transition: transform 0.4s cubic-bezier(0.3, 1.6, 0.5, 1); }
-  .wd__i:hover .wd__ic { transform: rotate(-8deg) scale(1.08); }
-  .wd__i b { font-size: 1rem; letter-spacing: -0.015em; }
-  .wd__go { margin-left: auto; color: var(--c); transition: transform 0.3s var(--ease); }
-  .wd__i:hover .wd__go { transform: translateX(4px); }
+  .wd__bg { position: absolute; right: -2.2rem; bottom: -2.4rem; z-index: -1; color: var(--c); opacity: 0.1; transition: transform 1.2s var(--ease), opacity 0.4s, color 0.4s; }
+  .wd__i:hover .wd__bg { transform: rotate(-14deg) scale(1.1); opacity: 0.16; color: #fff; }
+  .wd__n { font-family: var(--font-mono); font-size: 0.8rem; letter-spacing: 0.12em; color: var(--c); transition: color 0.35s; }
+  .wd__i:hover .wd__n { color: rgb(255 255 255 / 0.75); }
+  .wd__ic { grid-column: 2; grid-row: 1; display: grid; place-items: center; width: 58px; height: 58px; border-radius: 18px; background: #fff; color: var(--c);
+    box-shadow: 0 10px 22px -14px rgb(0 0 0 / 0.35); animation: wd-float 5s ease-in-out infinite; animation-delay: calc(var(--k) * -0.8s);
+    transition: transform 0.45s cubic-bezier(0.3, 1.6, 0.5, 1); }
+  .wd__i:hover .wd__ic { transform: rotate(-10deg) scale(1.1); }
+  @keyframes wd-float { 50% { translate: 0 -6px; } }
+  .wd__txt { grid-column: 1 / -1; grid-row: 3; display: grid; gap: 0.35rem; padding-right: 3.2rem; }
+  .wd__txt b { font-size: 1.25rem; letter-spacing: -0.02em; line-height: 1.2; }
+  .wd__txt small { font-size: 0.9rem; line-height: 1.45; opacity: 0.72; }
+  .wd__go { position: absolute; right: 1.3rem; bottom: 1.4rem; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%;
+    background: #fff; color: var(--c); transition: transform 0.4s var(--ease); }
+  .wd__i:hover .wd__go { transform: rotate(-45deg) scale(1.08); }
+  @media (max-width: 36rem) { .wd__grid { grid-template-columns: 1fr; } }
+  @media (prefers-reduced-motion: reduce) { .wd__ic { animation: none; } .wd__i::before { transition: none; } }
   .wd__cta { display: flex; justify-content: center; margin-top: 2rem; }
 
   /* ───── 08 our people ───── */
@@ -972,6 +993,7 @@ const mapList = mapOrder.map((s) => branches.find((b) => b.slug === s)!);
     .dr__q { display: none; }
     .pp__in { grid-template-columns: 1fr; }
     .wd__grid { grid-template-columns: 1fr 1fr; }
+    .wd__i { min-height: 13rem; }
     .op__in { grid-template-columns: 1fr; }
     .ww__in { grid-template-columns: 1fr; }
     .mv__grid { grid-template-columns: 1fr; }
