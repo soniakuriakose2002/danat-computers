@@ -366,7 +366,7 @@ const mapList = mapOrder.map((s) => branches.find((b) => b.slug === s)!);
           the two homepage maps cannot drift apart. */}
       <figure class="pr__map" data-rise style="--d:90ms">
         <Image src={omanMap} alt="Map of Oman showing the Danat branches in Sohar, Ruwi and Salalah"
-          widths={[428, 856]} sizes="(min-width: 62rem) 21rem, 62vw"
+          widths={[480, 960]} sizes="(min-width: 62rem) 30rem, 80vw"
           quality={80} format="webp" loading="lazy" />
         {/* A pin on a map should open that place on a map. These used to
             go to /branches#slug, which is the branch's text entry, not its
@@ -375,8 +375,13 @@ const mapList = mapOrder.map((s) => branches.find((b) => b.slug === s)!);
             13 for Sohar and Salalah, where only the city is known —
             zooming to a street we cannot vouch for would be inventing a
             location. */}
+        {/* A dashed route drawn Sohar → Ruwi → Salalah through the same
+            OMAN_SPOTS the pins use, in the image's own % space. */}
+        <svg class="pr__route" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          <polyline points={mapList.map((b) => `${OMAN_SPOTS[b.slug].x},${OMAN_SPOTS[b.slug].y}`).join(' ')} />
+        </svg>
         {mapList.map((b, i) => (
-          <a class="pr__pin" target="_blank" rel="noopener noreferrer"
+          <a class="pr__pin" data-s={b.slug} target="_blank" rel="noopener noreferrer"
             href={`https://www.openstreetmap.org/?mlat=${b.geo.lat}&mlon=${b.geo.lon}#map=${b.geo.precise ? 17 : 13}/${b.geo.lat}/${b.geo.lon}`}
             style={`--i:${i}; --x:${OMAN_SPOTS[b.slug].x}%; --y:${OMAN_SPOTS[b.slug].y}%`}>
             <i aria-hidden="true"></i><span>{b.city.split(',')[0]}</span>
@@ -387,10 +392,11 @@ const mapList = mapOrder.map((s) => branches.find((b) => b.slug === s)!);
       <ul class="pr__list">
         {branches.map((b, i) => (
           <li data-rise style={`--d:${i * 60}ms`}>
-            <a class="br" href={`/branches#${b.slug}`}>
-              <span class="br__shot" aria-hidden="true"><i>Photo</i></span>
+            <a class="br" data-s={b.slug} href={`/branches#${b.slug}`}>
+              <span class="br__n" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+              <span class="br__ic" aria-hidden="true"><Icon name="pin" size={20} /></span>
               <span class="br__t"><b>{b.name}</b><em>{b.city}</em></span>
-              <span class="br__go" aria-hidden="true"><Icon name="arrow" size={15} /></span>
+              <span class="br__go" aria-hidden="true"><Icon name="arrow" size={16} /></span>
             </a>
           </li>
         ))}
@@ -851,7 +857,7 @@ const mapList = mapOrder.map((s) => branches.find((b) => b.slug === s)!);
   /* 21rem rather than the silhouette's 16rem: a real tile render carries
      coastline, borders and place names, and at 16rem none of that is
      legible — the whole point of using the real map. */
-  .pr__map { position: relative; width: 100%; max-width: 21rem; justify-self: center; margin: 0;
+  .pr__map { position: relative; width: 100%; max-width: 30rem; justify-self: center; margin: 0;
     padding: 0.4rem; border-radius: 22px; background: #eef3ec; border: 1px solid rgb(20 40 25 / 0.06);
     box-shadow: 0 26px 50px -38px rgb(40 50 45 / 0.4);
     opacity: 0; transition: opacity 760ms var(--ease) 100ms; }
@@ -893,37 +899,49 @@ const mapList = mapOrder.map((s) => branches.find((b) => b.slug === s)!);
      image, so that one hangs to the left of its dot instead. */
   .pr__pin:last-child { flex-direction: row-reverse; }
 
-  .pr__list { display: grid; gap: 0.6rem; }
-  .br {
-    display: flex; align-items: center; gap: 0.85rem;
-    padding: 0.65rem 0.9rem 0.65rem 0.65rem; border-radius: 14px;
-    background: rgb(255 255 255 / 0.86); backdrop-filter: blur(8px);
-    box-shadow: 0 1px 2px rgb(10 30 12 / 0.04), 0 10px 26px -20px rgb(10 30 12 / 0.28);
-    transition: transform var(--t2) var(--ease), box-shadow var(--t2) var(--ease);
-  }
-  .br:hover {
-    transform: translateX(4px);
-    box-shadow: 0 1px 2px rgb(10 30 12 / 0.04), 0 20px 38px -24px rgb(10 30 12 / 0.34);
-  }
-  /* Held frame — branch photography still to come. */
-  .br__shot {
-    display: grid; place-items: center; width: 56px; height: 44px; flex: none;
-    border: 1px dashed var(--line-light); border-radius: 10px;
-    background: var(--off);
-  }
-  .br__shot i {
-    font-style: normal; font-family: var(--font-mono); font-size: 0.5rem;
-    letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-3);
-  }
+  /* The route: drawn in once the map arrives, then its dashes keep
+     travelling so the three branches read as one connected network. */
+  .pr__route { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+  .pr__route polyline { fill: none; stroke: var(--green-deep); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
+    vector-effect: non-scaling-stroke; stroke-dasharray: 2 7; opacity: 0; transition: opacity 0.8s var(--ease) 0.5s; }
+  .pr__map[data-in] .pr__route polyline { opacity: 0.55; animation: pr-march 1.6s linear infinite; }
+  @keyframes pr-march { to { stroke-dashoffset: -18; } }
+  /* each pin breathes with a soft ring */
+  .pr__pin i { position: relative; }
+  .pr__pin i::after { content: ''; position: absolute; inset: 0; border-radius: 50%; border: 2px solid var(--green-deep);
+    animation: pr-ring 2.4s ease-out infinite; animation-delay: calc(var(--i) * 0.8s); }
+  @keyframes pr-ring { from { transform: scale(1); opacity: 0.7; } to { transform: scale(3.4); opacity: 0; } }
+  /* hovering a branch card lights up its pin on the map */
+  .pr__grid:has(.br[data-s='ruwi']:hover) .pr__pin[data-s='ruwi'] span,
+  .pr__grid:has(.br[data-s='sohar']:hover) .pr__pin[data-s='sohar'] span,
+  .pr__grid:has(.br[data-s='salalah']:hover) .pr__pin[data-s='salalah'] span { background: var(--green-deep); color: #fff; }
+  .pr__grid:has(.br[data-s='ruwi']:hover) .pr__pin[data-s='ruwi'],
+  .pr__grid:has(.br[data-s='sohar']:hover) .pr__pin[data-s='sohar'],
+  .pr__grid:has(.br[data-s='salalah']:hover) .pr__pin[data-s='salalah'] { scale: 1.25; }
+
+  .pr__list { display: grid; gap: 0.75rem; margin: 0; padding: 0; list-style: none; }
+  /* Branch cards: number, pin badge, name and region. On hover a deep
+     green fill slides in from the left and the text turns white. */
+  .br { position: relative; isolation: isolate; overflow: hidden; display: flex; align-items: center; gap: 1rem;
+    padding: 1rem 1.1rem; border-radius: 20px; background: #fff; color: var(--text); text-decoration: none;
+    border: 1px solid rgb(20 40 25 / 0.06); box-shadow: 0 14px 30px -24px rgb(10 30 12 / 0.4);
+    transition: transform 0.4s var(--ease), box-shadow 0.4s var(--ease), color 0.3s; }
+  .br::before { content: ''; position: absolute; inset: 0; z-index: -1; background: var(--green-deep);
+    transform: scaleX(0); transform-origin: left; transition: transform 0.5s cubic-bezier(0.7, 0, 0.2, 1); }
+  .br:hover, .br:focus-visible { transform: translateX(6px); color: #fff; box-shadow: 0 24px 40px -24px rgb(20 60 25 / 0.6); }
+  .br:hover::before, .br:focus-visible::before { transform: scaleX(1); }
+  .br__n { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.1em; color: var(--green-deep); transition: color 0.3s; }
+  .br:hover .br__n { color: rgb(255 255 255 / 0.7); }
+  .br__ic { display: grid; place-items: center; width: 48px; height: 48px; flex: none; border-radius: 15px;
+    background: var(--p-mint); color: var(--green-deep); transition: background 0.3s, color 0.3s, transform 0.45s cubic-bezier(0.3, 1.6, 0.5, 1); }
+  .br:hover .br__ic { background: #fff; transform: rotate(-10deg) scale(1.08); }
   .br__t { display: grid; min-width: 0; }
-  .br__t b { font-size: 0.9375rem; font-weight: 700; letter-spacing: -0.02em; }
-  .br__t em { margin-top: 0.1rem; font-style: normal; font-size: 0.75rem; color: var(--text-3); }
-  .br__go {
-    display: grid; place-items: center; width: 28px; height: 28px; flex: none;
-    margin-left: auto; border-radius: 50%; color: var(--green-deep);
-    transition: transform var(--t2) var(--ease);
-  }
-  .br:hover .br__go { transform: translateX(3px); }
+  .br__t b { font-size: 1.05rem; font-weight: 700; letter-spacing: -0.02em; }
+  .br__t em { margin-top: 0.15rem; font-style: normal; font-size: 0.8rem; opacity: 0.7; }
+  .br__go { display: grid; place-items: center; width: 38px; height: 38px; flex: none; margin-left: auto; border-radius: 50%;
+    background: var(--off); color: var(--green-deep); transition: transform 0.4s var(--ease), background 0.3s; }
+  .br:hover .br__go { background: #fff; transform: rotate(-45deg); }
+  @media (prefers-reduced-motion: reduce) { .pr__route polyline, .pr__pin i::after { animation: none; } }
 
 
   /* ───── 05b team (draft) ───── */
@@ -1030,7 +1048,10 @@ const mapList = mapOrder.map((s) => branches.find((b) => b.slug === s)!);
 
   /* ───── responsive ───── */
   @media (min-width: 62rem) {
-    .pr__grid { grid-template-columns: minmax(0, 0.85fr) minmax(0, 0.7fr) minmax(0, 1.1fr); }
+    .pr__grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: clamp(2rem, 6vw, 5rem); }
+    .pr__intro { grid-column: 1; grid-row: 1; align-self: end; }
+    .pr__list { grid-column: 1; grid-row: 2; align-self: start; }
+    .pr__map { grid-column: 2; grid-row: 1 / span 2; }
   }
   @media (max-width: 56rem) {
     .aj__line { grid-template-columns: 1fr; gap: 2rem; padding-left: 0; }
