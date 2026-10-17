@@ -447,7 +447,7 @@ const nudge: Record<string, string> = {
       form.addEventListener('submit', (e) => {
         e.preventDefault();
         if (!form.reportValidity()) return;
-        window.open(`https://wa.me/${WA}?text=${encodeURIComponent(compose())}`,
+        window.open(`https://api.whatsapp.com/send?phone=${WA}&text=${encodeURIComponent(compose())}`,
           '_blank', 'noopener');
       });
 

@@ -5,7 +5,7 @@ import Icon from '@components/ui/Icon.astro';
 import PurposeOrbit from '@components/sections/PurposeOrbit.astro';
 import VideoModal from '@components/global/VideoModal.astro';
 import StoryCard from '@components/global/StoryCard.astro';
-import { site, branches, brands } from '@data/site';
+import { site, branches, brands, mapLink } from '@data/site';
 import { reviews, hasReviews, type Review } from '@data/reviews';
 import { OMAN_SPOTS } from '@data/omanMap';
 import imgTech from '@assets/photos/repair-solder.jpg';
@@ -370,11 +370,7 @@ const mapList = mapOrder.map((s) => branches.find((b) => b.slug === s)!);
           quality={80} format="webp" loading="lazy" />
         {/* A pin on a map should open that place on a map. These used to
             go to /branches#slug, which is the branch's text entry, not its
-            location. Same OpenStreetMap link the homepage uses, and the
-            same zoom rule: 17 for Ruwi, whose street address is confirmed,
-            13 for Sohar and Salalah, where only the city is known —
-            zooming to a street we cannot vouch for would be inventing a
-            location. */}
+            location. mapLink() in site.ts builds it — see the note there. */}
         {/* A dashed route drawn Sohar → Ruwi → Salalah through the same
             OMAN_SPOTS the pins use, in the image's own % space. */}
         <svg class="pr__route" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
@@ -382,7 +378,7 @@ const mapList = mapOrder.map((s) => branches.find((b) => b.slug === s)!);
         </svg>
         {mapList.map((b, i) => (
           <a class="pr__pin" data-s={b.slug} target="_blank" rel="noopener noreferrer"
-            href={`https://www.openstreetmap.org/?mlat=${b.geo.lat}&mlon=${b.geo.lon}#map=${b.geo.precise ? 17 : 13}/${b.geo.lat}/${b.geo.lon}`}
+            href={mapLink(b)}
             style={`--i:${i}; --x:${OMAN_SPOTS[b.slug].x}%; --y:${OMAN_SPOTS[b.slug].y}%`}>
             <i aria-hidden="true"></i><span>{b.city.split(',')[0]}</span>
           </a>

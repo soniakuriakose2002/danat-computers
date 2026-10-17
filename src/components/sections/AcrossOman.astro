@@ -2,7 +2,7 @@
 import { Image } from 'astro:assets';
 import Icon from '@components/ui/Icon.astro';
 import imgMap from '@assets/photos/oman-map.png';
-import { site, whatsappLink, branches as allBranches } from '@data/site';
+import { site, whatsappLink, mapLink, branches as allBranches } from '@data/site';
 import { OMAN_PATH, OMAN_VIEWBOX, OMAN_PINS, OMAN_ROUTES } from '@data/omanMap';
 
 /** Where each photo card sits, nudged clear of its pin. */
@@ -110,7 +110,7 @@ const stats = [
             class="ao__spot"
             data-low={b.slug === 'salalah' ? '' : undefined}
             style={`--x:${SPOTS[b.slug].x}%; --y:${SPOTS[b.slug].y}%`}
-            href={`https://www.openstreetmap.org/?mlat=${b.geo.lat}&mlon=${b.geo.lon}#map=${b.geo.precise ? 16 : 12}/${b.geo.lat}/${b.geo.lon}`}
+            href={mapLink(b)}
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -165,7 +165,7 @@ const stats = [
             </a>
             <a
               class="ao__dir"
-              href={`https://www.openstreetmap.org/?mlat=${b.geo.lat}&mlon=${b.geo.lon}#map=${b.geo.precise ? 17 : 13}/${b.geo.lat}/${b.geo.lon}`}
+              href={mapLink(b)}
               target="_blank"
               rel="noopener noreferrer"
             >

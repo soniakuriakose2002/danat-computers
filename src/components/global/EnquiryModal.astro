@@ -231,7 +231,7 @@ const forms = [
         form.addEventListener('submit', (e) => {
           e.preventDefault();
           if (!form.reportValidity()) return;
-          window.open('https://wa.me/' + wa + '?text=' + encodeURIComponent(compose()),
+          window.open('https://api.whatsapp.com/send?phone=' + wa + '&text=' + encodeURIComponent(compose()),
             '_blank', 'noopener');
         });
 

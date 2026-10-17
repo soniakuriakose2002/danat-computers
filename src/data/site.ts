@@ -173,6 +173,19 @@ export const brands: string[][] = [
   ['Hikvision', 'Dahua', 'Uniview', 'EZVIZ', 'TP-Link', 'Zebra', 'AOC', 'Panasonic'],
 ];
 
+/* api.whatsapp.com rather than wa.me: some networks in Oman do not
+   resolve wa.me at all (DNS_PROBE_FINISHED_NXDOMAIN), while
+   whatsapp.com resolves wherever WhatsApp itself works. Same chat. */
 export function whatsappLink(message = site.whatsappMessage): string {
-  return `https://wa.me/${site.phone.whatsapp}?text=${encodeURIComponent(message)}`;
+  return `https://api.whatsapp.com/send?phone=${site.phone.whatsapp}&text=${encodeURIComponent(message)}`;
+}
+
+/* Google Maps rather than openstreetmap.org: OSM's site rate-limits
+   shared networks (Error 429), and Google Maps opens in the app on
+   phones. Ruwi's street address is confirmed, so it gets its exact
+   point; Sohar and Salalah are only known by city, so they search the
+   city rather than dropping a pin on a spot we cannot vouch for. */
+export function mapLink(b: { city: string; geo: { lat: number; lon: number; precise: boolean } }): string {
+  const q = b.geo.precise ? `${b.geo.lat},${b.geo.lon}` : `${b.city}, Oman`;
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}`;
 }

@@ -22,13 +22,11 @@ const services = (await getCollection('services')).sort(
 );
 
 /* A real map rather than the drawn outline used elsewhere on the site.
-   OpenStreetMap's own embed: no API key, no ad tracking and no cookie
-   banner, which is why it is this and not Google tiles. The bbox frames
-   Oman so all three cities are in view; it is deliberately not centred on
-   a single pin, because we hold city coordinates and not shop ones. */
-const mapEmbed =
-  'https://www.openstreetmap.org/export/embed.html' +
-  '?bbox=51.8,16.4,60.0,26.6&layer=mapnik';
+   Google's keyless embed: openstreetmap.org rate-limits shared networks
+   (Error 429), which left this panel blank in the shop. Centred and
+   zoomed to frame all of Oman, not one pin, because we hold city
+   coordinates and not shop ones. */
+const mapEmbed = 'https://www.google.com/maps?ll=21.0,56.5&z=6&output=embed';
 
 const kb = {
   wa: whatsappLink(),

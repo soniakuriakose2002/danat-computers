@@ -11,7 +11,7 @@
  * and the map were previously two unrelated things sitting side by side.
  */
 import { Image } from 'astro:assets';
-import { branches, whatsappLink } from '@data/site';
+import { branches, whatsappLink, mapLink } from '@data/site';
 import omanMap from '@assets/photos/oman-map.png';
 
 /* Pin positions on this map image (same values as AcrossOman.astro). */
@@ -42,7 +42,7 @@ const shown = branches.filter((b) => SPOTS[b.slug]);
             </div>
             <div class="bm__acts">
               <a class="bm__pill bm__pill--g" href={whatsappLink(`Hello Danat — I'd like to contact your ${b.name} branch about`)} target="_blank" rel="noopener noreferrer">WhatsApp</a>
-              <a class="bm__pill" href={`https://www.openstreetmap.org/?mlat=${b.geo.lat}&mlon=${b.geo.lon}#map=${b.geo.precise ? 17 : 13}/${b.geo.lat}/${b.geo.lon}`} target="_blank" rel="noopener noreferrer">Map</a>
+              <a class="bm__pill" href={mapLink(b)} target="_blank" rel="noopener noreferrer">Map</a>
             </div>
           </li>
         ))}
